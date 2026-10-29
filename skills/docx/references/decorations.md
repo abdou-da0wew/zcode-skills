@@ -113,8 +113,8 @@ function buildCoverR6(config) {
 
   // 5. Meta fields (tab-aligned label + value)
   for (const line of (config.metaLines || [])) {
-    // Expect "label：value" format or plain text
-    const sep = line.indexOf("：") !== -1 ? "：" : (line.indexOf(":") !== -1 ? ":" : null);
+    // Expect "label\uFF1Avalue" (fullwidth colon) format or plain text
+    const sep = line.indexOf("\uFF1A") !== -1 ? "\uFF1A" : (line.indexOf(":") !== -1 ? ":" : null);
     const label = sep ? line.split(sep)[0].trim() : line;
     const value = sep ? line.split(sep).slice(1).join(sep).trim() : "";
     children.push(new Paragraph({
@@ -416,7 +416,7 @@ function buildCoverR7(config) {
     spacing: { before: 600 },
     indent: { left: padL },
     children: [new TextRun({
-      text: "\uFF0B",  // ＋ fullwidth plus
+      text: "\uFF0B",  // fullwidth plus sign
       size: 40, bold: true, color: C.titleColor,
       font: { ascii: "Arial", eastAsia: "SimHei" },
     })],

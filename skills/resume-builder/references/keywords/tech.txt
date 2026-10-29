@@ -5,7 +5,7 @@ TypeScript
 Spring Boot
 Spring Cloud
 gRPC
-微服务
+microservices
 Kafka
 RabbitMQ
 Redis
@@ -21,16 +21,16 @@ Kubernetes
 Helm
 AWS
 GCP
-阿里云
-高并发
-高可用
-分布式
-一致性
-限流
-降级
-熔断
-分库分表
-读写分离
+Alibaba Cloud
+high concurrency
+high availability
+distributed systems
+consistency
+rate limiting
+graceful degradation
+circuit breaking
+database sharding
+read-write splitting
 React
 Vue
 Next.js
@@ -41,9 +41,9 @@ TensorFlow
 sklearn
 XGBoost
 LightGBM
-特征工程
+feature engineering
 RAG
-向量检索
+vector search
 Embedding
 LLM
 SFT
@@ -51,15 +51,15 @@ RLHF
 Agent
 MCP
 vLLM
-量化
+quantization
 SQL
 Spark
 Flink
 Hive
 Presto
 Airflow
-A/B 测试
-模型评估
+A/B testing
+model evaluation
 Prometheus
 Grafana
 ELK

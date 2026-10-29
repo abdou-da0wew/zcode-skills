@@ -32,11 +32,11 @@ flowchart: {
 
 The following constraints are enforced **when generating Mermaid flowchart code**, not as post-checks:
 
-1. **Node text must be wrapped in quotes**: `A["用户登录"]` ✅ / `A[用户登录]` ❌ — quotes prevent CJK special characters from causing parse errors
-2. **Max 10 CJK characters per line in node text**: exceed → use `<br>` to break → `A["用户身份<br>验证模块"]`
+1. **Node text must be wrapped in quotes**: `A["User login"]` ✅ / `A[User login]` ❌ — quotes prevent CJK special characters from causing parse errors
+2. **Max 10 CJK characters per line in node text**: exceed → use `<br>` to break → `A["User identity<br>verification module"]`
 3. **Max 5 nodes per subgraph**: exceed → split into multiple subgraphs or switch to CSS approach
 4. **Max 10 total nodes**: exceed → switch to CSS flowchart template in `references/playwright-css.md`
-5. **Max 6 CJK characters in connector labels**: `-->|验证通过|` ✅ / `-->|用户身份验证通过后跳转|` ❌
+5. **Max 6 CJK characters in connector labels**: `-->|validation passed|` ✅ / `-->|redirect after user identity validation|` ❌
 6. **Config params must use enlarged values**: `padding: 32, nodeSpacing: 80, rankSpacing: 80`
 
 ## Rendering Methods
@@ -246,10 +246,10 @@ The most common chart type. Supports directions: `TB` (top→bottom), `LR` (left
 
 ```mermaid
 flowchart TB
-    A[开始] --> B{条件判断}
-    B -->|是| C[执行操作A]
-    B -->|否| D[执行操作B]
-    C --> E[结束]
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Do action A]
+    B -->|No| D[Do action B]
+    C --> E[End]
     D --> E
 
     style A fill:#EFF6FF,stroke:#3B82F6,stroke-width:2px,color:#1E293B
@@ -276,16 +276,16 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    subgraph 前端["🖥️ 前端"]
-        A[React App] --> B[API 调用]
+    subgraph Frontend["🖥️ Frontend"]
+        A[React App] --> B[API calls]
     end
-    subgraph 后端["⚙️ 后端"]
+    subgraph Backend["⚙️ Backend"]
         C[FastAPI] --> D[(PostgreSQL)]
     end
     B --> C
 
-    style 前端 fill:#EFF6FF,stroke:#3B82F6,stroke-width:1px
-    style 后端 fill:#F0FDF4,stroke:#10B981,stroke-width:1px
+    style Frontend fill:#EFF6FF,stroke:#3B82F6,stroke-width:1px
+    style Backend fill:#F0FDF4,stroke:#10B981,stroke-width:1px
 ```
 
 ---
@@ -296,25 +296,25 @@ Shows interaction sequence between systems/actors.
 
 ```mermaid
 sequenceDiagram
-    actor 用户
-    participant 前端 as 🖥️ 前端
-    participant API as ⚙️ API 网关
-    participant DB as 🗄️ 数据库
+    actor User
+    participant Frontend as 🖥️ Frontend
+    participant API as ⚙️ API Gateway
+    participant DB as 🗄️ Database
 
-    用户->>前端: 点击登录
-    前端->>API: POST /auth/login
-    API->>DB: 查询用户
-    DB-->>API: 用户信息
+    User->>Frontend: Click login
+    Frontend->>API: POST /auth/login
+    API->>DB: Query user
+    DB-->>API: User info
     
-    alt 验证成功
-        API-->>前端: 200 + JWT Token
-        前端-->>用户: 跳转首页
-    else 验证失败
-        API-->>前端: 401 未授权
-        前端-->>用户: 显示错误提示
+    alt Validation succeeds
+        API-->>Frontend: 200 + JWT Token
+        Frontend-->>User: Redirect to home page
+    else Validation fails
+        API-->>Frontend: 401 Unauthorized
+        Frontend-->>User: Show error message
     end
     
-    Note over 前端,API: Token 有效期 24 小时
+    Note over Frontend,API: Token valid for 24 hours
 ```
 
 ### Arrow Types
@@ -332,23 +332,23 @@ sequenceDiagram
 
 ```mermaid
 flowchart TB
-    subgraph 用户层["👤 用户层"]
-        U1[Web 浏览器]
-        U2[移动 App]
+    subgraph UserLayer["👤 User layer"]
+        U1[Web browser]
+        U2[Mobile app]
     end
 
-    subgraph 接入层["🌐 接入层"]
+    subgraph AccessLayer["🌐 Access layer"]
         GW[API Gateway<br><small>Nginx + Rate Limit</small>]
-        LB[负载均衡<br><small>Round Robin</small>]
+        LB[Load balancer<br><small>Round Robin</small>]
     end
 
-    subgraph 服务层["⚙️ 微服务"]
-        S1[用户服务<br><small>FastAPI</small>]
-        S2[内容服务<br><small>FastAPI</small>]
-        S3[推荐服务<br><small>PyTorch</small>]
+    subgraph ServiceLayer["⚙️ Microservices"]
+        S1[User service<br><small>FastAPI</small>]
+        S2[Content service<br><small>FastAPI</small>]
+        S3[Recommendation service<br><small>PyTorch</small>]
     end
 
-    subgraph 数据层["🗄️ 数据层"]
+    subgraph DataLayer["🗄️ Data layer"]
         DB[(PostgreSQL)]
         RD[(Redis Cache)]
         ES[(Elasticsearch)]
@@ -361,10 +361,10 @@ flowchart TB
     S2 --> DB & ES
     S3 --> RD & ES
 
-    style 用户层 fill:#EFF6FF,stroke:#3B82F6,stroke-width:1.5px
-    style 接入层 fill:#FFF7ED,stroke:#F59E0B,stroke-width:1.5px
-    style 服务层 fill:#F0FDF4,stroke:#10B981,stroke-width:1.5px
-    style 数据层 fill:#F5F3FF,stroke:#8B5CF6,stroke-width:1.5px
+    style UserLayer fill:#EFF6FF,stroke:#3B82F6,stroke-width:1.5px
+    style AccessLayer fill:#FFF7ED,stroke:#F59E0B,stroke-width:1.5px
+    style ServiceLayer fill:#F0FDF4,stroke:#10B981,stroke-width:1.5px
+    style DataLayer fill:#F5F3FF,stroke:#8B5CF6,stroke-width:1.5px
 ```
 
 ---
@@ -373,22 +373,22 @@ flowchart TB
 
 ```mermaid
 gantt
-    title 项目里程碑计划
+    title Project Milestone Plan
     dateFormat YYYY-MM-DD
     axisFormat %m/%d
 
-    section 需求阶段
-    需求调研           :done,    req1, 2024-01-01, 14d
-    需求评审           :done,    req2, after req1, 3d
+    section Requirements
+    Requirements research   :done,    req1, 2024-01-01, 14d
+    Requirements review     :done,    req2, after req1, 3d
 
-    section 开发阶段
-    后端开发           :active,  dev1, after req2, 21d
-    前端开发           :active,  dev2, after req2, 18d
-    联调测试           :         dev3, after dev1, 7d
+    section Development
+    Backend development     :active,  dev1, after req2, 21d
+    Frontend development    :active,  dev2, after req2, 18d
+    Integration testing     :         dev3, after dev1, 7d
 
-    section 上线阶段
-    灰度发布           :         rel1, after dev3, 3d
-    全量上线           :milestone, rel2, after rel1, 0d
+    section Launch
+    Staged rollout          :         rel1, after dev3, 3d
+    Full release            :milestone, rel2, after rel1, 0d
 ```
 
 ---
@@ -416,8 +416,8 @@ classDiagram
         +int stock
     }
 
-    User "1" --> "*" Order : 下单
-    Order "*" --> "*" Product : 包含
+    User "1" --> "*" Order : places order
+    Order "*" --> "*" Product : contains
 ```
 
 ---
@@ -453,9 +453,9 @@ erDiagram
         int stock
     }
 
-    USER ||--o{ ORDER : "下单"
-    ORDER ||--|{ ORDER_ITEM : "包含"
-    PRODUCT ||--o{ ORDER_ITEM : "被购买"
+    USER ||--o{ ORDER : "places"
+    ORDER ||--|{ ORDER_ITEM : "contains"
+    PRODUCT ||--o{ ORDER_ITEM : "is purchased in"
 ```
 
 ---
@@ -560,12 +560,12 @@ Mermaid mindmap doesn't support `style`/`classDef`, but you can greatly improve 
 <div id="diagram">
   <pre class="mermaid">
 mindmap
-    root((你的主题))
-        一级分支1
-            二级内容A
-            二级内容B
-        一级分支2
-            二级内容C
+    root((Your topic))
+        Level-1 branch 1
+            Level-2 content A
+            Level-2 content B
+        Level-1 branch 2
+            Level-2 content C
   </pre>
 </div>
 <script>
@@ -617,23 +617,23 @@ When content complexity exceeds Mermaid mindmap's comfort zone, **auto-switch to
 
 ```mermaid
 mindmap
-    root((AI 内容运营))
-        选题策划
-            热点扫描
-            竞品分析
-            用户调研
-        内容生产
-            长文
-            短文
-            视频
-        渠道分发
-            微信生态
-            小红书
-            B站
-        数据运营
-            数据分析
-            评论互动
-            持续优化
+    root((AI content operations))
+        Topic planning
+            Trend scanning
+            Competitor analysis
+            User research
+        Content production
+            Long-form articles
+            Short posts
+            Videos
+        Channel distribution
+            WeChat ecosystem
+            Xiaohongshu
+            Bilibili
+        Data operations
+            Data analysis
+            Comment engagement
+            Continuous optimization
 ```
 
 ### Known Limitations of Mermaid Mindmap
@@ -652,13 +652,13 @@ mindmap
 
 ```mermaid
 stateDiagram-v2
-    [*] --> 草稿
-    草稿 --> 审核中 : 提交审核
-    审核中 --> 已发布 : 审核通过
-    审核中 --> 草稿 : 退回修改
-    已发布 --> 已下架 : 违规/过期
-    已下架 --> 草稿 : 重新编辑
-    已发布 --> [*] : 永久删除
+    [*] --> Draft
+    Draft --> InReview : submit for review
+    InReview --> Published : approved
+    InReview --> Draft : sent back for revision
+    Published --> Delisted : violation/expired
+    Delisted --> Draft : re-edited
+    Published --> [*] : permanently deleted
 ```
 
 ---
@@ -670,17 +670,17 @@ gitGraph
     commit id: "init"
     branch develop
     checkout develop
-    commit id: "feat: 用户模块"
-    commit id: "feat: 订单模块"
+    commit id: "feat: user module"
+    commit id: "feat: order module"
     branch feature/payment
     checkout feature/payment
-    commit id: "feat: 支付接入"
-    commit id: "fix: 金额精度"
+    commit id: "feat: payment integration"
+    commit id: "fix: amount precision"
     checkout develop
-    merge feature/payment id: "merge: 支付"
+    merge feature/payment id: "merge: payment"
     checkout main
     merge develop id: "release: v1.0"
-    commit id: "hotfix: 安全补丁" type: REVERSE
+    commit id: "hotfix: security patch" type: REVERSE
 ```
 
 ---
@@ -690,7 +690,7 @@ gitGraph
 ### Single Node Style
 
 ```mermaid
-style 节点ID fill:#EFF6FF,stroke:#3B82F6,stroke-width:2px,color:#1E293B
+style nodeID fill:#EFF6FF,stroke:#3B82F6,stroke-width:2px,color:#1E293B
 ```
 
 ### Batch Styles (classDef)
@@ -701,9 +701,9 @@ flowchart LR
     classDef green fill:#F0FDF4,stroke:#10B981,stroke-width:1.5px,color:#1E293B
     classDef amber fill:#FFF7ED,stroke:#F59E0B,stroke-width:1.5px,color:#1E293B
 
-    A[步骤1]:::blue --> B{判断}:::amber
-    B -->|是| C[结果A]:::green
-    B -->|否| D[结果B]:::green
+    A[Step 1]:::blue --> B{Decision}:::amber
+    B -->|Yes| C[Result A]:::green
+    B -->|No| D[Result B]:::green
 ```
 
 ### Connector Styles
@@ -763,7 +763,7 @@ flowchart: { padding: 16, nodeSpacing: 50, rankSpacing: 60 }
 
 Use `<br>` tags:
 ```mermaid
-A[第一行<br>第二行<br><small>小字注释</small>]
+A[Line one<br>Line two<br><small>small footnote</small>]
 ```
 
 ### Q: Flowchart node text truncated or overlapping?
@@ -779,8 +779,8 @@ A[第一行<br>第二行<br><small>小字注释</small>]
 **Correct approach for long-text nodes**:
 ```mermaid
 flowchart LR
-    A["这是一段比较长的<br>需要换行的文字"]
-    B["用引号包裹节点文字<br>可以使用 HTML 标签"]
+    A["This is a fairly long text<br>that needs line wrapping"]
+    B["Quoted node text<br>can use HTML tags"]
 ```
 
 **Key configuration**:

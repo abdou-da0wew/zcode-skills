@@ -1,0 +1,1176 @@
+     1→     1→# AMiner Open Platform API Complete Reference
+     2→     2→
+     3→     3→**Base URL**: `https://publicapi.chatglm.cn/chatglm_public/skill/aminer`  
+     4→     4→**Authentication**: All endpoints should default to `Authorization: ${AMINER_API_KEY}` and include `X-Platform: openclaw` in the request headers.  
+     5→     5→**Token**: Log in to the [Console](https://open.aminer.cn/open/board?tab=control) to generate one, then export it as `AMINER_API_KEY`.
+     6→     6→
+     7→     7→---
+     8→     8→
+     9→     9→## Table of Contents
+    10→    10→
+    11→    11→- [Paper APIs (9)](#paper-apis)
+    12→    12→- [Scholar APIs (6)](#scholar-apis)
+    13→    13→- [Institution APIs (7)](#institution-apis)
+    14→    14→- [Journal APIs (3)](#journal-apis)
+    15→    15→- [Patent APIs (3)](#patent-apis)
+    16→    16→
+    17→    17→---
+    18→    18→
+    19→    19→## Paper APIs
+    20→    20→
+    21→    21→### 1. Paper Search
+    22→    22→
+    23→    23→- **URL**: `GET /api/paper/search`
+    24→    24→- **Price**: Free
+    25→    25→- **Description**: Search by paper title; returns low-cost screening fields such as paper ID, title, DOI, venue, first author, citation bucket, and year.
+    26→    26→
+    27→    27→**Request Parameters:**
+    28→    28→
+    29→    29→| Parameter | Type | Required | Description |
+    30→    30→|--------|------|------|------|
+    31→    31→| page | number | Yes | Page number (current online definition says it starts at 1) |
+    32→    32→| size | number | No | Items per page, maximum 20 |
+    33→    33→| title | string | Yes | Paper title |
+    34→    34→
+    35→    35→**Response Fields:**
+    36→    36→
+    37→    37→| Field | Description |
+    38→    38→|--------|------|
+    39→    39→| id | Paper ID |
+    40→    40→| title | Paper title |
+    41→    41→| title_zh | Paper title (Chinese) |
+    42→    42→| doi | DOI |
+    43→    43→| first_author | First author |
+    44→    44→| n_citation_bucket | Citation bucket: `0`, `1-10`, `11-50`, `51-200`, `200-1000`, `1000-5000`, `5000+` |
+    45→    45→| venue_name | Venue title |
+    46→    46→| year | Publication year |
+    47→    47→| total | Total count |
+    48→    48→
+    49→    49→**curl Example:**
+    50→    50→```bash
+    51→    51→curl -X GET \
+    52→    52→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/search?page=1&size=10&title=Looking+at+CTR+Prediction+Again%3A+Is+Attention+All+You+Need' \
+    53→    53→  -H 'Authorization: ${AMINER_API_KEY}' \
+    54→    54→  -H 'X-Platform: openclaw'
+    55→    55→```
+    56→    56→
+    57→    57→---
+    58→    58→
+    59→    59→### 2. Paper Search Pro
+    60→    60→
+    61→    61→- **URL**: `GET /api/paper/search/pro`
+    62→    62→- **Price**: ¥0.01/call
+    63→    63→- **Description**: Multi-condition search; supports filtering by keyword, abstract, author, institution, and journal.
+    64→    64→
+    65→    65→**Request Parameters:**
+    66→    66→
+    67→    67→| Parameter | Type | Required | Description |
+    68→    68→|--------|------|------|------|
+    69→    69→| page | number | No | Page number (starts at 0) |
+    70→    70→| size | number | No | Items per page |
+    71→    71→| title | string | No | Title keyword |
+    72→    72→| keyword | string | No | Keyword |
+    73→    73→| abstract | string | No | Abstract keyword |
+    74→    74→| author | string | No | Author name |
+    75→    75→| org | string | No | Institution name |
+    76→    76→| venue | string | No | Journal name |
+    77→    77→| order | string | No | Sort field: `year` (descending by year) or `n_citation` (descending by citations); omit for composite ranking |
+    78→    78→
+    79→    79→**Response Fields:**
+    80→    80→
+    81→    81→| Field | Description |
+    82→    82→|--------|------|
+    83→    83→| id | Paper ID |
+    84→    84→| title | Title (English) |
+    85→    85→| title_zh | Title (Chinese) |
+    86→    86→| doi | DOI |
+    87→    87→| total | Total count |
+    88→    88→
+    89→    89→**curl Example:**
+    90→    90→```bash
+    91→    91→curl -X GET \
+    92→    92→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/search/pro?title=transformer&author=Vaswani&order=n_citation&page=0&size=5' \
+    93→    93→  -H 'Authorization: ${AMINER_API_KEY}' \
+    94→    94→  -H 'X-Platform: openclaw'
+    95→    95→```
+    96→    96→
+    97→    97→---
+    98→    98→
+    99→    99→### 3. Paper QA Search
+   100→   100→
+   101→   101→- **URL**: `POST /api/paper/qa/search`
+   102→   102→- **Price**: ¥0.05/call
+   103→   103→- **Description**: AI-powered intelligent Q&A search; supports natural language queries and structured keyword search.
+   104→   104→
+   105→   105→**Request Parameters:**
+   106→   106→
+   107→   107→| Parameter | Type | Required | Description |
+   108→   108→|--------|------|------|------|
+   109→   109→| use_topic | boolean | Yes | When `true`, searches with topic fields and/or keywords extracted from `query`; when `false`, only `title`/`doi` are read and `query` is ignored. Set `true` for any `query` or topic search. |
+   110→   110→| topic_high | string | No | Valid when use_topic=true; keywords that must match (AND logic). Nested array format: `[["termA","termB"],["termC"]]` — outer AND, inner OR. |
+   111→   111→| topic_middle | string | No | Strongly boosted terms; same format as topic_high. |
+   112→   112→| topic_low | string | No | Weakly boosted terms; same format as topic_high. |
+   113→   113→| title | []string | No | Title query; the only text field read when use_topic=false. |
+   114→   114→| doi | string | No | Exact DOI query. |
+   115→   115→| year | []number | No | Year filter array. |
+   116→   116→| sci_flag | boolean | No | Return SCI papers only. |
+   117→   117→| n_citation_flag | boolean | No | Boost papers with high citation counts. |
+   118→   118→| size | number | No | Maximum number of results to return. |
+   119→   119→| offset | number | No | Offset. |
+   120→   120→| force_citation_sort | boolean | No | Sort entirely by citation count. |
+   121→   121→| force_year_sort | boolean | No | Sort entirely by year. |
+   122→   122→| author_terms | []string | No | Author name query; OR relationship within array; include multiple variants. |
+   123→   123→| org_terms | []string | No | Institution name query; OR relationship within array. |
+   124→   124→| author_id | []string | No | Author entity ID filter; accepts single ID or ID list. OR relationship with author_terms when both are provided. |
+   125→   125→| org_id | []string | No | Institution entity ID filter; accepts single ID or ID list. OR relationship with org_terms when both are provided. |
+   126→   126→| venue_ids | []string | No | Conference/journal ID list filter. |
+   127→   127→| query | string | No | Raw natural language question (slower); system auto-extracts keywords. Takes precedence over topic_high when both are provided. Only effective with use_topic=true; with `false` it is silently ignored and the call returns 403 "no data". |
+   128→   128→
+   129→   129→**Response Fields:**
+   130→   130→
+   131→   131→| Field | Description |
+   132→   132→|--------|------|
+   133→   133→| data | Paper ID list |
+   134→   134→| id | Paper ID |
+   135→   135→| title | Paper title |
+   136→   136→| title_zh | Title (Chinese) |
+   137→   137→| doi | DOI |
+   138→   138→| Total / total | Total count |
+   139→   139→
+   140→   140→**curl Example (natural language Q&A):**
+   141→   141→```bash
+   142→   142→curl -X POST \
+   143→   143→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/qa/search' \
+   144→   144→  -H 'Content-Type: application/json;charset=utf-8' \
+   145→   145→  -H 'Authorization: ${AMINER_API_KEY}' \
+   146→   146→  -H 'X-Platform: openclaw' \
+   147→   147→  -d '{"use_topic": true, "query": "deep learning protein structure prediction", "size": 10, "sci_flag": true}'
+   148→   148→```
+   149→   149→
+   150→   150→**curl Example (structured keywords):**
+   151→   151→```bash
+   152→   152→curl -X POST \
+   153→   153→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/qa/search' \
+   154→   154→  -H 'Content-Type: application/json;charset=utf-8' \
+   155→   155→  -H 'Authorization: ${AMINER_API_KEY}' \
+   156→   156→  -H 'X-Platform: openclaw' \
+   157→   157→  -d '{
+   158→   158→    "use_topic": true,
+   159→   159→    "topic_high": "[[\\"transformer\\",\\"self-attention\\"],[\\"protein folding\\"]]",
+   160→   160→    "topic_middle": "[[\"AlphaFold\"]]",
+   161→   161→    "sci_flag": true,
+   162→   162→    "force_citation_sort": true,
+   163→   163→    "size": 10
+   164→   164→  }'
+   165→   165→```
+   166→   166→
+   167→   167→> **Prefer Paper QA Search Pro; use this legacy endpoint sparingly.**  
+   168→   168→> Default almost all paper Q&A / topic / filter searches to **Paper QA Search Pro**. Keep this legacy API **only** for `topic_high/topic_middle/topic_low` structured OR/AND mode that Pro does not support. Do not start with this endpoint by default.
+   169→   169→
+   170→   170→---
+   171→   171→
+   172→   172→### 3b. Paper QA Search Pro
+   173→   173→
+   174→   174→> **Preferred default** for paper Q&A / topic / multi-filter search. Prefer this over legacy Paper QA Search whenever possible.
+   175→   175→
+   176→   176→- **URL**: `POST /api/v3/paper/qa/searchPro`
+   177→   177→- **Price**: ¥0.70/call
+   178→   178→- **Description**: Upgraded paper Q&A search. Supports natural-language understanding (`query_type=auto`), author/org/venue/year/citation filters, boolean terms, and cursor pagination. Default page size is fixed at **10** (not client-configurable on the open platform). Card response returns compact fields only.
+   179→   179→
+   180→   180→**Request Parameters:**
+   181→   181→
+   182→   182→| Parameter | Type | Required | Description |
+   183→   183→|--------|------|------|------|
+   184→   184→| query | string | No | Search text, max 500. Required when `query_type` is not `auto`. |
+   185→   185→| query_type | string | No | `auto` / `topic` / `keywords` / `title` / `identifier`. Default `auto`. |
+   186→   186→| cursor | string | No | Pagination cursor (16–256 chars). On next page, request body may contain **only** `cursor`. |
+   187→   187→| authors | []string | No | Author names; OR within list; max 100 |
+   188→   188→| author_ids | []string | No | Author IDs; OR with `authors` |
+   189→   189→| organizations | []string | No | Organization names; OR within list |
+   190→   190→| organization_ids | []string | No | Organization IDs; OR with `organizations` |
+   191→   191→| venues | []string | No | Venue names, e.g. `["NeurIPS"]` |
+   192→   192→| venue_ids | []string | No | Venue IDs; OR with `venues` |
+   193→   193→| year_values | []number | No | Exact years; mutually exclusive with `year_from`/`year_to` |
+   194→   194→| year_from | number | No | Start year (inclusive) |
+   195→   195→| year_to | number | No | End year (inclusive); must be ≥ `year_from` |
+   196→   196→| languages | []string | No | Hard language filter, e.g. `["en","zh"]` |
+   197→   197→| language_preference | string | No | Soft preference boost: `zh` / `en` |
+   198→   198→| has_chinese_title | boolean | No | Require / forbid Chinese title |
+   199→   199→| has_abstract | boolean | No | Require / forbid abstract |
+   200→   200→| min_citations | number | No | Minimum citation count (inclusive) |
+   201→   201→| max_citations | number | No | Maximum citation count (inclusive) |
+   202→   202→| all_terms | []string | No | All terms must match; max 20 |
+   203→   203→| any_terms | []string | No | At least one term must match |
+   204→   204→| exclude_terms | []string | No | Exclude if any term matches |
+   205→   205→| search_in | string | No | Scope for all/any/exclude only: `all` / `title` / `title_keywords` / `abstract` |
+   206→   206→| paper_ids | []string | No | Restrict to paper IDs |
+   207→   207→| exclude_paper_ids | []string | No | Exclude paper IDs |
+   208→   208→| dois | []string | No | DOI filter |
+   209→   209→| sort | string | No | `relevance` / `balanced` / `recent` / `citation` |
+   210→   210→
+   211→   211→**Response Fields (open-platform envelope):**
+   212→   212→
+   213→   213→| Field | Description |
+   214→   214→|--------|------|
+   215→   215→| success | Whether the call succeeded |
+   216→   216→| code | HTTP-style status: 200/400/410/500/502/503/504 |
+   217→   217→| message / msg | Status text; success often `"success"` or empty |
+   218→   218→| data | Business payload; usually `null` on failure |
+   219→   219→| data.items | Paper list (card view, compact fields only) |
+   220→   220→| data.items[].paper_id | Paper ID |
+   221→   221→| data.items[].title | Title (English/original) |
+   222→   222→| data.items[].title_zh | Title (Chinese) |
+   223→   223→| data.items[].authors[].name | Author English name |
+   224→   224→| data.items[].authors[].name_zh | Author Chinese name |
+   225→   225→| data.items[].year | Publication year (may be omitted) |
+   226→   226→| data.total.value | Hit count estimate |
+   227→   227→| data.total.relation | `eq` / `gte` / `unknown` |
+   228→   228→| data.next_cursor | Next-page cursor; null/omitted when no more pages |
+   229→   229→| data.warnings | Business warnings (`code` / `message`) |
+   230→   230→
+   231→   231→**Notes:**
+   232→   232→- Page size is fixed at 10; do **not** send `size` / `view` / `facets` / internal debug flags.
+   233→   233→- Pagination: first page → read `next_cursor` → next page body is `{"cursor":"..."}` only.
+   234→   234→- Always append paper URL: `https://www.aminer.cn/pub/{paper_id}`.
+   235→   235→
+   236→   236→**curl Example:**
+   237→   237→```bash
+   238→   238→curl -X POST \
+   239→   239→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/v3/paper/qa/searchPro' \
+   240→   240→  -H 'Content-Type: application/json;charset=utf-8' \
+   241→   241→  -H 'Authorization: ${AMINER_API_KEY}' \
+   242→   242→  -H 'X-Platform: openclaw' \
+   243→   243→  -d '{
+   244→   244→    "query": "大模型比较新的高引论文",
+   245→   245→    "query_type": "auto",
+   246→   246→    "sort": "balanced",
+   247→   247→    "year_from": 2024,
+   248→   248→    "min_citations": 30
+   249→   249→  }'
+   250→   250→```
+   251→   251→
+   252→   252→**curl Example (next page):**
+   253→   253→```bash
+   254→   254→curl -X POST \
+   255→   255→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/v3/paper/qa/searchPro' \
+   256→   256→  -H 'Content-Type: application/json;charset=utf-8' \
+   257→   257→  -H 'Authorization: ${AMINER_API_KEY}' \
+   258→   258→  -H 'X-Platform: openclaw' \
+   259→   259→  -d '{"cursor":"<NEXT_CURSOR_FROM_PREVIOUS_RESPONSE>"}'
+   260→   260→```
+   261→   261→
+   262→   262→---
+   263→   263→
+   264→   264→### 4. Paper Info
+   265→   265→
+   266→   266→- **URL**: `POST /api/paper/info`
+   267→   267→- **Price**: Free
+   268→   268→- **Description**: Batch-retrieve lightweight paper cards by paper ID, including abstract slice, year, venue ID, author list, and author count.
+   269→   269→
+   270→   270→> **Mandatory Parameter Constraints (High Priority)**
+   271→   271→> 1. `paper_info` only supports the batch parameter `ids` (array); it does not support a single `paper_id`.
+   272→   272→> 2. `paper_detail` only supports the single-paper parameter `id` (string); in the client `raw` function wrapper, the corresponding parameter name is `paper_id`.
+   273→   273→> 3. Never pass `ids` to `paper_detail`; doing so will trigger a parameter error (e.g., `unexpected keyword argument 'ids'`).
+   274→   274→> 4. If many results are matched and the user has not specified a count, default to querying only the top 10 details to avoid unnecessary costs.
+   275→   275→
+   276→   276→**Request Parameters:**
+   277→   277→
+   278→   278→| Parameter | Type | Required | Description |
+   279→   279→|--------|------|------|------|
+   280→   280→| ids | []string | Yes | Paper ID array, maximum 100 |
+   281→   281→
+   282→   282→**Response Fields:**
+   283→   283→
+   284→   284→| Field | Description |
+   285→   285→|--------|------|
+   286→   286→| id | Paper ID |
+   287→   287→| title | Paper title |
+   288→   288→| abstract_slice | Partial abstract |
+   289→   289→| authors | Author list (includes `name` / `name_zh`) |
+   290→   290→| author_count | Total author count |
+   291→   291→| issue | Volume number |
+   292→   292→| raw | Journal name |
+   293→   293→| venue | Journal info object |
+   294→   294→| venue_id | Venue ID |
+   295→   295→| year | Publication year |
+   296→   296→
+   297→   297→**curl Example:**
+   298→   298→```bash
+   299→   299→curl -X POST \
+   300→   300→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/info' \
+   301→   301→  -H 'Content-Type: application/json;charset=utf-8' \
+   302→   302→  -H 'Authorization: ${AMINER_API_KEY}' \
+   303→   303→  -H 'X-Platform: openclaw' \
+   304→   304→  -d '{"ids": ["53e9ab9bb7602d97023e53b2", "53e9a98eb7602d9703e42e5a"]}'
+   305→   305→```
+   306→   306→
+   307→   307→**Usage Note:**
+   308→   308→
+   309→   309→`paper_info` is a batch endpoint. Always pass `ids` as an array, even when querying only one paper.
+   310→   310→
+   311→   311→---
+   312→   312→
+   313→   313→### 5. Paper Details
+   314→   314→
+   315→   315→- **URL**: `GET /api/paper/detail`
+   316→   316→- **Price**: ¥0.01/call
+   317→   317→- **Description**: Retrieve full paper details by paper ID.
+   318→   318→
+   319→   319→**Request Parameters:**
+   320→   320→
+   321→   321→| Parameter | Type | Required | Description |
+   322→   322→|--------|------|------|------|
+   323→   323→| id | string | Yes | Paper ID |
+   324→   324→
+   325→   325→**Response Fields:**
+   326→   326→
+   327→   327→| Field | Description |
+   328→   328→|--------|------|
+   329→   329→| id | Paper ID |
+   330→   330→| title | Title (English) |
+   331→   331→| title_zh | Title (Chinese) |
+   332→   332→| abstract | Abstract |
+   333→   333→| abstract_zh | Abstract (Chinese) |
+   334→   334→| authors | Author list (name/name_zh/org/org_zh) |
+   335→   335→| doi | DOI |
+   336→   336→| issn | ISSN |
+   337→   337→| issue | Volume number |
+   338→   338→| volume | Issue number |
+   339→   339→| year | Year |
+   340→   340→| keywords | Keywords |
+   341→   341→| keywords_zh | Keywords (Chinese) |
+   342→   342→| raw | Journal name |
+   343→   343→| venue | Journal info object |
+   344→   344→
+   345→   345→**curl Example:**
+   346→   346→```bash
+   347→   347→curl -X GET \
+   348→   348→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/detail?id=53e9ab9bb7602d97023e53b2' \
+   349→   349→  -H 'Authorization: ${AMINER_API_KEY}' \
+   350→   350→  -H 'X-Platform: openclaw'
+   351→   351→```
+   352→   352→
+   353→   353→**Usage Note:**
+   354→   354→
+   355→   355→`paper_detail` is a single-paper endpoint. Pass one `id`; do not pass `ids`.
+   356→   356→
+   357→   357→---
+   358→   358→
+   359→   359→### 6. Paper Citations
+   360→   360→
+   361→   361→- **URL**: `GET /api/paper/relation`
+   362→   362→- **Price**: ¥0.10/call
+   363→   363→- **Description**: Retrieve the list of papers cited by a given paper ID.
+   364→   364→
+   365→   365→**Request Parameters:**
+   366→   366→
+   367→   367→| Parameter | Type | Required | Description |
+   368→   368→|--------|------|------|------|
+   369→   369→| id | string | Yes | Paper ID |
+   370→   370→
+   371→   371→**Response Fields:**
+   372→   372→
+   373→   373→| Field | Description |
+   374→   374→|--------|------|
+   375→   375→| _id | Paper ID |
+   376→   376→| title | Title |
+   377→   377→| cited | Basic info of papers cited by this paper |
+   378→   378→| n_citation | Number of times cited |
+   379→   379→
+   380→   380→**curl Example:**
+   381→   381→```bash
+   382→   382→curl -X GET \
+   383→   383→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/relation?id=53e9ab9bb7602d97023e53b2' \
+   384→   384→  -H 'Authorization: ${AMINER_API_KEY}' \
+   385→   385→  -H 'X-Platform: openclaw'
+   386→   386→```
+   387→   387→
+   388→   388→---
+   389→   389→
+   390→   390→### 7. Paper Batch Query (Multi-keyword)
+   391→   391→
+   392→   392→- **URL**: `GET /api/paper/list/citation/by/keywords`
+   393→   393→- **Price**: ¥0.10/call
+   394→   394→- **Description**: Retrieve paper keywords, abstracts, and other information via multiple keywords.
+   395→   395→
+   396→   396→**Request Parameters:**
+   397→   397→
+   398→   398→| Parameter | Type | Required | Description |
+   399→   399→|--------|------|------|------|
+   400→   400→| page | number | Yes | Page number |
+   401→   401→| size | number | Yes | Items per page |
+   402→   402→| keywords | string | Yes | Keyword array (JSON string format) |
+   403→   403→
+   404→   404→**Response Fields:**
+   405→   405→
+   406→   406→| Field | Description |
+   407→   407→|--------|------|
+   408→   408→| id | Paper ID |
+   409→   409→| title / title_zh | Title (bilingual) |
+   410→   410→| abstract / abstract_zh | Abstract (bilingual) |
+   411→   411→| keywords / keywords_zh | Keywords (bilingual) |
+   412→   412→| doi | DOI |
+   413→   413→| year | Year |
+   414→   414→| total | Total count |
+   415→   415→
+   416→   416→**curl Example:**
+   417→   417→```bash
+   418→   418→curl -X GET \
+   419→   419→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/list/citation/by/keywords?page=0&size=10&keywords=%5B%22deep+learning%22%2C%22object+detection%22%5D' \
+   420→   420→  -H 'Authorization: ${AMINER_API_KEY}' \
+   421→   421→  -H 'X-Platform: openclaw'
+   422→   422→```
+   423→   423→
+   424→   424→---
+   425→   425→
+   426→   426→### 8. Paper Details by Year and Venue
+   427→   427→
+   428→   428→- **URL**: `GET /api/paper/platform/allpubs/more/detail/by/ts/org/venue`
+   429→   429→- **Price**: ¥0.20/call
+   430→   430→- **Description**: Retrieve paper titles, authors, DOIs, keywords, and other details by publication year and journal.
+   431→   431→
+   432→   432→> **Note**: `venue_id` and `year` must be provided together; providing only `year` returns `null`. Use the **Venue Search** API first to obtain the `venue_id`.
+   433→   433→
+   434→   434→**Request Parameters:**
+   435→   435→
+   436→   436→| Parameter | Type | Required | Description |
+   437→   437→|--------|------|------|------|
+   438→   438→| year | number | Yes | Paper publication year |
+   439→   439→| venue_id | string | Yes | Journal ID (obtained via Venue Search; returns null if not provided) |
+   440→   440→
+   441→   441→**Response Fields (main):**
+   442→   442→
+   443→   443→| Field | Description |
+   444→   444→|--------|------|
+   445→   445→| _id | Paper ID |
+   446→   446→| title / title_zh | Title (bilingual) |
+   447→   447→| abstract | Abstract |
+   448→   448→| authors | Author array (name/org/email/homepage/orc_id/`_id`) |
+   449→   449→| doi | DOI |
+   450→   450→| issn | ISSN |
+   451→   451→| keywords / keywords_zh | Keywords (bilingual) |
+   452→   452→| year | Year |
+   453→   453→| venue | Journal info |
+   454→   454→
+   455→   455→**curl Example:**
+   456→   456→```bash
+   457→   457→curl -X GET \
+   458→   458→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/platform/allpubs/more/detail/by/ts/org/venue?year=2023&venue_id=<VENUE_ID>' \
+   459→   459→  -H 'Authorization: ${AMINER_API_KEY}' \
+   460→   460→  -H 'X-Platform: openclaw'
+   461→   461→```
+   462→   462→
+   463→   463→---
+   464→   464→
+   465→   465→## Scholar APIs
+   466→   466→
+   467→   467→### 9. Scholar Search
+   468→   468→
+   469→   469→- **URL**: `POST /api/person/search`
+   470→   470→- **Price**: Free
+   471→   471→- **Description**: Search for scholar candidates by name and institution conditions; returns identity, institution, interests, and citation count.
+   472→   472→
+   473→   473→**Request Parameters:**
+   474→   474→
+   475→   475→| Parameter | Type | Required | Description |
+   476→   476→|--------|------|------|------|
+   477→   477→| name | string | No | Scholar name |
+   478→   478→| org | string | No | Institution name |
+   479→   479→| org_id | []string | No | Institution entity ID array |
+   480→   480→| offset | number | No | Starting position (fixed at 0; pagination not supported) |
+   481→   481→| size | number | No | Number of results, maximum 10 |
+   482→   482→
+   483→   483→**Response Fields:**
+   484→   484→
+   485→   485→| Field | Description |
+   486→   486→|--------|------|
+   487→   487→| id | Scholar ID |
+   488→   488→| name | Name |
+   489→   489→| name_zh | Name (Chinese) |
+   490→   490→| org | Institution (English) |
+   491→   491→| org_zh | Institution (Chinese) |
+   492→   492→| org_id | Institution ID |
+   493→   493→| interests | Research interests |
+   494→   494→| n_citation | Citation count |
+   495→   495→| total | Total count |
+   496→   496→
+   497→   497→**curl Example:**
+   498→   498→```bash
+   499→   499→curl -X POST \
+   500→   500→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/person/search' \
+   501→   501→  -H 'Content-Type: application/json;charset=utf-8' \
+   502→   502→  -H 'Authorization: ${AMINER_API_KEY}' \
+   503→   503→  -H 'X-Platform: openclaw' \
+   504→   504→  -d '{"name": "Andrew Ng", "size": 5}'
+   505→   505→```
+   506→   506→
+   507→   507→---
+   508→   508→
+   509→   509→### 10. Scholar Details
+   510→   510→
+   511→   511→- **URL**: `GET /api/person/detail`
+   512→   512→- **Price**: ¥1.00/call
+   513→   513→- **Description**: Retrieve complete personal information by scholar ID.
+   514→   514→
+   515→   515→**Request Parameters:**
+   516→   516→
+   517→   517→| Parameter | Type | Required | Description |
+   518→   518→|--------|------|------|------|
+   519→   519→| id | string | Yes | Scholar ID |
+   520→   520→
+   521→   521→**Response Fields:**
+   522→   522→
+   523→   523→| Field | Description |
+   524→   524→|--------|------|
+   525→   525→| id / person_id | Scholar ID |
+   526→   526→| name / name_zh | Name (bilingual) |
+   527→   527→| bio / bio_zh | Personal bio (bilingual; not both present simultaneously) |
+   528→   528→| edu / edu_zh | Education history (bilingual) |
+   529→   529→| orgs / org_zhs | Institution list (English / Chinese) |
+   530→   530→| position / position_zh | Title (bilingual) |
+   531→   531→| domain | Research domain |
+   532→   532→| honor | Honors |
+   533→   533→| award | Awards |
+   534→   534→| year | Year |
+   535→   535→
+   536→   536→**curl Example:**
+   537→   537→```bash
+   538→   538→curl -X GET \
+   539→   539→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/person/detail?id=53f3ae78dabfae4b34b0c75d' \
+   540→   540→  -H 'Authorization: ${AMINER_API_KEY}' \
+   541→   541→  -H 'X-Platform: openclaw'
+   542→   542→```
+   543→   543→
+   544→   544→---
+   545→   545→
+   546→   546→### 11. Scholar Portrait
+   547→   547→
+   548→   548→- **URL**: `GET /api/person/figure`
+   549→   549→- **Price**: ¥0.50/call
+   550→   550→- **Description**: Retrieve research interests, domains, and structured work/education history.
+   551→   551→
+   552→   552→**Request Parameters:**
+   553→   553→
+   554→   554→| Parameter | Type | Required | Description |
+   555→   555→|--------|------|------|------|
+   556→   556→| id | string | Yes | Scholar ID |
+   557→   557→
+   558→   558→**Response Fields:**
+   559→   559→
+   560→   560→| Field | Description |
+   561→   561→|--------|------|
+   562→   562→| id | Scholar ID |
+   563→   563→| ai_interests | Research interest list |
+   564→   564→| ai_domain | Research domain list |
+   565→   565→| edus | Structured education history |
+   566→   566→| works | Structured work history |
+   567→   567→
+   568→   568→**curl Example:**
+   569→   569→```bash
+   570→   570→curl -X GET \
+   571→   571→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/person/figure?id=53f3ae78dabfae4b34b0c75d' \
+   572→   572→  -H 'Authorization: ${AMINER_API_KEY}' \
+   573→   573→  -H 'X-Platform: openclaw'
+   574→   574→```
+   575→   575→
+   576→   576→---
+   577→   577→
+   578→   578→### 12. Scholar Papers
+   579→   579→
+   580→   580→- **URL**: `GET /api/person/paper/relation`
+   581→   581→- **Price**: ¥1.50/call
+   582→   582→- **Description**: Retrieve a list of papers published by a scholar (ID + title).
+   583→   583→
+   584→   584→**Request Parameters:**
+   585→   585→
+   586→   586→| Parameter | Type | Required | Description |
+   587→   587→|--------|------|------|------|
+   588→   588→| id | string | Yes | Scholar ID |
+   589→   589→
+   590→   590→**Response Fields:**
+   591→   591→
+   592→   592→| Field | Description |
+   593→   593→|--------|------|
+   594→   594→| author_id | Scholar ID |
+   595→   595→| id | Paper ID |
+   596→   596→| title | Paper title |
+   597→   597→
+   598→   598→**curl Example:**
+   599→   599→```bash
+   600→   600→curl -X GET \
+   601→   601→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/person/paper/relation?id=53f3ae78dabfae4b34b0c75d' \
+   602→   602→  -H 'Authorization: ${AMINER_API_KEY}' \
+   603→   603→  -H 'X-Platform: openclaw'
+   604→   604→```
+   605→   605→
+   606→   606→---
+   607→   607→
+   608→   608→### 13. Scholar Patents
+   609→   609→
+   610→   610→- **URL**: `GET /api/person/patent/relation`
+   611→   611→- **Price**: ¥1.50/call
+   612→   612→- **Description**: Retrieve a list of patents associated with a scholar.
+   613→   613→
+   614→   614→**Request Parameters:**
+   615→   615→
+   616→   616→| Parameter | Type | Required | Description |
+   617→   617→|--------|------|------|------|
+   618→   618→| id | string | Yes | Scholar ID |
+   619→   619→
+   620→   620→**Response Fields:**
+   621→   621→
+   622→   622→| Field | Description |
+   623→   623→|--------|------|
+   624→   624→| patent_id | Patent ID |
+   625→   625→| person_id | Scholar ID |
+   626→   626→| title | Patent title |
+   627→   627→| en | Title (English) |
+   628→   628→| zh | Title (Chinese) |
+   629→   629→
+   630→   630→**curl Example:**
+   631→   631→```bash
+   632→   632→curl -X GET \
+   633→   633→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/person/patent/relation?id=53f3ae78dabfae4b34b0c75d' \
+   634→   634→  -H 'Authorization: ${AMINER_API_KEY}' \
+   635→   635→  -H 'X-Platform: openclaw'
+   636→   636→```
+   637→   637→
+   638→   638→---
+   639→   639→
+   640→   640→### 14. Scholar Projects
+   641→   641→
+   642→   642→- **URL**: `GET /api/project/person/v3/open`
+   643→   643→- **Price**: ¥1.50/call
+   644→   644→- **Description**: Retrieve research projects a scholar has participated in (funding amount, dates, source).
+   645→   645→
+   646→   646→**Request Parameters:**
+   647→   647→
+   648→   648→| Parameter | Type | Required | Description |
+   649→   649→|--------|------|------|------|
+   650→   650→| id | string | No | Scholar ID |
+   651→   651→
+   652→   652→**Response Fields:**
+   653→   653→
+   654→   654→| Field | Description |
+   655→   655→|--------|------|
+   656→   656→| id | Project ID |
+   657→   657→| titles | Project title |
+   658→   658→| country | Country |
+   659→   659→| project_source | Project source |
+   660→   660→| fund_amount | Funding amount |
+   661→   661→| fund_currency | Funding currency |
+   662→   662→| start_date | Start date |
+   663→   663→| end_date | End date |
+   664→   664→| total | Total count |
+   665→   665→
+   666→   666→**curl Example:**
+   667→   667→```bash
+   668→   668→curl -X GET \
+   669→   669→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/project/person/v3/open?id=53f3ae78dabfae4b34b0c75d' \
+   670→   670→  -H 'Authorization: ${AMINER_API_KEY}' \
+   671→   671→  -H 'X-Platform: openclaw'
+   672→   672→```
+   673→   673→
+   674→   674→---
+   675→   675→
+   676→   676→## Institution APIs
+   677→   677→
+   678→   678→### 15. Org Search
+   679→   679→
+   680→   680→- **URL**: `POST /api/organization/search`
+   681→   681→- **Price**: Free
+   682→   682→- **Description**: Search for institution IDs and standard names by institution keyword; includes partial aliases for normalization.
+   683→   683→
+   684→   684→**Request Parameters:**
+   685→   685→
+   686→   686→| Parameter | Type | Required | Description |
+   687→   687→|--------|------|------|------|
+   688→   688→| orgs | []string | No | Institution name array |
+   689→   689→
+   690→   690→**Response Fields:**
+   691→   691→
+   692→   692→| Field | Description |
+   693→   693→|--------|------|
+   694→   694→| aliases | Alias list (partial, usually top 3) |
+   695→   695→| org_id | Institution ID |
+   696→   696→| org_name | Institution name |
+   697→   697→| total | Total count |
+   698→   698→
+   699→   699→**curl Example:**
+   700→   700→```bash
+   701→   701→curl -X POST \
+   702→   702→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/organization/search' \
+   703→   703→  -H 'Content-Type: application/json;charset=utf-8' \
+   704→   704→  -H 'Authorization: ${AMINER_API_KEY}' \
+   705→   705→  -H 'X-Platform: openclaw' \
+   706→   706→  -d '{"orgs": ["Tsinghua University"]}'
+   707→   707→```
+   708→   708→
+   709→   709→---
+   710→   710→
+   711→   711→### 16. Org Details
+   712→   712→
+   713→   713→- **URL**: `POST /api/organization/detail`
+   714→   714→- **Price**: ¥0.01/call
+   715→   715→- **Description**: Retrieve institution details by institution ID.
+   716→   716→
+   717→   717→**Request Parameters:**
+   718→   718→
+   719→   719→| Parameter | Type | Required | Description |
+   720→   720→|--------|------|------|------|
+   721→   721→| ids | []string | Yes | Institution ID array |
+   722→   722→
+   723→   723→**Response Fields:**
+   724→   724→
+   725→   725→| Field | Description |
+   726→   726→|--------|------|
+   727→   727→| id | Institution ID |
+   728→   728→| name / name_en / name_zh | Institution name (raw/English/Chinese) |
+   729→   729→| acronyms | Abbreviation |
+   730→   730→| aliases | Alias list |
+   731→   731→| details | Detailed institution description |
+   732→   732→| type | Institution type (university/enterprise, etc.) |
+   733→   733→| location | Geographic location |
+   734→   734→| language | Language |
+   735→   735→| total | Total count |
+   736→   736→
+   737→   737→**curl Example:**
+   738→   738→```bash
+   739→   739→curl -X POST \
+   740→   740→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/organization/detail' \
+   741→   741→  -H 'Content-Type: application/json;charset=utf-8' \
+   742→   742→  -H 'Authorization: ${AMINER_API_KEY}' \
+   743→   743→  -H 'X-Platform: openclaw' \
+   744→   744→  -d '{"ids": ["5f71b2091c455f439fe9a7d7"]}'
+   745→   745→```
+   746→   746→
+   747→   747→---
+   748→   748→
+   749→   749→### 17. Org Scholars
+   750→   750→
+   751→   751→- **URL**: `GET /api/organization/person/relation`
+   752→   752→- **Price**: ¥0.50/call
+   753→   753→- **Description**: Retrieve the list of scholars affiliated with an institution (10 results per call).
+   754→   754→
+   755→   755→**Request Parameters:**
+   756→   756→
+   757→   757→| Parameter | Type | Required | Description |
+   758→   758→|--------|------|------|------|
+   759→   759→| org_id | string | No | Institution ID |
+   760→   760→| offset | number | No | Starting position (returns 10 results per call) |
+   761→   761→
+   762→   762→**Response Fields:**
+   763→   763→
+   764→   764→| Field | Description |
+   765→   765→|--------|------|
+   766→   766→| id | Scholar ID |
+   767→   767→| name / name_zh | Scholar name (bilingual) |
+   768→   768→| org / org_zh | Institution (bilingual) |
+   769→   769→| org_id | Institution ID |
+   770→   770→| total | Total count |
+   771→   771→
+   772→   772→**curl Example:**
+   773→   773→```bash
+   774→   774→curl -X GET \
+   775→   775→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/organization/person/relation?org_id=5f71b2091c455f439fe9a7d7&offset=0' \
+   776→   776→  -H 'Authorization: ${AMINER_API_KEY}' \
+   777→   777→  -H 'X-Platform: openclaw'
+   778→   778→```
+   779→   779→
+   780→   780→---
+   781→   781→
+   782→   782→### 18. Org Papers
+   783→   783→
+   784→   784→- **URL**: `GET /api/organization/paper/relation`
+   785→   785→- **Price**: ¥0.10/call
+   786→   786→- **Description**: Retrieve the list of papers published by scholars at an institution (10 results per call).
+   787→   787→
+   788→   788→**Request Parameters:**
+   789→   789→
+   790→   790→| Parameter | Type | Required | Description |
+   791→   791→|--------|------|------|------|
+   792→   792→| org_id | string | Yes | Institution ID |
+   793→   793→| offset | number | Yes | Starting position (returns 10 results per call) |
+   794→   794→
+   795→   795→**Response Fields:**
+   796→   796→
+   797→   797→| Field | Description |
+   798→   798→|--------|------|
+   799→   799→| id | Paper ID |
+   800→   800→| title / title_zh | Title (bilingual) |
+   801→   801→| doi | DOI |
+   802→   802→| total | Total count |
+   803→   803→
+   804→   804→**curl Example:**
+   805→   805→```bash
+   806→   806→curl -X GET \
+   807→   807→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/organization/paper/relation?org_id=5f71b2091c455f439fe9a7d7&offset=0' \
+   808→   808→  -H 'Authorization: ${AMINER_API_KEY}' \
+   809→   809→  -H 'X-Platform: openclaw'
+   810→   810→```
+   811→   811→
+   812→   812→---
+   813→   813→
+   814→   814→### 19. Org Patents
+   815→   815→
+   816→   816→- **URL**: `GET /api/organization/patent/relation`
+   817→   817→- **Price**: ¥0.10/call
+   818→   818→- **Description**: Retrieve the list of patent IDs owned by an institution; supports pagination with up to 10,000 results per call.
+   819→   819→
+   820→   820→**Request Parameters:**
+   821→   821→
+   822→   822→| Parameter | Type | Required | Description |
+   823→   823→|--------|------|------|------|
+   824→   824→| id | string | Yes | Institution ID |
+   825→   825→| page | number | No | Page number (starts at 1) |
+   826→   826→| page_size | number | No | Items per page; maximum 10,000 |
+   827→   827→
+   828→   828→**Response Fields:**
+   829→   829→
+   830→   830→| Field | Description |
+   831→   831→|--------|------|
+   832→   832→| id | Patent ID |
+   833→   833→| total | Total count |
+   834→   834→
+   835→   835→**curl Example:**
+   836→   836→```bash
+   837→   837→curl -X GET \
+   838→   838→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/organization/patent/relation?id=6233173d0a6eb145604733e2&page=1&page_size=100' \
+   839→   839→  -H 'Authorization: ${AMINER_API_KEY}' \
+   840→   840→  -H 'X-Platform: openclaw'
+   841→   841→```
+   842→   842→
+   843→   843→---
+   844→   844→
+   845→   845→### 20. Org Disambiguation
+   846→   846→
+   847→   847→- **URL**: `POST /api/organization/na`
+   848→   848→- **Price**: ¥0.01/call
+   849→   849→- **Description**: Retrieve the standardized institution name from an institution string (including abbreviations/aliases).
+   850→   850→
+   851→   851→**Request Parameters:**
+   852→   852→
+   853→   853→| Parameter | Type | Required | Description |
+   854→   854→|--------|------|------|------|
+   855→   855→| org | string | Yes | Institution name (may include aliases/abbreviations) |
+   856→   856→
+   857→   857→**Response Fields:**
+   858→   858→
+   859→   859→| Field | Description |
+   860→   860→|--------|------|
+   861→   861→| org_name | Normalized institution name |
+   862→   862→
+   863→   863→**curl Example:**
+   864→   864→```bash
+   865→   865→curl -X POST \
+   866→   866→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/organization/na' \
+   867→   867→  -H 'Content-Type: application/json;charset=utf-8' \
+   868→   868→  -H 'Authorization: ${AMINER_API_KEY}' \
+   869→   869→  -H 'X-Platform: openclaw' \
+   870→   870→  -d '{"org": "MIT CSAIL"}'
+   871→   871→```
+   872→   872→
+   873→   873→---
+   874→   874→
+   875→   875→### 21. Org Disambiguation Pro
+   876→   876→
+   877→   877→- **URL**: `POST /api/organization/na/pro`
+   878→   878→- **Price**: ¥0.05/call
+   879→   879→- **Description**: Extract the IDs of primary and secondary institutions from an institution string (recommended for workflows).
+   880→   880→
+   881→   881→**Request Parameters:**
+   882→   882→
+   883→   883→| Parameter | Type | Required | Description |
+   884→   884→|--------|------|------|------|
+   885→   885→| org | string | Yes | Institution name |
+   886→   886→
+   887→   887→**Response Fields:**
+   888→   888→
+   889→   889→| Field | Description |
+   890→   890→|--------|------|
+   891→   891→| 一级 | Primary institution name |
+   892→   892→| 一级ID | Primary institution ID |
+   893→   893→| 二级 | Secondary institution name |
+   894→   894→| 二级ID | Secondary institution ID |
+   895→   895→| Total / total | Total count |
+   896→   896→
+   897→   897→**curl Example:**
+   898→   898→```bash
+   899→   899→curl -X POST \
+   900→   900→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/organization/na/pro' \
+   901→   901→  -H 'Content-Type: application/json;charset=utf-8' \
+   902→   902→  -H 'Authorization: ${AMINER_API_KEY}' \
+   903→   903→  -H 'X-Platform: openclaw' \
+   904→   904→  -d '{"org": "Department of Computer Science, Tsinghua University"}'
+   905→   905→```
+   906→   906→
+   907→   907→---
+   908→   908→
+   909→   909→## Journal APIs
+   910→   910→
+   911→   911→### 22. Venue Search
+   912→   912→
+   913→   913→- **URL**: `POST /api/venue/search`
+   914→   914→- **Price**: Free
+   915→   915→- **Description**: Search for venue IDs and standard names by venue name; includes aliases and venue type.
+   916→   916→
+   917→   917→**Request Parameters:**
+   918→   918→
+   919→   919→| Parameter | Type | Required | Description |
+   920→   920→|--------|------|------|------|
+   921→   921→| name | string | No | Journal name (supports fuzzy search) |
+   922→   922→
+   923→   923→**Response Fields:**
+   924→   924→
+   925→   925→| Field | Description |
+   926→   926→|--------|------|
+   927→   927→| id | Journal ID |
+   928→   928→| name_en | Journal name (English) |
+   929→   929→| name_zh | Journal name (Chinese) |
+   930→   930→| aliases | Alias list (partial, usually top 3) |
+   931→   931→| venue_type | Venue type: `journal` or `conference` |
+   932→   932→| total | Total count |
+   933→   933→
+   934→   934→**curl Example:**
+   935→   935→```bash
+   936→   936→curl -X POST \
+   937→   937→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/venue/search' \
+   938→   938→  -H 'Content-Type: application/json;charset=utf-8' \
+   939→   939→  -H 'Authorization: ${AMINER_API_KEY}' \
+   940→   940→  -H 'X-Platform: openclaw' \
+   941→   941→  -d '{"name": "tkde"}'
+   942→   942→```
+   943→   943→
+   944→   944→---
+   945→   945→
+   946→   946→### 23. Venue Details
+   947→   947→
+   948→   948→- **URL**: `POST /api/venue/detail`
+   949→   949→- **Price**: ¥0.20/call
+   950→   950→- **Description**: Retrieve ISSN, abbreviation, type, and other details by journal ID.
+   951→   951→
+   952→   952→**Request Parameters:**
+   953→   953→
+   954→   954→| Parameter | Type | Required | Description |
+   955→   955→|--------|------|------|------|
+   956→   956→| id | string | Yes | Journal ID |
+   957→   957→
+   958→   958→**Response Fields:**
+   959→   959→
+   960→   960→| Field | Description |
+   961→   961→|--------|------|
+   962→   962→| id | Journal ID |
+   963→   963→| name / name_en / name_zh | Name (raw/English/Chinese) |
+   964→   964→| issn | ISSN |
+   965→   965→| eissn | EISSN |
+   966→   966→| alias | Alias |
+   967→   967→| type | Journal type |
+   968→   968→
+   969→   969→**curl Example:**
+   970→   970→```bash
+   971→   971→curl -X POST \
+   972→   972→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/venue/detail' \
+   973→   973→  -H 'Content-Type: application/json;charset=utf-8' \
+   974→   974→  -H 'Authorization: ${AMINER_API_KEY}' \
+   975→   975→  -H 'X-Platform: openclaw' \
+   976→   976→  -d '{"id": "<VENUE_ID>"}'
+   977→   977→```
+   978→   978→
+   979→   979→---
+   980→   980→
+   981→   981→### 24. Venue Papers
+   982→   982→
+   983→   983→- **URL**: `POST /api/venue/paper/relation`
+   984→   984→- **Price**: ¥0.10/call
+   985→   985→- **Description**: Retrieve a list of papers for a journal by journal ID (supports year filtering).
+   986→   986→
+   987→   987→**Request Parameters:**
+   988→   988→
+   989→   989→| Parameter | Type | Required | Description |
+   990→   990→|--------|------|------|------|
+   991→   991→| id | string | Yes | Journal ID |
+   992→   992→| offset | number | No | Starting position |
+   993→   993→| limit | number | No | Number of results to return |
+   994→   994→| year | number | No | Filter by year |
+   995→   995→
+   996→   996→**Response Fields:**
+   997→   997→
+   998→   998→| Field | Description |
+   999→   999→|--------|------|
+  1000→  1000→| id | Paper ID |
+  1001→  1001→| title | Paper title |
+  1002→  1002→| year | Year |
+  1003→  1003→| offset | Current offset |
+  1004→  1004→| total | Total count |
+  1005→  1005→
+  1006→  1006→**curl Example:**
+  1007→  1007→```bash
+  1008→  1008→curl -X POST \
+  1009→  1009→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/venue/paper/relation' \
+  1010→  1010→  -H 'Content-Type: application/json;charset=utf-8' \
+  1011→  1011→  -H 'Authorization: ${AMINER_API_KEY}' \
+  1012→  1012→  -H 'X-Platform: openclaw' \
+  1013→  1013→  -d '{"id": "<VENUE_ID>", "year": 2023, "offset": 0, "limit": 20}'
+  1014→  1014→```
+  1015→  1015→
+  1016→  1016→---
+  1017→  1017→
+  1018→  1018→## Patent APIs
+  1019→  1019→
+  1020→  1020→### 25. Patent Search
+  1021→  1021→
+  1022→  1022→- **URL**: `POST /api/patent/search`
+  1023→  1023→- **Price**: Free
+  1024→  1024→- **Description**: Search for patents by title or keyword; returns lightweight trend fields such as first inventor, application year, and publication year.
+  1025→  1025→
+  1026→  1026→**Request Parameters:**
+  1027→  1027→
+  1028→  1028→| Parameter | Type | Required | Description |
+  1029→  1029→|--------|------|------|------|
+  1030→  1030→| query | string | Yes | Query field, such as patent title or keywords |
+  1031→  1031→| page | number | Yes | Page number |
+  1032→  1032→| size | number | Yes | Items per page |
+  1033→  1033→
+  1034→  1034→**Response Fields:**
+  1035→  1035→
+  1036→  1036→| Field | Description |
+  1037→  1037→|--------|------|
+  1038→  1038→| id | Patent ID |
+  1039→  1039→| title | Patent title (English) |
+  1040→  1040→| title_zh | Patent title (Chinese) |
+  1041→  1041→| inventor_name | First inventor name |
+  1042→  1042→| app_year | Application year |
+  1043→  1043→| pub_year | Publication year |
+  1044→  1044→
+  1045→  1045→**curl Example:**
+  1046→  1046→```bash
+  1047→  1047→curl -X POST \
+  1048→  1048→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/patent/search' \
+  1049→  1049→  -H 'Content-Type: application/json;charset=utf-8' \
+  1050→  1050→  -H 'Authorization: ${AMINER_API_KEY}' \
+  1051→  1051→  -H 'X-Platform: openclaw' \
+  1052→  1052→  -d '{"page":0,"query":"Si02","size":20}'
+  1053→  1053→```
+  1054→  1054→
+  1055→  1055→---
+  1056→  1056→
+  1057→  1057→### 26. Patent Info
+  1058→  1058→
+  1059→  1059→- **URL**: `GET /api/patent/info`
+  1060→  1060→- **Price**: Free
+  1061→  1061→- **Description**: Retrieve a patent basic card by patent ID, including patent numbers, inventor, country, and basic year fields.
+  1062→  1062→
+  1063→  1063→**Request Parameters:**
+  1064→  1064→
+  1065→  1065→| Parameter | Type | Required | Description |
+  1066→  1066→|--------|------|------|------|
+  1067→  1067→| id | string | Yes | Patent ID |
+  1068→  1068→
+  1069→  1069→**Response Fields:**
+  1070→  1070→
+  1071→  1071→| Field | Description |
+  1072→  1072→|--------|------|
+  1073→  1073→| id | Patent ID |
+  1074→  1074→| title / en | Patent title (English) |
+  1075→  1075→| app_num | Application number |
+  1076→  1076→| pub_num | Publication number |
+  1077→  1077→| pub_kind | Publication type |
+  1078→  1078→| inventor | Inventor |
+  1079→  1079→| country | Country |
+  1080→  1080→| sequence | Sequence |
+  1081→  1081→| app_year | Application year |
+  1082→  1082→| pub_year | Publication year |
+  1083→  1083→
+  1084→  1084→**curl Example:**
+  1085→  1085→```bash
+  1086→  1086→curl -X GET \
+  1087→  1087→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/patent/info?id=<PATENT_ID>' \
+  1088→  1088→  -H 'Authorization: ${AMINER_API_KEY}' \
+  1089→  1089→  -H 'X-Platform: openclaw'
+  1090→  1090→```
+  1091→  1091→
+  1092→  1092→---
+  1093→  1093→
+  1094→  1094→### 27. Patent Details
+  1095→  1095→
+  1096→  1096→- **URL**: `GET /api/patent/detail`
+  1097→  1097→- **Price**: ¥0.01/call
+  1098→  1098→- **Description**: Retrieve full patent details by patent ID (including abstract, filing date, assignee, IPC classification, etc.).
+  1099→  1099→
+  1100→  1100→**Request Parameters:**
+  1101→  1101→
+  1102→  1102→| Parameter | Type | Required | Description |
+  1103→  1103→|--------|------|------|------|
+  1104→  1104→| id | string | Yes | Patent ID |
+  1105→  1105→
+  1106→  1106→**Response Fields:**
+  1107→  1107→
+  1108→  1108→| Field | Description |
+  1109→  1109→|--------|------|
+  1110→  1110→| id | Patent ID |
+  1111→  1111→| title | Patent title |
+  1112→  1112→| abstract | Abstract |
+  1113→  1113→| app_date | Filing date |
+  1114→  1114→| app_num | Application number |
+  1115→  1115→| pub_date | Publication date |
+  1116→  1116→| pub_num | Publication number |
+  1117→  1117→| pub_kind | Publication type |
+  1118→  1118→| assignee | Assignee |
+  1119→  1119→| inventor | Inventor |
+  1120→  1120→| country | Country |
+  1121→  1121→| ipc | IPC classification code |
+  1122→  1122→| ipcr | IPCR classification code |
+  1123→  1123→| cpc | CPC classification code |
+  1124→  1124→| priority | Priority info |
+  1125→  1125→| description | Description |
+  1126→  1126→
+  1127→  1127→**curl Example:**
+  1128→  1128→```bash
+  1129→  1129→curl -X GET \
+  1130→  1130→  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/patent/detail?id=<PATENT_ID>' \
+  1131→  1131→  -H 'Authorization: ${AMINER_API_KEY}' \
+  1132→  1132→  -H 'X-Platform: openclaw'
+  1133→  1133→```
+  1134→  1134→
+  1135→  1135→---
+  1136→  1136→
+  1137→  1137→## Appendix: API Pricing Summary
+  1138→  1138→
+  1139→  1139→| Category | Free APIs | Paid APIs |
+  1140→  1140→|------|---------|---------|
+  1141→  1141→| Paper | Paper Search, Paper Info | Paper Search Pro(¥0.01), Paper Details(¥0.01), Paper Citations(¥0.10), Paper QA Search(¥0.05), **Paper QA Search Pro(¥0.70)**, Paper Batch Query(¥0.10), By Condition(¥0.20) |
+  1142→  1142→| Scholar | Scholar Search | Scholar Details(¥1.00), Scholar Portrait(¥0.50), Scholar Papers(¥1.50), Scholar Patents(¥1.50), Scholar Projects(¥1.50) |
+  1143→  1143→| Institution | Org Search | Org Details(¥0.01), Org Scholars(¥0.50), Org Papers(¥0.10), Org Patents(¥0.10), Org Disambiguation(¥0.01), Org Disambiguation Pro(¥0.05) |
+  1144→  1144→| Journal | Venue Search | Venue Details(¥0.20), Venue Papers(¥0.10) |
+  1145→  1145→| Patent | Patent Search, Patent Info | Patent Details(¥0.01) |
+  1146→  1146→
+  1147→  1147→---
+  1148→  1148→
+  1149→  1149→## Appendix: Common Error Codes
+  1150→  1150→
+  1151→  1151→| Code | Meaning | Recommended Action |
+  1152→  1152→|------|---------|-------------------|
+  1153→  1153→| 401 | Token invalid or expired | Re-generate token at [Console](https://open.aminer.cn/open/board?tab=control) |
+  1154→  1154→| 403 | Insufficient balance or permission denied | Top up account or check token scope |
+  1155→  1155→| 404 | Entity not found | Verify the ID is correct |
+  1156→  1156→| 429 | Rate limit exceeded | Wait a few seconds and retry |
+  1157→  1157→| 500 / 502 / 503 / 504 | Server error (transient) | Retry with exponential backoff (1s → 2s → 4s) |
+  1158→  1158→
+  1159→  1159→> For `4xx` errors (except 429), do not retry — fix the request parameters first.
+  1160→  1160→
+  1161→  1161→---
+  1162→  1162→
+  1163→  1163→## Appendix: Pagination Limits
+  1164→  1164→
+  1165→  1165→| API | Constraint |
+  1166→  1166→|-----|-----------|
+  1167→  1167→| `paper_search` | `size` max 20; `page` starts at 1 |
+  1168→  1168→| `paper_search_pro` | `page` starts at 0 |
+  1169→  1169→| `paper_qa_search_pro` | Fixed 10 results/page; use `cursor` / `next_cursor` (cursor-only body on next page) |
+  1170→  1170→| `person_search` | `size` max 10; `offset` fixed at 0 (no pagination) |
+  1171→  1171→| `org_person_relation` | Fixed 10 results per call; use `offset` to paginate |
+  1172→  1172→| `org_paper_relation` | Fixed 10 results per call; use `offset` to paginate |
+  1173→  1173→| `org_patent_relation` | `page_size` max 10,000; `page` starts at 1 |
+  1174→  1174→| `venue_paper_relation` | Use `offset` + `limit` to paginate |
+  1175→  1175→| `paper_info` | `ids` array max 100 items |
+  1176→  1176→

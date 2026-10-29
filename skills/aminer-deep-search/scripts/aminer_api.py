@@ -6,7 +6,7 @@ single JSON document to stdout (the tool result); diagnostics and the cost
 summary go to stderr. No relevance scoring or loop control happens here — the
 host model decides what to search, what to keep, and when to stop.
 
-Endpoints (base: https://publicapi.chatglm.cn/chatglm_public/skill/aminer):
+Endpoints (base: $AMINER_API_BASE_URL — set this env var to your AMiner API gateway):
   GET  /api/paper/search/pro   keyword search, ¥0.01/page   (subcommand: search)
   POST /api/paper/qa/search    natural-language search, ¥0.05/call (qa-search)
   POST /api/paper/info         batch metadata, free, <=100 ids     (info, and enrichment)
@@ -26,7 +26,7 @@ import urllib.parse
 import urllib.request
 from typing import Any
 
-BASE_URL = "https://publicapi.chatglm.cn/chatglm_public/skill/aminer"
+BASE_URL = os.environ.get("AMINER_API_BASE_URL", "")  # set to your AMiner API gateway
 CONSOLE_URL = "https://open.aminer.cn/open/board?tab=control"
 TIMEOUT_SECONDS = 30.0
 MAX_RETRIES = 3

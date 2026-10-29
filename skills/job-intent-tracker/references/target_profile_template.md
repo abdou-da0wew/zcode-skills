@@ -1,74 +1,74 @@
-# 岗位画像（Target Profile）模板
+# Role Profile (Target Profile) Template
 
-填写时把所有 `<占位>` 都换成具体内容。空着不填等于没画像。
-
----
-
-## 一、岗位基本信息
-
-- **岗位名称**：<如：高级产品经理 - 用户增长方向>
-- **方向定位**：<如：B 端 SaaS / C 端工具 / 内容平台 / Fintech>
-- **职级范围**：<如：P6-P7 / 中级-高级 / Senior IC>
-- **目标城市**：<北京 / 上海 / 深圳 / 杭州 / Remote / 海外>
-- **薪资带（市场参考）**：<__k × __ 月，仅供参考，建议核实职级和城市差异>
+When filling this in, replace every `<placeholder>` with concrete content. Leaving it blank equals no profile.
 
 ---
 
-## 二、典型职责描述（JD 共性）
+## 1. Basic Role Information
 
-罗列 3~5 条该岗位常见的职责动词 + 对象：
-- <如：负责 ___ 业务线的产品规划与迭代>
-- <如：通过数据分析定位用户流失环节并设计实验>
-- <如：跨部门协作，推动 ___ 项目落地>
-
----
-
-## 三、技能要求
-
-### Must-have（缺一票否决）
-- <硬技能 1，如：5+ 年 C 端产品经验>
-- <硬技能 2，如：熟练使用 SQL，能独立完成数据分析>
-- <硬技能 3，如：有从 0 到 1 的产品案例>
-
-### Nice-to-have（加分项）
-- <如：有海外市场或跨境业务经验>
-- <如：懂基础前端，能跟开发深度沟通>
-- <如：有大厂背景或被收购初创经验>
-
-### 软技能信号（HR / 终面会 probe）
-- <如：跨部门协调能力>
-- <如：业务 sense / 商业化 sense>
-- <如：用户同理心>
+- **Role name**: <e.g. Senior Product Manager - User Growth>
+- **Direction**: <e.g. B2B SaaS / consumer tools / content platform / Fintech>
+- **Level range**: <e.g. mid-senior / Senior IC / staff>
+- **Target cities**: <Beijing / Shanghai / Shenzhen / Hangzhou / Remote / overseas>
+- **Salary band (market reference)**: <__k × __ months, reference only; advise verifying level and city differences>
 
 ---
 
-## 四、面试流程预期
+## 2. Typical Responsibilities (common JD threads)
 
-按公司 tier 分层估算，给用户一个心理预期：
+List 3~5 typical responsibility verb + object pairs for this role:
+- <e.g. Own product planning and iteration for the ___ business line>
+- <e.g. Use data analysis to locate user churn points and design experiments>
+- <e.g. Collaborate across departments to drive the ___ project to launch>
 
-| 公司类型 | 流程长度 | 典型环节 |
+---
+
+## 3. Skill Requirements
+
+### Must-have (missing any one is a veto)
+- <Hard skill 1, e.g. 5+ years of consumer product experience>
+- <Hard skill 2, e.g. proficient in SQL, able to run data analysis independently>
+- <Hard skill 3, e.g. has a 0-to-1 product case>
+
+### Nice-to-have (bonus points)
+- <e.g. overseas market or cross-border business experience>
+- <e.g. basic frontend knowledge, able to communicate deeply with engineers>
+- <e.g. big-tech background or acquired-startup experience>
+
+### Soft-skill signals (probed by HR / final round)
+- <e.g. cross-department coordination>
+- <e.g. business sense / commercial sense>
+- <e.g. user empathy>
+
+---
+
+## 4. Expected Interview Process
+
+Estimate by company tier to give the user realistic expectations:
+
+| Company type | Process length | Typical stages |
 |---------|---------|----------|
-| 大厂 / Tier 1 | 4~6 周 | 简历 → 笔试 → 1 面（专业）→ 2 面（深度）→ 3 面（leader）→ HR 面 → Offer |
-| 中厂 / Tier 2 | 2~4 周 | 简历 → 1 面 → 2 面 → HR → Offer |
-| 创业 / Tier 3 | 1~2 周 | 简历 → 1~2 面（含创始人）→ Offer |
+| Big tech / Tier 1 | 4~6 weeks | Resume → written test → interview 1 (domain) → interview 2 (deep dive) → interview 3 (hiring manager) → HR → Offer |
+| Mid-size / Tier 2 | 2~4 weeks | Resume → interview 1 → interview 2 → HR → Offer |
+| Startup / Tier 3 | 1~2 weeks | Resume → 1~2 interviews (incl. founder) → Offer |
 
-填写实际预期：<具体到该方向的常见流程>
-
----
-
-## 五、对标公司清单
-
-按 tier 分层列 3~5 家：
-
-- **Tier 1（梦想 offer，匹配度需达 80%+）**：<公司 1>、<公司 2>、<公司 3>
-- **Tier 2（合理选择，匹配度 60%+）**：<公司 1>、<公司 2>、<公司 3>
-- **Tier 3（保底 / 练手，匹配度 40%+）**：<公司 1>、<公司 2>、<公司 3>
+Fill in the actual expectation: <the common process for this specific direction>
 
 ---
 
-## 六、求职策略提示
+## 5. Benchmark Company List
 
-- **简历重点**：突出 ___ 经验，弱化 ___
-- **作品集 / case**：建议准备 ___（如：一个完整的产品分析报告 / 一份 SQL 项目）
-- **网络渠道**：优先走 ___（内推 / 猎头 / 官网 / 拉勾 / 脉脉），少用 ___
-- **时间预算**：从准备到拿 offer，建议留 <8~12 周> 缓冲
+List 3~5 companies per tier:
+
+- **Tier 1 (dream offers; fit must be 80%+)**: <company 1>, <company 2>, <company 3>
+- **Tier 2 (reasonable choices; fit 60%+)**: <company 1>, <company 2>, <company 3>
+- **Tier 3 (safety / practice; fit 40%+)**: <company 1>, <company 2>, <company 3>
+
+---
+
+## 6. Job-Search Strategy Tips
+
+- **Resume focus**: highlight ___ experience, downplay ___
+- **Portfolio / case**: prepare ___ (e.g. a complete product analysis report / a SQL project)
+- **Channels**: prefer ___ (referrals / recruiters / careers sites / job boards / professional networks), avoid ___
+- **Time budget**: from prep to offer, leave a <8~12 week> buffer

@@ -1,6 +1,6 @@
 # AMiner Free Search API Catalog
 
-**Base URL**: `https://publicapi.chatglm.cn/chatglm_public/skill/aminer`  
+**Base URL**: `${AMINER_API_BASE_URL}`  
 **Authentication**: All endpoints should default to `Authorization: ${AMINER_API_KEY}`. In workflow execution, also include `X-Platform: openclaw` when required by the gateway.  
 **Scope**: This catalog only documents the free APIs used by `aminer-free-academic`.
 
@@ -49,7 +49,7 @@
 **curl Example:**
 ```bash
 curl -X GET \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/search?page=1&size=10&title=Looking+at+CTR+Prediction+Again%3A+Is+Attention+All+You+Need' \
+  '${AMINER_API_BASE_URL}/api/paper/search?page=1&size=10&title=Looking+at+CTR+Prediction+Again%3A+Is+Attention+All+You+Need' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw'
 ```
@@ -86,7 +86,7 @@ curl -X GET \
 **curl Example:**
 ```bash
 curl -X POST \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/info' \
+  '${AMINER_API_BASE_URL}/api/paper/info' \
   -H 'Content-Type: application/json;charset=utf-8' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw' \
@@ -130,11 +130,11 @@ curl -X POST \
 **curl Example:**
 ```bash
 curl -X POST \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/person/search' \
+  '${AMINER_API_BASE_URL}/api/person/search' \
   -H 'Content-Type: application/json;charset=utf-8' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw' \
-  -d '{"name":"王曙","offset":0,"org":"Shanghai Jiaotong","size":10}'
+  -d '{"name":"Shu Wang","offset":0,"org":"Shanghai Jiaotong","size":10}'
 ```
 
 ---
@@ -165,11 +165,11 @@ curl -X POST \
 **curl Example:**
 ```bash
 curl -X POST \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/organization/search' \
+  '${AMINER_API_BASE_URL}/api/organization/search' \
   -H 'Content-Type: application/json;charset=utf-8' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw' \
-  -d '{"orgs":["清华大学"]}'
+  -d '{"orgs":["Tsinghua University"]}'
 ```
 
 ---
@@ -202,7 +202,7 @@ curl -X POST \
 **curl Example:**
 ```bash
 curl -X POST \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/venue/search' \
+  '${AMINER_API_BASE_URL}/api/venue/search' \
   -H 'Content-Type: application/json;charset=utf-8' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw' \
@@ -241,7 +241,7 @@ curl -X POST \
 **curl Example:**
 ```bash
 curl -X POST \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/patent/search' \
+  '${AMINER_API_BASE_URL}/api/patent/search' \
   -H 'Content-Type: application/json;charset=utf-8' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw' \
@@ -280,7 +280,7 @@ curl -X POST \
 **curl Example:**
 ```bash
 curl -X GET \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/patent/info?id=<PATENT_ID>' \
+  '${AMINER_API_BASE_URL}/api/patent/info?id=<PATENT_ID>' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw'
 ```

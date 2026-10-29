@@ -1,0 +1,648 @@
+     1→<!DOCTYPE html>
+     2→<html lang="zh-CN">
+     3→<head>
+     4→<meta charset="UTF-8">
+     5→<meta name="viewport" content="width=device-width, initial-scale=1.0">
+     6→<title>[必填] 替换为 PPT 标题 · Deck Title</title>
+     7→<link rel="preconnect" href="https://fonts.googleapis.com">
+     8→<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     9→<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@300;400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    10→<style>
+    11→  :root{
+    12→    /* ============ 主题色(默认:🖋 墨水经典) ============
+    13→       切换主题:从 references/themes.md 复制对应的 :root 块
+    14→       整体替换这几行(--ink / --ink-rgb / --paper / --paper-rgb)
+    15→       其他地方散落的 rgba() 都走 var(--ink-rgb) / var(--paper-rgb),无需逐处改 */
+    16→    --ink:#0a0a0b;
+    17→    --ink-rgb:10,10,11;
+    18→    --paper:#f1efea;
+    19→    --paper-rgb:241,239,234;
+    20→    --paper-tint:#e8e5de;
+    21→    --ink-tint:#18181a;
+    22→
+    23→    /* ============ 字体(跨主题固定) ============ */
+    24→    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    25→    --serif-en:"Playfair Display","Source Serif 4",Georgia,serif;
+    26→    --serif-body-en:"Source Serif 4",Georgia,serif;
+    27→    --serif-zh:"Noto Serif SC",source-han-serif-sc,serif;
+    28→    --sans-zh:"Noto Sans SC",source-han-sans-sc,sans-serif;
+    29→  }
+    30→  *{box-sizing:border-box;margin:0;padding:0}
+    31→  html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);color:var(--paper);font-family:var(--sans-zh);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+    32→
+    33→  /* ============ WebGL 双背景 ============ */
+    34→  canvas.bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;transition:opacity 1.2s ease}
+    35→  canvas#bg-light{opacity:0}
+    36→  canvas#bg-dark{opacity:1}
+    37→  body.light-bg canvas#bg-light{opacity:1}
+    38→  body.light-bg canvas#bg-dark{opacity:0}
+    39→
+    40→  /* ============ Deck 容器 + 翻页 ============ */
+    41→  /* width: NSLIDES * 100vw，会在 JS 里动态矫正 */
+    42→  #deck{position:fixed;inset:0;width:10000vw;height:100vh;display:flex;flex-wrap:nowrap;transition:transform .9s cubic-bezier(.77,0,.175,1);z-index:10;will-change:transform}
+    43→  .slide{width:100vw;height:100vh;flex:0 0 100vw;position:relative;padding:6vh 6vw 10vh 6vw;display:flex;flex-direction:column;overflow:hidden}
+    44→  .slide.light{color:var(--ink)}
+    45→  .slide.dark{color:var(--paper)}
+    46→
+    47→  /* 默认页：遮罩较厚，保证文字可读 */
+    48→  .slide::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;transition:background .7s ease}
+    49→  .slide.light::before{background:rgba(var(--paper-rgb),.78);backdrop-filter:blur(3px)}
+    50→  .slide.dark::before{background:rgba(var(--ink-rgb),.78);backdrop-filter:blur(3px)}
+    51→  /* Hero 页：遮罩大幅降低，让 WebGL 背景明显透出 */
+    52→  .slide.hero.light::before{background:rgba(var(--paper-rgb),.16);backdrop-filter:none}
+    53→  .slide.hero.dark::before{background:rgba(var(--ink-rgb),.12);backdrop-filter:none}
+    54→  /* Hero 页顶底微弱渐隐，保证 chrome/foot 区域可读 */
+    55→  .slide.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
+    56→  .slide.hero.light::after{background:linear-gradient(180deg,rgba(var(--paper-rgb),.28) 0%,rgba(var(--paper-rgb),0) 14%,rgba(var(--paper-rgb),0) 86%,rgba(var(--paper-rgb),.28) 100%)}
+    57→  .slide.hero.dark::after{background:linear-gradient(180deg,rgba(var(--ink-rgb),.32) 0%,rgba(var(--ink-rgb),0) 14%,rgba(var(--ink-rgb),0) 86%,rgba(var(--ink-rgb),.32) 100%)}
+    58→
+    59→  /* ============ Magazine chrome：顶部 meta + 底部 foot ============ */
+    60→  .chrome{display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+    61→  .chrome .left,.chrome .right{display:flex;gap:2.4em;align-items:center}
+    62→  .chrome .sep{width:40px;height:1px;background:currentColor;opacity:.4}
+    63→  .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.55}
+    64→  .foot .title{font-family:var(--serif-zh);font-weight:400;letter-spacing:.05em;text-transform:none;opacity:.75;font-size:13px}
+    65→
+    66→  .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;padding:6px 14px;border:1px solid currentColor;opacity:.85}
+    67→  .rule{width:100%;height:1px;background:currentColor;opacity:.25;margin:3vh 0}
+    68→  .rule.v{width:1px;height:100%;margin:0}
+    69→
+    70→  /* ============ 字体规则 ============
+    71→     · 衬线（Noto Serif SC / Playfair）：大标题、重点金句、数字
+    72→     · 非衬线（Noto Sans SC）：正文描述、body、补充说明
+    73→     · 等宽（IBM Plex Mono）：kicker、meta 小标签、foot 右侧
+    74→  */
+    75→  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;opacity:.6;margin-bottom:2.6vh}
+    76→  .display{font-family:var(--serif-en);font-weight:700;font-size:11vw;line-height:.92;letter-spacing:-.025em}
+    77→  .display-zh{font-family:var(--serif-zh);font-weight:700;font-size:7.8vw;line-height:1.04;letter-spacing:-.005em}
+    78→  .h1-zh{font-family:var(--serif-zh);font-weight:700;font-size:4.6vw;line-height:1.12;letter-spacing:-.005em}
+    79→  .h2-zh{font-family:var(--serif-zh);font-weight:600;font-size:3.2vw;line-height:1.2;letter-spacing:0}
+    80→  .h3-zh{font-family:var(--serif-zh);font-weight:500;font-size:1.9vw;line-height:1.35}
+    81→  .body-zh{font-family:var(--sans-zh);font-weight:400;font-size:max(15px,1.22vw);line-height:1.75;opacity:.82;letter-spacing:.01em}
+    82→  .body-serif{font-family:var(--serif-zh);font-weight:400;font-size:max(15px,1.3vw);line-height:1.65;opacity:.88}
+    83→  .lead{font-family:var(--serif-zh);font-weight:400;font-size:1.9vw;line-height:1.4;opacity:.85}
+    84→  .meta{font-family:var(--mono);font-size:max(11px,.88vw);letter-spacing:.16em;text-transform:uppercase;opacity:.6}
+    85→  .big-num{font-family:var(--serif-en);font-weight:800;font-size:10vw;line-height:.85;letter-spacing:-.03em;font-feature-settings:"tnum"}
+    86→  .mid-num{font-family:var(--serif-en);font-weight:700;font-size:5.5vw;line-height:.88;letter-spacing:-.02em;font-feature-settings:"tnum"}
+    87→  .ghost{font-family:var(--serif-en);font-weight:900;font-size:34vw;line-height:.8;opacity:.06;letter-spacing:-.04em;position:absolute;font-feature-settings:"tnum"}
+    88→  em{font-style:italic;font-family:var(--serif-en)}
+    89→  .en{font-family:var(--serif-en);font-style:italic;font-weight:500}
+    90→
+    91→  /* ============ 布局工具 ============ */
+    92→  .col{display:flex;flex-direction:column;gap:2.4vh}
+    93→  .row{display:flex;align-items:center;gap:3vw}
+    94→  .grid-6{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:4vw 6vw;flex:1;align-content:center;padding:2vh 0}
+    95→  .grid-9{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:3vh 4vw;flex:1;align-content:center}
+    96→  .grid-4{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:4vh 6vw;flex:1;align-content:center}
+    97→  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:4vw;flex:1;align-content:center}
+    98→  .split{display:grid;grid-template-columns:1fr 1fr;gap:4vw;flex:1;align-items:center}
+    99→  .split-55{display:grid;grid-template-columns:55fr 45fr;gap:5vw;flex:1;align-items:stretch}
+   100→  .fill{flex:1}
+   101→  .center{align-items:center;justify-content:center;text-align:center}
+   102→  .bottom-left{position:absolute;left:6vw;bottom:9vh;max-width:50vw}
+   103→  .bottom-right{position:absolute;right:6vw;bottom:9vh;max-width:50vw;text-align:right}
+   104→  .top-right{position:absolute;right:6vw;top:6vh;text-align:right}
+   105→
+   106→  /* ============ Stat（数字矩阵） ============ */
+   107→  .stat{display:flex;flex-direction:column;gap:1vh;align-items:flex-start}
+   108→  .stat .n{font-family:var(--serif-en);font-weight:800;font-size:8vw;line-height:.88;letter-spacing:-.03em;font-feature-settings:"tnum"}
+   109→  .stat .l{font-family:var(--sans-zh);font-size:max(13px,1.05vw);opacity:.7;margin-top:1vh;font-weight:400;line-height:1.5}
+   110→  .stat .m{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.5;margin-bottom:.2vh}
+   111→
+   112→  /* ============ Callout（引用框） ============ */
+   113→  .callout{padding:3vh 2.4vw;border-left:3px solid currentColor;position:relative;font-family:var(--serif-zh);font-size:max(15px,1.2vw);line-height:1.55;opacity:.92}
+   114→  .slide.light .callout{background:rgba(var(--ink-rgb),.05)}
+   115→  .slide.dark .callout{background:rgba(var(--paper-rgb),.06)}
+   116→  .callout .cite{display:block;margin-top:1.6vh;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+   117→  .callout .q-big{font-family:var(--serif-zh);font-weight:600;font-size:max(17px,1.6vw);line-height:1.42}
+   118→
+   119→  /* ============ Platform（平台卡） ============ */
+   120→  .plat{display:flex;flex-direction:column;justify-content:flex-end;padding:2vh 0;border-top:1px solid currentColor;border-color:rgba(127,127,127,.35)}
+   121→  .plat .name{font-family:var(--serif-zh);font-weight:700;font-size:1.8vw;margin-bottom:.6vh}
+   122→  .plat .nb{font-family:var(--serif-en);font-weight:700;font-size:3.2vw;letter-spacing:-.02em;line-height:1;font-feature-settings:"tnum"}
+   123→  .plat .sub{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.55;margin-top:.6vh}
+   124→  .plat .fill{font-family:var(--sans-zh);font-weight:300;font-size:2.4vw;opacity:.28;letter-spacing:-.01em;line-height:1}
+   125→
+   126→  /* ============ Rowline（表格行） ============ */
+   127→  .rowline{display:grid;grid-template-columns:1fr 2fr 1fr;gap:2vw;padding:2.2vh 0;border-top:1px solid currentColor;align-items:center;border-color:rgba(127,127,127,.25)}
+   128→  .rowline:last-child{border-bottom:1px solid currentColor;border-color:rgba(127,127,127,.25)}
+   129→  .rowline .k{font-family:var(--serif-zh);font-weight:700;font-size:1.7vw}
+   130→  .rowline .v{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.2vw);opacity:.85;line-height:1.55}
+   131→  .rowline .m{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;justify-self:end}
+   132→
+   133→  /* ============ Pillar（支柱卡片） ============ */
+   134→  .pillar{display:flex;flex-direction:column;gap:1.8vh}
+   135→  .pillar .ic{font-family:var(--serif-en);font-style:italic;font-size:2.6vw;opacity:.45;font-weight:400}
+   136→  .pillar .ic svg{width:2.8vw;height:2.8vw;stroke-width:1.2;opacity:.7}
+   137→  .pillar .t{font-family:var(--serif-zh);font-weight:700;font-size:2.4vw;line-height:1.1}
+   138→  .pillar .d{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.1vw);opacity:.76;line-height:1.6}
+   139→
+   140→  /* ============ Signature / Highlight ============ */
+   141→  .sign{font-family:var(--serif-en);font-style:italic;font-weight:500;font-size:2vw;opacity:.7}
+   142→  .hi{position:relative;display:inline}
+   143→  .slide.dark .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--paper-rgb),.15);z-index:-1}
+   144→  .slide.light .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--ink-rgb),.08);z-index:-1}
+   145→
+   146→  /* ============ Icons（Lucide via CDN） ============ */
+   147→  .ico{width:1em;height:1em;display:inline-block;vertical-align:-.12em;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+   148→  .ico-lg,.ico-md,.ico-sm{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+   149→  .ico-lg{width:2.6vw;height:2.6vw;stroke-width:1.2;display:inline-block}
+   150→  .ico-md{width:1.8vw;height:1.8vw;stroke-width:1.3;display:inline-block;vertical-align:-.4em}
+   151→  .ico-sm{width:1.1vw;height:1.1vw;stroke-width:1.4;display:inline-block;vertical-align:-.15em;opacity:.7}
+   152→
+   153→  /* ============ 图片占位（虚线框，提示设计师位置） ============ */
+   154→  .img-slot{border:1.5px dashed rgba(127,127,127,.4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1vh;padding:2vh 2vw;font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;opacity:.55;position:relative;aspect-ratio:16/9;width:100%;max-height:56vh;margin-inline:auto;box-sizing:border-box}
+   155→  .img-slot::before{content:"";position:absolute;inset:8px;border:1px solid currentColor;opacity:.2}
+   156→  .img-slot .plus{font-size:2vw;font-weight:300;opacity:.5;letter-spacing:0}
+   157→  .img-slot .label{position:relative;z-index:2;text-align:center}
+   158→  .img-slot.r-4x3{aspect-ratio:4/3}
+   159→  .img-slot.r-3x2{aspect-ratio:3/2}
+   160→  .img-slot.r-1x1{aspect-ratio:1/1}
+   161→
+   162→  /* ============ 图片实填框（关键：固定高度 + 只裁底部） ============
+   163→     重要约束：高度用内联 height:Nvh 精确控制，不要用 aspect-ratio（会撑破布局）
+   164→     object-position:top center 保证严禁裁剪顶部和左右，只裁剪底部
+   165→  */
+   166→  .frame-img{overflow:hidden;position:relative;background:rgba(0,0,0,.04);box-sizing:border-box;width:100%;border-radius:4px}
+   167→  .slide.dark .frame-img{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
+   168→  .frame-img > img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+   169→  .frame-cap{display:flex;justify-content:space-between;align-items:baseline;gap:1vw;margin-top:.8vh;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.72}
+   170→  .frame-cap .pf{font-family:var(--serif-zh);font-weight:600;font-size:max(13px,1vw);letter-spacing:.04em;text-transform:none;opacity:.94}
+   171→  .frame-cap .nb{font-family:var(--serif-en);font-style:italic;font-size:max(15px,1.2vw);letter-spacing:.02em;text-transform:none;opacity:.88}
+   172→  .frame-cap .idx{font-family:var(--mono);opacity:.5}
+   173→  figure.tile{display:flex;flex-direction:column;margin:0;min-width:0}
+   174→  figure.tile > .frame-img{flex:0 0 auto}
+   175→
+   176→  /* ============ 导航 ============ */
+   177→  #nav{position:fixed;left:50%;bottom:2.6vh;transform:translateX(-50%);z-index:30;display:flex;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+   178→  #nav .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .3s ease;border:0;padding:0}
+   179→  #nav .dot:hover{background:rgba(255,255,255,.5);transform:scale(1.15)}
+   180→  #nav .dot.active{background:rgba(255,255,255,.95);width:22px;border-radius:999px}
+   181→  body.light-bg #nav{background:rgba(255,255,255,.25)}
+   182→  body.light-bg #nav .dot{background:rgba(var(--ink-rgb),.25)}
+   183→  body.light-bg #nav .dot.active{background:rgba(var(--ink-rgb),.9)}
+   184→  #hint{position:fixed;bottom:3vh;right:3vw;z-index:30;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.4;mix-blend-mode:difference;color:#aaa}
+   185→
+   186→  /* ============================================================
+   187→     ============ LAYOUTS API · 面向 agent 的类（v2）============
+   188→     所有 layouts.md 中的骨架都基于下面这套命名。
+   189→     如果你在 layouts.md 里看到某个类，它必须在下面有定义。
+   190→     ============================================================ */
+   191→
+   192→  /* ---------- .frame：每页主内容容器 ---------- */
+   193→  .frame{flex:1;display:flex;flex-direction:column;min-height:0}
+   194→  /* 当 .frame 同时加了 grid 类时，grid 的 display:grid 覆盖 flex */
+   195→  .frame.grid-2-7-5,
+   196→  .frame.grid-2-6-6,
+   197→  .frame.grid-2-8-4,
+   198→  .frame.grid-3-3,
+   199→  .frame.grid-6{display:grid}
+   200→
+   201→  /* ---------- 标题层级（API 名称，衬线为主） ---------- */
+   202→  .h-hero{
+   203→    font-family:var(--serif-zh);
+   204→    font-weight:900;
+   205→    font-size:10vw;
+   206→    line-height:.96;
+   207→    letter-spacing:-.02em;
+   208→  }
+   209→  .h-xl{
+   210→    font-family:var(--serif-zh);
+   211→    font-weight:700;
+   212→    font-size:6.2vw;
+   213→    line-height:1.08;
+   214→    letter-spacing:-.01em;
+   215→  }
+   216→  .h-sub{
+   217→    font-family:var(--serif-zh);
+   218→    font-weight:500;
+   219→    font-size:3.1vw;
+   220→    line-height:1.25;
+   221→    letter-spacing:0;
+   222→    opacity:.7;
+   223→  }
+   224→  .h-md{
+   225→    font-family:var(--serif-zh);
+   226→    font-weight:600;
+   227→    font-size:2.3vw;
+   228→    line-height:1.3;
+   229→  }
+   230→  /* 英文标题专用（Playfair 衬线） */
+   231→  .h-hero-en,.h-xl-en{font-family:var(--serif-en);letter-spacing:-.025em}
+   232→
+   233→  /* ---------- lead 引语 ---------- */
+   234→  .lead{
+   235→    font-family:var(--serif-zh);
+   236→    font-weight:400;
+   237→    font-size:1.75vw;
+   238→    line-height:1.5;
+   239→    opacity:.86;
+   240→  }
+   241→
+   242→  /* ---------- meta-row 底部元数据 ---------- */
+   243→  .meta-row{
+   244→    display:flex;
+   245→    gap:1.2em;
+   246→    align-items:baseline;
+   247→    flex-wrap:wrap;
+   248→    font-family:var(--mono);
+   249→    font-size:max(12px,.92vw);
+   250→    letter-spacing:.16em;
+   251→    text-transform:uppercase;
+   252→    opacity:.6;
+   253→  }
+   254→
+   255→  /* ---------- stat-card（数据大字报用） ---------- */
+   256→  .stat-card{
+   257→    display:flex;
+   258→    flex-direction:column;
+   259→    gap:.8vh;
+   260→    align-items:flex-start;
+   261→    padding-top:1.6vh;
+   262→    border-top:1px solid currentColor;
+   263→    border-color:rgba(127,127,127,.3);
+   264→  }
+   265→  .stat-card .stat-label{
+   266→    font-family:var(--mono);
+   267→    font-size:max(10px,.78vw);
+   268→    letter-spacing:.24em;
+   269→    text-transform:uppercase;
+   270→    opacity:.55;
+   271→  }
+   272→  .stat-card .stat-nb{
+   273→    font-family:var(--serif-en);
+   274→    font-weight:800;
+   275→    font-size:5.8vw;
+   276→    line-height:.9;
+   277→    letter-spacing:-.03em;
+   278→    font-feature-settings:"tnum";
+   279→    margin-top:.4vh;
+   280→  }
+   281→  .stat-card .stat-nb .stat-unit{
+   282→    font-family:var(--serif-zh);
+   283→    font-weight:500;
+   284→    font-size:.38em;
+   285→    letter-spacing:0;
+   286→    opacity:.72;
+   287→    margin-left:.14em;
+   288→  }
+   289→  .stat-card .stat-note{
+   290→    font-family:var(--sans-zh);
+   291→    font-weight:400;
+   292→    font-size:max(13px,1.05vw);
+   293→    line-height:1.5;
+   294→    opacity:.72;
+   295→    margin-top:.6vh;
+   296→  }
+   297→  /* 当 stat-card 用于 grid-4（2x2），数字可以更大 */
+   298→  .grid-4 .stat-card .stat-nb{font-size:7.5vw}
+   299→  /* 当只有 3 个，字也可以稍大 */
+   300→  .grid-3 .stat-card .stat-nb{font-size:6.8vw}
+   301→
+   302→  /* ---------- pipeline（流水线） ---------- */
+   303→  .pipeline-section{
+   304→    margin-top:4.4vh;
+   305→    padding-top:2.8vh;
+   306→    border-top:1px dashed rgba(127,127,127,.32);
+   307→  }
+   308→  .pipeline-section:first-of-type{
+   309→    border-top:0;
+   310→    padding-top:0;
+   311→    margin-top:3vh;
+   312→  }
+   313→  .pipeline-label{
+   314→    font-family:var(--mono);
+   315→    font-size:max(11px,.85vw);
+   316→    letter-spacing:.24em;
+   317→    text-transform:uppercase;
+   318→    opacity:.62;
+   319→    margin-bottom:2.2vh;
+   320→  }
+   321→  .pipeline{
+   322→    display:grid;
+   323→    grid-template-columns:repeat(5,1fr);
+   324→    gap:1.2vw;
+   325→  }
+   326→  .pipeline[data-cols="3"]{grid-template-columns:repeat(3,1fr)}
+   327→  .pipeline[data-cols="4"]{grid-template-columns:repeat(4,1fr)}
+   328→  .pipeline[data-cols="6"]{grid-template-columns:repeat(6,1fr)}
+   329→  .step{
+   330→    display:flex;
+   331→    flex-direction:column;
+   332→    gap:.8vh;
+   333→    padding-top:1.4vh;
+   334→    border-top:1px solid currentColor;
+   335→    border-color:rgba(127,127,127,.35);
+   336→  }
+   337→  .step-nb{
+   338→    font-family:var(--serif-en);
+   339→    font-style:italic;
+   340→    font-weight:500;
+   341→    font-size:1.15vw;
+   342→    opacity:.45;
+   343→  }
+   344→  .step-title{
+   345→    font-family:var(--sans-zh);
+   346→    font-weight:700;
+   347→    font-size:1.55vw;
+   348→    letter-spacing:.01em;
+   349→    line-height:1.2;
+   350→  }
+   351→  .step-desc{
+   352→    font-family:var(--sans-zh);
+   353→    font-weight:400;
+   354→    font-size:max(12px,.95vw);
+   355→    line-height:1.45;
+   356→    opacity:.72;
+   357→  }
+   358→
+   359→  /* ---------- 网格（layouts.md 所用） ---------- */
+   360→  /* 这些类独立挂到任何容器上都能生效，不依赖 .frame 复合选择器 */
+   361→  .grid-2-7-5{display:grid;grid-template-columns:7fr 5fr;gap:3vw 4vh;align-items:start}
+   362→  .grid-2-6-6{display:grid;grid-template-columns:1fr 1fr;gap:3vw 4vh;align-items:start}
+   363→  .grid-2-8-4{display:grid;grid-template-columns:8fr 4fr;gap:3vw 4vh;align-items:start}
+   364→  .grid-3-3{
+   365→    display:grid;
+   366→    grid-template-columns:repeat(3,1fr);
+   367→    grid-auto-rows:minmax(0,1fr);
+   368→    gap:2.4vh 2vw;
+   369→  }
+   370→  /* grid-6 已在旧样式里定义为 3x2，这里仅补 align */
+   371→
+   372→  /* ---------- 图片 frame-img（layouts.md 主命名） ---------- */
+   373→  /* 在旧样式里已定义，这里补 img-cap 命名别名与增强 */
+   374→  figure.frame-img{margin:0;display:flex;flex-direction:column;min-width:0}
+   375→  .img-cap{
+   376→    display:block;
+   377→    margin-top:.8vh;
+   378→    font-family:var(--mono);
+   379→    font-size:max(10px,.8vw);
+   380→    letter-spacing:.22em;
+   381→    text-transform:uppercase;
+   382→    opacity:.6;
+   383→  }
+   384→  /* callout src 命名别名 */
+   385→  .callout-src{
+   386→    display:block;
+   387→    margin-top:1.6vh;
+   388→    font-family:var(--mono);
+   389→    font-size:11px;
+   390→    letter-spacing:.2em;
+   391→    text-transform:uppercase;
+   392→    opacity:.6;
+   393→  }
+   394→
+   395→  /* ---------- chrome & foot 补位（layouts.md 简单写法） ---------- */
+   396→  .chrome{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.2em;text-transform:uppercase;opacity:.62}
+   397→  .foot{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.18em;text-transform:uppercase;opacity:.5}
+   398→
+   399→  /* ---------- 响应式降级 ---------- */
+   400→  @media (max-width:900px){
+   401→    .display{font-size:16vw}
+   402→    .display-zh{font-size:12vw}
+   403→    .h1-zh{font-size:7vw}
+   404→    .h-hero{font-size:14vw}
+   405→    .h-xl{font-size:9vw}
+   406→    .pipeline{grid-template-columns:repeat(2,1fr)}
+   407→    .grid-2-7-5,.grid-2-6-6,.grid-2-8-4{grid-template-columns:1fr}
+   408→  }
+   409→</style>
+   410→</head>
+   411→<body>
+   412→
+   413→<canvas id="bg-dark" class="bg"></canvas>
+   414→<canvas id="bg-light" class="bg"></canvas>
+   415→<div id="hint">← → 翻页 · ESC 索引</div>
+   416→
+   417→<div id="deck">
+   418→
+   419→<!-- ============================================================
+   420→     SLIDES 插入区 · 在此处填充所有 <section class="slide ..."> 页面
+   421→     每页模板参考 references/page-patterns.md
+   422→     页面组件参考 references/components.md
+   423→     ============================================================ -->
+   424→
+   425→<!-- SLIDES_HERE -->
+   426→
+   427→</div>
+   428→
+   429→<div id="nav"></div>
+   430→
+   431→<script>
+   432→/* =============== WebGL 双背景 ===============
+   433→   深色页：Holographic Dispersion（全息色散 · 钛金暗流）—— 彩虹微扰、鼠标径向涟漪
+   434→   浅色页：Spiral Vortex（旋转涡流 · 银色珍珠）—— domain-warp 流动、无中心
+   435→   修改风格请参考 references/webgl-backgrounds.md
+   436→*/
+   437→const VS = `attribute vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}`;
+   438→
+   439→const FS_DARK = `precision highp float;
+   440→uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;
+   441→vec3 palette(float t,vec3 a,vec3 b,vec3 c,vec3 d){return a+b*cos(6.28318*(c*t+d));}
+   442→void main(){
+   443→  vec2 uv=gl_FragCoord.xy/u_resolution.xy;
+   444→  vec2 p=uv*2.0-1.0;p.x*=u_resolution.x/u_resolution.y;
+   445→  vec2 m=u_mouse*2.0-1.0;m.x*=u_resolution.x/u_resolution.y;
+   446→  float md=length(p-m);
+   447→  float mr=sin(md*15.0-u_time*4.0)*exp(-md*3.0);p+=mr*0.08;
+   448→  vec2 p0=p;
+   449→  for(float i=1.0;i<4.0;i++){
+   450→    p.x+=0.1/i*sin(i*3.0*p.y+u_time*0.4)+0.05;
+   451→    p.y+=0.1/i*cos(i*2.0*p.x+u_time*0.3)-0.05;
+   452→  }
+   453→  float r=length(p);float ang=atan(p.y,p.x);
+   454→  vec3 a=vec3(0.12,0.12,0.13);
+   455→  vec3 b=vec3(0.03,0.04,0.05);
+   456→  vec3 c=vec3(1.0,1.0,1.0);
+   457→  vec3 d=vec3(0.1,0.2,0.4);
+   458→  vec3 col=palette(r*1.5+p0.x*0.5+u_time*0.1,a,b,c,d);
+   459→  float disp=sin(r*25.0-u_time*1.5+ang*2.0)*0.5+0.5;
+   460→  col+=vec3(disp*0.015,disp*0.01,disp*0.02);
+   461→  float hi=pow(sin(p.x*4.0+p.y*3.0+u_time)*0.5+0.5,8.0);
+   462→  col+=hi*0.08;
+   463→  vec3 base=vec3(0.05,0.05,0.06);
+   464→  col=mix(base,col,0.85);
+   465→  gl_FragColor=vec4(col,1.0);
+   466→}`;
+   467→
+   468→const FS_LIGHT = `precision highp float;
+   469→uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;
+   470→float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+   471→float noise(vec2 p){
+   472→  vec2 i=floor(p),f=fract(p);
+   473→  float a=hash(i),b=hash(i+vec2(1,0));
+   474→  float c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));
+   475→  vec2 u=f*f*(3.0-2.0*f);
+   476→  return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;
+   477→}
+   478→float fbm(vec2 p){
+   479→  float v=0.0,a=0.5;
+   480→  mat2 m=mat2(0.80,0.60,-0.60,0.80);
+   481→  for(int i=0;i<5;i++){v+=a*noise(p);p=m*p*2.02;a*=0.5;}
+   482→  return v;
+   483→}
+   484→void main(){
+   485→  vec2 uv=gl_FragCoord.xy/u_resolution.xy;
+   486→  vec2 p=uv;p.x*=u_resolution.x/u_resolution.y;
+   487→  vec2 m=u_mouse;m.x*=u_resolution.x/u_resolution.y;
+   488→  vec2 md=p-m;float dl=length(md);
+   489→  p+=normalize(md+vec2(0.0001))*exp(-dl*5.0)*0.03;
+   490→  vec2 q=vec2(fbm(p*1.8+u_time*0.07),fbm(p*1.8+vec2(5.2,1.3)+u_time*0.06));
+   491→  vec2 r=vec2(fbm(p*2.0+q*1.3+vec2(1.7,9.2)+u_time*0.05),
+   492→              fbm(p*2.0+q*1.3+vec2(8.3,2.8)+u_time*0.04));
+   493→  float f=fbm(p*2.2+r*1.5);
+   494→  vec3 silverDark=vec3(0.86,0.85,0.84);
+   495→  vec3 paper=vec3(0.955,0.945,0.925);
+   496→  vec3 col=mix(silverDark,paper,f);
+   497→  float ph=r.x*2.2+u_time*0.35;
+   498→  col+=vec3(0.78,0.62,0.92)*sin(ph)*0.055;
+   499→  col+=vec3(0.55,0.72,0.95)*sin(ph*0.8+2.0)*0.05;
+   500→  float hl=smoothstep(0.48,0.92,f);
+   501→  col+=hl*0.06;
+   502→  gl_FragColor=vec4(col,1.0);
+   503→}`;
+   504→
+   505→const mouse={x:0.5,y:0.5};
+   506→addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth;mouse.y=e.clientY/innerHeight});
+   507→
+   508→function bootGL(canvasId, fsSrc){
+   509→  const canvas=document.getElementById(canvasId);
+   510→  const gl=canvas.getContext('webgl',{alpha:false,antialias:true});
+   511→  if(!gl) return ()=>false;
+   512→  const mk=(t,s)=>{const sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh};
+   513→  const prog=gl.createProgram();
+   514→  gl.attachShader(prog,mk(gl.VERTEX_SHADER,VS));
+   515→  gl.attachShader(prog,mk(gl.FRAGMENT_SHADER,fsSrc));
+   516→  gl.linkProgram(prog);gl.useProgram(prog);
+   517→  const buf=gl.createBuffer();
+   518→  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+   519→  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+   520→  const pos=gl.getAttribLocation(prog,'position');
+   521→  gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
+   522→  const lRes=gl.getUniformLocation(prog,'u_resolution');
+   523→  const lT=gl.getUniformLocation(prog,'u_time');
+   524→  const lM=gl.getUniformLocation(prog,'u_mouse');
+   525→  const resize=()=>{
+   526→    const d=Math.min(window.devicePixelRatio||1,2);
+   527→    canvas.width=innerWidth*d;canvas.height=innerHeight*d;
+   528→    gl.viewport(0,0,canvas.width,canvas.height);
+   529→  };
+   530→  addEventListener('resize',resize);resize();
+   531→  return (tSec)=>{
+   532→    gl.uniform2f(lRes,canvas.width,canvas.height);
+   533→    gl.uniform1f(lT,tSec);
+   534→    gl.uniform2f(lM,mouse.x,1-mouse.y);
+   535→    gl.drawArrays(gl.TRIANGLES,0,6);
+   536→    return true;
+   537→  };
+   538→}
+   539→const drawDark=bootGL('bg-dark',FS_DARK);
+   540→const drawLight=bootGL('bg-light',FS_LIGHT);
+   541→const t0=Date.now();
+   542→(function loop(){
+   543→  const t=(Date.now()-t0)/1000;
+   544→  drawDark(t);drawLight(t);
+   545→  requestAnimationFrame(loop);
+   546→})();
+   547→
+   548→// =============== 导航（翻页 / 圆点 / 键盘 / 滚轮 / 触屏） ===============
+   549→const deck=document.getElementById('deck');
+   550→const slides=deck.querySelectorAll('.slide');
+   551→const nav=document.getElementById('nav');
+   552→let idx=0,total=slides.length,lock=false;
+   553→
+   554→// 关键：矫正 deck 宽度为 total * 100vw，否则翻页会错位
+   555→deck.style.width=(total*100)+'vw';
+   556→
+   557→slides.forEach((s,i)=>{
+   558→  const b=document.createElement('button');
+   559→  b.className='dot';b.dataset.i=i;b.setAttribute('aria-label','Page '+(i+1));
+   560→  b.onclick=()=>go(i);
+   561→  nav.appendChild(b);
+   562→});
+   563→
+   564→function go(n){
+   565→  if(lock)return;
+   566→  idx=Math.max(0,Math.min(total-1,n));
+   567→  deck.style.transform=`translateX(${-idx*100}vw)`;
+   568→  /* load-bearing: .slide.active is read by Open Design's host bridge
+   569→     (src/runtime/srcdoc.ts findActiveByClass) to drive the slide counter.
+   570→     No CSS targets it — do not remove. */
+   571→  slides.forEach((s,i)=>s.classList.toggle('active',i===idx));
+   572→  nav.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+   573→  /* 主题切换：优先读 data-theme，其次从 class（light/dark）推断 */
+   574→  const el=slides[idx];
+   575→  const th=el.dataset.theme || (el.classList.contains('light')?'light':(el.classList.contains('dark')?'dark':'dark'));
+   576→  document.body.classList.toggle('light-bg',th==='light');
+   577→  lock=true;setTimeout(()=>lock=false,700);
+   578→}
+   579→
+   580→/* =============== ESC 索引视图 =============== */
+   581→let overviewOn=false;
+   582→const ov=document.createElement('div');
+   583→ov.id='overview';
+   584→ov.style.cssText='position:fixed;inset:0;z-index:100;background:rgba(var(--ink-rgb),.92);backdrop-filter:blur(12px);display:none;overflow-y:auto;padding:4vh 4vw';
+   585→document.body.appendChild(ov);
+   586→
+   587→function buildOverview(){
+   588→  ov.innerHTML='';
+   589→  const grid=document.createElement('div');
+   590→  grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:2vh 1.6vw;max-width:90vw;margin:0 auto';
+   591→  slides.forEach((s,i)=>{
+   592→    const card=document.createElement('div');
+   593→    card.style.cssText='cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid '+(i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)')+';transition:border-color .2s';
+   594→    card.onmouseenter=()=>card.style.borderColor='rgba(var(--paper-rgb),.6)';
+   595→    card.onmouseleave=()=>card.style.borderColor=i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)';
+   596→    const wrap=document.createElement('div');
+   597→    wrap.style.cssText='width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;pointer-events:none;background:'+(s.classList.contains('light')?'var(--paper)':'var(--ink)');
+   598→    const clone=s.cloneNode(true);
+   599→    clone.style.cssText='width:100vw;height:100vh;transform:scale('+(1/4.5)+');transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none';
+   600→    wrap.appendChild(clone);
+   601→    const label=document.createElement('div');
+   602→    label.style.cssText='padding:6px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper);opacity:.7';
+   603→    label.textContent=(i+1)+' / '+total;
+   604→    card.appendChild(wrap);
+   605→    card.appendChild(label);
+   606→    card.onclick=()=>{toggleOverview();go(i)};
+   607→    grid.appendChild(card);
+   608→  });
+   609→  ov.appendChild(grid);
+   610→}
+   611→
+   612→function toggleOverview(){
+   613→  overviewOn=!overviewOn;
+   614→  if(overviewOn){buildOverview();ov.style.display='block';}
+   615→  else{ov.style.display='none';}
+   616→}
+   617→
+   618→addEventListener('keydown',e=>{
+   619→  if(e.key==='Escape'){e.preventDefault();toggleOverview();return;}
+   620→  if(overviewOn)return;
+   621→  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '||e.key==='ArrowDown')go(idx+1);
+   622→  if(e.key==='ArrowLeft'||e.key==='PageUp'||e.key==='ArrowUp')go(idx-1);
+   623→  if(e.key==='Home')go(0);
+   624→  if(e.key==='End')go(total-1);
+   625→});
+   626→
+   627→let wheelTO=null,wheelAcc=0;
+   628→addEventListener('wheel',e=>{
+   629→  wheelAcc+=e.deltaY+e.deltaX;
+   630→  if(Math.abs(wheelAcc)>50){go(idx+(wheelAcc>0?1:-1));wheelAcc=0;}
+   631→  clearTimeout(wheelTO);wheelTO=setTimeout(()=>wheelAcc=0,150);
+   632→},{passive:true});
+   633→
+   634→let tx=0,ty=0;
+   635→addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+   636→addEventListener('touchend',e=>{
+   637→  const dx=(e.changedTouches[0].clientX-tx);
+   638→  const dy=(e.changedTouches[0].clientY-ty);
+   639→  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))go(idx+(dx<0?1:-1));
+   640→},{passive:true});
+   641→
+   642→go(0);
+   643→</script>
+   644→<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+   645→<script>lucide.createIcons();</script>
+   646→</body>
+   647→</html>
+   648→

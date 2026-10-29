@@ -1,251 +1,251 @@
 ---
 name: auto-target-tracker
-description: 自动目标进度追踪器。在对话中检测到目标相关图片（笔记、进度、截图、记录）时，自动调用 VLM 识别关键信息并记录到目标日记。适用于学习管理、健身追踪、工作进度、习惯养成、创作记录等所有目标管理场景。
+description: Automatic goal progress tracker. When goal-related images (notes, progress, screenshots, records) are detected in the conversation, automatically invokes a VLM to recognize the key information and logs it into the goal journal. Works for all goal-management scenarios: study tracking, fitness tracking, work progress, habit building, creative work logs, and more.
 ---
 
-# 自动目标进度追踪器
+# Automatic Goal Progress Tracker
 
-## 触发条件
+## Trigger Conditions
 
-当对话中出现以下条件时自动触发：
+Automatically triggers when any of the following appears in the conversation:
 
-1. **用户发送了图片**（特别是学习笔记、进度截图、健身记录、任务清单、创作作品等）。
-2. **用户在设定的目标时间段**（如 08:30, 10:00, 20:00）发送了图片。
-3. **用户明确说**"帮我记一下"、"看下进度"、"打卡"、"更新一下"等。
+1. **The user sends an image** (especially study notes, progress screenshots, workout logs, task checklists, creative works, etc.).
+2. **The user sends an image during a scheduled goal time slot** (e.g. 08:30, 10:00, 20:00).
+3. **The user explicitly says** things like "log this for me", "check my progress", "checking in", "update it", etc.
 
 ---
 
-## 工作流程
+## Workflow
 
-### 1. 检测图片
+### 1. Detect the image
 
-当检测到图片时，检查：
-- 图片文件名是否包含目标关键词（progress, goal, task, workout, note等）
-- 图片内容是否包含目标元素（进度条、文字、代码、图表、计划表等）
-- 是否在预定的目标提醒时间附近
-- 用户最近的对话上下文是否涉及目标的执行
+When an image is detected, check:
+- Whether the image file name contains goal-related keywords (progress, goal, task, workout, note, etc.)
+- Whether the image content contains goal elements (progress bars, text, code, charts, plans, etc.)
+- Whether it is near a scheduled goal reminder time
+- Whether the recent conversation context involves working on a goal
 
-### 2. 调用 VLM 识别
+### 2. Invoke the VLM to recognize
 
-使用 vlm 工具识别图片：
+Use the `vlm` tool to recognize the image:
 
-**通用 prompt 模板**：
+**Generic prompt template**:
 ```
-"识别图片中的关键信息，根据目标类型提取以下内容：
-- 核心任务/内容
-- 完成进度或数量
-- 关键数据（如时间、重量、字数等）
-- 给出一段简短的执行反馈"
+"Identify the key information in the image and extract the following based on the goal type:
+- Core task/content
+- Completion progress or count
+- Key data (time, weight, word count, etc.)
+- A short piece of execution feedback"
 ```
 
-**目标类型专用 prompt**：
+**Goal-type-specific prompts**:
 
-| 目标类型 | Prompt |
+| Goal type | Prompt |
 |---------|--------|
-| 学习 | "识别学习笔记，提取知识点、完成度" |
-| 健身 | "识别健身记录，提取运动类型、组数、次数、重量" |
-| 工作 | "识别工作进度，提取完成任务、完成率" |
-| 创作 | "识别创作作品，提取创作类型、进度、关键元素" |
-| 习惯 | "识别打卡记录，提取打卡内容、连续天数" |
+| Study | "Identify the study notes; extract knowledge points and completion level" |
+| Fitness | "Identify the workout log; extract exercise type, sets, reps, weight" |
+| Work | "Identify the work progress; extract completed tasks and completion rate" |
+| Creative | "Identify the creative work; extract the type, progress, and key elements" |
+| Habit | "Identify the check-in record; extract the check-in content and streak days" |
 
-### 3. 解析目标信息
+### 3. Parse the goal information
 
-从 VLM 返回的结果中提取：
-- **任务/内容清单**：识别出的具体行动或任务
-- **完成度**：基于图片内容的进度估算
-- **关键数据**：时间、数量、重量、字数等量化指标
-- **认知反馈**：对当前目标状态的简评
+From the VLM's response, extract:
+- **Task/content list**: the specific actions or tasks identified
+- **Completion level**: estimated progress based on the image content
+- **Key data**: quantitative metrics such as time, count, weight, word count
+- **Cognitive feedback**: a brief assessment of the current goal state
 
-### 4. 记录到目标日记
+### 4. Record in the goal journal
 
-调用`edit_daily`工具将识别结果记录到当天的日常笔记中
+Call the `edit_daily` tool to write the recognition results into the daily note for today
 
 
-### 5. 反馈给用户
+### 5. Feed back to the user
 
-向用户确认识别结果：
+Confirm the recognition results with the user:
 
 ```
-已记录你的目标打卡：
+Your goal check-in has been recorded:
 
-📝 识别结果：
-核心内容：你拍的是今天的英语单词表，一共记了 15 个新词。
-进度估算：今天的单词任务全部搞定，进度打败了 80% 的学习党。
-建议：有两个单词的拼写有点模糊，明天复习的时候记得多看两眼。
+📝 Recognition results:
+Core content: You photographed today's English vocabulary list — 15 new words memorized.
+Progress estimate: Today's vocabulary task is fully done; you're ahead of 80% of learners.
+Suggestion: Two of the words were a bit blurry — take an extra look when reviewing tomorrow.
 
-记录准确吗？要帮你存进今天的目标日记里吗？
+Is the record accurate? Want me to save it into today's goal journal?
 ```
 
 ---
 
-## 记录格式
+## Recording Format
 
-### 目标日记条目示例
+### Example goal journal entry
 
 ```markdown
-## 20:00 打卡记录
+## 20:00 Check-in record
 
-**目标类型**: 📚 学习
+**Goal type**: 📚 Study
 
-**图片**: ![目标图片](path/to/image.jpg)
+**Image**: ![Goal image](path/to/image.jpg)
 
-**VLM识别结果**:
+**VLM recognition results**:
 
-| 任务/内容 | 进度/数量 | 状态 |
+| Task/Content | Progress/Count | Status |
 |----------|----------|------|
-| 英语单词 (Unit 1) | 15 个 | 已完成 |
-| 数学练习 (第3章) | 80% | 进行中 |
+| English vocabulary (Unit 1) | 15 words | Completed |
+| Math exercises (Chapter 3) | 80% | In progress |
 
-| **总计** | | **今日达成 2/3** |
+| **Total** | | **2/3 done today** |
 
-**关键数据**:
-- 学习时长: 2小时
-- 专注度: 高
+**Key data**:
+- Study time: 2 hours
+- Focus level: High
 
-**备注**: 自动识别，用户确认正确
+**Note**: Auto-recognized, confirmed correct by the user
 
 ---
 
-## 10:30 健身打卡
+## 10:30 Fitness check-in
 
-**目标类型**: 🏃 健身
+**Goal type**: 🏃 Fitness
 
-**图片**: ![健身记录](path/to/gym.jpg)
+**Image**: ![Workout log](path/to/gym.jpg)
 
-**VLM识别结果**:
+**VLM recognition results**:
 
-| 运动类型 | 组数 | 次数 | 重量 | 状态 |
+| Exercise | Sets | Reps | Weight | Status |
 |---------|------|------|------|------|
-| 卧推 | 4 | 12 | 60kg | ✅ 完成 |
-| 深蹲 | 4 | 10 | 80kg | ✅ 完成 |
-| 引体向上 | 3 | 8 | 自重 | ⚠️ 少一组 |
+| Bench press | 4 | 12 | 60kg | ✅ Done |
+| Squat | 4 | 10 | 80kg | ✅ Done |
+| Pull-up | 3 | 8 | Bodyweight | ⚠️ One set short |
 
-| **总计** | | | **今日达标** |
+| **Total** | | | **On target today** |
 
-**关键数据**:
-- 总重量: 2640kg
-- 训练时长: 45分钟
+**Key data**:
+- Total weight: 2640kg
+- Training time: 45 minutes
 
-**备注**: 引体向上少完成一组，下次补上
+**Note**: One pull-up set short — make it up next time
 ```
 
 ---
 
-## 与目标系统的集成
+## Integration with the Goal System
 
-### 每日汇总
+### Daily summary
 
-在每天晚上 22:00 的汇总中，包含：
-- 今日所有打卡记录
-- 目标达成率分析
-- 与目标的对比（如果设置了目标）
+The 22:00 daily summary should include:
+- All of today's check-in records
+- Goal achievement rate analysis
+- Comparison against goals (if goals are set)
 
-### 周/月报告
+### Weekly/monthly reports
 
-在周报告中，包含：
-- 本周有效执行时长
-- 目标覆盖范围
-- 连续打卡天数
-- 动态难度调整建议：如果连续达标，则建议提升下周任务量
+The weekly report should include:
+- Effective execution time this week
+- Goal coverage
+- Consecutive check-in days
+- Adaptive difficulty suggestions: if targets were consistently met, suggest increasing next week's workload
 
 ---
 
-## 常见使用场景
+## Common Scenarios
 
-### 场景1：学习打卡
+### Scenario 1: Study check-in
 
-**用户行为**：发送手写笔记照片
+**User action**: sends a photo of handwritten notes
 
-**自动识别**：
-- 提取知识点
-- 计算学习进度
-- 记录到学习日志
+**Auto-recognition**:
+- Extract knowledge points
+- Compute study progress
+- Record in the study log
 
-**反馈示例**：
+**Example feedback**:
 ```
-📚 识别到学习笔记：
-- 机器学习监督学习算法（已完成）
-- 梯度下降优化器（进行中）
-- 正则化防过拟合（未开始）
+📚 Study notes recognized:
+- Supervised learning algorithms for machine learning (completed)
+- Gradient descent optimizers (in progress)
+- Regularization to prevent overfitting (not started)
 
-进度：33% | 预计还需 2 小时完成
-```
-
-### 场景2：健身打卡
-
-**用户行为**：发送健身记录照片
-
-**自动识别**：
-- 提取运动类型
-- 统计组数、次数、重量
-- 计算训练量
-
-**反馈示例**：
-```
-🏃 健身记录已识别：
-- 卧推 60kg × 12 × 4组 ✅
-- 深蹲 80kg × 10 × 4组 ✅
-- 引体向上 自重 × 8 × 3组 ✅
-
-总训练量：2640kg | 时长：45分钟
+Progress: 33% | Estimated 2 more hours to finish
 ```
 
-### 场景3：工作进度
+### Scenario 2: Fitness check-in
 
-**用户行为**：发送项目进度截图
+**User action**: sends a photo of a workout log
 
-**自动识别**：
-- 提取已完成任务
-- 计算完成百分比
-- 识别剩余任务
+**Auto-recognition**:
+- Extract exercise types
+- Tally sets, reps, weight
+- Compute training volume
 
-**反馈示例**：
+**Example feedback**:
 ```
-💼 工作进度已识别：
-- 需求文档（已完成）✅
-- 原型设计（已完成）✅
-- 前端开发（进行中）🔄 80%
-- 后端开发（未开始）⏳
+🏃 Workout log recognized:
+- Bench press 60kg × 12 × 4 sets ✅
+- Squat 80kg × 10 × 4 sets ✅
+- Pull-up bodyweight × 8 × 3 sets ✅
 
-项目总进度：67%
-```
-
-### 场景4：创作打卡
-
-**用户行为**：发送创作作品照片
-
-**自动识别**：
-- 提取创作类型
-- 识别关键元素
-- 估算完成度
-
-**反馈示例**：
-```
-🎨 创作记录已识别：
-类型：插画创作
-元素：人物角色、背景场景
-完成度：线稿100%，上色60%
-
-建议：今天完成了角色线稿，明天可以开始背景上色
+Total training volume: 2640kg | Duration: 45 minutes
 ```
 
-### 场景5：习惯打卡
+### Scenario 3: Work progress
 
-**用户行为**：发送打卡日历截图
+**User action**: sends a project progress screenshot
 
-**自动识别**：
-- 提取连续打卡天数
-- 识别今日打卡状态
-- 计算打卡率
+**Auto-recognition**:
+- Extract completed tasks
+- Compute completion percentage
+- Identify remaining tasks
 
-**反馈示例**：
+**Example feedback**:
 ```
-✅ 习惯打卡已识别：
-早起：连续 15 天 | 打卡率 100%
-阅读：连续 8 天 | 打卡率 73%
-运动：连续 21 天 | 打卡率 100%
+💼 Work progress recognized:
+- Requirements doc (completed) ✅
+- Prototype design (completed) ✅
+- Frontend development (in progress) 🔄 80%
+- Backend development (not started) ⏳
 
-🎉 运动已连续打卡 3 周，继续保持！
+Overall project progress: 67%
+```
+
+### Scenario 4: Creative check-in
+
+**User action**: sends a photo of a creative work
+
+**Auto-recognition**:
+- Extract the creative type
+- Identify key elements
+- Estimate completion
+
+**Example feedback**:
+```
+🎨 Creative work recognized:
+Type: illustration
+Elements: character, background scene
+Completion: line art 100%, coloring 60%
+
+Suggestion: You finished the character line art today — background coloring can start tomorrow
+```
+
+### Scenario 5: Habit check-in
+
+**User action**: sends a habit tracker calendar screenshot
+
+**Auto-recognition**:
+- Extract consecutive check-in days
+- Identify today's check-in status
+- Compute check-in rate
+
+**Example feedback**:
+```
+✅ Habit check-ins recognized:
+Early rising: 15-day streak | 100% check-in rate
+Reading: 8-day streak | 73% check-in rate
+Exercise: 21-day streak | 100% check-in rate
+
+🎉 Exercise has hit a 3-week streak — keep it up!
 ```
 
 ---
@@ -253,65 +253,65 @@ description: 自动目标进度追踪器。在对话中检测到目标相关图�
 ## Scope
 
 This skill ONLY:
-- 识别目标相关图片并提取关键信息
-- 记录打卡数据到日常笔记文件
-- 提供进度反馈和建议
+- Recognizes goal-related images and extracts key information
+- Records check-in data into daily note files
+- Provides progress feedback and suggestions
 
 This skill NEVER:
-- 自动执行任何基于识别结果的操作
-- 上传图片到外部服务（除 VLM API）
-- 访问用户未授权的图片资源
-- 修改用户的目标计划（仅记录进度）
+- Automatically performs any actions based on the recognition results
+- Uploads images to external services (other than the VLM API)
+- Accesses image resources the user has not authorized
+- Modifies the user's goal plans (only records progress)
 
 ---
 
 ## Security & Privacy
 
 **Data that stays local:**
-- 识别后的结构化结果
-- 记录到 日常笔记或长期记忆 和 USER.md 的内容
-- 打卡历史数据
+- The structured recognition results
+- Content recorded into the daily note / long-term memory and USER.md
+- Check-in history data
 
 **This skill does NOT:**
-- 分享目标进度或打卡数据给第三方
-- 自动发布打卡信息到社交平台
-- 访问用户的其他图片资源
+- Share goal progress or check-in data with third parties
+- Auto-publish check-in information to social platforms
+- Access the user's other image resources
 
 ---
 
-## 注意事项
+## Notes
 
-1. **隐私保护**: 图片和识别结果仅存储在本地，不会上传到云端（除了调用 VLM API 进行识别）
-2. **准确性**: VLM 识别的内容仅供参考，可能因字迹模糊、图片质量等原因有所偏差
-3. **及时确认**: 建议用户在记录后及时确认识别结果，如有偏差可手动修正
-4. **目标类型识别**: 系统会根据图片内容自动判断目标类型，如有误可手动调整
-5. **进度估算**: 进度百分比基于图片内容估算，可能不准确，建议用户定期手动更新
+1. **Privacy**: images and recognition results are stored locally only and are never uploaded to the cloud (except for the VLM API call used for recognition)
+2. **Accuracy**: VLM recognition is for reference only and may be inaccurate due to blurry handwriting, image quality, etc.
+3. **Timely confirmation**: users are advised to confirm the recognition results promptly after recording; discrepancies can be corrected manually
+4. **Goal type detection**: the system infers the goal type from the image content; if it is wrong, adjust manually
+5. **Progress estimation**: progress percentages are estimated from the image content and may be inaccurate; users are advised to update manually on a regular basis
 
 ---
 
-## 集成建议
+## Integration Suggestions
 
-### 与 SOUL.md 配合
+### With SOUL.md
 
-将自动追踪器整合到目标管理日常工作流中：
+Fold the auto-tracker into the day-to-day goal-management workflow:
 
 ```markdown
-### 2. 智能记录与估算 (Logging & Estimation)
+### 2. Smart Logging & Estimation (Logging & Estimation)
 
-- 当用户发送任何与目标相关的图片时：
-  1. 自动调用 auto-target-tracker 识别内容
-  2. 提取关键信息并估算进度
-  3. 立刻记录到日常笔记中
-  4. 同步更新 USER.md 的目标进度
+- Whenever the user sends any goal-related image:
+  1. Automatically invoke auto-target-tracker to recognize the content
+  2. Extract the key information and estimate progress
+  3. Immediately record it in the daily note
+  4. Sync the goal progress to USER.md
 ```
 
-### 与 HEARTBEAT.md 配合
+### With HEARTBEAT.md
 
-在心跳检查中包含：
+Include the following in the heartbeat check:
 
 ```markdown
-## 每日汇总
-- 22:00 自动读取今日所有打卡记录
-- 生成目标进度报告
-- 发送给用户
+## Daily summary
+- At 22:00, automatically read all of today's check-in records
+- Generate a goal progress report
+- Send it to the user
 ```

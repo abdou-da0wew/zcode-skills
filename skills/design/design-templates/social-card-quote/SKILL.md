@@ -1,6 +1,6 @@
 ---
 name: social-card-quote
-description: 一句话主导的社交卡 — 论点 / 引言 / 原则 / 关键问句 / 一句话洞察占满版心，配 source / 章节标签 / 边注 / 三个锚点。必须按语义断行（不靠自动 wrap），至少一个锚点防止 floating。触发："做个引言卡 / 论点卡 / 金句卡 / 原则卡 / hero 问句卡"。NOT 长段落伪装成引言，NOT 空洞鸡汤口号，NOT 居中文字无任何锚点结构。
+description: Quote-driven social card — a thesis / pull-quote / principle / key question / one-line insight fills the whole text block, backed by source / section label / marginal note / three anchors. Must break lines semantically (no auto-wrap reliance) and include at least one anchor to prevent floating. Triggers: "make a quote card / thesis card / punchline card / principle card / hero question card". NOT long paragraphs disguised as quotes, NOT empty motivational slogans, NOT centered text with no anchoring structure.
 visibility: public
 mode: template
 carrier: fixed-image
@@ -8,13 +8,13 @@ scenario: social-content
 pattern_source: pattern.html
 source_priority: skill-first
 triggers:
-  - "做个引言卡"
-  - "论点卡"
-  - "金句卡"
-  - "原则卡"
-  - "hero 问句卡"
-  - "一句话卡"
-  - "书摘卡"
+  - "make a quote card"
+  - "thesis card"
+  - "punchline card"
+  - "principle card"
+  - "hero question card"
+  - "one-liner card"
+  - "book excerpt card"
 related_patterns: social-card-editorial
 ---
 
@@ -39,7 +39,7 @@ The quote is the page. Do not bury it under decorations or explainers.
 - Break lines semantically, not by random wrapping.
 - Provide at least one anchor: date, section label, source, note, or footer marker.
 - Keep whitespace intentional.
-- Use `reference/title-and-breaking.md` for Chinese line breaks.
+- Use `reference/title-and-breaking.md` for semantic line breaking.
 
 ## Avoid
 

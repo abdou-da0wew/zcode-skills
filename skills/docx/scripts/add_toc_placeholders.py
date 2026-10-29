@@ -18,7 +18,7 @@ Usage:
     ]
 
     Default behavior (no flags): auto-extracts Heading 1-3 from the document.
-    Filters out table/figure captions (e.g. "表 1：xxx", "图 2：xxx").
+    Filters out table/figure captions (e.g. "Table 1: xxx", "Figure 2: xxx").
 
 Example:
     python add_toc_placeholders.py document.docx
@@ -54,7 +54,7 @@ def _extract_headings_from_docx(docx_path: str, max_level: int = 3) -> list:
     page_estimate = 1
 
     # Pattern to filter out table/figure captions styled as headings
-    caption_pattern = re.compile(r'^[表图]\s*\d')
+    caption_pattern = re.compile(r'^[\u8868\u56fe]\s*\d')  # matches CJK caption prefixes for Table/Figure
 
     for i, para in enumerate(doc.paragraphs):
         style_name = para.style.name if para.style else ''

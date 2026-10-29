@@ -1,35 +1,110 @@
 #!/usr/bin/env python3
 """Run trigger evaluation for a skill description.
 
-Tests whether a skill's description causes GLM to trigger (read the skill)
-for a set of queries. Outputs results as JSON.
+Tests whether a skill's description causes the agent to trigger (invoke or
+read the skill) for a set of queries. Outputs results as JSON.
+
+Works with any OpenAI-compatible LLM server (Ollama, vLLM, LM Studio,
+OpenRouter, ...) — no vendor SDK or CLI required. Configure via environment
+variables:
+
+    LLM_BASE_URL  (default: http://localhost:11434/v1)
+    LLM_API_KEY   (default: "" — only sent if set)
+    LLM_MODEL     (default: qwen2.5)
 """
 
 import argparse
 import json
 import os
-import select
-import subprocess
 import sys
 import time
+import urllib.error
+import urllib.request
 import uuid
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from scripts.utils import parse_skill_md
 
+# --- OpenAI-compatible endpoint configuration ---
+BASE_URL = os.environ.get("LLM_BASE_URL", "http://localhost:11434/v1").rstrip("/")
+API_KEY = os.environ.get("LLM_API_KEY", "")
+MODEL = os.environ.get("LLM_MODEL", "qwen2.5")
+
 
 def find_project_root() -> Path:
-    """Find the project root by walking up from cwd looking for .glm/.
+    """Find the project root by walking up from cwd.
 
-    Mimics how GLM Code discovers its project root, so the command file
-    we create ends up where glm -p will look for it.
+    Kept for interface compatibility with run_loop.py, which passes the
+    result through to run_eval(). With the HTTP-based evaluator the value
+    is informational only.
     """
     current = Path.cwd()
     for parent in [current, *current.parents]:
-        if (parent / ".glm").is_dir():
+        if (parent / ".git").is_dir() or (parent / ".opencode").is_dir():
             return parent
     return current
+
+
+def chat_completions(body: dict, timeout: int = 60) -> dict:
+    """POST to the /chat/completions endpoint of an OpenAI-compatible server."""
+    req = urllib.request.Request(
+        f"{BASE_URL}/chat/completions",
+        data=json.dumps(body).encode("utf-8"),
+        headers={
+            "Content-Type": "application/json",
+            **({"Authorization": f"Bearer {API_KEY}"} if API_KEY else {}),
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(
+            f"LLM request failed ({e.code}): {e.read().decode('utf-8', errors='replace')}"
+    )
+
+
+# Tools offered to the model, mirroring the agent's surface: a Skill tool
+# (invoke a skill by name) and a Read tool (read a file by path). Trigger
+# detection = the model calls one of these with the skill under test.
+TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "Skill",
+            "description": "Invoke one of the available skills by name to handle the user's request.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "skill": {
+                        "type": "string",
+                        "description": "The name of the skill to invoke, exactly as listed in available_skills.",
+                    }
+                },
+                "required": ["skill"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "Read",
+            "description": "Read a file from disk.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "file_path": {
+                        "type": "string",
+                        "description": "Absolute path of the file to read.",
+                    }
+                },
+                "required": ["file_path"],
+            },
+        },
+    },
+]
 
 
 def run_single_query(
@@ -37,148 +112,68 @@ def run_single_query(
     skill_name: str,
     skill_description: str,
     timeout: int,
-    project_root: str,
+    project_root: str = "",
     model: str | None = None,
 ) -> bool:
     """Run a single query and return whether the skill was triggered.
 
-    Creates a command file in .glm/commands/ so it appears in GLM's
-    available_skills list, then runs `glm -p` with the raw query.
-    Uses --include-partial-messages to detect triggering early from
-    stream events (content_block_start) rather than waiting for the
-    full assistant message, which only arrives after tool execution.
+    The skill under test is presented to the model through an
+    "available_skills" block in the system prompt (name + description),
+    mimicking how the agent lists skills. The query is sent as a user
+    message together with the Skill/Read tools; the model has triggered
+    the skill if it calls Skill with this skill's name or Read on the
+    skill's SKILL.md file.
     """
     unique_id = uuid.uuid4().hex[:8]
     clean_name = f"{skill_name}-skill-{unique_id}"
-    project_commands_dir = Path(project_root) / ".glm" / "commands"
-    command_file = project_commands_dir / f"{clean_name}.md"
+
+    system_prompt = (
+        "You are a coding agent. You have a set of skills available.\n"
+        "available_skills:\n"
+        f"- {clean_name}: {skill_description}\n"
+        "\n"
+        "When one of the available skills is relevant to the user's request, "
+        "invoke it with the Skill tool (or read its SKILL.md with the Read "
+        "tool). If no skill is relevant, do not call any tool."
+    )
+
+    body = {
+        "model": model or MODEL,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": query},
+        ],
+        "tools": TOOLS,
+        "tool_choice": "auto",
+    }
 
     try:
-        project_commands_dir.mkdir(parents=True, exist_ok=True)
-        # Use YAML block scalar to avoid breaking on quotes in description
-        indented_desc = "\n  ".join(skill_description.split("\n"))
-        command_content = (
-            f"---\n"
-            f"description: |\n"
-            f"  {indented_desc}\n"
-            f"---\n\n"
-            f"# {skill_name}\n\n"
-            f"This skill handles: {skill_description}\n"
-        )
-        command_file.write_text(command_content)
+        response = chat_completions(body, timeout=timeout)
+    except Exception as e:
+        print(f"Warning: LLM request failed: {e}", file=sys.stderr)
+        return False
 
-        cmd = [
-            "glm",
-            "-p", query,
-            "--output-format", "stream-json",
-            "--verbose",
-            "--include-partial-messages",
-        ]
-        if model:
-            cmd.extend(["--model", model])
+    choices = response.get("choices") or []
+    message = choices[0].get("message", {}) if choices else {}
 
-        # Remove GLMCODE env var to allow nesting glm -p inside a
-        # GLM Code session. The guard is for interactive terminal conflicts;
-        # programmatic subprocess usage is safe.
-        env = {k: v for k, v in os.environ.items() if k != "GLMCODE"}
-
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            cwd=project_root,
-            env=env,
-        )
-
-        triggered = False
-        start_time = time.time()
-        buffer = ""
-        # Track state for stream event detection
-        pending_tool_name = None
-        accumulated_json = ""
-
+    for tool_call in message.get("tool_calls") or []:
+        fn = tool_call.get("function", {}) or {}
+        tool_name = fn.get("name", "")
+        raw_args = fn.get("arguments", "")
         try:
-            while time.time() - start_time < timeout:
-                if process.poll() is not None:
-                    remaining = process.stdout.read()
-                    if remaining:
-                        buffer += remaining.decode("utf-8", errors="replace")
-                    break
+            args = json.loads(raw_args) if isinstance(raw_args, str) else (raw_args or {})
+        except json.JSONDecodeError:
+            args = {}
+        args_blob = json.dumps(args, ensure_ascii=False) if args else ""
 
-                ready, _, _ = select.select([process.stdout], [], [], 1.0)
-                if not ready:
-                    continue
+        if tool_name == "Skill" and clean_name in args_blob:
+            return True
+        if tool_name == "Read" and clean_name in args_blob:
+            return True
+        # Any other tool call (or a call for a different skill) = no trigger
+        return False
 
-                chunk = os.read(process.stdout.fileno(), 8192)
-                if not chunk:
-                    break
-                buffer += chunk.decode("utf-8", errors="replace")
-
-                while "\n" in buffer:
-                    line, buffer = buffer.split("\n", 1)
-                    line = line.strip()
-                    if not line:
-                        continue
-
-                    try:
-                        event = json.loads(line)
-                    except json.JSONDecodeError:
-                        continue
-
-                    # Early detection via stream events
-                    if event.get("type") == "stream_event":
-                        se = event.get("event", {})
-                        se_type = se.get("type", "")
-
-                        if se_type == "content_block_start":
-                            cb = se.get("content_block", {})
-                            if cb.get("type") == "tool_use":
-                                tool_name = cb.get("name", "")
-                                if tool_name in ("Skill", "Read"):
-                                    pending_tool_name = tool_name
-                                    accumulated_json = ""
-                                else:
-                                    return False
-
-                        elif se_type == "content_block_delta" and pending_tool_name:
-                            delta = se.get("delta", {})
-                            if delta.get("type") == "input_json_delta":
-                                accumulated_json += delta.get("partial_json", "")
-                                if clean_name in accumulated_json:
-                                    return True
-
-                        elif se_type in ("content_block_stop", "message_stop"):
-                            if pending_tool_name:
-                                return clean_name in accumulated_json
-                            if se_type == "message_stop":
-                                return False
-
-                    # Fallback: full assistant message
-                    elif event.get("type") == "assistant":
-                        message = event.get("message", {})
-                        for content_item in message.get("content", []):
-                            if content_item.get("type") != "tool_use":
-                                continue
-                            tool_name = content_item.get("name", "")
-                            tool_input = content_item.get("input", {})
-                            if tool_name == "Skill" and clean_name in tool_input.get("skill", ""):
-                                triggered = True
-                            elif tool_name == "Read" and clean_name in tool_input.get("file_path", ""):
-                                triggered = True
-                            return triggered
-
-                    elif event.get("type") == "result":
-                        return triggered
-        finally:
-            # Clean up process on any exit path (return, exception, timeout)
-            if process.poll() is None:
-                process.kill()
-                process.wait()
-
-        return triggered
-    finally:
-        if command_file.exists():
-            command_file.unlink()
+    return False
 
 
 def run_eval(
@@ -195,7 +190,7 @@ def run_eval(
     """Run the full eval set and return results."""
     results = []
 
-    with ProcessPoolExecutor(max_workers=num_workers) as executor:
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
         future_to_info = {}
         for item in eval_set:
             for run_idx in range(runs_per_query):
@@ -265,7 +260,7 @@ def main():
     parser.add_argument("--timeout", type=int, default=30, help="Timeout per query in seconds")
     parser.add_argument("--runs-per-query", type=int, default=3, help="Number of runs per query")
     parser.add_argument("--trigger-threshold", type=float, default=0.5, help="Trigger rate threshold")
-    parser.add_argument("--model", default=None, help="Model to use for glm -p (default: user's configured model)")
+    parser.add_argument("--model", default=None, help="Model to use (default: $LLM_MODEL or qwen2.5)")
     parser.add_argument("--verbose", action="store_true", help="Print progress to stderr")
     args = parser.parse_args()
 

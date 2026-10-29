@@ -29,7 +29,7 @@
     overflow: hidden;
   }
 
-  /* ---------- 视频舞台 ---------- */
+  /* ---------- Video stage ---------- */
   .stage {
     position: absolute;
     inset: 0;
@@ -55,7 +55,7 @@
     background: #0a0a0a;
   }
 
-  /* ---------- 滤镜 ---------- */
+  /* ---------- Filters ---------- */
   .f-original { filter: contrast(1.02) brightness(1.0); }
   .f-vivid    { filter: saturate(1.6) contrast(1.15) brightness(1.05); }
   .f-vintage  { filter: sepia(0.55) contrast(0.92) brightness(0.96) saturate(0.7) hue-rotate(-10deg); }
@@ -223,7 +223,7 @@
   }
   .stack { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 
-  /* 中央对焦框 */
+  /* Center focus reticle */
   .reticle {
     position: absolute;
     top: 50%; left: 50%;
@@ -249,14 +249,14 @@
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   }
 
-  /* ---------- 滤镜纵向选择器（底部中央） ---------- */
+  /* ---------- Vertical filter selector (bottom center) ---------- */
   .filter-wheel {
     position: absolute;
     left: 50%;
     bottom: 88px;
     transform: translateX(-50%);
     width: 280px;
-    height: 168px;          /* 显示 5 项，每项 ~36px */
+    height: 168px;          /* shows 5 items, ~36px each */
     z-index: 7;
     pointer-events: auto;
     overflow: hidden;
@@ -312,11 +312,11 @@
   .chip.name { padding: 2px 12px; }
   .filter-item.active .chip.num2 { background: var(--hud); color: #000; border-color: var(--hud); }
 
-  /* 中线 — 不跨视频，只局限在 wheel 内 */
+  /* Center line — does not cross the video, confined to the wheel */
   .wheel-indicator {
     position: absolute;
     left: 50%;
-    bottom: calc(88px + 84px - 18px);   /* 居中线对齐 active 项 */
+    bottom: calc(88px + 84px - 18px);   /* aligned to the active item on the center line */
     transform: translateX(-50%);
     width: 240px;
     height: 36px;
@@ -325,7 +325,7 @@
     border-top: 1px solid rgba(255,255,255,0.18);
     border-bottom: 1px solid rgba(255,255,255,0.18);
   }
-  /* 两侧小箭头提示 */
+  /* Small arrow hints on both sides */
   .wheel-indicator::before,
   .wheel-indicator::after {
     content: '';
@@ -338,7 +338,7 @@
   .wheel-indicator::before { left: -16px; border-right: none; border-bottom: none; }
   .wheel-indicator::after  { right: -16px; border-left: none; border-top: none; }
 
-  /* 操作提示（自动消失） */
+  /* Operation hint (auto-dismisses) */
   .help {
     position: absolute;
     left: 50%;
@@ -372,7 +372,7 @@
     margin: 0 2px;
   }
 
-  /* 加载中 */
+  /* Loading */
   .loading {
     position: absolute;
     top: 50%; left: 50%;
@@ -503,17 +503,17 @@
       </div>
     </div>
 
-    <!-- 滤镜中线高亮 -->
+    <!-- Filter center-line highlight -->
     <div class="wheel-indicator"></div>
 
-    <!-- 纵向滚动滤镜选择器 -->
+    <!-- Vertical scrolling filter selector -->
     <div class="filter-wheel" id="wheel">
       <div class="filter-list" id="list"></div>
     </div>
 
-    <!-- 操作提示 -->
+    <!-- Operation hint -->
     <div class="help" id="help">
-      滚轮 / <kbd>↑</kbd><kbd>↓</kbd> 切换滤镜
+      Scroll wheel / <kbd>↑</kbd><kbd>↓</kbd> to switch filters
     </div>
   </div>
 
@@ -548,7 +548,7 @@
   const fallback = $('fallback');
   let currentIdx = 0;
 
-  /* ---------- 视频加载 ---------- */
+  /* ---------- Video loading ---------- */
   let srcIndex = 0;
   function tryNextSource() {
     if (srcIndex >= videoSources.length) {
@@ -576,7 +576,7 @@
   resetLoadTimer();
   tryNextSource();
 
-  /* ---------- 渲染滤镜列表 ---------- */
+  /* ---------- Render filter list ---------- */
   filters.forEach((f, i) => {
     const el = document.createElement('div');
     el.className = 'filter-item' + (i === currentIdx ? ' active' : '');
@@ -606,9 +606,9 @@
       el.classList.toggle('active', i === idx);
     });
 
-    /* 纵向居中：把 active 项移到中线（top: 50%） */
-    /* active 元素的 top（相对 list） = idx * ITEM_H
-       list 的 top = 50%（中线），要让 active 的中心也对齐中线
+    /* Vertical centering: move the active item onto the center line (top: 50%) */
+    /* active element's top (relative to list) = idx * ITEM_H
+       list's top = 50% (the center line); the active item's center must also sit on that line
        => translateY = -(idx * ITEM_H) - ITEM_H/2 */
     const offset = -(idx * ITEM_H) - ITEM_H / 2;
     list.style.transform = `translateY(${offset}px)`;
@@ -624,7 +624,7 @@
     reticle.classList.add('focus');
   }
 
-  /* 键盘：上下切换 */
+  /* Keyboard: up/down to switch */
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowUp' || e.key === 'ArrowLeft')  { e.preventDefault(); setFilter((currentIdx - 1 + filters.length) % filters.length); }
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); setFilter((currentIdx + 1) % filters.length); }
@@ -635,7 +635,7 @@
     }
   });
 
-  /* 滚轮：在 wheel 区域内或整个 viewfinder 都能滚 */
+  /* Wheel: scrollable inside the wheel area or the whole viewfinder */
   let wheelLock = false;
   function onWheel(e) {
     e.preventDefault();
@@ -646,10 +646,10 @@
     setFilter((currentIdx + dir + filters.length) % filters.length);
   }
   $('wheel').addEventListener('wheel', onWheel, { passive: false });
-  /* 整个 viewfinder 区域也可滚轮切换（更直观） */
+  /* The whole viewfinder area also switches on wheel (more intuitive) */
   $('viewfinder').addEventListener('wheel', onWheel, { passive: false });
 
-  /* 触摸滑动 */
+  /* Touch swipe */
   let touchStartY = null;
   $('wheel').addEventListener('touchstart', e => {
     touchStartY = e.touches[0].clientY;
@@ -664,7 +664,7 @@
     }
   }, { passive: true });
 
-  /* 点击对焦（避开底部 HUD 与滤镜轮） */
+  /* Tap to focus (avoiding the bottom HUD and filter wheel) */
   stage.addEventListener('click', e => {
     if (e.clientY > window.innerHeight - 280) return;
     const rect = stage.getBoundingClientRect();
@@ -683,7 +683,7 @@
     }, 1500);
   });
 
-  /* 时间码 */
+  /* Timecode */
   let startTs = null;
   function tickTimecode(ts) {
     if (!startTs) startTs = ts;
@@ -702,7 +702,7 @@
   }
   requestAnimationFrame(tickTimecode);
 
-  /* 电量 */
+  /* Battery */
   let battery = 100;
   setInterval(() => {
     battery = Math.max(12, battery - 1);
@@ -712,12 +712,12 @@
     if (battery < 15) $('batFill').style.background = '#ff3b30';
   }, 8000);
 
-  /* 操作提示 */
+  /* Operation hint */
   const help = $('help');
   setTimeout(() => help.classList.add('show'), 800);
   setTimeout(() => help.classList.remove('show'), 4200);
 
-  /* 播放/暂停按钮 */
+  /* Play/pause button */
   const recBtn = $('recBtn');
   const recLabel = $('recLabel');
   function updateRec() {
@@ -736,7 +736,7 @@
   vid.addEventListener('play', updateRec);
   vid.addEventListener('pause', updateRec);
 
-  /* 初次定位 */
+  /* Initial positioning */
   setTimeout(() => setFilter(0), 50);
 </script>
 </body>

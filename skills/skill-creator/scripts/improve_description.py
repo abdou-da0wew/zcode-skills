@@ -2,38 +2,62 @@
 """Improve a skill description based on eval results.
 
 Takes eval results (from run_eval.py) and generates an improved description
-by calling `z-ai chat -p` as a subprocess.
+by calling an OpenAI-compatible LLM server over HTTP.
+
+Works with any OpenAI-compatible LLM (Ollama, vLLM, LM Studio, OpenRouter,
+...) — no vendor SDK or CLI required. Configure via environment variables:
+
+    LLM_BASE_URL  (default: http://localhost:11434/v1)
+    LLM_API_KEY   (default: "" — only sent if set)
+    LLM_MODEL     (default: qwen2.5; overridden by the --model argument)
 """
 
 import argparse
 import json
 import os
 import re
-import subprocess
 import sys
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 from scripts.utils import parse_skill_md
 
+# --- OpenAI-compatible endpoint configuration ---
+BASE_URL = os.environ.get("LLM_BASE_URL", "http://localhost:11434/v1").rstrip("/")
+API_KEY = os.environ.get("LLM_API_KEY", "")
+MODEL = os.environ.get("LLM_MODEL", "qwen2.5")
 
-def _call_zai(prompt: str, timeout: int = 300) -> str:
-    """Run `z-ai chat -p` with the prompt and return the text response."""
-    cmd = ["z-ai", "chat", "-p", prompt]
 
-    env = {k: v for k, v in os.environ.items() if k != "GLMCODE"}
-
-    result = subprocess.run(
-        cmd,
-        capture_output=True,
-        text=True,
-        env=env,
-        timeout=timeout,
+def _call_llm(prompt: str, timeout: int = 300, model: str | None = None) -> str:
+    """Send the prompt to an OpenAI-compatible chat/completions endpoint and
+    return the assistant's text response."""
+    body = {
+        "model": model or MODEL,
+        "messages": [
+            {"role": "user", "content": prompt},
+        ],
+    }
+    req = urllib.request.Request(
+        f"{BASE_URL}/chat/completions",
+        data=json.dumps(body).encode("utf-8"),
+        headers={
+            "Content-Type": "application/json",
+            **({"Authorization": f"Bearer {API_KEY}"} if API_KEY else {}),
+        },
+        method="POST",
     )
-    if result.returncode != 0:
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            response = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
         raise RuntimeError(
-            f"z-ai chat exited {result.returncode}\nstderr: {result.stderr}"
+            f"LLM request failed ({e.code}): {e.read().decode('utf-8', errors='replace')}"
         )
-    return result.stdout
+    choices = response.get("choices") or []
+    if not choices:
+        raise RuntimeError(f"LLM returned no choices: {json.dumps(response)[:500]}")
+    return choices[0].get("message", {}).get("content", "") or ""
 
 
 def improve_description(
@@ -47,7 +71,7 @@ def improve_description(
     log_dir: Path | None = None,
     iteration: int | None = None,
 ) -> str:
-    """Call z-ai to improve the description based on eval results."""
+    """Call the LLM to improve the description based on eval results."""
     failed_triggers = [
         r for r in eval_results["results"]
         if r["should_trigger"] and not r["pass"]
@@ -65,9 +89,9 @@ def improve_description(
     else:
         scores_summary = f"Train: {train_score}"
 
-    prompt = f"""You are optimizing a skill description for a GLM Code skill called "{skill_name}". A "skill" is sort of like a prompt, but with progressive disclosure -- there's a title and description that GLM sees when deciding whether to use the skill, and then if it does use the skill, it reads the .md file which has lots more details and potentially links to other resources in the skill folder like helper files and scripts and additional documentation or examples.
+    prompt = f"""You are optimizing a skill description for a skill called "{skill_name}" used by the DiveeOI agent (OpenCode-based). A "skill" is sort of like a prompt, but with progressive disclosure -- there's a title and description that the agent sees when deciding whether to use the skill, and then if it does use the skill, it reads the .md file which has lots more details and potentially links to other resources in the skill folder like helper files and scripts and additional documentation or examples.
 
-The description appears in GLM's "available_skills" list. When a user sends a query, GLM decides whether to invoke the skill based solely on the title and on this description. Your goal is to write a description that triggers for relevant queries, and doesn't trigger for irrelevant ones.
+The description appears in the agent's "available_skills" list. When a user sends a query, the agent decides whether to invoke the skill based solely on the title and on this description. Your goal is to write a description that triggers for relevant queries, and doesn't trigger for irrelevant ones.
 
 Here's the current description:
 <current_description>
@@ -123,14 +147,14 @@ Concretely, your description should not be more than about 100-200 words, even i
 Here are some tips that we've found to work well in writing these descriptions:
 - The skill should be phrased in the imperative -- "Use this skill for" rather than "this skill does"
 - The skill description should focus on the user's intent, what they are trying to achieve, vs. the implementation details of how the skill works.
-- The description competes with other skills for GLM's attention — make it distinctive and immediately recognizable.
+- The description competes with other skills for the agent's attention — make it distinctive and immediately recognizable.
 - If you're getting lots of failures after repeated attempts, change things up. Try different sentence structures or wordings.
 
-I'd encourage you to be creative and mix up the style in different iterations since you'll have multiple opportunities to try different approaches and we'll just grab the highest-scoring one at the end. 
+I'd encourage you to be creative and mix up the style in different iterations since you'll have multiple opportunities to try different approaches and we'll just grab the highest-scoring one at the end.
 
 Please respond with only the new description text in <new_description> tags, nothing else."""
 
-    text = _call_zai(prompt)
+    text = _call_llm(prompt, model=model)
 
     match = re.search(r"<new_description>(.*?)</new_description>", text, re.DOTALL)
     description = match.group(1).strip().strip('"') if match else text.strip().strip('"')
@@ -146,9 +170,8 @@ Please respond with only the new description text in <new_description> tags, not
 
     # Safety net: the prompt already states the 1024-char hard limit, but if
     # the model blew past it anyway, make one fresh single-turn call that
-    # quotes the too-long version and asks for a shorter rewrite. (The old
-    # SDK path did this as a true multi-turn; `glm -p` is one-shot, so we
-    # inline the prior output into the new prompt instead.)
+    # quotes the too-long version and asks for a shorter rewrite. (The call
+    # is one-shot, so we inline the prior output into the new prompt.)
     if len(description) > 1024:
         shorten_prompt = (
             f"{prompt}\n\n"
@@ -160,7 +183,7 @@ Please respond with only the new description text in <new_description> tags, not
             f"important trigger words and intent coverage. Respond with only "
             f"the new description in <new_description> tags."
         )
-        shorten_text = _call_zai(shorten_prompt)
+        shorten_text = _call_llm(shorten_prompt, model=model)
         match = re.search(r"<new_description>(.*?)</new_description>", shorten_text, re.DOTALL)
         shortened = match.group(1).strip().strip('"') if match else shorten_text.strip().strip('"')
 
@@ -185,7 +208,7 @@ def main():
     parser.add_argument("--eval-results", required=True, help="Path to eval results JSON (from run_eval.py)")
     parser.add_argument("--skill-path", required=True, help="Path to skill directory")
     parser.add_argument("--history", default=None, help="Path to history JSON (previous attempts)")
-    parser.add_argument("--model", required=True, help="Model for improvement")
+    parser.add_argument("--model", required=True, help="Model for improvement (e.g. $LLM_MODEL)")
     parser.add_argument("--verbose", action="store_true", help="Print thinking to stderr")
     args = parser.parse_args()
 

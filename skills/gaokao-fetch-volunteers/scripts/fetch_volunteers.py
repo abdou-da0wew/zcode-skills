@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""调用智能推荐志愿表 API，解析响应并输出结构化 JSON。"""
+"""Call the smart volunteer recommendation API, parse the response, and output
+structured JSON.
+
+NOTE: province/batch/gradeType string values below are the gaokao API's Chinese string
+values, written as \\uXXXX escapes (Python decodes them identically) so this source
+stays ASCII.
+"""
 
 from __future__ import annotations
 
@@ -21,34 +27,47 @@ from province_config import (
     validate_subjects_for_volunteer_api,
 )
 
-# ========== 接口配置（修改此处即可切换环境）==========
-BASE_URL = "https://publicapi.chatglm.cn/chatglm_public/skill"
+# ========== API configuration (edit here to switch environments) ==========
+# Set ZP_API_BASE_URL to your gaokao volunteer-recommendation API server
+# (any OpenAI-compatible or REST endpoint that serves the /zp/volunteer/* routes).
+BASE_URL = os.environ.get("ZP_API_BASE_URL", "")
 API_PATH = "/zp/volunteer/intelligenceVolunteer"
 BATCH_LIST_PATH = "/zp/volunteer/batch/list"
 # =====================================================
 
+if not BASE_URL:
+    raise SystemExit(
+        "ZP_API_BASE_URL is not set. Export it to point at your gaokao "
+        "volunteer-recommendation API server, e.g.:\n"
+        "  export ZP_API_BASE_URL=https://your-api-server.example.com\n"
+        "The server must serve the /zp/volunteer/* routes used by this script."
+    )
+
 TYPE_LABELS = {
-    "CHONG": "冲",
-    "WEN": "稳",
-    "BAO": "保",
-    "NAN": "难",
-    "YI": "易",
+    "CHONG": "Reach",
+    "WEN": "Match",
+    "BAO": "Safety",
+    "NAN": "Difficult",
+    "YI": "Easy",
 }
 
 PROVINCE_BATCH_FALLBACK: dict[str, str] = {
-    "天津": "本科批A段",
-    "浙江": "普通类一段",
-    "山东": "普通类一段",
-    "四川": "本科批B段",
-    "云南": "本科批B段",
-    "甘肃": "本科批",
-    "宁夏": "本科批B段",
-    "新疆": "本科一批",
+    # Tianjin -> undergraduate batch segment A; Zhejiang/Shandong -> general category segment 1;
+    # Sichuan/Yunnan/Ningxia -> undergraduate batch segment B; Gansu -> undergraduate batch;
+    # Xinjiang -> undergraduate first batch.
+    "\u5929\u6d25": "\u672c\u79d1\u6279A\u6bb5",
+    "\u6d59\u6c5f": "\u666e\u901a\u7c7b\u4e00\u6bb5",
+    "\u5c71\u4e1c": "\u666e\u901a\u7c7b\u4e00\u6bb5",
+    "\u56db\u5ddd": "\u672c\u79d1\u6279B\u6bb5",
+    "\u4e91\u5357": "\u672c\u79d1\u6279B\u6bb5",
+    "\u7518\u8083": "\u672c\u79d1\u6279",
+    "\u5b81\u590f": "\u672c\u79d1\u6279B\u6bb5",
+    "\u65b0\u7586": "\u672c\u79d1\u4e00\u6279",
 }
 
 
 def resolve_batch_fallback(province: str | None, batch: str | None) -> str | None:
-    """批次 API 失败时的省份静态兜底。"""
+    """Static per-province fallback used when the batch API fails."""
     if not province:
         return batch
     mapped = PROVINCE_BATCH_FALLBACK.get(province)
@@ -56,7 +75,7 @@ def resolve_batch_fallback(province: str | None, batch: str | None) -> str | Non
         return batch
     if batch is None:
         return mapped
-    if str(batch).strip() == "本科批":
+    if str(batch).strip() == "\u672c\u79d1\u6279":  # generic "undergraduate batch"
         return mapped
     return batch
 
@@ -76,7 +95,7 @@ def call_batch_list_api(
     base_url: str | None = None,
     timeout: int = 60,
 ) -> list[dict[str, Any]]:
-    """GET 批次列表，返回 result 数组。"""
+    """GET the batch list; return the result array."""
     url = batch_list_url(params, base_url)
     req = Request(url, method="GET", headers={"Accept": "*/*"})
     try:
@@ -85,16 +104,16 @@ def call_batch_list_api(
             text = resp.read().decode(charset)
     except HTTPError as e:
         detail = e.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"批次接口 HTTP {e.code}: {detail}") from e
+        raise RuntimeError(f"batch API HTTP {e.code}: {detail}") from e
     except URLError as e:
-        raise RuntimeError(f"批次接口网络失败: {e.reason}") from e
+        raise RuntimeError(f"batch API network failure: {e.reason}") from e
 
     raw = json.loads(text)
     if raw.get("status") != 0:
-        raise ValueError(f"批次接口异常: status={raw.get('status')}, message={raw.get('message')}")
+        raise ValueError(f"batch API error: status={raw.get('status')}, message={raw.get('message')}")
     result = raw.get("result")
     if not isinstance(result, list):
-        raise ValueError("批次接口返回格式异常：result 非数组")
+        raise ValueError("unexpected batch API response format: result is not an array")
     if not result:
         province = params.get("province")
         classify = params.get("classify")
@@ -103,8 +122,9 @@ def call_batch_list_api(
         if grade_type:
             hint += f", gradeType={grade_type}"
         raise ValueError(
-            f"批次列表为空（{province}，{hint}）。"
-            f"请确认 classify 与省份选科模式一致（见 reference.md）"
+            f"Batch list is empty (province={province}, {hint}). "
+            f"Confirm that classify matches the province's subject-combination mode "
+            f"(see reference.md)"
         )
     return result
 
@@ -115,40 +135,42 @@ def select_batch_from_list(
     preferred_batch: str | None = None,
     grade_type: str | None = None,
 ) -> dict[str, Any]:
-    """从批次列表中选取与分数、层次最匹配的一项。"""
+    """Pick the batch entry that best matches the score and tier preference."""
     if not items:
-        raise ValueError("没有可填报的批次")
+        raise ValueError("no fillable batch available")
 
     candidates = list(items)
 
-    # 1. 精确批次名（非泛称「本科批」）
-    if preferred_batch and preferred_batch.strip() not in ("本科批", "专科批"):
+    # 1. Exact batch name (not the generic undergraduate/vocational batch labels,
+    #    unicode-escaped: "\u672c\u79d1\u6279" / "\u4e13\u79d1\u6279")
+    if preferred_batch and preferred_batch.strip() not in ("\u672c\u79d1\u6279", "\u4e13\u79d1\u6279"):
         exact = [x for x in candidates if x.get("batch") == preferred_batch]
         if exact:
             return exact[0]
 
-    # 2. 按 gradeType / 泛称本科批·专科批 过滤
+    # 2. Filter by gradeType / the generic undergraduate-vocational batch labels
+    #    (escaped: "\u672c\u79d1" = undergraduate, "\u4e13\u79d1" = vocational)
     if grade_type:
         filtered = [x for x in candidates if x.get("gradeType") == grade_type]
         if filtered:
             candidates = filtered
-    elif preferred_batch == "本科批":
-        filtered = [x for x in candidates if x.get("gradeType") == "本科"]
+    elif preferred_batch == "\u672c\u79d1\u6279":
+        filtered = [x for x in candidates if x.get("gradeType") == "\u672c\u79d1"]
         if filtered:
             candidates = filtered
-    elif preferred_batch == "专科批":
-        filtered = [x for x in candidates if x.get("gradeType") == "专科"]
+    elif preferred_batch == "\u4e13\u79d1\u6279":
+        filtered = [x for x in candidates if x.get("gradeType") == "\u4e13\u79d1"]
         if filtered:
             candidates = filtered
 
-    # 3. 分数达线：取控制线下考生分数仍达标的批次中，控制线最高者（偏本科一段）
+    # 3. Score threshold: among qualified batches pick the one with the highest control line
     qualified = [x for x in candidates if user_score >= int(x.get("score") or 0)]
     pool = qualified if qualified else candidates
     return max(pool, key=lambda x: int(x.get("score") or 0))
 
 
 def apply_batch_item_to_payload(payload: dict[str, Any], batch_item: dict[str, Any]) -> None:
-    """将选中批次写入志愿请求体。"""
+    """Write the selected batch into the volunteer request body."""
     payload["batch"] = batch_item.get("batch")
     if batch_item.get("type"):
         payload["volunteerType"] = batch_item["type"]
@@ -165,7 +187,7 @@ def resolve_batch_via_api(
     payload: dict[str, Any],
     base_url: str | None = None,
 ) -> tuple[str, dict[str, Any], list[dict[str, Any]]]:
-    """调用批次接口并选定 batch，返回 (batch名, 选中项, 全部项)。"""
+    """Call the batch API and select a batch; return (batch name, selected item, all items)."""
     params = batch_list_query_params(payload)
     items = call_batch_list_api(params, base_url=base_url)
     selected = select_batch_from_list(
@@ -195,7 +217,7 @@ def _parse_json_field(value: Any) -> Any:
 
 
 def parse_score_history(score_str: Any) -> list[dict[str, str]]:
-    """将 score / parityScore 字段解析为 [{year, score, rank, plan_num}, ...]。"""
+    """Parse the score / parityScore fields into [{year, score, rank, plan_num}, ...]."""
     parsed = _parse_json_field(score_str)
     if not isinstance(parsed, list):
         return []
@@ -292,12 +314,12 @@ def group_schools_by_type(schools: list[dict[str, Any]]) -> dict[str, list[dict[
 
 
 def normalize_api_response(raw: dict[str, Any]) -> dict[str, Any]:
-    """兼容新旧两种响应信封：{code,msg,body} 与 {status,message,result}。"""
+    """Support both response envelopes: {code,msg,body} and {status,message,result}."""
     if "result" in raw and "status" in raw:
         status = raw.get("status")
         msg = raw.get("message") or ""
         if status != 0:
-            raise ValueError(f"API 返回异常: status={status}, message={msg}")
+            raise ValueError(f"API error: status={status}, message={msg}")
         return {"code": 200, "msg": msg or "OK", "body": raw.get("result") or {}}
     return raw
 
@@ -313,7 +335,7 @@ def parse_api_response(raw: dict[str, Any]) -> dict[str, Any]:
     code = raw.get("code")
     msg = raw.get("msg") or ""
     if code != 200:
-        raise ValueError(f"API 返回异常: code={code}, msg={msg}")
+        raise ValueError(f"API error: code={code}, msg={msg}")
 
     body = raw.get("body") or {}
     schools_raw = body.get("schoolList") or []
@@ -427,48 +449,48 @@ def call_api(
         detail = e.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"HTTP {e.code}: {detail}") from e
     except URLError as e:
-        raise RuntimeError(f"网络请求失败: {e.reason}") from e
+        raise RuntimeError(f"network request failed: {e.reason}") from e
 
     return json.loads(text)
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="获取并解析智能推荐志愿表")
+    parser = argparse.ArgumentParser(description="Fetch and parse the smart volunteer recommendation")
     parser.add_argument(
         "--student",
         type=Path,
-        help="student.json 路径（自动映射倾向到 API 选填参数，优先于 --config）",
+        help="path to student.json (auto-maps preferences to optional API parameters; takes priority over --config)",
     )
     parser.add_argument(
         "--config",
         type=Path,
-        help="完整请求 JSON 文件路径",
+        help="path to a complete request JSON file",
     )
     parser.add_argument(
         "--base-url",
         default=os.environ.get("ZP_API_BASE_URL", BASE_URL),
-        help=f"API 根地址（默认脚本内 BASE_URL: {BASE_URL}）",
+        help=f"API root URL (defaults to the in-script BASE_URL: {BASE_URL})",
     )
-    parser.add_argument("-o", "--output", type=Path, required=True, help="解析结果 JSON 输出路径")
-    parser.add_argument("--save-raw", type=Path, help="可选：保存 API 原始响应")
+    parser.add_argument("-o", "--output", type=Path, required=True, help="output path for the parsed-result JSON")
+    parser.add_argument("--save-raw", type=Path, help="optional: save the raw API response")
 
-    parser.add_argument("--province", help="高考省份")
-    parser.add_argument("--classify", help="选科模式：文科/理科/物理/历史/综合")
-    parser.add_argument("--subjects", help="选科组合，逗号分隔，如 物理,化学,生物")
-    parser.add_argument("--grade-type", dest="grade_type", help="成绩类型：本科/专科（京沪津专科批）")
-    parser.add_argument("--score", type=int, help="高考成绩")
-    parser.add_argument("--rank", type=int, help="高考位次")
-    parser.add_argument("--batch", help="填报批次，如 本科批")
+    parser.add_argument("--province", help="gaokao province (API expects its Chinese name, e.g. \\u5c71\\u4e1c = Shandong)")
+    parser.add_argument("--classify", help="subject mode: liberal arts/science/physics/history/comprehensive (Chinese API values)")
+    parser.add_argument("--subjects", help="subject combination, comma-separated, e.g. physics,chemistry,biology (Chinese API values)")
+    parser.add_argument("--grade-type", dest="grade_type", help="grade type: undergraduate/vocational (Chinese API values; Beijing/Shanghai/Tianjin vocational only)")
+    parser.add_argument("--score", type=int, help="gaokao score")
+    parser.add_argument("--rank", type=int, help="provincial rank")
+    parser.add_argument("--batch", help="application batch, e.g. the undergraduate batch (Chinese API value)")
     parser.add_argument(
         "--auto-batch",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="是否通过 batch/list 接口自动解析批次（默认开启）",
+        help="resolve the batch automatically via the batch/list API (default: on)",
     )
-    parser.add_argument("--universitys", help="心仪高校，逗号分隔")
-    parser.add_argument("--provinces", help="省份意向，逗号分隔")
-    parser.add_argument("--tags", help="院校属性意向，逗号分隔")
-    parser.add_argument("--major-class", dest="major_class", help="专业类意向，逗号分隔")
+    parser.add_argument("--universitys", help="desired universities, comma-separated (Chinese names)")
+    parser.add_argument("--provinces", help="province preferences, comma-separated (Chinese names)")
+    parser.add_argument("--tags", help="university attribute preferences, comma-separated")
+    parser.add_argument("--major-class", dest="major_class", help="major-class preferences, comma-separated (Chinese MOE class names)")
     parser.add_argument("--university-num", type=int, default=30)
     parser.add_argument("--major-num", type=int, default=6)
     parser.add_argument(
@@ -485,7 +507,7 @@ def main() -> int:
     try:
         payload = build_request_payload(args)
     except (OSError, json.JSONDecodeError) as e:
-        print(f"错误: 无法读取请求配置 — {e}", file=sys.stderr)
+        print(f"Error: cannot read the request config - {e}", file=sys.stderr)
         return 1
 
     if not args.student and not args.config:
@@ -495,12 +517,13 @@ def main() -> int:
         missing = [k for k in required if payload.get(k) is None]
         if missing:
             print(
-                f"错误: 缺少必填参数 {missing}，请使用 --student、--config 或补全命令行",
+                f"Error: missing required parameters {missing}; use --student, --config, "
+                f"or complete the CLI arguments",
                 file=sys.stderr,
             )
             return 1
 
-    # CLI 中 null 用字符串 "null" 传入时转为 None（subjects 在 sanitize 阶段按省处理）
+    # CLI passes null as the string "null" -> convert to None (subjects is handled per province in sanitize)
     for key in ("gradeType", "rank", "universitys", "provinces", "tags", "majorClass"):
         if payload.get(key) == "null":
             payload[key] = None
@@ -508,7 +531,7 @@ def main() -> int:
     try:
         validate_classify(str(payload.get("province", "")), payload.get("classify"))
     except ValueError as e:
-        print(f"错误: {e}", file=sys.stderr)
+        print(f"Error: {e}", file=sys.stderr)
         return 1
 
     batch_resolution: dict[str, Any] | None = None
@@ -521,29 +544,29 @@ def main() -> int:
                 "available": all_items,
             }
             print(
-                f"批次: {batch_name}（{selected.get('gradeType', '')} / {selected.get('type', '')}）",
+                f"Batch: {batch_name} ({selected.get('gradeType', '')} / {selected.get('type', '')})",
                 file=sys.stderr,
             )
         except (RuntimeError, ValueError, json.JSONDecodeError) as e:
-            print(f"警告: 批次接口失败，使用静态兜底 — {e}", file=sys.stderr)
+            print(f"Warning: batch API failed, using the static fallback - {e}", file=sys.stderr)
             payload["batch"] = resolve_batch_fallback(payload.get("province"), payload.get("batch"))
             batch_resolution = {"source": "fallback", "batch": payload.get("batch")}
     elif not payload.get("batch"):
-        print("错误: 已关闭 --auto-batch 且未提供 batch", file=sys.stderr)
+        print("Error: --no-auto-batch is set and no batch was provided", file=sys.stderr)
         return 1
 
     sanitize_payload_for_api(payload)
     try:
         validate_subjects_for_volunteer_api(payload)
     except ValueError as e:
-        print(f"错误: {e}", file=sys.stderr)
+        print(f"Error: {e}", file=sys.stderr)
         return 1
 
-    print(f"请求: {api_url(args.base_url)}", file=sys.stderr)
+    print(f"Request: {api_url(args.base_url)}", file=sys.stderr)
     try:
         raw = call_api(payload, base_url=args.base_url)
     except (RuntimeError, json.JSONDecodeError) as e:
-        print(f"错误: {e}", file=sys.stderr)
+        print(f"Error: {e}", file=sys.stderr)
         return 1
 
     if args.save_raw:
@@ -553,7 +576,7 @@ def main() -> int:
     try:
         parsed = parse_api_response(raw)
     except ValueError as e:
-        print(f"错误: {e}", file=sys.stderr)
+        print(f"Error: {e}", file=sys.stderr)
         return 1
 
     parsed["request"] = payload
@@ -561,7 +584,7 @@ def main() -> int:
         parsed["batch_resolution"] = batch_resolution
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(parsed, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"已保存解析结果: {args.output}（共 {parsed['stats']['total']} 所院校）")
+    print(f"Parsed result saved: {args.output} ({parsed['stats']['total']} universities in total)")
     return 0
 
 

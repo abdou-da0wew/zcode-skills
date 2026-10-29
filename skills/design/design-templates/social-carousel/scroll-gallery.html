@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>专辑选辑</title>
+<title>Curated Collections</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body {
@@ -11,13 +11,13 @@
     overflow: hidden;
     background: #0a0a0a;
     color: #f4f4f4;
-    /* 中文字体放在前面，避免破折号/引号被英文字体抢走（破折号杀手）。lang="zh-CN" 配合激活字体 locl */
+    /* CJK fonts come first so em-dashes/quotes are not captured by Latin fonts (the dash killer). Font-feature "locl" activates per the html lang attribute */
     font-family: "PingFang SC", "MiSans", "HarmonyOS Sans SC", "Hiragino Sans GB", "Microsoft YaHei UI", -apple-system, BlinkMacSystemFont, sans-serif;
     overscroll-behavior: none;
     touch-action: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* 中文断行兜底：按词断而非按字硬断 */
+    /* CJK line-break fallback: break by word rather than hard-break by character */
     word-break: keep-all;
     overflow-wrap: break-word;
     line-break: strict;
@@ -81,8 +81,8 @@
     -webkit-user-drag: none;
   }
 
-  /* ===== 几何切割层 ===== */
-  /* 拱形：底部贴边的拱门遮罩 */
+  /* ===== Geometric cutout layers ===== */
+  /* Arch: bottom-flush arch mask */
   .geo-arch {
     position: absolute;
     left: 24px; right: 24px; bottom: 0;
@@ -93,7 +93,7 @@
   }
   .geo-arch img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* 椭圆框 */
+  /* Oval frame */
   .geo-oval {
     position: absolute;
     left: 28px; right: 28px;
@@ -104,7 +104,7 @@
   }
   .geo-oval img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* 圆形剪裁 */
+  /* Circular crop */
   .geo-circle {
     position: absolute;
     top: 32px; left: 50%;
@@ -115,7 +115,7 @@
   }
   .geo-circle img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* 半圆贴边（顶部圆形） */
+  /* Half-dome flush to the top (circle clipped at edges) */
   .geo-halftop {
     position: absolute;
     left: 0; right: 0; top: 0;
@@ -125,7 +125,7 @@
   }
   .geo-halftop img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* 对角切 */
+  /* Diagonal cut */
   .geo-diag {
     position: absolute;
     inset: 0;
@@ -134,11 +134,11 @@
   }
   .geo-diag img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* 满版渐变照片背景 */
+  /* Full-bleed gradient photo background */
   .geo-full { position: absolute; inset: 0; overflow: hidden; }
   .geo-full img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* 双圆叠加装饰 */
+  /* Overlapping double-circle ornament */
   .ring {
     position: absolute;
     border: 1.5px solid currentColor;
@@ -146,12 +146,12 @@
     pointer-events: none;
   }
 
-  /* ===== 卡片文字 ===== */
+  /* ===== Card text ===== */
   .title {
     position: absolute;
     left: 24px; right: 24px;
     bottom: 60px;
-    /* 中文宋体栈（编辑/文学气质）。中文优先，避免标点回落到 Latin 字体 */
+    /* CJK serif stack (editorial/literary feel). CJK first so punctuation doesn't fall back to a Latin font */
     font-family: "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", "STSong", "SimSun", "Times New Roman", "Georgia", serif;
     font-weight: 500;
     font-size: 30px;
@@ -188,7 +188,7 @@
     position: absolute;
     left: 24px;
     top: 24px;
-    /* 中文不用合成斜体；改用 sans + 适度字距营造编辑部感 */
+    /* No synthetic italics for CJK; use sans + moderate tracking for the editorial-desk feel */
     font-family: "PingFang SC", "MiSans", "HarmonyOS Sans SC", "Hiragino Sans GB", -apple-system, "Helvetica Neue", sans-serif;
     font-style: normal;
     font-size: 11px;
@@ -215,88 +215,88 @@
 <main class="stage">
   <div class="lane" id="lane">
     <div class="track" id="track">
-      <!-- 卡片由 JS 注入，便于轮播循环 -->
+      <!-- Cards are injected by JS so the carousel can loop seamlessly -->
     </div>
   </div>
 </main>
 
 <script>
 (() => {
-  // ===== 卡片数据：标题 / 图片 / 几何样式 =====
-  // 图片来自 Unsplash 公开 CDN（可直连）
+  // ===== Card data: title / image / geometry =====
+  // Images come from the public Unsplash CDN (directly reachable)
   const U = (id, w=900) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
 
   const CARDS = [
     {
       kind: 'arch',
       bg: '#f3efe6',
-      img: U('1506905925346-21bda4d32df4'),       // 山峦
-      title: '成为\n十倍速设计师',
-      meta: '第 01 辑',
+      img: U('1506905925346-21bda4d32df4'),       // mountains
+      title: 'Become a\nten-times-faster\ndesigner',
+      meta: 'Vol. 01',
       titleClass: '',
     },
     {
       kind: 'full',
       bg: '#e9c3a0',
-      img: U('1554034483-04fda0d3507b'),           // 暖橘渐变
-      title: '为躁动心智\n打造的\n随取工坊',
-      meta: '第 02 辑',
+      img: U('1554034483-04fda0d3507b'),           // warm orange gradient
+      title: 'A grab-and-go\nworkshop for\nrestless minds',
+      meta: 'Vol. 02',
       titleClass: 'light center',
       markLight: true,
     },
     {
       kind: 'oval',
       bg: '#ffffff',
-      img: U('1465146344425-f00d5f5c8f07'),         // 草地花
-      title: '向一株草，\n学习耐心。',
-      meta: '第 03 辑',
+      img: U('1465146344425-f00d5f5c8f07'),         // meadow flowers
+      title: 'From a blade of grass,\nlearn patience.',
+      meta: 'Vol. 03',
       titleClass: 'top',
       titleAlign: 'right',
     },
     {
       kind: 'circle',
       bg: '#eef0ea',
-      img: U('1470071459604-3b5ec3a7fe05'),         // 雾山
-      title: '慢生活\n手帐',
-      meta: '第 04 辑',
+      img: U('1470071459604-3b5ec3a7fe05'),         // misty mountains
+      title: 'Slow living\njournal',
+      meta: 'Vol. 04',
       titleClass: '',
     },
     {
       kind: 'halftop',
       bg: '#f6f1ea',
-      img: U('1487958449943-2429e8be8625'),         // 建筑
-      title: '都市札记 ——\n2026。',
-      meta: '第 05 辑',
+      img: U('1487958449943-2429e8be8625'),         // architecture
+      title: 'Urban notes —\n2026.',
+      meta: 'Vol. 05',
       titleClass: '',
     },
     {
       kind: 'full',
       bg: '#c9d4d0',
-      img: U('1502134249126-9f3755a50d78'),         // 暮色山景
-      title: '多做事，\n少说话。',
-      meta: '第 06 辑',
+      img: U('1502134249126-9f3755a50d78'),         // dusk mountain view
+      title: 'Do more,\nsay less.',
+      meta: 'Vol. 06',
       titleClass: 'light',
       markLight: true,
     },
     {
       kind: 'diag',
       bg: '#efe7dc',
-      img: U('1518837695005-2083093ee35b'),         // 海洋
-      title: '漂流\n状态。',
-      meta: '第 07 辑',
+      img: U('1518837695005-2083093ee35b'),         // ocean
+      title: 'Drift\nmode.',
+      meta: 'Vol. 07',
       titleClass: '',
     },
     {
       kind: 'arch',
       bg: '#ece6db',
-      img: U('1469474968028-56623f02e42e'),         // 风景
-      title: '一份\n安静工作\n田野指南',
-      meta: '第 08 辑',
+      img: U('1469474968028-56623f02e42e'),         // landscape
+      title: 'A field guide\nto quiet\nwork',
+      meta: 'Vol. 08',
       titleClass: '',
     },
   ];
 
-  // ===== 渲染卡片 =====
+  // ===== Render cards =====
   const SHAPES = {
     arch:   `<div class="geo-arch"><img src="{IMG}" alt=""></div>`,
     oval:   `<div class="geo-oval"><img src="{IMG}" alt=""></div>`,
@@ -322,7 +322,7 @@
     return `
       <article class="card ${widthCls}" style="background:${c.bg}">
         ${shape}
-        <div class="meta ${metaCls} ${metaPos}">${c.meta} · 编辑专栏</div>
+        <div class="meta ${metaCls} ${metaPos}">${c.meta} · Editorial Column</div>
         <h2 class="title ${c.titleClass}" style="${titleStyle}">${titleHTML}</h2>
         <div class="mark ${c.markLight ? 'light' : ''}">${markSVG}</div>
       </article>
@@ -330,23 +330,23 @@
   }
 
   const track = document.getElementById('track');
-  // 双倍渲染以实现无缝循环
+  // Double-render for a seamless loop
   const html = CARDS.map(buildCard).join('');
   track.innerHTML = html + html;
 
-  // ===== 横向轮播：自动滚 + 拖拽 =====
+  // ===== Horizontal carousel: auto-scroll + drag =====
   const lane = document.getElementById('lane');
 
-  let x = 0;           // 当前位移
-  let vx = -0.45;      // 自动速度（px/帧）
-  let halfWidth = 0;   // 一组卡片宽度（包含 gap 与左 padding）
+  let x = 0;           // current offset
+  let vx = -0.45;      // auto speed (px/frame)
+  let halfWidth = 0;   // width of one card group (incl. gap and left padding)
   let isDown = false;
   let lastX = 0;
   let dragVX = 0;
   let paused = false;
 
   function measure() {
-    // 一组卡片的总宽：第二组第一张距 track 左边的距离 = 一组宽度
+    // Total width of one group: distance from the second group's first card to the track's left edge = one group width
     const cards = track.children;
     if (cards.length < CARDS.length + 1) return;
     const first = cards[0];
@@ -358,7 +358,7 @@
     if (!isDown && !paused) {
       x += vx;
     }
-    // 无缝循环
+    // Seamless loop
     if (halfWidth > 0) {
       if (x <= -halfWidth) x += halfWidth;
       if (x > 0) x -= halfWidth;
@@ -367,7 +367,7 @@
     requestAnimationFrame(tick);
   }
 
-  // 拖拽
+  // Dragging
   lane.addEventListener('pointerdown', e => {
     isDown = true;
     lastX = e.clientX;
@@ -386,7 +386,7 @@
     if (!isDown) return;
     isDown = false;
     lane.classList.remove('is-dragging');
-    // 惯性：把最后一次拖拽速度带入自动速度，再缓慢回到默认
+    // Inertia: carry the last drag velocity into the auto speed, then ease back to the default
     const target = -0.45;
     let v = Math.max(-12, Math.min(12, dragVX));
     const ease = () => {
@@ -401,18 +401,18 @@
   lane.addEventListener('pointercancel', endDrag);
   lane.addEventListener('pointerleave', endDrag);
 
-  // 滚轮横向滚动（鼠标横滑或竖滚都映射到 x）
+  // Wheel horizontal scrolling (both horizontal swipe and vertical scroll map to x)
   lane.addEventListener('wheel', e => {
     const dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
     x -= dx * 0.6;
     e.preventDefault();
   }, { passive:false });
 
-  // 悬停轻微减速
+  // Slight slow-down on hover
   lane.addEventListener('mouseenter', () => { paused = false; vx = -0.2; });
   lane.addEventListener('mouseleave', () => { vx = -0.45; });
 
-  // 等图片加载好再测量
+  // Wait for images to load before measuring
   const imgs = track.querySelectorAll('img');
   let loaded = 0;
   const onReady = () => { if (++loaded >= imgs.length) measure(); };
@@ -420,7 +420,7 @@
     if (img.complete) onReady();
     else { img.addEventListener('load', onReady); img.addEventListener('error', onReady); }
   });
-  // 兜底，1.2s 后强制测量一次
+  // Fallback: force one measurement after 1.2s
   setTimeout(measure, 1200);
   window.addEventListener('resize', measure);
 

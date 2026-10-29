@@ -181,7 +181,7 @@ const C = {
 ### Question Numbering
 
 Entire paper uses consistent three-level numbering:
-- **Major sections:** I, II, III, IV... (Chinese: 一、二、三、四…)
+- **Major sections:** I, II, III, IV... (Chinese papers: `\u4e00\u3001 \u4e8c\u3001 \u4e09\u3001 \u56db\u3001\u2026`)
 - **Questions:** 1. 2. 3. ... (Arabic + period)
 - **Sub-questions:** (1) (2) (3) ... (parenthesized)
 
@@ -229,7 +229,7 @@ Use `keepNext: true` to chain: stem → figure → first 3 answer lines.
 
 ### Underline Formatting for "Underlined Parts" (Mandatory)
 
-When a question references "underlined part" (划线部分), the relevant text MUST use actual underline formatting (`underline: { type: UnderlineType.SINGLE }`). **Never** show "划线部分为 XXX" as plain text annotation — the underline must be visually rendered.
+When a question references an "underlined part" (the "huaxian bufen" convention), the relevant text MUST use actual underline formatting (`underline: { type: UnderlineType.SINGLE }`). **Never** describe the underlined part as plain-text annotation (e.g., "the underlined part is XXX") — the underline must be visually rendered.
 
 ```js
 // ✅ Correct — actual underline on the referenced text
@@ -241,7 +241,7 @@ new Paragraph({ children: [
 ]})
 
 // ❌ Wrong — underlined part described as annotation text
-new TextRun({ text: "1. It is a butterfly. (对划线部分提问) 注：划线部分为 a butterfly" })
+new TextRun({ text: "1. It is a butterfly. (Ask a question about the underlined part) Note: the underlined part is \"a butterfly\"" })
 ```
 
 ### Font Hierarchy
@@ -461,7 +461,7 @@ function writingLines(count) {
 
 ---
 
-## 11. Answer Key (参考答案)
+## 11. Answer Key
 
 ### Output Rules
 
@@ -471,7 +471,7 @@ function writingLines(count) {
 ### Separate File Format (Default)
 
 The answer key file should include:
-- Title: "《{exam title}》参考答案" (SimHei, 14pt/size:28, bold, centered)
+- Title: "{exam title} — Answer Key" wrapped in CJK book-title marks `\u300a{exam title}\u300b\u53c2\u8003\u7b54\u6848` for Chinese papers (SimHei, 14pt/size:28, bold, centered)
 - Same question numbering as the exam
 - Concise answers (letter choices, key words, short solutions)
 - Font: SimSun 10.5pt (size: 21)
@@ -486,7 +486,7 @@ The answer key file should include:
   children: [
     new Paragraph({
       alignment: AlignmentType.CENTER, spacing: { after: 300 },
-      children: [new TextRun({ text: "参考答案", size: 28, bold: true,
+      children: [new TextRun({ text: "Answer Key", size: 28, bold: true,
         font: { eastAsia: "SimHei" } })],
     }),
     // ... answer content paragraphs

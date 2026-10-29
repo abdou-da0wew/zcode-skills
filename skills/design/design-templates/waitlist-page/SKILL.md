@@ -5,14 +5,14 @@ visibility: public
 mode: template
 carrier: web-page
 scenario: pre-launch
-pattern_source: 层云-waitlist.html
+pattern_source: strata-waitlist.html
 source_priority: skill-first
 triggers:
-  - "做个 waitlist 预发布"
-  - "高端候补名单页"
-  - "邀请制邮件登记"
-  - "pre-launch 暗色页"
-  - "层云风预登记"
+  - "make a waitlist pre-launch page"
+  - "premium waitlist page"
+  - "invite-only email signup page"
+  - "pre-launch dark page"
+  - "strata-style pre-registration page"
 ---
 
 # Waitlist Page Template
@@ -35,9 +35,9 @@ Use this template when the artifact is a **pre-launch / private-beta / early-acc
 
 ## Required Reading
 
-Read this `SKILL.md` first. Do **not** read `层云-waitlist.html` by default.
+Read this `SKILL.md` first. Do **not** read `strata-waitlist.html` by default.
 
-Read `层云-waitlist.html` only when you need: the floating-card drift loop (8 cards, 14–19s with staggered entrance), the fade-up cascade timing, the live-counter bump-on-submit animation, the glass-nav backdrop blur, or the form success / error states. Extract patterns; do not copy the placeholder brand voice, the 820+ counter starting value, or class names wholesale.
+Read `strata-waitlist.html` only when you need: the floating-card drift loop (8 cards, 14–19s with staggered entrance), the fade-up cascade timing, the live-counter bump-on-submit animation, the glass-nav backdrop blur, or the form success / error states. Extract patterns; do not copy the placeholder brand voice, the 820+ counter starting value, or class names wholesale.
 
 ## Design Strategy
 
@@ -75,9 +75,9 @@ Avoid:
 - countdown timers, urgency banners, scarcity badges
 - testimonials from people who haven't used the product
 - 3D plastic mockup hero images
-- 黑金 / neon-cyber palettes
+- black-and-gold / neon-cyber palettes
 - emoji in the counter or features
 
 ## Platform / Size
 
-Desktop and mobile both first-class — waitlists get shared on Twitter / 微信 and most clicks are mobile. Keep the hero readable at 360px width; the floating cards should reduce to 4 (not 8) on mobile.
+Desktop and mobile both first-class — waitlists get shared on Twitter / WeChat and most clicks are mobile. Keep the hero readable at 360px width; the floating cards should reduce to 4 (not 8) on mobile.

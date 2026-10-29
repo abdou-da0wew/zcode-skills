@@ -66,7 +66,7 @@ def build_api_request(
 
 
 def normalize_rec5_paper(raw: dict[str, Any]) -> dict[str, Any]:
-    """Normalize raw rec5 paper dict to the in-skill record shape (Markdown display / JSON 输出)."""
+    """Normalize raw rec5 paper dict to the in-skill record shape (Markdown display / JSON output)."""
     paper_id = _clean_text(raw.get("paper_id") or raw.get("id"))
     links = raw.get("links") if isinstance(raw.get("links"), dict) else {}
     aminer_url = (

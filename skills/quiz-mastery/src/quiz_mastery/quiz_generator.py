@@ -53,74 +53,76 @@ class QuizGenerator:
         for kp in knowledge_points:
             desc_parts = [f"- **{kp.title}** (ID: {kp.id})"]
             if kp.definition:
-                desc_parts.append(f"  定义: {kp.definition}")
+                desc_parts.append(f"  Definition: {kp.definition}")
             if kp.description:
-                desc_parts.append(f"  描述: {kp.description}")
+                desc_parts.append(f"  Description: {kp.description}")
             if kp.source and kp.source.snippets:
-                desc_parts.append(f"  原文片段: {'; '.join(kp.source.snippets)}")
+                desc_parts.append(f"  Source snippets: {'; '.join(kp.source.snippets)}")
             kp_descriptions.append("\n".join(desc_parts))
 
         kp_text = "\n\n".join(kp_descriptions)
 
         level_desc = {
-            1: "识记（基础记忆和理解，考察概念辨认和基本事实）",
-            2: "理解（深层理解，考察概念区分、原理解释和简单应用）",
-            3: "应用（综合运用，考察实际场景应用、分析和问题解决）",
+            1: "Recall (basic memorization and understanding; tests concept recognition and basic facts)",
+            2: "Understand (deeper understanding; tests concept discrimination, explaining principles, and simple application)",
+            3: "Apply (synthesis; tests real-scenario application, analysis, and problem solving)",
         }
 
         system_prompt = (
-            "你是一个专业的出题助手。根据提供的知识点信息，生成高质量的测验题目。\n"
-            "严格按照要求的 JSON 格式输出，不要输出任何其他内容。\n"
-            "题目必须紧扣知识点的名称、定义和原文描述，不能出脱离原文的题目。"
+            "You are a professional question-writing assistant. Generate high-quality quiz "
+            "questions based on the knowledge point information provided.\n"
+            "Strictly output in the required JSON format; do not output anything else.\n"
+            "Questions must stay closely tied to each knowledge point's name, definition, and "
+            "source description; never write questions that drift away from the source."
         )
 
-        user_prompt = f"""请根据以下知识点生成 {num_questions} 道测验题。
+        user_prompt = f"""Generate {num_questions} quiz questions based on the following knowledge points.
 
-## 难度级别
+## Difficulty level
 Level {level}: {level_desc[level]}
 
-## 题型分配
+## Question type distribution
 {distribution_text}
 
-## 知识点信息
+## Knowledge point information
 
 {kp_text}
 
-## 出题要求
-1. 每道题必须关联至少一个知识点 ID
-2. 选择题 (single_choice)：4 个选项 A/B/C/D，answer 填正确选项字母
-3. 判断题 (true_false)：answer 填 "True" 或 "False"
-4. 填空题 (fill_blank)：prompt 中用 ____ 标记空白处，answer 填正确答案文本
-5. 简答题 (short_answer)：answer 填参考答案
-6. 每道题必须包含 explanation（解析）
-7. 题目内容必须基于上述知识点的名称、定义和描述，不要超出范围
-8. **每道题必须填写 `category` 和 `knowledge_point` 字段**（用于分类筛选和侧栏分组）：
-   - `category`：一级分类，**短词**（建议 2-6 字），用于顶部分类筛选 chip。
-     例：物理 / 数学 / 法律 / 历史 / 编程 / 通用 等。
-     **不要**写成长串、不要含日期、不要含编号、不要含书名号或斜杠。
-   - `knowledge_point`：所属知识点名称（直接用关联知识点的 title 即可），用于侧栏分组。
-9. 总题数：{num_questions} 道
+## Question-writing requirements
+1. Every question must be linked to at least one knowledge point ID
+2. Choice questions (single_choice): 4 options A/B/C/D; answer is the correct option letter
+3. True/false questions (true_false): answer is "True" or "False"
+4. Fill-blank questions (fill_blank): mark blanks with ____ in the prompt; answer is the correct answer text
+5. Short-answer questions (short_answer): answer is the reference answer
+6. Every question must include an explanation
+7. Question content must be based on the knowledge point names, definitions, and descriptions above; do not go out of scope
+8. **Every question must fill in the `category` and `knowledge_point` fields** (used for category filtering and sidebar grouping):
+   - `category`: top-level category, a **short word** (2-6 characters recommended), used by the top category filter chips.
+     Examples: Physics / Math / Law / History / Programming / General.
+     Do **not** write long strings; do not include dates, numbers, book-title marks, or slashes.
+   - `knowledge_point`: the name of the knowledge point this question belongs to (just use the linked knowledge point's title); used for sidebar grouping.
+9. Total number of questions: {num_questions}
 
-## 输出格式
-输出纯 JSON 数组，每个元素格式如下：
+## Output format
+Output a plain JSON array; each element has the following shape:
 ```json
 [
   {{
     "id": "q_001",
     "knowledge_point_ids": ["kp_id"],
-    "category": "物理",
-    "knowledge_point": "牛顿第二定律",
+    "category": "Physics",
+    "knowledge_point": "Newton's Second Law",
     "level": {level},
     "type": "single_choice",
-    "prompt": "题目内容",
-    "options": ["A. 选项一", "B. 选项二", "C. 选项三", "D. 选项四"],
+    "prompt": "Question text",
+    "options": ["A. Option one", "B. Option two", "C. Option three", "D. Option four"],
     "answer": "A",
-    "explanation": "解析内容"
+    "explanation": "Explanation"
   }}
 ]
 ```
 
-请直接输出 JSON 数组，不要包含 markdown 代码块标记或其他文字。"""
+Output the JSON array directly, without markdown code fences or any other text."""
 
         return {
             "system_prompt": system_prompt,

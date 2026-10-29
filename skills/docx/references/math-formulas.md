@@ -2,7 +2,7 @@
 
 ## Design Philosophy
 
-GLM uses **LaTeX as the formula input syntax**, internally converting to docx-js Math objects.
+The model uses **LaTeX as the formula input syntax**, internally converting to docx-js Math objects.
 
 **Why not write OMML directly?**
 - Models are naturally proficient in LaTeX (abundant in training data)

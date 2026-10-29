@@ -8,11 +8,11 @@ scenario: internal-tool
 pattern_source: stack-dashboard-zh.html
 source_priority: skill-first
 triggers:
-  - "做个运营仪表盘"
-  - "内部工具看板"
-  - "中文 ops dashboard"
-  - "KPI hero 看板"
-  - "Linear 风看板"
+  - "build an ops dashboard"
+  - "internal tool dashboard"
+  - "Chinese ops dashboard"
+  - "KPI hero dashboard"
+  - "Linear-style dashboard"
 ---
 
 # Dashboard Template

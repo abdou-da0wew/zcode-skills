@@ -1,6 +1,7 @@
 ---
 name: social-card-screenshot-explainer
-description: 截图 / UI / 工具流解释类社交卡 — 必须给截图一个"舞台"：可读裁切 + 标注层级 + 出现的理由。骨架：封面 + 大截图 + 3 个标注 / 截图裁切 + 放大细节 + 结论 / before-after 截图对 / 产品 UI 框 + 编号 callout / 3 步工作流。截图要大到手机能看清，箭头节制，加一个 takeaway 标题。触发："做个工具教程卡 / AI 工作流卡 / UI 解释卡 / 截图说明卡 / before-after 卡"。NOT 原图直接丢上画布，NOT 装饰性无关截图。
+description: >-
+  Screenshot / UI / tool-workflow explainer social card — the screenshot must get a "stage": readable crop + annotation hierarchy + a reason to be there. Skeletons: cover + large screenshot + 3 annotations / screenshot crop + zoomed detail + conclusion / before-after screenshot pair / product UI frame + numbered callouts / 3-step workflow. Screenshots must be big enough to read on a phone, arrows used sparingly, plus one takeaway title. Triggers: "make a tool tutorial card / AI workflow card / UI explainer card / screenshot explainer card / before-after card". NOT raw screenshots dropped onto the canvas, NOT decorative unrelated screenshots.
 visibility: public
 mode: template
 carrier: fixed-image
@@ -8,12 +9,12 @@ scenario: social-content
 pattern_source: pattern.html
 source_priority: skill-first
 triggers:
-  - "做个工具教程卡"
-  - "AI 工作流卡"
-  - "UI 解释卡"
-  - "截图说明卡"
-  - "before-after 卡"
-  - "产品功能拆解卡"
+  - "make a tool tutorial card"
+  - "AI workflow card"
+  - "UI explainer card"
+  - "screenshot explainer card"
+  - "before-after card"
+  - "product feature breakdown card"
 related_patterns: social-card-swiss
 ---
 

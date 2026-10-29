@@ -44,7 +44,7 @@ const { FootnoteReferenceRun, Footnote } = require("docx");
 const doc = new Document({
   footnotes: {
     1: { children: [new Paragraph({ children: [new TextRun({ text: "Smith, J. (2024). Research Methods. Academic Press, pp. 45-67.", size: 18 })] })] },
-    2: { children: [new Paragraph({ children: [new TextRun({ text: "Zhang, W. (2023). \u201c数据分析方法研究\u201d. 科学通报, 68(12), 1234-1250.", size: 18 })] })] },
+    2: { children: [new Paragraph({ children: [new TextRun({ text: "Zhang, W. (2023). \u201cData Analysis Methods Research\u201d. Chinese Science Bulletin, 68(12), 1234-1250.", size: 18 })] })] },
   },
   sections: [{
     children: [
@@ -145,7 +145,7 @@ new Paragraph({ children: [new PageBreak()] })
 
 **⚠️⚠️⚠️ CRITICAL — #1 MOST COMMON BUG ⚠️⚠️⚠️**
 
-Bare Chinese curly quotation marks (`""` `''`) in JS string literals **WILL break syntax and crash document generation**. This bug occurs most often in **Chinese body text** where curly quotes are used for emphasis, proper nouns, event names, or quoted speech — e.g., `"双11"`, `"前低后高"`, `"618"大促`. **Every single occurrence** of `""''` in text content MUST be Unicode-escaped. No exceptions.
+Bare curly quotation marks (`""` `''`) — or unescaped straight quotes — in JS string literals **WILL break syntax and crash document generation**. This bug occurs most often in **body text** where quotes are used for emphasis, proper nouns, event names, or quoted speech — e.g., promotional event names like `"Double 11"`, `"618"`, or a phrase like `"slow first, fast later"`. **Every single occurrence** of `""''` in text content MUST be Unicode-escaped. No exceptions.
 
 **MANDATORY RULE: Before writing ANY `TextRun`, `para()`, or string containing Chinese text, scan the text for `""''` characters and replace ALL of them with `\u201c \u201d \u2018 \u2019`.**
 
@@ -158,13 +158,13 @@ Bare Chinese curly quotation marks (`""` `''`) in JS string literals **WILL brea
 
 ```js
 // ❌ WRONG — curly quotes in Chinese text break JS syntax (VERY COMMON MISTAKE)
-content.push(para("2025年四个季度行业增速呈现"前低后高"的态势。在"618"大促、"双11""双12"活动拉动下增长显著。"));
-new TextRun({ text: "他说"你好"" })
+content.push(para("The industry grew strongly across all four quarters of 2025, driven by the "618" mid-year sale and the "Double 11" and "Double 12" shopping festivals."));
+new TextRun({ text: "He said "hello"" })
 new TextRun({ text: 'It's a test' })
 
 // ✅ CORRECT — ALL curly quotes replaced with Unicode escapes
-content.push(para("2025年四个季度行业增速呈现\u201c前低后高\u201d的态势。在\u201c618\u201d大促、\u201c双11\u201d\u201c双12\u201d活动拉动下增长显著。"));
-new TextRun({ text: "他说\u201c你好\u201d" })
+content.push(para("The industry grew strongly across all four quarters of 2025, driven by the \u201c618\u201d mid-year sale and the \u201cDouble 11\u201d and \u201cDouble 12\u201d shopping festivals."));
+new TextRun({ text: "He said \u201chello\u201d" })
 new TextRun({ text: "It\u2019s a test" })
 
 // ✅ CORRECT — straight quotes escaped or use alternate delimiters

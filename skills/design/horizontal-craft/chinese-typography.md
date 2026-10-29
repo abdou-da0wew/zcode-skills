@@ -1,162 +1,162 @@
 ---
 name: chinese-typography
-description: 给中文排版做决策时使用。覆盖：版心 / 页边距 / 字号 / 字重 / 字间距 / 行距 / 行长 / 段落缩进 / 标点占格 / 网格系统 / 字体选择与搭配 / 横排直排混排 / 标题断句 / 破折号 / 全角半角 / 避头尾。触发场景：书籍排版、长文/文章页、PDF 报告、H5/海报、PPT/Keynote、网页正文、画册、招股书、PRD/技术文档、古籍/文言、公文、邀请函、博物馆图录，或任何"中文阅读体验不舒服"的诊断与修正。
+description: Use when making Chinese typesetting decisions. Covers type area / margins / font size / weight / letter spacing / line spacing / line length / paragraph indent / punctuation spacing / grid systems / font selection and pairing / mixed horizontal-vertical writing / title line breaking / em dash / fullwidth vs halfwidth / kinsoku (line-start and line-end rules). Trigger scenarios: book typesetting, long-form/article pages, PDF reports, H5/posters, PPT/Keynote, web body text, catalogs, prospectuses, PRD/technical documents, classical Chinese texts, official documents, invitations, museum catalogs, or any "the Chinese reading experience feels off" diagnosis and fix.
 ---
 
-# 中文字体排版 Chinese Typography
+# Chinese Typography
 
-"模数 → 网格 → 版心 → 文本造型"方法论。核心一句话：**把一个页面的所有空间要素（版心、页边距、字号、行距、字距）都关联到一个共同的模数（基因）上**，让秩序看得见、看不见地存在。
+The "modulus → grid → type area (banxin) → text shaping" methodology. Core idea in one sentence: **tie every spatial element of a page (type area, margins, font size, line spacing, letter spacing) to a single common modulus (a gene)**, so that order exists visibly and invisibly.
 
-> **格 = 工具属性的网格（理性）；律 = 设计师对格的使用（灵性）。美比严格按网格排列更重要。**
+> **The grid = the tool's rationality; the rhythm = the designer's use of the grid. Beauty matters more than mechanically obeying the grid.**
 
-## 什么时候启用本 skill
+## When to activate this skill
 
-- 用户让你"排个版面 / 做个文档 / 调下样式 / 设计 H5 / 写一份正式 PDF / 做古籍样式 / 排公文"，且文本主体是中文
-- 用户指出"这页看着乱 / 难读 / 不专业 / 不像出版物 / 字太挤 / 行太长 / 标题断得奇怪"
-- 用户在 CSS / Tailwind / InDesign / Figma / PPT / Keynote / Word / Typst / LaTeX 上做中文长文样式
-- 用户问"用多大字 / 多大行距 / 多宽的栏 / 留多少白 / 横排还是直排 / 标题怎么换行"
-- 用户做"中国最美的书"风、出版社风、博物馆图录风、学术风、商务报告风、古典/书法风的设计
+- The user asks you to "lay out a page / make a document / tweak styles / design an H5 / write a formal PDF / do a classical-text style / set official documents", and the text is mainly Chinese
+- The user says "this page looks messy / hard to read / unprofessional / not like a publication / too cramped / lines too long / titles break strangely"
+- The user works on long-form Chinese styles in CSS / Tailwind / InDesign / Figma / PPT / Keynote / Word / Typst / LaTeX
+- The user asks "what font size / what line spacing / how wide a column / how much whitespace / horizontal or vertical / how should titles wrap"
+- The user wants a "most beautiful Chinese books" style, publishing-house style, museum-catalog style, academic style, business-report style, or classical/calligraphic design
 
-## 触发时务必先问自己 3 个方向题
+## Before triggering, ask yourself 3 directional questions
 
-1. **横排还是直排？** 古籍今译、文言、诗词、邀请函、传统书法集、博物馆图录的部分内页 → 优先考虑直排；现代长文、教材、商务文档 → 横排。
-2. **是否有混排？** 横排中嵌入直排（标题/匾额、对联、引文造型）、直排中嵌入横排（西文术语、数字、图注）都是常用手法，不是"破格"，是基础语法。
-3. **地区风格？** 大陆简体（横排标点偏左下、直排偏右上、开明式标点）/ 港台繁体（标点居中、可不严格避头尾）/ 日文（标点偏左下/右上、严格避头尾）。差异主要在标点位置与避头尾松紧，不要混着用。
+1. **Horizontal or vertical?** Classical-text modern translations, literary Chinese, poetry, invitations, traditional calligraphy collections, some museum-catalog inner pages → consider vertical first; modern long-form, textbooks, business documents → horizontal.
+2. **Mixed writing?** Vertical embedded in horizontal (titles/plaques, couplets, quotation shaping) and horizontal embedded in vertical (Western terms, numbers, figure captions) are standard techniques, not "breaking the rules" — they are basic grammar.
+3. **Regional style?** Mainland Simplified (horizontal punctuation sits bottom-left, vertical top-right, Kaiming-style punctuation) / Hong Kong-Taiwan Traditional (centered punctuation, kinsoku may be relaxed) / Japanese (punctuation bottom-left/top-right, strict kinsoku). The differences are mainly punctuation placement and kinsoku strictness — never mix them.
 
-详见 `reference/directions.md`。
+See `reference/directions.md` for details.
 
-## 九条最关键的规则（按重要性）
+## The nine most critical rules (by importance)
 
-### 1. 先决定排版方向，再决定一切版心
-- **直排**：文字上→下、行右→左；页面右翻、装订右侧；图/表标题左右侧；点号"，。；："偏右上；引号用直角「」『』
-- **横排**：文字左→右、行上→下；页面左翻、装订左侧；图/表标题上下方；大陆点号偏左下；引号用弯""''
-- **混排**：直排中遇 1 字英文/缩略词 → **正立排**；遇 2–3 位数字 → **纵中横排（tate-chu-yoko）**；遇整段西文 → **顺时针 90° 旋转**
-- 不要把日文标点规则套到中文（如直排冒号转 90° 躺下是日文做法，中文要直立）
+### 1. Decide writing direction first; every type-area decision follows
+- **Vertical**: text top→bottom, lines right→left; pages turn right-to-left, bound on the right; figure/table captions to the sides; pause punctuation (ideographic comma, full stop, semicolon, colon) sits top-right; quotation marks use corner brackets (U+300C/U+300D, U+300E/U+300F)
+- **Horizontal**: text left→right, lines top→bottom; pages turn left-to-right, bound on the left; figure/table captions above/below; Mainland pause punctuation sits bottom-left; quotation marks use curly quotes (U+201C/U+201D, U+2018/U+2019)
+- **Mixed**: a 1-letter English word/abbreviation inside vertical text → **set upright**; 2–3 digit numbers → **tate-chu-yoko** (horizontal-in-vertical); whole Western paragraphs → **rotate 90° clockwise**
+- Do not apply Japanese punctuation rules to Chinese (e.g. a colon rotating 90° to lie down is a Japanese convention; in Chinese it stays upright)
 
-### 2. 标题断句必须按词，不按字数
-**用户最常踩的坑。**
-- 正文：默认按字断行，不要按词；汉语双音节词约占 60%，按词断会变锯齿状不美。
-- **标题：必须按词断**，否则会出歧义（反例："我外交部强烈谴责伊拉克 / 大使馆被炸事件"）。
-- 虚词位禁忌：**"的"不入行首；"和 / 与 / 及 / 或"不入行末**；地名/人名/书名/术语严禁拆开。
-- 标题占行必须是正文行高整数倍：一级 4–5 行、二级 2–3 行、三级 1–2 行、双行题 3 行。
-- 大标题必出现在奇数页（横排左翻书 = 右页 / 直排右翻书 = 左页）。
-- 写 HTML 时手动加 `<wbr>` 或 `<br>` 控制断点；CSS 不可断字符之间用 `&#8288;`（U+2060 WJ）。
+### 2. Break titles by word, not by character count
+**The most common user-facing pitfall.**
+- Body text: break by character by default, not by word; ~60% of Mandarin words are disyllabic, and word-based breaking makes ragged zigzag lines.
+- **Titles: must break by word**, otherwise ambiguity appears (classic bad example: "Foreign ministry strongly condemns the Iraq / embassy bombing incident" — the break makes it read as "Iraq embassy").
+- Function-word taboos: the possessive particle *de* must not start a line; conjunctions meaning "and / or" must not end a line; place names, personal names, book titles, and terms must never be split.
+- A title's line count must be an integer multiple of the body line height: level 1 takes 4–5 lines, level 2 takes 2–3 lines, level 3 takes 1–2 lines, a two-part title takes 3 lines.
+- A major title must appear on an odd page (horizontal left-turning book = right page / vertical right-turning book = left page).
+- In HTML, add `<wbr>` or `<br>` manually to control break points; for characters CSS must not break between, use `&#8288;` (U+2060 WJ).
 
-详见 `reference/title-and-breaking.md`。
+See `reference/title-and-breaking.md` for details.
 
-### 3. 先定模数（modulus），再定一切
-所有字号、行距、页边距、版心宽高，都必须是同一个模数（典型 1.5pt 或 0.5pt）的整数倍。模数像"基因"贯穿全书。
-- 入门默认：**模数 = 1.5pt**，正文 9pt（= 6×1.5pt），图注 6pt，小标题 12pt
-- 不要用 1.618pt 这种带小数的"黄金比"做模数——汉字是定宽方格，多位小数会让单元格宽算不齐
-- 1–5pt 字号用 0.5pt 步进，6–12pt 用 1pt 步进（铅字时代沿用至今的可整除性）
+### 3. Fix the modulus first, then everything else
+All font sizes, line spacing, margins, and type-area dimensions must be integer multiples of one modulus (typically 1.5pt or 0.5pt). The modulus runs through the whole document like a gene.
+- Beginner default: **modulus = 1.5pt**, body 9pt (= 6×1.5pt), captions 6pt, subheads 12pt
+- Never use a decimal "golden ratio" modulus like 1.618pt — Han glyphs are fixed-width squares; multi-digit decimals make cell widths impossible to reconcile
+- For 1–5pt sizes use 0.5pt steps; for 6–12pt use 1pt steps (divisibility inherited from the metal-type era)
 
-### 4. 行长必须是字号整数倍
-**这是 W3C《中文排版需求》§2.3.5 明文要求，不是建议。**
-- 公式：`行长 = 字号 × 字数`；不整倍会导致两端对齐时末行字距异常（错版信号）。
-- **横排正文 17–40 字最佳，硬上限 ≤48 字；直排正文 ≤55 字；行长最小 ≥10 字**（少于 10 字回行频繁、易疲劳）。
-- 在 CSS：`max-width: 30em` 是对中文最稳的护栏（西文是 65–75 字符 ≈ 35em）。
-- 拉宽页面就增加栏数，不是无限拉长行。
-- 框架高公式：`高 = (行数 − 1) × 行高 + 字号`，末行只占字号高度，不要把高度凑整成 mm。
+### 4. Line length must be an integer multiple of font size
+**This is an explicit requirement of the W3C "Requirements for Chinese Text Layout" §2.3.5, not a suggestion.**
+- Formula: `line length = font size × character count`; a non-integer multiple causes abnormal letter spacing on justified last lines (a mis-set signal).
+- **Horizontal body text: 17–40 characters is best, hard cap ≤48; vertical body text ≤55; minimum line length ≥10 characters** (below 10, wrapping is too frequent and fatiguing).
+- In CSS: `max-width: 30em` is the most reliable guardrail for Chinese (Latin is 65–75 characters ≈ 35em).
+- To widen the page, add columns — never stretch the line indefinitely.
+- Frame height formula: `height = (line count − 1) × line height + font size`; the last line only occupies the font-size height; do not round the height to whole mm.
 
-### 5. 行距 = 字号的 50%–100%（即 1.5–2 倍行高）
-- W3C 标准：行距（行间空白） = 字号的 50%–100%，**对应行高（含字本身）= 字号的 1.5–2 倍**。
-- 现代屏幕舒适：`line-height: 1.5`；长文/文学：1.7–2.0；密集表格：1.33。
-- **超过字号 100% 不增易读性**（即 line-height 超过 2）；过窄（< 1.2）密集；过宽（> 2.2）章节断裂感。
-- 直排带注音时，**行距 ≥ 1.5 × 基字**。
-- 行间有专名号 / 着重号 / 书名号甲式时，单面装行距 ≥ 1/2 字号，双面装 ≥ 5/8 字号。
+### 5. Line spacing = 50%–100% of font size (i.e. 1.5–2× line height)
+- W3C standard: line spacing (inter-line gap) = 50%–100% of font size, **corresponding to a line height (including the glyph itself) of 1.5–2×**.
+- Comfortable on modern screens: `line-height: 1.5`; long-form/literary: 1.7–2.0; dense tables: 1.33.
+- **Above 100% of font size adds no readability** (i.e. line-height beyond 2); too narrow (< 1.2) feels dense; too wide (> 2.2) breaks section cohesion.
+- For vertical text with ruby annotation, **line spacing ≥ 1.5× base glyphs**.
+- When proper-name marks / emphasis dots / book-title marks (style A) sit between lines, single-sided binding needs spacing ≥ 1/2 font size, double-sided ≥ 5/8 font size.
 
-### 6. 版心位置略偏上、内紧外松、上紧下松
-- 横排书籍：版心**略往上**移取得视觉最佳点
-- 对页（书籍/PDF）：**订口（内）< 切口（外）< 天头（顶）< 地脚（底）**（典型比例 3:5:8:13 或 2:3:5:8）
-- 直排对页相反：天头 < 地脚（与横排相同），但订口（右页右侧 / 左页左侧）< 切口
-- 页边距太小，文字会"扑面而来"产生压迫；版心是负形的留白决定优雅程度
-- **先定版心再余白**（中式）——不是西式"先留边距后剩版心"
+### 6. Type area sits slightly high; tight inside, loose outside; tight top, loose bottom
+- Horizontal books: move the type area **slightly upward** for the best visual position
+- Facing pages (book/PDF): **gutter (inner) < fore-edge (outer) < head (top) < foot (bottom)** (typical ratios 3:5:8:13 or 2:3:5:8)
+- Vertical facing pages invert head/foot: head < foot (same as horizontal), but gutter (right side of the right page / left side of the left page) < fore-edge
+- Margins too small make text "rush at the reader" and feel oppressive; the type area is the negative shape whose whitespace decides elegance
+- **Fix the type area first, then the whitespace** (the Chinese method) — not the Western "reserve margins first, and the type area is what's left"
 
-### 7. 字间距：原则上不动（密排）
-- 现代汉字字体的字面率 92%–96%，字与字之间已天然留白；**正文不要再加 letter-spacing**
-- CSS：`letter-spacing: 0`（不要设 `0.05em` 这种"看着精致"的间距，会破坏字号节奏）
-- 只有标题、Logo、空间表达情绪时才主动加字距
-- 疏排（增加字距）的合理场景：标题求平衡、图说求平衡、短诗词、儿童读物；常见 1/4 em / 1/3 em / 1/2 em / 1 em
+### 7. Letter spacing: leave it alone by default (solid setting)
+- Modern Chinese fonts have face ratios of 92%–96%; space between characters is already built in; **do not add letter-spacing to body text**
+- CSS: `letter-spacing: 0` (do not set "delicate-looking" values like `0.05em`; it breaks the size rhythm)
+- Add tracking deliberately only for titles, logos, or emotional spatial expression
+- Legitimate loose-setting scenarios: balancing titles, balancing captions, short poetry, children's books; common values 1/4 em, 1/3 em, 1/2 em, 1 em
 
-### 8. 字重和字号联动选择，控制纸/屏对比度
-- 小字（6–7.5pt 印刷 / < 14px 屏幕）：中等字重（Regular / 55S）辨识度最高，避免极细字重
-- 大字（≥ 9pt 印刷 / ≥ 16px 屏幕）：可以用 Light/45S 取得优雅感
-- 屏幕白底深色文字 ≥ 4.5:1 对比度（WCAG AA）；纸面看"字的黑能否压过纸的白"
-- 同一段文本只用 1 个字体家族的不同字重，不要混 4 个字体
-- **正文最小字号下限**：W3C 规定 6 号 = 7.875pt（≈ 2.8mm），更小汉字结构难辨
+### 8. Choose weight and size together; control paper/screen contrast
+- Small text (6–7.5pt print / < 14px screen): medium weight (Regular / 55S) is most legible; avoid ultra-thin weights
+- Large text (≥ 9pt print / ≥ 16px screen): Light / 45S can achieve elegance
+- Screen dark-on-white needs ≥ 4.5:1 contrast (WCAG AA); on paper, ask "does the ink outweigh the paper"
+- Within one text block use different weights of a single family — never mix 4 typefaces
+- **Minimum body size floor**: W3C specifies size 6 = 7.875pt (≈ 2.8mm); below that Han glyph structure becomes hard to discern
 
-### 9. 标点必须按"加法模式"做宽度调整，并严格避头尾
-**横排中文易忽略的最大问题。** 大陆默认开明式（句末全宽、句内半宽）；港台默认居中式；行末标点一律半宽（GB/T 15834-2011 §5.1.10）。
-- 选 1 种标点风格贯穿全文：**全角式 / 半角式 / 开明式 / 居中式**（详见 `reference/punctuation.md`）
-- 加法模式：标点 = 半宽 + 加空隙；调整对象是空隙，不是字面。InDesign / QuarkXPress / JIS 都按加法。
-- 避头尾必须做：**basic 级 = 最低标准**（行首禁顿逗句冒分叹问、结束引括书名号；行尾禁开始引括书名号）；正式中文出版用 **GB 级 / strict 级**
-- 行首禁止：`。，、；：？！…—）》」』`等；行尾禁止：`（《「『"`
-- 段落缩进首行 2 字（`text-indent: 2em`），段间不空行；引文整段缩进 4 字
-- 不可分离禁则：破折号 / 省略号 / 数字内 / 数字+单位 / 上下标+被注词 / 西文单词 都不可被换行拆开
+### 9. Punctuation width must follow the "additive model", with strict kinsoku
+**The biggest overlooked problem in horizontal Chinese.** Mainland defaults to Kaiming style (fullwidth at sentence end, halfwidth within sentences); Hong Kong/Taiwan default to centered; end-of-line punctuation is always halfwidth (GB/T 15834-2011 §5.1.10).
+- Pick one punctuation style for the whole document: **fullwidth / halfwidth / Kaiming / centered** (see `reference/punctuation.md`)
+- Additive model: punctuation = halfwidth glyph + added gap; what you adjust is the gap, not the glyph face. InDesign / QuarkXPress / JIS all work this way.
+- Kinsoku is mandatory: **basic level = the minimum** (line-start: no pause commas, full stops, colons, semicolons, exclamation/question marks, or closing quotes/brackets/book-title marks; line-end: no opening quotes/brackets/book-title marks); formal Chinese publishing uses **GB level / strict level**
+- Line-start forbidden: ideographic comma (U+3001), fullwidth full stop (U+3002), fullwidth semicolon/colon/question/exclamation (U+FF1B U+FF1A U+FF1F U+FF01), ellipsis (U+2026), em dash (U+2014), closing paren/bracket (U+FF09), closing corner quotes (U+300D U+300F), etc.; line-end forbidden: opening paren (U+FF08), opening angle book-title mark (U+300A), opening corner quotes (U+300C U+300E), open double quote (U+201C)
+- Indent the first line of paragraphs 2 characters (`text-indent: 2em`); no blank line between paragraphs; block quotes indent 4 characters
+- Inseparable pairs: em dash / ellipsis / digits within a number / number + unit / super-subscript + annotated word / Western words must never be split by a line break
 
-详见 `reference/punctuation.md`。
+See `reference/punctuation.md` for details.
 
-## 表现力手法（严谨之上，让中文版面有亮点、有节奏，而不是平铺）
+## Expressive techniques (beyond rigor: give Chinese layouts highlights and rhythm, not flatness)
 
-上面九条保证"**排得严谨、专业、不外行**"。但严谨不等于出彩——一篇规范却平淡的长文，正文+标题+段落一路平铺，没有视觉锤、没有节奏，就是常见的"中文排版很无聊"。对**长文 / 编辑页 / 海报 / 画册 / 公众号 / 任何想要有设计感的中文页**，在守住九条的前提下，主动用下面的手法做出亮点（按内容选 1–3 个，不要全堆）：
+The nine rules above guarantee "**set rigorously, professionally, without amateur tells**". But rigor is not brilliance — a compliant yet flat long-form page, with body + titles + paragraphs laid out in an even wash, no visual hammer, no rhythm, is exactly the familiar "Chinese typesetting is boring" result. For **long-form / editorial pages / posters / catalogs / official-account layouts / any Chinese page that wants design presence**, while keeping the nine rules, deliberately use the techniques below to create highlights (pick 1–3 by content; do not pile them all on):
 
-- **标题字号大反差。** 正文与主标题拉开 3–5 倍字号跨度（正文 16px → 主标 clamp 到 48–96px+），让标题成为视觉锤，而不是"大一号的正文"。中文方块字在大字号下张力很强，敢放大。
-- **字重对比制造焦点。** 同一屏里用"特粗大字 + 常规正文 + 细体辅助信息"三档字重拉开层次；中文避免堆砌多字重，2–3 档即可，但对比要敢拉开。
-- **首字下沉 / 段首装饰。** 文章开篇或章节起始用首字下沉（2–3 行高）或放大的起首句，给阅读一个明确的"入口仪式"。
-- **横竖混排做造型。** 横排正文中嵌竖排标题/引文/章节名（参考第 1 条），是中文特有的造型语法——竖排标题贴边、竖排短引文做侧栏，立刻有"中文设计感"而非"翻译腔网页"。
-- **引文 / 金句造型块。** 把关键句拎出来放大成独立造型块（大字号、留白、或配标点装饰），作为长文的节奏停顿点和记忆点，而不是夹在段落里。
-- **大字标题 / 数字作版面主体。** 海报、章节页、数据页可以让一行大字或一个大数字占据大半视口，正文退为辅助——文字本身就是画面。
-- **节奏：快慢交替。** 标题区/引文区/图版区是"慢、重、大"，正文区是"快、轻、密"，靠字号留白的明暗交替制造翻页般的节奏，避免从头到尾一个密度。
+- **Extreme title-size contrast.** Pull body and main title 3–5× apart (body 16px → main title clamped to 48–96px+), making the title the visual hammer rather than "slightly bigger body text". Han square glyphs have enormous tension at large sizes — dare to scale up.
+- **Weight contrast creates focus.** Within one screen use three tiers — "ultra-bold display + regular body + light auxiliary info" — for hierarchy; avoid stacking many weights in Chinese, 2–3 tiers is enough, but dare to contrast.
+- **Drop caps / opening ornament.** Open an article or chapter with a drop cap (2–3 lines tall) or an enlarged opening sentence, giving reading a clear "entrance ritual".
+- **Horizontal-vertical mixing as shape.** Embed a vertical title/quote/chapter name inside horizontal body text (see rule 1) — a shaping grammar unique to Chinese. A vertical title hugging the margin, or a vertical short quote as a side rail, instantly reads as "Chinese design" rather than a "translated webpage".
+- **Quote / golden-sentence shaping blocks.** Pull a key sentence out and enlarge it into an independent shaped block (large size, whitespace, or punctuation ornament), serving as the rhythm pause and memory point of long-form — not buried inside a paragraph.
+- **Large type / numbers as the layout's subject.** Posters, chapter pages, and data pages can let one line of huge type or one big number occupy most of the viewport, with body text demoted to support — the text itself is the picture.
+- **Rhythm: alternate fast and slow.** Title/quote/plate zones are "slow, heavy, large"; body zones are "fast, light, dense"; use alternation of size and whitespace to create page-turning rhythm instead of one density throughout.
 
-底线：**这些手法服务内容与可读性，不是炫技**。表现力建立在九条严谨规则之上——先排得对，再排得出彩；大字反差、混排造型不能破坏避头尾、行长模数、版心秩序。该克制的场景（公文、正式报告正文）保持安静，该出彩的场景（编辑长文、海报、品牌内容）主动用。
+The floor: **these techniques serve content and readability, not showing off**. Expressiveness builds on the nine rigorous rules — set it right first, then make it shine; size contrast and mixed-direction shaping must never break kinsoku, line-length modulus, or type-area order. Scenes that need restraint (official documents, formal report body) stay quiet; scenes that should shine (editorial long-form, posters, brand content) use these actively.
 
-## 用之前必读的设计哲学
+## Design philosophy to read before using
 
-1. **网格是工具不是枷锁**。瑞士派"具有建设性的、可供分析和理解的设计"——网格能让最普通的排印公司也做出优雅版面，但**优秀作品总在恰当的时候"破格"**
-2. **直觉是伪装的记忆**——经过训练的直觉才有效；新人先严格守规则，老手再有意识地破规则
-3. **正形 vs 负形**：版心是正形，页边距是负形，负形甚至优先于正形成为审美判断依据。**留白不是空，是设计**
-4. **一书一宇宙**：宏伟来自精妙细节。标点占格、行距数值这种"小事"是阅读舒适度的核心
-5. **理性建筑感与灵性诗意的张力**：中文排版同时需要欧氏几何/费氏数列的理性，与"格律美"的灵性
-6. **基础概念不可违背，大原则不宜违背，多选项按优先顺序构建自洽逻辑**（"孔雀计划"序）
-7. **字体设计 ≠ 字体排印**。skill 范围限定后者；不要陷入字体本身好坏的讨论，而要管"怎么用"
+1. **The grid is a tool, not shackles**. The Swiss school's "constructive design that can be analyzed and understood" — a grid lets the most ordinary typesetting shop produce elegant pages, but **excellent work always "breaks the grid" at the right moment**
+2. **Intuition is disguised memory** — only trained intuition works; beginners obey rules strictly, veterans then break them consciously
+3. **Positive vs negative shape**: the type area is the positive shape; margins are the negative shape, and the negative shape can even take priority over the positive as the basis of aesthetic judgment. **Whitespace is not emptiness; it is design**
+4. **One book, one universe**: grandeur comes from precise details. "Small things" like punctuation spacing and line-spacing values are the core of reading comfort
+5. **The tension between rational architecture and spiritual poetry**: Chinese typesetting needs both the rationality of Euclidean geometry / Fibonacci sequences and the spirituality of "metrical beauty"
+6. **Foundational concepts must not be violated, major principles should not be violated, multiple options are built into a self-consistent logic by priority** (the "Peacock Plan" ordering)
+7. **Type design ≠ typography**. This skill covers the latter; do not get drawn into debating whether a typeface itself is good — manage "how it is used"
 
-## 标准工作流（任何媒介通用）
+## Standard workflow (works for any medium)
 
-按这个顺序决策，不要跳步：
+Decide in this order; do not skip steps:
 
-1. **确定排版方向**：横排 / 直排 / 混合；地区风格（大陆 / 港台 / 日式）
-2. **确定开本/画布**：纸面用毫米，屏幕用 px，纵横比常用 2:3 / 3:4 / 16:9 / 5:8
-3. **确定正文字号**：印刷 9pt / 屏幕 16px / H5 看视距
-4. **确定模数**：通常 = 正文字号 / 6 或 / 4（如正文 9pt → 模数 1.5pt；正文 16px → 模数 4px）
-5. **建版心**：开本 = 正文字号 × 整数（如 60 字宽 × 90 字高 = 540×810pt）。**先版心，后余白**
-6. **设页边距**：按模数的整数倍设 L/R/O/U，遵守"内紧外松、上紧下松"
-7. **算分栏**：每栏 17–40 字（栏间距也是模数整数倍，常用 2 字宽 = 18pt）
-8. **设行距**：字号 × 1.5~2，且必须是模数整数倍
-9. **定字号体系**：标题 / 小标题 / 正文 / 图注 / 注释 / 页码，全部模数倍数；标题必须是正文行高整数倍
-10. **选字体**：1 个家族多个字重；为衬线/无衬线、宋/黑/楷/仿宋做出与内容气质匹配的选择
-11. **设标点风格**：全角 / 半角 / 开明 / 居中，全文统一
-12. **排印 + 检查标点占格 + 检查回行 + 检查标题断句 + 检查文本灰度均匀 + 检查孤行孤字**
+1. **Writing direction**: horizontal / vertical / mixed; regional style (Mainland / HK-TW / Japanese)
+2. **Page format / canvas**: paper in millimeters, screen in px; common aspect ratios 2:3 / 3:4 / 16:9 / 5:8
+3. **Body font size**: print 9pt / screen 16px / H5 depends on viewing distance
+4. **Modulus**: usually body size ÷ 6 or ÷ 4 (body 9pt → modulus 1.5pt; body 16px → modulus 4px)
+5. **Build the type area**: page = body size × integers (e.g. 60 chars wide × 90 chars high = 540×810pt). **Type area first, whitespace after**
+6. **Set margins**: set left/right/outer/head as modulus multiples, respecting "tight inside, loose outside; tight top, loose bottom"
+7. **Compute columns**: 17–40 characters per column (column gap also a modulus multiple, commonly 2 characters = 18pt)
+8. **Set line spacing**: font size × 1.5–2, and a modulus multiple
+9. **Define the size system**: title / subhead / body / caption / footnote / page number — all modulus multiples; title line count must be a body line-height multiple
+10. **Choose fonts**: one family, multiple weights; pick serif/sans and Song/Hei/Kai/FangSong to match the content's temperament
+11. **Set punctuation style**: fullwidth / halfwidth / Kaiming / centered, consistent throughout
+12. **Set type + check punctuation spacing + check line wraps + check title breaks + check text gray evenness + check orphans and singles**
 
 
-## 字体选择分流规则（不在本文件直接选字体）
+## Font-selection routing (do not pick fonts in this file)
 
-本文件负责中文排版 baseline：版心、行长、行距、段落、标点、标题断句、阅读灰度。**不要从本文件选择具体展示字体**。
+This file owns the Chinese typesetting baseline: type area, line length, line spacing, paragraphs, punctuation, title breaking, reading gray. **Do not choose specific display fonts from this file.**
 
-字体选择按两层处理：
+Font selection is handled in two tiers:
 
 ```text
-普通中文 Web / UI / H5 / 原型正文
-→ 使用安全系统字体栈，不读取 `reference/fonts.md`
+Ordinary Chinese web / UI / H5 / prototype body text
+→ use the safe system font stack; do not read `reference/fonts.md`
 
-字体会显著影响视觉方向，或需要命名字体 / 上传字体 / OSS 字体 / CDN 字体
-→ 必须读取 `reference/fonts.md`
+Fonts materially shape the visual direction, or a named / uploaded / OSS / CDN font is needed
+→ you must read `reference/fonts.md`
 ```
 
-需要选字体时读 `reference/fonts.md`：§ 一 选字体（气质→字体表）→ § 二 加载执行（含 § 2.5 组装 font-family）。字体的选择和加载都在该文件内完成，不要再拆成额外文件。
+When font selection is needed, read `reference/fonts.md`: §1 Choose fonts (temperament → font table) → §2 Loading execution (including §2.5 assembling font-family). Both choosing and loading happen in that file; do not split them into extra files.
 
-### 安全默认字体栈
+### Safe default font stack
 
-普通中文 Web、UI、H5、表单、Dashboard、工具页正文，默认使用系统中文字体栈。中文字体必须放在西文字体之前，保护中文标点、破折号、省略号和全角符号。
+For ordinary Chinese web, UI, H5, form, dashboard, and tool-page body text, use the system Chinese font stack by default. The Chinese font must come before the Latin fonts, protecting Chinese punctuation, em dashes, ellipses, and fullwidth symbols.
 
 ```css
 font-family: "PingFang SC", "HarmonyOS Sans SC", "Noto Sans CJK SC",
@@ -164,63 +164,62 @@ font-family: "PingFang SC", "HarmonyOS Sans SC", "Noto Sans CJK SC",
              system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 ```
 
-正文不要使用展示字体、书法字体、游戏字体、强装饰字体。标题可以更有性格，但必须先进入 `reference/fonts.md` 做场景筛选。
+Do not use display, calligraphic, game, or strongly decorative fonts for body text. Titles may have more character, but must first go through the scenario filter in `reference/fonts.md`.
 
-从 `fonts.md` 选定了具体字体（尤其是给英文单独指定了 Latin 字体）后，写 `font-family` 时务必按 `reference/fonts.md § 2.5` 组装：**含中文的页面，`font-family` 里必须显式出现一个 CJK 字体名，Latin 字体后面绝不能直接接 `system-ui`**（否则中文 fallback 不可控）。
+After choosing a specific font from `fonts.md` (especially when a separate Latin font is specified for English), assemble `font-family` strictly per `reference/fonts.md §2.5`: **on pages containing Chinese, an explicit CJK font name must appear in `font-family`, and a Latin font must never be followed directly by `system-ui`** (otherwise the Chinese fallback is uncontrolled).
 
-### 必须读取 `reference/fonts.md` 的情况
+### When you must read `reference/fonts.md`
 
-只要命中下列任一条件，就不要在本文件内凭感觉选字体，必须读取 `reference/fonts.md`：
+If any of the following hold, do not pick fonts by feel in this file — read `reference/fonts.md`:
 
-| 触发条件 | 为什么必须读 fonts.md |
+| Trigger | Why fonts.md is required |
 |---|---|
-| 封面、海报、小红书、公众号首图、PPT 封面、活动页、主视觉 | 标题字体会直接决定视觉气质 |
-| 用户给了字体相关风格词：科技感、工业感、文学感、古籍感、学术感、杂志感、高级感、正式、公文、书卷气、手作感 | 这些不是排版 baseline，属于字体场景选择 |
-| 用户明确提到字体、字形、字感、宋体、黑体、楷体、仿宋、标题字、展示字 | 已进入字体选择任务 |
-| 需要命名字体、上传字体、OSS 字体、CDN 字体、`@font-face` 或自托管字体 | 必须确认是否可加载、是否有 fallback |
-| 长文、报告、公众号、白皮书、出版感页面且字体会影响阅读气质 | 需要在宋/黑/楷/仿宋和字面率之间做选择 |
-| 品牌页、产品发布页、作品集、内容型页面需要明显字体人格 | 字体是风格来源，不应只用系统栈 |
-| 当前视觉方向会被字体选择明显改变 | 不允许从本文件的默认字体栈直接跳到展示字体 |
+| Covers, posters, Xiaohongshu, official-account header images, PPT covers, event pages, key visuals | The title font directly decides visual temperament |
+| The user gives font-related style words: techy, industrial, literary, classical, academic, magazine, premium, formal, official-document, bookish, handcrafted | These are not typesetting baseline; they are font-scenario choices |
+| The user explicitly mentions fonts, glyph shapes, type feel, Song, Hei, Kai, FangSong, title faces, display faces | This is now a font-selection task |
+| A named font, uploaded font, OSS font, CDN font, `@font-face`, or self-hosted font is needed | You must confirm loadability and fallback |
+| Long-form, reports, official accounts, white papers, publication-feel pages where the font affects reading temperament | You must choose among Song/Hei/Kai/FangSong and weigh face ratio |
+| Brand pages, product launch pages, portfolios, content pages that need a visible font personality | The font is a style source; the system stack alone will not do |
+| The current visual direction would visibly change with the font choice | Jumping from this file's default stack straight to a display font is not allowed |
 
-### 何时不读 `reference/fonts.md`
+### When not to read `reference/fonts.md`
 
-以下情况可以只用安全系统字体栈：
+The safe system font stack is enough when:
 
-- 普通产品 UI、Dashboard、后台、表单、工具页正文；
-- 用户没有字体/风格诉求，且字体不会明显改变视觉方向；
-- 设计系统或模板已经提供了明确字体方案；
-- 当前任务只是局部间距、行高、断句、标点、版心调整。
+- ordinary product UI, dashboards, admin panels, forms, tool-page body text;
+- the user has no font/style demand and fonts will not visibly change the visual direction;
+- the design system or template already provides an explicit font scheme;
+- the task is only local spacing, line height, line breaking, punctuation, or type-area adjustment.
 
-### OSS / 测试字体加载
+### OSS / test font loading
 
-不要直接按字体名或 URL 挑字体。先在 `reference/fonts.md § 一` 完成场景筛选；选中的字体若需真实加载，用 `§ 二` 同文件内的 URL 表和 `@font-face` 模板完成，并按 `§ 2.5` 组装 font-family。
+Do not pick fonts directly by name or URL. First complete the scenario filter in `reference/fonts.md §1`; if the chosen font needs real loading, use the URL table and `@font-face` templates in `§2` of the same file, and assemble font-family per `§2.5`.
 
-## 常见错误与诊断
+## Common errors and diagnosis
 
-| 症状 | 原因 | 修法 |
+| Symptom | Cause | Fix |
 |---|---|---|
-| "看着挤、累" | 行长 > 48 字 或 行距 < 1.3 | 缩窄版心 / 加大 `line-height` 到 1.5–1.7 |
-| "看着空、散" | 行距 > 2.0 或 字号过小 | 收紧行距，或字号 +1 步进 |
-| "页面里有白块/虫蛀感" | 全角标点连用未挤压 | 启用 InDesign 中文排版设置 / CSS `text-spacing-trim` |
-| "字号一堆，乱" | 字号不在同一模数 | 重建字号体系，全部 = 模数 × 整数 |
-| "层级不清" | 字号差 < 1.5×、或字重差不够 | 加大字号比 或 改字重，不要靠颜色撑层级 |
-| "页边距怪" | 上下左右一样宽 | 改成 内 < 外 < 上 < 下 的递增关系 |
-| "标题断得莫名其妙" | 按字数硬断，把词撕开 | 手动 `<wbr>` 在词间断；虚词"的"前不断、"和"后不断 |
-| "末行字距特别大或特别小" | 行长不是字号整数倍 + 两端对齐 | 重算 `width = 字号 × 字数` |
-| "破折号断成两截" | 用了两个 `—` 但没设禁止分开 | InDesign 加入"不可分割"集 / CSS 加 `&#8288;` |
-| "上一行就一个字带个句号" | 孤字成行 | 挤进前行 / 末行均排 / 改写删字 |
-| "页眉就一行（前段末行）" | 孤行成页 | 调整前页 / 删字 / 加字 |
-| "直排里数字躺倒了" | 没用 tate-chu-yoko | 2-3 位数字用纵中横排；4 位以上整体旋转 |
+| "Looks cramped, tiring" | Line length > 48 chars or line spacing < 1.3 | Narrow the type area / raise `line-height` to 1.5–1.7 |
+| "Looks empty, loose" | Line spacing > 2.0 or size too small | Tighten line spacing, or step size up once |
+| "White blocks / moth-eaten feel in the page" | Consecutive fullwidth punctuation not squeezed | Enable InDesign Chinese typesetting settings / CSS `text-spacing-trim` |
+| "Too many sizes, chaotic" | Sizes not on one modulus | Rebuild the size system; every size = modulus × integer |
+| "Hierarchy unclear" | Size ratio < 1.5× or weight gap too small | Increase size ratio or change weight; don't prop hierarchy with color |
+| "Margins look wrong" | All four sides equal width | Change to increasing inner < outer < top < bottom |
+| "Title breaks nonsensically" | Breaking by character count, tearing words apart | Manual `<wbr>` between words; never break before the particle *de* or after "and" |
+| "Last-line spacing wildly large or small" | Line length not a size multiple + justification | Recompute `width = font size × character count` |
+| "Em dash splits in two" | Two `—` glyphs without no-break set | InDesign: add to the "inseparable" set / CSS: add `&#8288;` |
+| "A single character plus a period on the previous line" | An orphan character forms a line | Squeeze into the previous line / distribute the last line / rewrite to drop a character |
+| "Page header is one line (last line of previous section)" | A widow line lands alone on a page | Adjust the previous page / delete or add characters |
+| "Numbers lie sideways in vertical text" | tate-chu-yoko not used | 2–3 digit numbers use tate-chu-yoko; 4+ digits rotate as a whole |
 
 
-## Reference 文件（按条件读，1–3 个最相关的）
+## Reference files (read by condition; the 1–3 most relevant)
 
-| 触发条件 | 读这个文件 | 文件里讲什么 |
+| Trigger | Read this file | What it covers |
 |---|---|---|
-| 标题/封面/海报/PPT/小红书标题需要人工断行 | `reference/title-and-breaking.md` | 标题断句、占行、正文断行、不可分离禁则、孤行孤字 |
-| 长文/报告/公众号/公文/出版物、标点密集、破折号/省略号/引号/书名号问题 | `reference/punctuation.md` | 避头尾、标点风格、加法/减法模式、破折号、省略号、行内挤压/拉伸 |
-| 字号/行距/字距/段落/文本灰度/屏幕阅读舒适度诊断 | `reference/text-detail.md` | 字号、字重、字距、行距、段落缩进、Ruby 注音、文本灰度 |
-| 字体选择、展示字体、品牌字体、标题字体、正式报告字体、可加载字体测试 | `reference/fonts.md` | § 一 选字体(气质→表)→ § 二 加载执行；不要从本文件直接选字体 |
-| 复杂版面/长文报告/PDF/画册/分栏/版心/模数/栅格 | `reference/grid-system.md` | 模数、版心、网格、栏宽、CLReq 关键数值（Web/H5/deck 只借模数和阅读逻辑） |
-| 直排/混排/诗词/古籍/邀请函/传统中文/地区排版差异 | `reference/directions.md` | 横排/直排/混排、装订方向、CSS writing-mode、地区风格差异 |
-
+| Manual line breaking needed for titles/covers/posters/PPT/Xiaohongshu titles | `reference/title-and-breaking.md` | Title breaking, line occupation, body line breaking, inseparable pairs, orphans and singles |
+| Long-form/reports/official accounts/official documents/publications, punctuation-dense, em dash/ellipsis/quote/book-title-mark problems | `reference/punctuation.md` | Kinsoku, punctuation styles, additive/subtractive models, em dash, ellipsis, inline squeeze/stretch |
+| Diagnosis of size/line spacing/tracking/paragraphs/text gray/screen reading comfort | `reference/text-detail.md` | Font size, weight, tracking, line spacing, paragraph indent, ruby annotation, text gray |
+| Font selection, display fonts, brand fonts, title fonts, formal report fonts, loadable font testing | `reference/fonts.md` | §1 Choose fonts (temperament → table) → §2 Loading execution; do not pick fonts directly from this file |
+| Complex layouts/long-form reports/PDF/catalogs/columns/type area/modulus/grids | `reference/grid-system.md` | Modulus, type area, grids, column widths, key CLReq values (web/H5/deck borrow only modulus and reading logic) |
+| Vertical/mixed writing, poetry, classical texts, invitations, traditional Chinese, regional differences | `reference/directions.md` | Horizontal/vertical/mixed writing, binding direction, CSS writing-mode, regional style differences |

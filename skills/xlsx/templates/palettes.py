@@ -16,7 +16,7 @@ Usage:
     from templates.palettes import resolve_palette, get_palette
 
     # Auto-detect from user prompt
-    palette = resolve_palette("帮我做一个温暖的销售月报")  # Chinese prompt example
+    palette = resolve_palette("Make me a warm sales monthly report")  # example prompt
     # → warm palette
 
     # Manual selection
@@ -333,88 +333,86 @@ PALETTE_REGISTRY["classic_blue"] = ORIGINAL_BLUE
 # Step 1: Explicit style keywords (highest priority)
 _STYLE_KEYWORDS: Dict[str, list[str]] = {
     "professional": [
-        "正式", "商务", "专业", "沉稳", "稳重", "professional", "formal",
-        "corporate", "business",
+        "formal", "business", "professional", "composed", "steady", "corporate",
     ],
     "warm": [
-        "温暖", "活力", "热情", "热烈", "暖色", "温馨", "warm", "energetic",
-        "活跃", "热力",
+        "warm", "energetic", "passionate", "cozy", "lively", "hot tones",
+        "active", "warm colors",
     ],
     "elegant": [
-        "极简", "简约", "elegant", "minimal",
-        "清新", "自然", "清爽", "淡雅", "浅色", "明亮", "fresh",
-        "natural", "clean", "light", "素雅",
-        "多彩", "丰富", "鲜艳", "vivid", "colorful", "明快",
-        "高饱和", "鲜明", "亮色",
+        "minimal", "minimalist", "elegant", "understated",
+        "fresh", "natural", "clean", "pastel", "light colors", "bright", "fresh look",
+        "natural", "clean", "light", "unadorned",
+        "colorful", "rich", "vivid", "colorful look", "crisp",
+        "high-saturation", "bright tones", "vivid colors",
     ],
     "creative": [
-        "文艺", "个性", "紫色", "莫兰迪", "creative", "artistic",
-        "柔和", "雅致",
+        "artistic", "distinctive", "purple", "morandi", "creative", "design-forward",
+        "soft", "refined",
     ],
     # Premium themes
     "muji": [
-        "muji", "无印", "呼吸感", "白纸", "铅笔", "素净", "无印良品",
+        "muji", "airy", "breathing room", "plain paper", "pencil", "unadorned", "muji style",
     ],
     "aesop": [
-        "aesop", "沙岩", "大地色", "护肤", "泥土", "陶", "terracotta",
+        "aesop", "sandstone", "earth tones", "skincare", "soil", "clay", "terracotta",
     ],
     "bloomberg": [
-        "bloomberg", "终端", "深蓝", "terminal", "金融终端", "数据终端",
-        "rams", "dieter", "工业", "德系", "包豪斯", "bauhaus", "less but better",
-        "工业风",
+        "bloomberg", "terminal", "deep blue", "financial terminal", "data terminal",
+        "rams", "dieter", "industrial", "german industrial", "bauhaus", "less but better",
+        "industrial look",
     ],
     "kinfolk": [
-        "kinfolk", "奶油", "刊物", "杂志", "慢生活", "latte", "拿铁",
+        "kinfolk", "cream", "journal", "magazine", "slow life", "latte", "coffee tones",
     ],
     "celine": [
-        "celine", "黑白", "时装", "冷冽", "mono", "纯黑", "monochrome",
+        "celine", "black and white", "fashion", "cold tones", "mono", "pure black", "monochrome",
     ],
     "bottega": [
-        "bottega", "墨绿", "深绿", "森林", "橄榄", "绿色", "forest",
-        "贵气", "奢牌",
+        "bottega", "ink green", "deep green", "forest", "olive", "green", "forest tones",
+        "refined luxury", "luxury brand",
     ],
     "chanel": [
-        "chanel", "米金", "金棕", "香奈儿", "champagne", "米色", "奶茶",
+        "chanel", "beige gold", "golden brown", "chanel style", "champagne", "beige", "milky tea",
     ],
     "original_blue": [
-        "原始", "经典蓝", "classic blue", "original", "传统蓝",
+        "classic blue", "original blue", "traditional blue",
     ],
 }
 
 # Step 2: Scene keywords → infer style (lower priority)
 _SCENE_TO_STYLE: Dict[str, str] = {
     # Sales / Marketing / Ops → warm
-    "销售": "warm", "营销": "warm", "运营": "warm", "客户": "warm",
-    "业绩": "warm", "KPI": "warm", "GMV": "warm", "转化": "warm",
-    "漏斗": "warm", "签约": "warm", "提成": "warm", "电商": "warm",
-    "sales": "warm", "marketing": "warm", "campaign": "warm",
+    "sales": "warm", "marketing": "warm", "operations": "warm", "customer": "warm",
+    "performance": "warm", "kpi": "warm", "gmv": "warm", "conversion": "warm",
+    "funnel": "warm", "deal signed": "warm", "commission": "warm", "ecommerce": "warm",
+    "campaign": "warm",
     # Education / Medical → muji (was fresh, now removed)
-    "成绩": "muji", "考试": "muji", "学生": "muji", "课程": "muji",
-    "教育": "muji", "GPA": "muji", "学校": "muji", "班级": "muji",
-    "医疗": "muji", "健康": "muji", "患者": "muji", "体检": "muji",
-    "医院": "muji", "科室": "muji", "护理": "muji",
-    "环保": "muji",
-    "education": "muji", "medical": "muji", "health": "muji",
+    "grades": "muji", "exam": "muji", "student": "muji", "course": "muji",
+    "education": "muji", "gpa": "muji", "school": "muji", "class": "muji",
+    "medical": "muji", "health": "muji", "patient": "muji", "checkup": "muji",
+    "hospital": "muji", "clinic": "muji", "nursing": "muji",
+    "environment": "muji",
     # Design / Brand → creative
-    "设计": "creative", "创意": "creative", "品牌": "creative",
-    "UI": "creative", "UX": "creative", "作品": "creative",
-    "视觉": "creative", "素材": "creative",
-    "design": "creative", "brand": "creative", "portfolio": "creative",
+    "design": "creative", "creative work": "creative", "brand": "creative",
+    "ui": "creative", "ux": "creative", "artwork": "creative",
+    "visual": "creative", "assets": "creative",
+    "aesthetic": "creative", "portfolio": "creative",
     # Formal / Reporting → professional
-    "汇报": "professional", "提案": "professional", "会议": "professional",
-    "述职": "professional", "总结": "professional", "报告": "professional",
-    "年报": "professional", "季报": "professional", "月报": "professional",
-    "财务": "professional", "财报": "professional", "预算": "professional",
-    "审计": "professional", "咨询": "professional", "战略": "professional",
-    "finance": "professional", "budget": "professional", "report": "professional",
+    "briefing": "professional", "proposal": "professional", "meeting": "professional",
+    "performance review": "professional", "summary": "professional", "report": "professional",
+    "annual report": "professional", "quarterly report": "professional", "monthly report": "professional",
+    "finance": "professional", "financial report": "professional", "budget": "professional",
+    "audit": "professional", "consulting": "professional", "strategy": "professional",
+    "accounting": "professional",
     # Minimal / Premium → elegant
     "premium": "elegant", "luxury": "elegant",
     # Finance data → bloomberg
-    "股票": "bloomberg", "基金": "bloomberg", "投资": "bloomberg",
-    "交易": "bloomberg", "行情": "bloomberg", "K线": "bloomberg",
-    "stock": "bloomberg", "trading": "bloomberg", "portfolio_fin": "bloomberg",
+    "stock": "bloomberg", "fund": "bloomberg", "investment": "bloomberg",
+    "trading": "bloomberg", "market data": "bloomberg", "candlestick": "bloomberg",
+    "ticker": "bloomberg", "portfolio_fin": "bloomberg",
     # High-end / Luxury brand → chanel
-    "奢侈": "chanel", "高端": "chanel", "高级": "chanel",
+    "luxury goods": "chanel", "high-end": "chanel", "premium feel": "chanel",
 }
 
 

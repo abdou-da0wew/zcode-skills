@@ -117,7 +117,7 @@ doc["word/document.xml"].revert_deletion(del_elem)
 ### Comments
 
 ```python
-doc = Document('unpacked', author="Z.ai", initials="Z")
+doc = Document('unpacked', author="DiveeOI", initials="Z")
 
 # Comment on a range
 start = doc["word/document.xml"].get_node(tag="w:del", attrs={"w:id": "1"})
@@ -216,7 +216,7 @@ nodes = doc["word/document.xml"].insert_after(nodes[-1], "<w:r><w:t>B</w:t></w:r
 
 ## Validation Rules
 
-The validator ensures document text matches the original after reverting GLM's changes:
+The validator ensures document text matches the original after reverting the model's changes:
 - **Never modify text inside another author's `<w:ins>` or `<w:del>` tags**
 - **Use nested deletions** to remove another author's insertions
 - **Every edit must be tracked** with `<w:ins>` or `<w:del>` tags

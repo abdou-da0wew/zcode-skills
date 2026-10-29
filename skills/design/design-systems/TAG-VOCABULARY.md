@@ -1,41 +1,39 @@
-# Brand 标签受控词表
+# Brand Tag Controlled Vocabulary
 
-`index.json` 的 `brand_inspiration` 条目使用下列受控词表打多维标签。**新增或修改品牌标签时，
-词条应从此表中选**，避免近义词分裂（如"克制 / 简约 / 极简"）导致检索漏匹配。
+The `brand_inspiration` entries in `index.json` are tagged along multiple dimensions using the controlled vocabulary below. **When adding or modifying brand tags, pick terms from this table** to avoid near-synonym splitting (e.g. "restrained / minimal / minimalist") that causes search misses.
 
-词表从 89 个品牌 DESIGN.md 的真实内容归纳而来，并与 `deck-templates` 的 `template.json`
-维度设计对齐。
+The vocabulary was induced from the real content of 89 brand DESIGN.md files and aligned with the dimension design of `deck-templates`' `template.json`.
 
 ---
 
-## `industry`（行业，数组，≥1）
-AI · 开发者工具 · 生产力/协作 · 金融/支付 · 汽车 · 奢侈品 · 社交/通讯 · 电商/零售 ·
-媒体/出版 · 基础设施/企业 · 消费电子/科技 · 内容/创意工具 · 出行/本地生活 · 电信 · 文档/教育
+## `industry` (array, ≥1)
+AI · Developer tools · Productivity/collaboration · Finance/payments · Automotive · Luxury · Social/messaging · E-commerce/retail ·
+Media/publishing · Infrastructure/enterprise · Consumer electronics/tech · Content/creative tools · Mobility/local life · Telecom · Documents/education
 
-## `product_type`（产品形态，数组，≥1）
-SaaS · 官网/营销页 · 开发者平台 · 消费App · 内容平台 · 电商/交易 · 品牌展示页 ·
-产品发布页 · 文档站 · 作品集/个人
+## `product_type` (array, ≥1)
+SaaS · Official site/marketing page · Developer platform · Consumer app · Content platform · E-commerce/transactions · Brand showcase page ·
+Product launch page · Documentation site · Portfolio/personal
 
-## `mood`（情绪气质，数组，≥2）
-极简 · 克制 · 精密/工程感 · 技术感 · 奢华 · 戏剧化 · 暗黑原生 · 影像优先 · 编辑/杂志感 ·
-温暖 · 亲和/友好 · 活力/明亮 · 内容优先 · 企业/可信 · 渐变氛围 · 插画丰富 · 复古/玩味 · 未来/科幻
+## `mood` (array, ≥2)
+Minimalist · Restrained · Precision/engineered · Technical · Luxurious · Dramatic · Dark-native · Image-first · Editorial/magazine ·
+Warm · Friendly/approachable · Energetic/bright · Content-first · Corporate/trustworthy · Gradient atmosphere · Illustration-rich · Retro/playful · Futuristic/sci-fi
 
-说明（保留的近义区分，刻意不合并）：
-- `极简` = 结构性减法；`克制` = 安静不喧哗。二者可共存也可单独出现。
-- `精密/工程感` = 精确校准的视觉；`技术感` = 代码/开发者气质。
+Notes (near-synonym distinctions kept deliberately unmerged):
+- `Minimalist` = structural subtraction; `Restrained` = quiet, not loud. They can coexist or appear alone.
+- `Precision/engineered` = precisely calibrated visuals; `Technical` = code/developer temperament.
 
-## 单值维度
-- `formality`（正式度）：high / medium / low
-- `density`（信息密度）：high / medium / low
-- `scheme`（明暗）：light / dark / both
-- `era`（年代感）：复古 / 现代 / 未来
+## Single-value dimensions
+- `formality`: high / medium / low
+- `density`: high / medium / low
+- `scheme`: light / dark / both
+- `era`: retro / modern / futuristic
 
-## 自然语言字段
-- `best_for`：最适合的场景（一句话）
-- `avoid_for`：不适合的场景（一句话）
+## Natural-language fields
+- `best_for`: the scenarios it fits best (one sentence)
+- `avoid_for`: the scenarios it does not fit (one sentence)
 
 ---
 
-## 检索用法
-按需求维度过滤 `index.json` → 锁定候选品牌 → 只读命中品牌的 `DESIGN.md` 获取完整 token 与规则。
-数组维度支持多对多：一个品牌可在同一维度命中多个值（如 Stripe 同属 金融/支付 与 开发者工具）。
+## Retrieval usage
+Filter `index.json` by the required dimensions → lock in candidate brands → read only the matched brand's `DESIGN.md` for full tokens and rules.
+Array dimensions support many-to-many: one brand can match multiple values in the same dimension (e.g. Stripe belongs to both finance/payments and developer tools).

@@ -1,11 +1,11 @@
-# 风格预设 — 改 `:root` 那 8 个 CSS 变量就能切换
+# Style presets — switch by changing the 8 `:root` CSS variables
 
-每个预设都是 8 行 CSS。换风格时把 `template.html` 里 `:root` 块的对应行替换即可。
-不要去动字体（除非用户明确要求换字体），保持工业 / 博物馆质感。
+Each preset is 8 lines of CSS. To switch styles, replace the corresponding lines of the `:root` block in `template.html`.
+Do not touch the fonts (unless the user explicitly asks for a font change); keep the industrial / museum texture.
 
 ---
 
-## 1. default — 冷调钢蓝（默认 / "克制之物"原版）
+## 1. default — cold steel blue (default / the original "Restrained Objects")
 
 ```css
 :root{
@@ -19,12 +19,12 @@
   --steel:     #3a4a5a;
 }
 ```
-适合：北欧工业、机械藏品、灰色金属、仪器、铸铁器物
-触发词：克制 / 北欧 / 工业 / 钢铁 / 灰
+Fits: Nordic industrial, machine collections, gray metal, instruments, cast-iron objects
+Trigger words: restrained / Nordic / industrial / steel / gray
 
 ---
 
-## 2. warm-leather — 暖棕复古
+## 2. warm-leather — warm brown vintage
 
 ```css
 :root{
@@ -35,32 +35,32 @@
   --ink-soft:  #6e5e44;
   --line:      #b6a787;
   --line-soft: #cdc1a5;
-  --steel:     #8a5a2e;   /* 棕铜 */
+  --steel:     #8a5a2e;   /* bronze brown */
 }
 ```
-适合：皮革、木作、烟斗、相机、老钟表、复古家具
-触发词：暖 / 复古 / 棕 / 皮革 / 怀旧 / 老件
+Fits: leather, woodcraft, pipes, cameras, old watches, vintage furniture
+Trigger words: warm / vintage / brown / leather / nostalgic / old pieces
 
 ---
 
-## 3. night-iron — 暗夜铁
+## 3. night-iron — night iron
 
 ```css
 :root{
   --bg:        #14161a;
   --bg-soft:   #1c1f24;
   --paper:     #2a2e35;
-  --ink:       #e8eaee;     /* 反色：底深字浅 */
+  --ink:       #e8eaee;     /* inverted: dark ground, light text */
   --ink-soft:  #9aa0a8;
   --line:      #3a3f46;
   --line-soft: #2a2e34;
-  --steel:     #c9a35a;   /* 暗金 */
+  --steel:     #c9a35a;   /* dark gold */
 }
 ```
-适合：高端音响、机械键盘、烟火、暗色系产品、灯具
-触发词：暗 / 深色 / 夜 / 暗金 / 黑色
+Fits: high-end audio, mechanical keyboards, fireworks, dark-toned products, lighting
+Trigger words: dark / deep / night / dark gold / black
 
-注：用此预设时还要把 body `background-image` 的两个 radial 颜色调整为更深，建议：
+Note: with this preset also darken the two radial colors of the body `background-image`; suggested:
 ```css
 body{
   background-image:
@@ -71,7 +71,7 @@ body{
 
 ---
 
-## 4. paper-press — 纸张印刷
+## 4. paper-press — paper & print
 
 ```css
 :root{
@@ -82,15 +82,15 @@ body{
   --ink-soft:  #5a4f3e;
   --line:      #b9ac8e;
   --line-soft: #cec3a6;
-  --steel:     #9a3324;   /* 铅红 */
+  --steel:     #9a3324;   /* lead red */
 }
 ```
-适合：书籍、文具、印刷品、手作笔记、新闻类
-触发词：纸 / 印刷 / report / 文具 / 报刊 / 出版
+Fits: books, stationery, printed matter, handmade notes, news
+Trigger words: paper / print / report / stationery / press / publishing
 
 ---
 
-## 5. navy-blueprint — 海军蓝图
+## 5. navy-blueprint — navy blueprint
 
 ```css
 :root{
@@ -101,17 +101,17 @@ body{
   --ink-soft:  #aab6c8;
   --line:      #4a5568;
   --line-soft: #2e3a4d;
-  --steel:     #ffffff;     /* 白线条 */
+  --steel:     #ffffff;     /* white linework */
 }
 ```
-适合：海事仪器、航空、导航、舰船零件、深色仪表
-触发词：海军 / 蓝图 / blueprint / 航海 / 舰
+Fits: maritime instruments, aviation, navigation, ship parts, dark gauges
+Trigger words: navy / blueprint / nautical / ship
 
-注：建议同时把跑马灯 `.ticker` 的背景改 `var(--bg-soft)`、文字改 `var(--ink)`，否则浅底深字看不清。
+Note: also change the marquee `.ticker` background to `var(--bg-soft)` and its text to `var(--ink)`, otherwise light-on-light is unreadable.
 
 ---
 
-## 6. ceramic-clay — 陶土黏土
+## 6. ceramic-clay — ceramic clay
 
 ```css
 :root{
@@ -122,15 +122,15 @@ body{
   --ink-soft:  #6b4f38;
   --line:      #b39472;
   --line-soft: #c8ad8c;
-  --steel:     #5e3a1f;   /* 炉火棕 */
+  --steel:     #5e3a1f;   /* kiln-fire brown */
 }
 ```
-适合：陶器、瓷、土耳其器物、东亚老物件、有泥土感的工艺品
-触发词：陶 / 瓷 / 土 / 窑 / 泥 / 黏土
+Fits: pottery, porcelain, Anatolian objects, East Asian antiques, earthy crafts
+Trigger words: ceramic / porcelain / earth / kiln / clay
 
 ---
 
-## 7. mint-laboratory — 实验室薄荷
+## 7. mint-laboratory — laboratory mint
 
 ```css
 :root{
@@ -141,25 +141,25 @@ body{
   --ink-soft:  #4f655a;
   --line:      #99ada3;
   --line-soft: #b9c7bf;
-  --steel:     #2a6e5a;   /* 苔藓绿 */
+  --steel:     #2a6e5a;   /* moss green */
 }
 ```
-适合：医疗器械、玻璃容器、实验室仪器、植物类、中性医疗
-触发词：实验 / 医疗 / 玻璃 / 苔藓 / 绿
+Fits: medical devices, glassware, lab instruments, botanicals, neutral clinical
+Trigger words: lab / medical / glass / moss / green
 
 ---
 
-## 怎么挑
+## How to choose
 
-如果用户没说风格，根据品类自动挑：
+If the user gives no style, pick automatically by category:
 
-| 品类 | 默认风格 |
+| Category | Default style |
 |---|---|
-| 铸铁、钢、机械、北欧器物 | default |
-| 木作、皮革、复古、相机 | warm-leather |
-| 音响、灯具、深色高端 | night-iron |
-| 文具、纸品、书 | paper-press |
-| 海事、航空、导航 | navy-blueprint |
-| 陶瓷、东亚器物 | ceramic-clay |
-| 实验仪器、医疗、玻璃 | mint-laboratory |
-| 不确定 | default（最安全） |
+| Cast iron, steel, machinery, Nordic objects | default |
+| Woodcraft, leather, vintage, cameras | warm-leather |
+| Audio, lighting, dark high-end | night-iron |
+| Stationery, paper goods, books | paper-press |
+| Maritime, aviation, navigation | navy-blueprint |
+| Ceramics, East Asian objects | ceramic-clay |
+| Lab instruments, medical, glass | mint-laboratory |
+| Unsure | default (safest) |

@@ -15,8 +15,8 @@ default_for:
   - report deck
   - strategy deck
   - workshop deck
-  - 演示文稿
-  - 路演材料
+  - presentation
+  - roadshow materials
 speaker_notes: optional
 animations: optional
 fidelity: high
@@ -97,7 +97,7 @@ first_impression, anti_default) before generating.
 Run `quality-gate.md` as a blocking check. Must satisfy: one idea per slide; honest data/charts;
 consistent system across slides; no invented numbers/quotes; no emoji-as-icons / Lorem ipsum;
 visible focus and reduced-motion where interactive; non-visible Design Compliance block matching
-the code. Apply `horizontal-craft/chinese-typography.md` if substantial Chinese text.
+the code. Apply `horizontal-craft/chinese-typography.md` for substantial Chinese text.
 
 ## Handoff
 

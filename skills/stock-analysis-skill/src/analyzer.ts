@@ -1,16 +1,15 @@
 /**
- * analyzer.ts — LLM/VLM 分析层
- * 七段式决策仪表盘 + 美股可附加股息分析
+ * analyzer.ts — LLM/VLM analysis layer
+ * Seven-section decision dashboard + optional dividend analysis for US stocks
  */
 
-import ZAI from "z-ai-web-dev-sdk";
+import { chatCompletions, validateStockData, MODEL } from "./dataFetcher";
 import { StockData, AnalysisResult, OutputFormat, Market, Verdict, PositionInfo } from "./types";
-import { validateStockData } from "./dataFetcher";
 import { analyzeDividend, formatDividendMarkdown } from "./dividend";
 
-const MARKET_LABEL: Record<Market, string> = { CN: "A股", HK: "港股", US: "美股" };
+const MARKET_LABEL: Record<Market, string> = { CN: "A-share", HK: "HK stock", US: "US stock" };
 
-// ── 仪表盘 Prompt ─────────────────────────────────────────
+// ── Dashboard prompt ──────────────────────────────────────
 
 function buildDashboardPrompt(
   data: StockData,
@@ -18,147 +17,153 @@ function buildDashboardPrompt(
   warnings: string[]
 ): string {
   const warningBlock = warnings.length > 0
-    ? `⚠️ 数据预警（必须在报告中体现）：\n${warnings.map((w) => `- ${w}`).join("\n")}\n\n`
+    ? `⚠️ Data warnings (must be reflected in the report):\n${warnings.map((w) => `- ${w}`).join("\n")}\n\n`
     : "";
 
   const positionBlock = position
     ? position.status === "holding"
-      ? `用户持仓：持仓中，成本价 ${position.cost ?? "未知"} 元${position.shares ? `，${position.shares} 股` : ""}。请给出盈亏分析和针对性建议。`
-      : `用户持仓：当前空仓。`
-    : `用户持仓：未提供（请同时给出空仓者和持仓者两套建议）。`;
+      ? `User position: holding, cost basis ${position.cost ?? "unknown"}${position.shares ? `, ${position.shares} shares` : ""}. Provide a P/L analysis and targeted advice.`
+      : `User position: currently no position.`
+    : `User position: not provided (give two sets of advice — one for empty-position and one for holding readers).`;
 
   return `${warningBlock}${positionBlock}
 
-股票数据：
+Stock data:
 \`\`\`json
 ${JSON.stringify(data, null, 2)}
 \`\`\`
 
-请输出以下格式的完整决策仪表盘（严格按结构，不增删章节）：
+Output the complete decision dashboard in exactly the following format (strictly follow the structure; do not add or remove sections):
 
 ---
 
-## 决策仪表盘 · {名称}({代码}) · {市场}
+## Decision Dashboard · {name}({code}) · {market}
 
 ---
 
-### 📰 重要信息速览
-**💭 舆情情绪：** 一句话描述
-**📊 业绩预期：** 结合 PE/ROE/行业简述，数据缺失标"暂缺"
-**🚨 风险警报：**
-- 风险1（技术面或宏观）
-- 风险2（基本面或行业）
-**✨ 利好催化：**
-- 利好1（技术面）
-- 利好2（基本面或行业）
-**📢 最新动态：** 结合行业背景，补充1条关键信息
+### 📰 Key Information at a Glance
+**💭 Sentiment:** one sentence
+**📊 Earnings expectations:** brief comment combining PE/ROE/industry; mark missing data as "N/A"
+**🚨 Risk alerts:**
+- Risk 1 (technical or macro)
+- Risk 2 (fundamental or industry)
+**✨ Positive catalysts:**
+- Catalyst 1 (technical)
+- Catalyst 2 (fundamental or industry)
+**📢 Latest development:** one key piece of information with industry context
 
 ---
 
-### 📌 核心结论
-**[emoji] 结论：强烈买入 / 买入 / 观望 / 卖出**（四选一，乖离率>5%不得为买入）
-**💬 一句话决策：** 核心逻辑
-**⏰ 时效性：** 立即行动 / 今日内 / 不急
+### 📌 Core Conclusion
+**[emoji] Verdict: Strong Buy / Buy / Hold / Sell** (choose exactly one; deviation rate >5% must not be Buy)
+**💬 One-line decision:** core logic
+**⏰ Time sensitivity:** act now / within today / no rush
 
-（根据持仓状态输出）
-- **🆕 空仓者：** 是否进场、建仓点位、仓位比例
-- **💼 持仓者：** 持有/加仓/减仓/止损建议${position?.status === "holding" && position.cost ? "，含成本盈亏分析" : ""}
-
----
-
-### 📈 当日行情
-列出：收盘价、昨收、开盘、最高、最低、涨跌幅、涨跌额、振幅、成交量、成交额（缺失标"暂缺"）
+(based on position status)
+- **🆕 Empty-position readers:** whether to enter, entry points, position size
+- **💼 Holding readers:** hold / add / trim / stop-loss advice${position?.status === "holding" && position.cost ? ", including cost-basis P/L analysis" : ""}
 
 ---
 
-### 📊 数据透视
-
-**技术面：**
-表格（指标 | 数值 | 解读）：MA5、MA10、MA20、乖离率(BIAS20)、RSI（如有）、支撑位、压力位
-结论：均线状态 + 趋势强度（xx/100）
-
-**基本面（注明报告期）：**
-表格（指标 | 数值 | 行业对比）：ROE、毛利率、净利率、资产负债率、PE、PB
-数据缺失标"暂缺"，不得捏造
-
-**资金面：**（A股/港股适用，美股可略）
-- 主力净流入：金额（占比%），一句话解读
-- 筹码：获利比例 | 平均成本 | 集中度
+### 📈 Today's Session
+List: close, previous close, open, high, low, change %, change amount, amplitude, volume, turnover (mark missing as "N/A")
 
 ---
 
-### 🎯 作战计划
+### 📊 Data Deep-Dive
 
-| 点位类型 | 价格 | 说明 |
+**Technicals:**
+Table (indicator | value | reading): MA5, MA10, MA20, deviation rate (BIAS20), RSI (if available), support, resistance
+Conclusion: moving-average state + trend strength (xx/100)
+
+**Fundamentals (state the reporting period):**
+Table (indicator | value | industry comparison): ROE, gross margin, net margin, debt ratio, PE, PB
+Mark missing data as "N/A"; never fabricate
+
+**Capital flows:** (applies to A-shares/HK stocks; optional for US stocks)
+- Main-capital net inflow: amount (share %), one-sentence reading
+- Chips: profit-taking ratio | average cost | concentration
+
+---
+
+### 🎯 Battle Plan
+
+| Level type | Price | Notes |
 |---------|------|------|
-| 🎯 理想买入 | xxx | |
-| 🔵 次优买入 | xxx | |
-| 🛑 止损位   | xxx | |
-| 🎊 目标位   | xxx | |
+| 🎯 Ideal buy | xxx | |
+| 🔵 Second-best buy | xxx | |
+| 🛑 Stop-loss | xxx | |
+| 🎊 Target | xxx | |
 
-**💰 仓位建议：** x成
-**建仓策略：** 分批策略
-**风控策略：** 止损纪律
-
----
-
-### ✅ 检查清单
-- ✅/⚠️/❌ 均线状态
-- ✅/⚠️/❌ 乖离率安全（<5%）
-- ✅/⚠️/❌ 量能配合
-- ✅/⚠️/❌ 估值合理
-- ✅/⚠️/❌ 资金流向
-- ✅/⚠️/❌ 筹码健康
-
-**综合结论：** 一句话总结当前状态和建议。
+**💰 Position advice:** x/10 of capital
+**Entry strategy:** staggered entries
+**Risk control:** stop-loss discipline
 
 ---
-*以上分析仅供参考，不构成投资建议，据此操作风险自担。*`;
+
+### ✅ Checklist
+- ✅/⚠️/❌ Moving-average state
+- ✅/⚠️/❌ Deviation rate safe (<5%)
+- ✅/⚠️/❌ Volume confirmation
+- ✅/⚠️/❌ Valuation reasonable
+- ✅/⚠️/❌ Capital flow
+- ✅/⚠️/❌ Chip health
+
+**Overall conclusion:** one sentence summarizing the current state and recommendation.
+
+---
+*The analysis above is for reference only and does not constitute investment advice; act at your own risk.*`;
 }
 
-// ── 研报 Prompt（PDF/Word）──────────────────────────────
+// ── Research report prompt (PDF/Word) ─────────────────────
 
 function buildReportPrompt(data: StockData, position: PositionInfo | undefined): string {
   const positionBlock = position?.status === "holding"
-    ? `用户持仓成本：${position.cost ?? "未知"}`
-    : "用户当前空仓";
+    ? `User position cost: ${position.cost ?? "unknown"}`
+    : "User currently has no position";
 
   return `${positionBlock}
 
-股票数据：
+Stock data:
 \`\`\`json
 ${JSON.stringify(data, null, 2)}
 \`\`\`
 
-请生成结构化研报：
+Generate a structured research report:
 
-【研究报告】{名称}({代码}) · {市场} · {日期}
+[Research Report] {name}({code}) · {market} · {date}
 
-一、投资结论（买入/强烈买入/观望/卖出，含目标价、止损价，分空仓/持仓两套建议）
-二、重要信息速览（舆情/业绩预期/风险/利好/最新动态）
-三、数据透视（技术面/基本面/资金面）
-四、作战计划（点位表/仓位/持仓周期）
-五、风险提示（2-3条）
+I. Investment conclusion (Buy/Strong Buy/Hold/Sell, with target price and stop-loss; two sets of advice — empty position and holding)
+II. Key information at a glance (sentiment / earnings expectations / risks / catalysts / latest developments)
+III. Data deep-dive (technicals / fundamentals / capital flows)
+IV. Battle plan (level table / position / holding period)
+V. Risk disclosures (2-3 items)
 
-免责声明：本报告由AI辅助生成，仅供参考，不构成投资建议，据此操作风险自担。`;
+Disclaimer: this report is AI-assisted, for reference only, and does not constitute investment advice; act at your own risk.`;
 }
 
-// ── 提取结论 ──────────────────────────────────────────────
+// ── Verdict extraction ────────────────────────────────────
 
 function extractVerdict(text: string): Verdict {
+  const CANON: Record<string, Verdict> = {
+    "strong buy": "Strong Buy",
+    "buy": "Buy",
+    "hold": "Hold",
+    "sell": "Sell",
+  };
   const patterns = [
-    /结论[：:]\s*[💚🟢🟡🔴⚪]?\s*(强烈买入|买入|观望|卖出)/,
-    /核心结论[：:]\s*[💚🟢🟡🔴⚪]?\s*(强烈买入|买入|观望|卖出)/,
-    /\*\*(强烈买入|买入|观望|卖出)\*\*/,
+    /verdict[:\s]*[💚🟢🟡🔴⚪]?\s*(Strong Buy|Buy|Hold|Sell)/i,
+    /conclusion[:\s]*[💚🟢🟡🔴⚪]?\s*(Strong Buy|Buy|Hold|Sell)/i,
+    /\*\*(Strong Buy|Buy|Hold|Sell)\*\*/i,
   ];
   for (const p of patterns) {
     const m = text.match(p);
-    if (m) return m[1] as Verdict;
+    if (m) return CANON[m[1].toLowerCase()] ?? "Hold";
   }
-  return "观望";
+  return "Hold";
 }
 
-// ── 核心分析 ──────────────────────────────────────────────
+// ── Core analysis ─────────────────────────────────────────
 
 export async function analyzeStock(
   data: StockData,
@@ -172,33 +177,32 @@ export async function analyzeStock(
   if (!valid) {
     return {
       code: data.code, market: data.market, name,
-      verdict: "观望",
-      analysis: `## ⚠️ 数据获取失败\n\n${data.code} 数据无法获取（${data.error ?? "未知错误"}），建议手动核实。`,
+      verdict: "Hold",
+      analysis: `## ⚠️ Data Fetch Failed\n\nData for ${data.code} could not be retrieved (${data.error ?? "unknown error"}); verify manually.`,
       warnings, outputFormat,
       generatedAt: new Date().toISOString(),
     };
   }
 
-  const zai = await ZAI.create();
   const userPrompt = outputFormat === "markdown"
     ? buildDashboardPrompt(data, position, warnings)
     : buildReportPrompt(data, position);
 
-  let analysisText = "⚠️ LLM 未返回内容，请重试。";
+  let analysisText = "⚠️ The LLM returned no content; please retry.";
   try {
-    const completion = await zai.chat.completions.create({
+    const completion = await chatCompletions({
+      model: MODEL,
       messages: [
-        { role: "system", content: `你是一位资深${MARKET_LABEL[data.market]}股票分析师。数据缺失标"暂缺"，严禁捏造。乖离率>5%不得建议买入。结论四选一：强烈买入/买入/观望/卖出。输出语言：中文。` },
+        { role: "system", content: `You are a senior ${MARKET_LABEL[data.market]} stock analyst. Mark missing data as "N/A"; fabricating data is strictly prohibited. When the deviation rate is >5%, never recommend buying. The verdict must be exactly one of: Strong Buy / Buy / Hold / Sell. Output language: English.` },
         { role: "user", content: userPrompt },
       ],
-      thinking: { type: "disabled" },
     });
     analysisText = completion.choices[0]?.message?.content ?? analysisText;
   } catch (err: any) {
-    analysisText = `## ⚠️ 分析失败\n\nLLM 调用出错：${err.message}`;
+    analysisText = `## ⚠️ Analysis Failed\n\nLLM call error: ${err.message}`;
   }
 
-  // 美股附加股息分析
+  // Optional dividend analysis for US stocks
   if (includeDividend && data.market === "US" && outputFormat === "markdown") {
     try {
       const dividend = await analyzeDividend(data.code);
@@ -216,7 +220,7 @@ export async function analyzeStock(
   };
 }
 
-// ── 批量分析 ──────────────────────────────────────────────
+// ── Batch analysis ────────────────────────────────────────
 
 export async function analyzeMultipleStocks(
   stockDataList: StockData[],
@@ -232,7 +236,7 @@ export async function analyzeMultipleStocks(
   return results;
 }
 
-// ── K线图分析（VLM）──────────────────────────────────────
+// ── K-line chart analysis (VLM) ───────────────────────────
 
 export async function analyzeChartImage(
   imageUrlOrBase64: string,
@@ -240,25 +244,26 @@ export async function analyzeChartImage(
   isBase64 = false
 ): Promise<string> {
   try {
-    const zai = await ZAI.create();
-    const imageContent = isBase64
-      ? { type: "base64" as const, data: imageUrlOrBase64, mediaType: "image/png" as const }
-      : { type: "url" as const, url: imageUrlOrBase64 };
+    // OpenAI-compatible vision input: image_url with either a remote URL or a base64 data URI
+    const imageUrl = isBase64
+      ? `data:image/png;base64,${imageUrlOrBase64}`
+      : imageUrlOrBase64;
 
-    const completion = await zai.chat.completions.create({
+    const completion = await chatCompletions({
+      model: MODEL,
       messages: [
-        { role: "system", content: "你是技术分析专家，擅长K线形态识别。请用中文回答。" },
+        { role: "system", content: "You are a technical analysis expert specializing in candlestick (K-line) pattern recognition. Answer in English." },
         {
           role: "user",
           content: [
-            { type: "image", image: imageContent },
-            { type: "text", text: `这是 ${stockCode} 的K线图，请分析：\n1. 当前K线形态\n2. 趋势方向\n3. 关键支撑位和压力位\n4. 成交量配合\n5. 短期操作建议` },
+            { type: "image_url", image_url: { url: imageUrl } },
+            { type: "text", text: `This is the K-line chart of ${stockCode}. Analyze:\n1. Current candlestick pattern\n2. Trend direction\n3. Key support and resistance levels\n4. Volume confirmation\n5. Short-term action advice` },
           ],
         },
       ],
     });
-    return completion.choices[0]?.message?.content ?? "⚠️ VLM 未返回内容";
+    return completion.choices[0]?.message?.content ?? "⚠️ The VLM returned no content";
   } catch (err: any) {
-    return `K线图分析失败：${err.message}`;
+    return `K-line chart analysis failed: ${err.message}`;
   }
 }

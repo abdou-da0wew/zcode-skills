@@ -1,35 +1,35 @@
 ---
 name: web-shader-extractor
 description: |
-  从网页中提取 WebGL/Canvas/Shader 视觉特效代码，反混淆后移植为独立原生 JS 项目。
-  触发条件：用户提供网址并要求提取 shader、提取特效、提取动画效果、提取 canvas 效果、
-  复刻某网站的视觉效果、"把这个网站的背景效果扒下来" 等。
+  Extract WebGL/Canvas/Shader visual effect code from web pages, de-obfuscate it, and port it into a standalone native JS project.
+  Trigger when the user provides a URL and asks to extract a shader, extract an effect, extract an animation, extract a canvas effect,
+  replicate a website's visual effect, "rip this site's background effect", etc.
 ---
 
 # Web Shader Extractor
 
-从网页提取 WebGL/Canvas/Shader 特效，反混淆并移植为独立项目。
+Extract WebGL/Canvas/Shader effects from web pages, de-obfuscate them, and port them into standalone projects.
 
-核心原则：
-- **先 1:1 复刻，确认正确后再考虑简化框架**
-- **全程自主执行，不中断用户** — 提取是只读操作，安全性无风险。除 Phase 6 简化提议外，所有步骤自动完成，不询问用户确认。遇到问题自行判断最佳方案继续推进，只在需要用户做产品决策时才询问。
+Core principles:
+- **Replicate 1:1 first; only consider simplifying the framework after correctness is confirmed**
+- **Run fully autonomously without interrupting the user** — extraction is a read-only operation with no safety risk. Except for the Phase 6 simplification proposal, all steps run automatically without asking the user for confirmation. When problems arise, judge the best path yourself and keep moving; only ask the user when a product decision is genuinely needed.
 
-## Phase 0: 环境检查（首次自动执行）
+## Phase 0: Environment Check (auto-runs on first use)
 
-在开始提取前，检查并自动安装所需依赖。**不要询问用户，直接安装**。
+Before starting extraction, check and automatically install the required dependencies. **Do not ask the user; install directly**.
 
 ```bash
-# 1. 检查 Node.js
+# 1. Check Node.js
 node --version 2>/dev/null || {
   echo "Node.js not found, installing..."
   # macOS
   brew install node 2>/dev/null || {
-    # fallback: 直接下载 LTS
+    # fallback: download LTS directly
     curl -fsSL https://nodejs.org/dist/v22.15.0/node-v22.15.0-darwin-arm64.tar.gz | tar xz -C /usr/local --strip-components=1
   }
 }
 
-# 2. Playwright 及浏览器（fetch-rendered-dom.mjs 内置自动安装，但这里预检可提前发现问题）
+# 2. Playwright and browser (fetch-rendered-dom.mjs auto-installs, but this precheck surfaces problems early)
 RUNNER_DIR="$HOME/.cache/playwright-runner"
 if [ ! -d "$RUNNER_DIR/node_modules/playwright" ]; then
   echo "Installing Playwright (one-time setup)..."
@@ -41,105 +41,105 @@ if [ ! -d "$RUNNER_DIR/node_modules/playwright" ]; then
 fi
 ```
 
-如果安装过程中遇到权限或网络问题，尝试以下备选方案：
-- npm 权限问题 → 使用 `--prefix` 安装到用户目录
-- 网络问题（Chromium 下载慢）→ 设置 `PLAYWRIGHT_DOWNLOAD_HOST=https://npmmirror.com/mirrors/playwright` 使用国内镜像
-- 实在无法安装 Playwright → 降级为纯 curl 模式（跳过 DOM 渲染，仅分析静态 HTML + JS bundle），在 Phase 2 中标注可能缺失 canvas-info
+If installation hits permission or network problems, try these fallbacks:
+- npm permission issues → install into the user directory with `--prefix`
+- Network issues (slow Chromium download) → set `PLAYWRIGHT_DOWNLOAD_HOST=https://npmmirror.com/mirrors/playwright` to use a mirror
+- If Playwright truly cannot be installed → degrade to pure-curl mode (skip DOM rendering; analyze only static HTML + JS bundle) and note in Phase 2 that canvas-info may be missing
 
-## Phase 1: 获取源码
+## Phase 1: Fetch the Source
 
-**并行执行**：Playwright 获取渲染后 DOM + curl 获取静态 HTML。
+**Run in parallel**: Playwright to fetch the rendered DOM + curl to fetch the static HTML.
 
 ```bash
-# Playwright（获取 canvas 引擎版本、组件树、运行时网络请求）
+# Playwright (canvas engine version, component tree, runtime network requests)
 node ~/.claude/skills/web-shader-extractor/scripts/fetch-rendered-dom.mjs '<URL>'
 # → /tmp/rendered/: dom.html, canvas-info.json, network.json, screenshot.png, console.log
 
-# curl（获取原始 HTML，用于提取内嵌配置和密钥）
+# curl (raw HTML, for extracting inline configs and keys)
 curl -s -L --compressed '<URL>' > /tmp/page.html
 ```
 
-如果 Playwright 脚本失败（未安装/启动异常），先尝试自动修复（重新安装依赖），若仍失败则降级为纯 curl 模式继续工作，不要停下来询问用户。
+If the Playwright script fails (not installed / startup error), first attempt auto-repair (reinstall dependencies); if it still fails, degrade to pure-curl mode and keep working — do not stop to ask the user.
 
-从 network.json 和 HTML 交叉提取 JS URL，批量下载到 /tmp/。
+Cross-extract JS URLs from network.json and the HTML, and batch-download them into /tmp/.
 
-### Phase 2: 技术栈识别
+### Phase 2: Tech Stack Identification
 
 ```
-canvas-info.json 的 dataEngine 字段：
-├─ "three.js rXXX" → Three.js（r170+ 可能是 TSL → references/tsl-extraction.md）
+dataEngine field of canvas-info.json:
+├─ "three.js rXXX" → Three.js (r170+ may be TSL → references/tsl-extraction.md)
 ├─ "Babylon.js vX.X" → Babylon.js
-├─ null → 进一步区分：
-│   ├─ bundle 含 createShader/shaderSource → Raw WebGL / PixiJS
-│   └─ bundle 含 getContext('2d') 且无 WebGL 调用 → 2D Canvas（→ references/porting-strategy.md § 2D Canvas）
-└─ 无 canvas → CSS/SVG 动画
+├─ null → distinguish further:
+│   ├─ bundle contains createShader/shaderSource → Raw WebGL / PixiJS
+│   └─ bundle contains getContext('2d') and no WebGL calls → 2D Canvas (→ references/porting-strategy.md § 2D Canvas)
+└─ no canvas → CSS/SVG animation
 
-URL 或 HTML 特征匹配已知平台 → 直接跳转专用工作流（跳过通用 Phase 3-4）：
-├─ unicorn.studio → references/unicorn-studio.md（Firestore REST API 直取配置+shader）
-└─ shaders.com → references/shaders-com.md（Nuxt payload + XOR 解码 + TSL→GLSL 翻译）
+URL or HTML signature matches a known platform → jump straight to the dedicated workflow (skip generic Phases 3-4):
+├─ unicorn.studio → references/unicorn-studio.md (Firestore REST API to fetch config + shaders directly)
+└─ shaders.com → references/shaders-com.md (Nuxt payload + XOR decoding + TSL→GLSL translation)
 
-扫描确认：bash scripts/scan-bundle.sh /tmp/*.js
-→ 框架特征速查 references/tech-signatures.md
+Scan to confirm: bash scripts/scan-bundle.sh /tmp/*.js
+→ framework signature quick reference: references/tech-signatures.md
 ```
 
-### Phase 3: 配置提取
+### Phase 3: Config Extraction
 
 ```
-1. 搜索公开 API → 直接获取配置（API 返回可能是编码的 → references/encoded-definitions.md）
-2. 从 Nuxt payload / __NEXT_DATA__ / HTML 内嵌 JSON 提取
-3. 从 JS bundle 提取默认值
-→ 详见 references/config-extraction.md
+1. Look for public APIs → fetch config directly (the API response may be encoded → references/encoded-definitions.md)
+2. Extract from Nuxt payload / __NEXT_DATA__ / inline HTML JSON
+3. Extract default values from the JS bundle
+→ details in references/config-extraction.md
 ```
 
-### Phase 4: Shader 代码提取
+### Phase 4: Shader Code Extraction
 
-用 **Agent** 分析 JS bundle（1MB+ 不适合主上下文）。
-→ Agent prompt 模板和反混淆规则 `references/extraction-workflow.md`
+Use a **subagent** to analyze the JS bundle (1MB+ does not fit the main context).
+→ agent prompt template and de-obfuscation rules in `references/extraction-workflow.md`
 
-### Phase 5: 移植
+### Phase 5: Porting
 
 ```
-纯 2D 全屏 shader → 原生 WebGL2（零依赖）
-3D / PBR / GPGPU → 保留原始框架（CDN importmap）
-不确定 → 先用原始框架，Phase 6 再评估
-→ 详见 references/porting-strategy.md
+Pure 2D fullscreen shader → native WebGL2 (zero dependencies)
+3D / PBR / GPGPU → keep the original framework (CDN importmap)
+Unsure → start with the original framework and re-evaluate in Phase 6
+→ details in references/porting-strategy.md
 ```
 
-### Phase 6: 简化评估
+### Phase 6: Simplification Evaluation
 
-移植完成后，自行验证效果（打开页面截图对比）。如果效果正确且存在简化空间，**向用户提议简化方案**，由用户决定是否执行。
+After porting, verify the result yourself (open the page and compare screenshots). If the result is correct and simplification is possible, **propose the simplification to the user** and let them decide whether to execute it.
 
-### Phase 7: 提取报告（询问用户是否生成）
+### Phase 7: Extraction Report (ask the user whether to generate it)
 
-提取完成后，**询问用户**是否生成 `EXTRACTION-REPORT.md`（会消耗额外 token 回顾对话历史）。
+After extraction, **ask the user** whether to generate `EXTRACTION-REPORT.md` (it costs extra tokens to review the conversation history).
 
-报告内容结构：
+Report structure:
 ```markdown
-# 提取报告：{项目名}
-**来源/作者/平台/时间**
+# Extraction Report: {project name}
+**Source / author / platform / time**
 
-## 目标效果（一句话描述）
-## 提取思路与时间线（每个迭代的问题→修复）
-## 场景结构（组件树/图层结构）
-## 最终渲染管线（pass 列表）
-## 关键资源文件
-## 发现的关键经验（表格：经验/影响/沉淀位置）
-## 剩余已知差异
-## 技术栈（原始 vs 移植）
+## Target effect (one-sentence description)
+## Extraction approach and timeline (each iteration's problem → fix)
+## Scene structure (component tree / layer structure)
+## Final render pipeline (pass list)
+## Key resource files
+## Key lessons learned (table: lesson / impact / where it was recorded)
+## Remaining known differences
+## Tech stack (original vs. ported)
 ```
 
-报告放在项目目录内（如 `ascii-glyph-dither/EXTRACTION-REPORT.md`）。
+The report goes inside the project directory (e.g. `ascii-glyph-dither/EXTRACTION-REPORT.md`).
 
-## Reference 索引
+## Reference Index
 
-| 需要时 | 读取 |
+| When you need to | Read |
 |--------|------|
-| 识别框架（Three.js/WebGL/PixiJS 特征） | `references/tech-signatures.md` |
-| Agent 提取 prompt + 反混淆规则 | `references/extraction-workflow.md` |
-| 获取配置参数（API/payload/内嵌） | `references/config-extraction.md` |
-| Three.js TSL 节点 shader 重建 | `references/tsl-extraction.md` |
-| 编码/加密配置解码 | `references/encoded-definitions.md` |
-| onBeforeCompile GLSL 注入陷阱 | `references/shader-injection.md` |
-| 移植框架选择 + 项目结构 | `references/porting-strategy.md` |
-| **Unicorn Studio** 专用流程（curtains.js + Firestore） | `references/unicorn-studio.md` |
-| **shaders.com** 专用流程（TSL + XOR 编码 + Y-flip 陷阱） | `references/shaders-com.md` |
+| Identify the framework (Three.js/WebGL/PixiJS signatures) | `references/tech-signatures.md` |
+| Agent extraction prompt + de-obfuscation rules | `references/extraction-workflow.md` |
+| Fetch config parameters (API/payload/inline) | `references/config-extraction.md` |
+| Rebuild Three.js TSL node shaders | `references/tsl-extraction.md` |
+| Decode encoded/encrypted configs | `references/encoded-definitions.md` |
+| onBeforeCompile GLSL injection pitfalls | `references/shader-injection.md` |
+| Porting framework choice + project structure | `references/porting-strategy.md` |
+| **Unicorn Studio** dedicated flow (curtains.js + Firestore) | `references/unicorn-studio.md` |
+| **shaders.com** dedicated flow (TSL + XOR encoding + Y-flip trap) | `references/shaders-com.md` |

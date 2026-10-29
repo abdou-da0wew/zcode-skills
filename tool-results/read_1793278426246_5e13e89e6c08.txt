@@ -1,0 +1,1011 @@
+     1→<!doctype html>
+     2→<html lang="zh-CN">
+     3→<head>
+     4→<meta charset="utf-8" />
+     5→<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+     6→<title>栖间 — 定价方案</title>
+     7→
+     8→<!-- 西文用 Inter，仅用于数字 / 价格；中文走系统字体 -->
+     9→<link rel="preconnect" href="https://fonts.googleapis.com" />
+    10→<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    11→<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    12→
+    13→<style>
+    14→  /* ---------- 字体回落陷阱处理 ----------
+    15→     破折号、引号、省略号是中西共享码位字符。
+    16→     如果把英文字体放在中文之前，浏览器会先用英文字体渲染这些标点 → 破折号下沉、断开。
+    17→     方案：用 unicode-range 把 Inter 限制在拉丁码位（U+0000–007F + 拉丁补充），
+    18→            中文字体优先承担所有中日韩字符与全角标点。 */
+    19→  @font-face{
+    20→    font-family:'Inter Latin';
+    21→    src: local('Inter'), local('Inter-Regular');
+    22→    font-weight: 400 700;
+    23→    font-style: normal;
+    24→    unicode-range: U+0000-007F, U+00A0-00FF, U+2000-206F, U+2070-209F;
+    25→  }
+    26→
+    27→  :root{
+    28→    --ink:#0a0a0a;
+    29→    --ink-2:#1d1d1f;
+    30→    --muted:#5f6066;
+    31→    --soft:#8a8e96;
+    32→    --line:rgba(10,10,10,.10);
+    33→    --line-2:rgba(10,10,10,.06);
+    34→
+    35→    /* liquid glass surface */
+    36→    --glass:
+    37→      linear-gradient(135deg,
+    38→        rgba(255,255,255,.62) 0%,
+    39→        rgba(255,255,255,.36) 48%,
+    40→        rgba(255,255,255,.52) 100%);
+    41→    --glass-strong:
+    42→      linear-gradient(135deg,
+    43→        rgba(255,255,255,.78) 0%,
+    44→        rgba(255,255,255,.58) 50%,
+    45→        rgba(255,255,255,.72) 100%);
+    46→    --glass-border: rgba(255,255,255,.55);
+    47→    --glass-hi: rgba(255,255,255,.95);
+    48→    --glass-lo: rgba(255,255,255,.12);
+    49→    --glass-shadow:
+    50→      inset 0 1px 0 var(--glass-hi),
+    51→      inset 0 -1px 0 var(--glass-lo),
+    52→      inset 1px 0 0 rgba(255,255,255,.22),
+    53→      inset -1px 0 0 rgba(255,255,255,.16),
+    54→      0 1px 0 rgba(255,255,255,.4),
+    55→      0 22px 50px -22px rgba(20,40,90,.22),
+    56→      0 6px 18px -10px rgba(20,40,90,.14);
+    57→    --blur: blur(28px) saturate(1.7);
+    58→
+    59→    --radius:20px;
+    60→    --radius-sm:999px;
+    61→
+    62→    --sky-overlay: rgba(255,255,255,0);
+    63→    --sky-tint: rgba(245,248,251,.45);
+    64→  }
+    65→
+    66→  body.dark{
+    67→    --ink:#f4f6fa;
+    68→    --ink-2:#dcdfe6;
+    69→    --muted:#9aa0aa;
+    70→    --soft:#6c707a;
+    71→    --line:rgba(255,255,255,.14);
+    72→    --line-2:rgba(255,255,255,.08);
+    73→
+    74→    --glass:
+    75→      linear-gradient(135deg,
+    76→        rgba(22,26,38,.55) 0%,
+    77→        rgba(22,26,38,.38) 50%,
+    78→        rgba(22,26,38,.52) 100%);
+    79→    --glass-strong:
+    80→      linear-gradient(135deg,
+    81→        rgba(22,26,38,.72) 0%,
+    82→        rgba(22,26,38,.55) 50%,
+    83→        rgba(22,26,38,.68) 100%);
+    84→    --glass-border: rgba(255,255,255,.16);
+    85→    --glass-hi: rgba(255,255,255,.22);
+    86→    --glass-lo: rgba(0,0,0,.25);
+    87→    --glass-shadow:
+    88→      inset 0 1px 0 var(--glass-hi),
+    89→      inset 0 -1px 0 var(--glass-lo),
+    90→      inset 1px 0 0 rgba(255,255,255,.06),
+    91→      inset -1px 0 0 rgba(255,255,255,.04),
+    92→      0 22px 60px -22px rgba(0,0,0,.55),
+    93→      0 6px 18px -10px rgba(0,0,0,.4);
+    94→
+    95→    --sky-overlay: rgba(6,9,18,.62);
+    96→    --sky-tint: rgba(6,9,18,.55);
+    97→  }
+    98→
+    99→  *,*::before,*::after{box-sizing:border-box}
+   100→  html,body{margin:0;padding:0}
+   101→  html{-webkit-text-size-adjust:100%}
+   102→  body{
+   103→    /* 中文优先：先苹方 / MiSans / HarmonyOS / 雅黑，再 Inter Latin 拉丁码位补位 */
+   104→    font-family:
+   105→      "PingFang SC", "MiSans", "HarmonyOS Sans SC",
+   106→      "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei",
+   107→      "Inter Latin", "Inter",
+   108→      system-ui, -apple-system, sans-serif;
+   109→    color:var(--ink);
+   110→    background:#cfe1ee;
+   111→    min-height:100vh;
+   112→    -webkit-font-smoothing:antialiased;
+   113→    text-rendering:optimizeLegibility;
+   114→
+   115→    /* 中文正文不要碰字距 */
+   116→    letter-spacing: 0;
+   117→    line-height: 1.7;
+   118→
+   119→    /* 中文避头尾 + 不在字符内部断行 */
+   120→    line-break: strict;
+   121→    word-break: keep-all;
+   122→    overflow-wrap: break-word;
+   123→    hanging-punctuation: allow-end;
+   124→
+   125→    transition: color .35s ease;
+   126→  }
+   127→
+   128→  /* 数字 / 价格用 Inter 等宽几何感 */
+   129→  .num{
+   130→    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+   131→    font-feature-settings: "tnum" 1, "lnum" 1;
+   132→    letter-spacing: -0.01em;
+   133→  }
+   134→
+   135→  /* -------- sky background -------- */
+   136→  .sky{
+   137→    position:fixed;
+   138→    top:-10px; left:-10px; right:-10px; bottom:-10px;
+   139→    background-color:#bcd6ec;
+   140→    z-index:-2;
+   141→    overflow:hidden;
+   142→  }
+   143→  .sky-img{
+   144→    position:absolute; inset:0;
+   145→    background-image:url('https://images.unsplash.com/photo-1601297183305-6df142704ea2?auto=format&fit=crop&w=2800&q=80');
+   146→    background-repeat:repeat;
+   147→    background-size:2800px auto;
+   148→    background-position:0 0;
+   149→    will-change:background-position;
+   150→    -webkit-mask-image:
+   151→      linear-gradient(to bottom, transparent 0%, #000 7%, #000 93%, transparent 100%),
+   152→      linear-gradient(to right,  transparent 0%, #000 7%, #000 93%, transparent 100%);
+   153→    -webkit-mask-size: 2800px var(--tile-h, 1867px);
+   154→    -webkit-mask-repeat: repeat;
+   155→    -webkit-mask-composite: source-in;
+   156→    mask-image:
+   157→      linear-gradient(to bottom, transparent 0%, #000 7%, #000 93%, transparent 100%),
+   158→      linear-gradient(to right,  transparent 0%, #000 7%, #000 93%, transparent 100%);
+   159→    mask-size: 2800px var(--tile-h, 1867px);
+   160→    mask-repeat: repeat;
+   161→    mask-composite: intersect;
+   162→  }
+   163→  .sky::after{
+   164→    content:"";
+   165→    position:absolute; inset:0;
+   166→    background:
+   167→      radial-gradient(120% 60% at 50% 0%, rgba(255,255,255,.42), rgba(255,255,255,0) 60%),
+   168→      linear-gradient(180deg, rgba(245,248,251,0) 40%, var(--sky-tint) 100%),
+   169→      var(--sky-overlay);
+   170→    pointer-events:none;
+   171→    transition: background .6s ease;
+   172→  }
+   173→  @media (prefers-reduced-motion:reduce){
+   174→    .sky-img{ background-position:50% 50% !important; }
+   175→  }
+   176→
+   177→  /* -------- shell -------- */
+   178→  .wrap{
+   179→    max-width:1180px;
+   180→    margin:0 auto;
+   181→    padding:28px 28px 88px;
+   182→  }
+   183→
+   184→  /* -------- reusable glass surface -------- */
+   185→  .glass{
+   186→    background-image: var(--glass);
+   187→    background-color: transparent;
+   188→    border:1px solid var(--glass-border);
+   189→    backdrop-filter: var(--blur);
+   190→    -webkit-backdrop-filter: var(--blur);
+   191→    box-shadow: var(--glass-shadow);
+   192→  }
+   193→
+   194→  /* -------- top nav -------- */
+   195→  nav.top{
+   196→    display:flex;
+   197→    justify-content:space-between;
+   198→    align-items:center;
+   199→    gap:16px;
+   200→    margin-bottom:56px;
+   201→  }
+   202→
+   203→  /* -------- brand：trademark 风胶囊 -------- */
+   204→  .brand{
+   205→    display:inline-flex; align-items:stretch;
+   206→    height: 38px;
+   207→    padding: 0;
+   208→    border-radius: var(--radius-sm);
+   209→    width:fit-content;
+   210→    color:var(--ink);
+   211→    text-decoration:none;
+   212→    overflow:hidden;
+   213→  }
+   214→  .brand-mark{
+   215→    display:inline-flex; align-items:center; justify-content:center;
+   216→    padding: 0 13px 0 0;
+   217→  }
+   218→  .brand-mark svg{
+   219→    width:18px;
+   220→    height:auto;
+   221→    display:block;
+   222→  }
+   223→  .brand-divider{
+   224→    width: 1px;
+   225→    align-self: stretch;
+   226→    background: rgba(10,10,10,.22);
+   227→  }
+   228→  body.dark .brand-divider{
+   229→    background: rgba(255,255,255,.28);
+   230→  }
+   231→  .brand-text{
+   232→    display:inline-flex; align-items:center;
+   233→    padding: 0 0 0 13px;
+   234→    font-family:
+   235→      "PingFang SC", "MiSans", "HarmonyOS Sans SC",
+   236→      "Microsoft YaHei UI", "Helvetica Neue", Arial, sans-serif;
+   237→    font-weight: 700;
+   238→    font-size: 14px;
+   239→    letter-spacing: 0.06em;
+   240→    line-height: 1;
+   241→  }
+   242→  .brand-text .reg{
+   243→    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+   244→    font-size: 9px;
+   245→    font-weight: 500;
+   246→    margin-left: 3px;
+   247→    transform: translateY(-5px);
+   248→    color: var(--muted);
+   249→  }
+   250→  .nav-center{
+   251→    display:inline-flex; align-items:center;
+   252→    padding:5px;
+   253→    border-radius:var(--radius-sm);
+   254→  }
+   255→  .nav-center a{
+   256→    color:var(--muted);
+   257→    text-decoration:none;
+   258→    font-size:14px; font-weight:500;
+   259→    padding:7px 18px;
+   260→    border-radius:var(--radius-sm);
+   261→    transition:color .2s ease, background .25s ease;
+   262→    letter-spacing: 0.02em;
+   263→  }
+   264→  .nav-center a:hover{ color:var(--ink) }
+   265→  .nav-center a.active{
+   266→    background:var(--ink);
+   267→    color:#fff;
+   268→    box-shadow: 0 1px 0 rgba(255,255,255,.3) inset, 0 6px 14px -8px rgba(0,0,0,.5);
+   269→  }
+   270→  body.dark .nav-center a.active{
+   271→    background:#fff; color:#0a0a0a;
+   272→  }
+   273→
+   274→  /* -------- pricing hero -------- */
+   275→  .pricing-hero{
+   276→    display:flex;
+   277→    flex-direction:column;
+   278→    align-items:center;
+   279→    text-align:center;
+   280→    margin-bottom:48px;
+   281→    gap:20px;
+   282→  }
+   283→  .eyebrow{
+   284→    display:inline-flex; align-items:center; gap:10px;
+   285→    padding:6px 16px;
+   286→    border-radius:var(--radius-sm);
+   287→    width:fit-content;
+   288→    font-size:13px; font-weight:500;
+   289→    color:var(--ink-2);
+   290→    letter-spacing: 0.02em;
+   291→  }
+   292→  .eyebrow .pulse{
+   293→    position:relative;
+   294→    width:6px; height:6px; border-radius:50%;
+   295→    background:var(--ink);
+   296→  }
+   297→  .eyebrow .pulse::after{
+   298→    content:""; position:absolute; inset:-3px; border-radius:50%;
+   299→    background:rgba(10,10,10,.18);
+   300→    animation:pulse 2.2s ease-out infinite;
+   301→  }
+   302→  body.dark .eyebrow .pulse{ background:#fff }
+   303→  body.dark .eyebrow .pulse::after{ background:rgba(255,255,255,.25) }
+   304→  @keyframes pulse{
+   305→    0%{transform:scale(.5);opacity:.8}
+   306→    100%{transform:scale(2.6);opacity:0}
+   307→  }
+   308→
+   309→  h1.headline{
+   310→    /* 大标题用中文系统字体 + Medium 字重；不混 Helvetica 避免破折号问题 */
+   311→    font-family:
+   312→      "PingFang SC", "MiSans", "HarmonyOS Sans SC",
+   313→      "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+   314→    font-weight:500;
+   315→    font-size:clamp(40px, 6.4vw, 72px);
+   316→    line-height:1.18;
+   317→    /* 大字号中文加 0.01–0.02em 字距，更从容；过多会破坏节奏 */
+   318→    letter-spacing: 0.01em;
+   319→    margin:0;
+   320→    max-width:860px;
+   321→    text-wrap: balance;
+   322→  }
+   323→  h1.headline em{
+   324→    font-family:inherit;
+   325→    font-style:normal;
+   326→    font-weight:500;
+   327→    color:var(--muted);
+   328→    letter-spacing: 0.01em;
+   329→  }
+   330→  body.dark h1.headline em{ color:#aab0b9 }
+   331→
+   332→  .subhead{
+   333→    color:var(--ink-2);
+   334→    font-size:16px;
+   335→    line-height: 1.75;
+   336→    max-width:560px;
+   337→    margin:0;
+   338→    /* 段落正文严格不加字距 */
+   339→    letter-spacing: 0;
+   340→  }
+   341→
+   342→  /* -------- billing toggle 行 -------- */
+   343→  .toggle-row{
+   344→    display:flex; justify-content:center;
+   345→    margin-bottom:32px;
+   346→  }
+   347→  .toggle{
+   348→    display:inline-flex; align-items:center;
+   349→    padding:4px;
+   350→    border-radius:var(--radius-sm);
+   351→  }
+   352→  .toggle button{
+   353→    border:0; background:transparent; cursor:pointer;
+   354→    font:inherit; font-size:13.5px; font-weight:500;
+   355→    color:var(--muted);
+   356→    padding:8px 18px;
+   357→    border-radius:var(--radius-sm);
+   358→    transition:color .2s, background .2s;
+   359→    display:inline-flex; align-items:center; gap:8px;
+   360→    letter-spacing: 0.02em;
+   361→  }
+   362→  .toggle button.on{
+   363→    background:var(--ink); color:#fff;
+   364→    box-shadow: 0 1px 0 rgba(255,255,255,.3) inset, 0 6px 14px -8px rgba(0,0,0,.4);
+   365→  }
+   366→  body.dark .toggle button.on{ background:#fff; color:#0a0a0a }
+   367→  .toggle .save{
+   368→    font-size:11.5px;
+   369→    color:#7d8088;
+   370→    letter-spacing: 0;
+   371→  }
+   372→  .toggle button.on .save{ color:rgba(255,255,255,.7) }
+   373→  body.dark .toggle button.on .save{ color:rgba(10,10,10,.6) }
+   374→
+   375→  /* -------- tiers -------- */
+   376→  .tiers{
+   377→    display:grid;
+   378→    grid-template-columns:repeat(4,1fr);
+   379→    gap:14px;
+   380→    align-items:stretch;
+   381→  }
+   382→
+   383→  .tier{
+   384→    position:relative;
+   385→    border-radius:var(--radius);
+   386→    padding:26px 24px 22px;
+   387→    display:flex; flex-direction:column;
+   388→    transition:transform .5s cubic-bezier(.2,.7,.2,1),
+   389→               box-shadow .5s ease,
+   390→               color .35s ease;
+   391→    cursor:pointer;
+   392→    overflow:hidden;
+   393→    isolation:isolate;
+   394→    min-height:420px;
+   395→    color:var(--ink);
+   396→  }
+   397→  .tier > *:not(.bg):not(.scrim):not(.frost){ position:relative; z-index:3 }
+   398→  .tier:hover{ transform:translateY(-2px) }
+   399→
+   400→  .tier.selected{
+   401→    transform:translateY(-12px) scale(1.02);
+   402→  }
+   403→  .tier .bg{
+   404→    position:absolute; inset:-14%;
+   405→    background-size:cover;
+   406→    background-position:50% 50%;
+   407→    filter:blur(26px) saturate(1.15) brightness(.55) contrast(1.05);
+   408→    opacity:0;
+   409→    transition:opacity .55s ease;
+   410→    z-index:0;
+   411→  }
+   412→  .tier .scrim{
+   413→    position:absolute; inset:0;
+   414→    background:
+   415→      radial-gradient(120% 80% at 50% 0%, rgba(0,0,0,.0) 0%, rgba(0,0,0,.25) 100%),
+   416→      linear-gradient(180deg, rgba(0,0,0,.20) 0%, rgba(0,0,0,.55) 100%);
+   417→    opacity:0;
+   418→    transition:opacity .55s ease;
+   419→    z-index:1;
+   420→  }
+   421→  .tier .frost{
+   422→    position:absolute; inset:0;
+   423→    border-radius:inherit;
+   424→    background-image: var(--glass);
+   425→    background-color: transparent;
+   426→    border:1px solid var(--glass-border);
+   427→    backdrop-filter: var(--blur);
+   428→    -webkit-backdrop-filter: var(--blur);
+   429→    box-shadow: var(--glass-shadow);
+   430→    z-index:2;
+   431→    opacity:1;
+   432→    transition: opacity .45s ease;
+   433→  }
+   434→  .tier.selected{ color:#fff }
+   435→  .tier.selected .bg, .tier.selected .scrim{ opacity:1 }
+   436→  .tier.selected .frost{ opacity:0 }
+   437→  .tier::after{
+   438→    content:""; position:absolute; inset:0; border-radius:inherit;
+   439→    border:1px solid rgba(255,255,255,0);
+   440→    box-shadow: 0 0 0 rgba(0,0,0,0);
+   441→    pointer-events:none; z-index:4;
+   442→    transition: border-color .4s ease, box-shadow .4s ease;
+   443→  }
+   444→  .tier.selected::after{
+   445→    border-color: rgba(255,255,255,.18);
+   446→    box-shadow:
+   447→      inset 0 1px 0 rgba(255,255,255,.18),
+   448→      0 30px 60px -24px rgba(0,0,0,.55),
+   449→      0 8px 24px -12px rgba(0,0,0,.4);
+   450→  }
+   451→
+   452→  .tier .label{
+   453→    display:flex; align-items:center; justify-content:space-between;
+   454→    font-size:13.5px; color:var(--muted);
+   455→    margin-bottom:16px;
+   456→    font-weight:500;
+   457→    letter-spacing: 0.05em; /* 双字标签可疏排 */
+   458→    transition: color .35s ease;
+   459→  }
+   460→  .tier.selected .label{ color: rgba(255,255,255,.78) }
+   461→  .tier .badge{
+   462→    font-size:11px;
+   463→    padding:4px 10px;
+   464→    background:var(--ink);
+   465→    color:#fff;
+   466→    border-radius:var(--radius-sm);
+   467→    letter-spacing: 0.02em;
+   468→    box-shadow: 0 1px 0 rgba(255,255,255,.3) inset;
+   469→    transition: background .35s ease, color .35s ease;
+   470→  }
+   471→  body.dark .tier .badge{ background:#fff; color:#0a0a0a }
+   472→  .tier.selected .badge{
+   473→    background: rgba(255,255,255,.18);
+   474→    color:#fff;
+   475→    backdrop-filter: blur(10px);
+   476→    -webkit-backdrop-filter: blur(10px);
+   477→    box-shadow: inset 0 0 0 1px rgba(255,255,255,.22);
+   478→  }
+   479→
+   480→  .tier .price{
+   481→    /* 价格主体是数字 → 用 Inter；¥ 用中文字体也能渲染 */
+   482→    font-family: "Inter", "Helvetica Neue", "PingFang SC", sans-serif;
+   483→    font-weight:500;
+   484→    font-size:44px;
+   485→    letter-spacing:-0.025em; line-height:1;
+   486→    margin:0;
+   487→    display:flex; align-items:baseline; gap:2px;
+   488→  }
+   489→  .tier .price .sign{
+   490→    font-size:22px;
+   491→    font-weight:500;
+   492→    margin-right:2px;
+   493→    transform: translateY(-2px);
+   494→  }
+   495→  .tier .price.free{
+   496→    font-family:
+   497→      "PingFang SC", "MiSans", "HarmonyOS Sans SC",
+   498→      "Microsoft YaHei UI", sans-serif;
+   499→    font-size:36px;
+   500→    letter-spacing: 0.04em;
+   501→  }
+   502→  .tier .price-note{
+   503→    margin-top:8px;
+   504→    font-size:12.5px;
+   505→    color:var(--soft);
+   506→    font-weight:500;
+   507→    letter-spacing: 0.02em;
+   508→    transition: color .35s ease;
+   509→  }
+   510→  .tier.selected .price-note{ color: rgba(255,255,255,.72) }
+   511→
+   512→  .tier .pitch{
+   513→    font-size:14px;
+   514→    color:var(--ink-2);
+   515→    margin:20px 0 20px;
+   516→    min-height:48px;
+   517→    line-height:1.65;
+   518→    letter-spacing: 0;
+   519→    transition: color .35s ease;
+   520→  }
+   521→  .tier.selected .pitch{ color: rgba(255,255,255,.88) }
+   522→
+   523→  .tier ul{
+   524→    list-style:none; padding:0; margin:0 0 22px;
+   525→    display:flex; flex-direction:column; gap:11px;
+   526→  }
+   527→  .tier li{
+   528→    font-size:13.5px;
+   529→    line-height:1.55;
+   530→    color:var(--ink-2);
+   531→    display:flex; align-items:flex-start; gap:10px;
+   532→    letter-spacing: 0;
+   533→    transition: color .35s ease;
+   534→  }
+   535→  .tier.selected li{ color: rgba(255,255,255,.94) }
+   536→  .tier li::before{
+   537→    content:""; flex:none;
+   538→    width:14px; height:14px; border-radius:50%;
+   539→    margin-top: 3px;
+   540→    background: rgba(10,10,10,.06) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/9px no-repeat;
+   541→    transition: background .35s ease;
+   542→  }
+   543→  body.dark .tier li::before{
+   544→    background: rgba(255,255,255,.10) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/9px no-repeat;
+   545→  }
+   546→  .tier.selected li::before{
+   547→    background: rgba(255,255,255,.20) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/9px no-repeat;
+   548→  }
+   549→
+   550→  .tier .cta{
+   551→    margin-top:auto;
+   552→    width:100%;
+   553→    border:1px solid var(--line);
+   554→    background: rgba(255,255,255,.5);
+   555→    color:var(--ink);
+   556→    border-radius:14px;
+   557→    padding:13px 14px;
+   558→    font:inherit; font-weight:500; font-size:14px;
+   559→    letter-spacing: 0.04em;
+   560→    cursor:pointer;
+   561→    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+   562→    transition:background .2s, border-color .2s, color .2s, transform .15s;
+   563→    backdrop-filter: blur(8px);
+   564→    -webkit-backdrop-filter: blur(8px);
+   565→  }
+   566→  body.dark .tier .cta{ background: rgba(255,255,255,.08); color:var(--ink) }
+   567→  .tier .cta:hover{ border-color: rgba(10,10,10,.28) }
+   568→  body.dark .tier .cta:hover{ border-color: rgba(255,255,255,.28) }
+   569→
+   570→  .tier.selected .cta{
+   571→    background:#fff; color:#0a0a0a;
+   572→    border-color:rgba(255,255,255,.6);
+   573→    box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 10px 20px -10px rgba(0,0,0,.5);
+   574→  }
+   575→  body.dark .tier.selected .cta{
+   576→    background:#fff; color:#0a0a0a; border-color:#fff;
+   577→  }
+   578→  .tier .cta svg{ width:14px; height:14px }
+   579→
+   580→  /* -------- 价值对比小条 -------- */
+   581→  .value-strip{
+   582→    margin-top:28px;
+   583→    border-radius:var(--radius);
+   584→    padding:18px 24px;
+   585→    display:flex;
+   586→    justify-content:space-between;
+   587→    align-items:center;
+   588→    gap:24px;
+   589→    font-size:13.5px;
+   590→    color:var(--ink-2);
+   591→  }
+   592→  .value-strip span{ display:inline-flex; align-items:center; gap:8px }
+   593→  .value-strip svg{ width:14px; height:14px; flex:none }
+   594→  .value-strip .dot{
+   595→    width:4px; height:4px; border-radius:50%; background:var(--line);
+   596→  }
+   597→  @media (max-width:780px){
+   598→    .value-strip{ flex-wrap:wrap; gap:10px 18px; padding:16px 20px }
+   599→  }
+   600→
+   601→  /* -------- FAQ -------- */
+   602→  .faq-card{
+   603→    margin-top:88px;
+   604→    border-radius:var(--radius);
+   605→    padding:40px 44px;
+   606→    display:grid;
+   607→    grid-template-columns:1fr 1.8fr;
+   608→    gap:24px 56px;
+   609→  }
+   610→  .faq-card h2{
+   611→    font-family:
+   612→      "PingFang SC", "MiSans", "HarmonyOS Sans SC",
+   613→      "Microsoft YaHei UI", sans-serif;
+   614→    font-weight:500;
+   615→    font-size:28px;
+   616→    letter-spacing: 0.01em;
+   617→    line-height: 1.35;
+   618→    margin:0;
+   619→    max-width:260px;
+   620→  }
+   621→  .faq-card h2 small{
+   622→    display:block;
+   623→    font-size:14px;
+   624→    font-weight:400;
+   625→    color:var(--muted);
+   626→    margin-top:10px;
+   627→    line-height:1.6;
+   628→    letter-spacing: 0;
+   629→  }
+   630→  .faq-list{ display:flex; flex-direction:column }
+   631→  details.q{
+   632→    border-top:1px solid var(--line-2);
+   633→    padding:18px 0;
+   634→  }
+   635→  details.q:first-of-type{ border-top:0; padding-top:4px }
+   636→  details.q summary{
+   637→    list-style:none;
+   638→    cursor:pointer;
+   639→    display:flex; align-items:center; justify-content:space-between;
+   640→    gap:24px;
+   641→    font-weight:500; font-size:15px;
+   642→    color:var(--ink);
+   643→    line-height:1.5;
+   644→    letter-spacing: 0.01em;
+   645→  }
+   646→  details.q summary::-webkit-details-marker{ display:none }
+   647→  details.q .plus{
+   648→    flex:none;
+   649→    width:22px; height:22px; border-radius:50%;
+   650→    border:1px solid var(--line);
+   651→    position:relative;
+   652→    transition:background .25s ease, border-color .25s ease;
+   653→  }
+   654→  details.q .plus::before,
+   655→  details.q .plus::after{
+   656→    content:""; position:absolute; left:50%; top:50%;
+   657→    width:10px; height:1.2px; background:var(--ink);
+   658→    transform:translate(-50%,-50%);
+   659→    transition:transform .25s ease, background .25s ease;
+   660→  }
+   661→  details.q .plus::after{ transform:translate(-50%,-50%) rotate(90deg) }
+   662→  details.q[open] .plus{ background:var(--ink); border-color:var(--ink) }
+   663→  details.q[open] .plus::before,
+   664→  details.q[open] .plus::after{ background:#fff }
+   665→  details.q[open] .plus::after{ transform:translate(-50%,-50%) rotate(0) }
+   666→  body.dark details.q[open] .plus{ background:#fff; border-color:#fff }
+   667→  body.dark details.q[open] .plus::before,
+   668→  body.dark details.q[open] .plus::after{ background:#0a0a0a }
+   669→
+   670→  details.q .a{
+   671→    margin-top:12px;
+   672→    color:var(--ink-2);
+   673→    font-size:14.5px;
+   674→    /* 中文长段：行长护栏 + 1.75 行距 */
+   675→    max-width:34em;
+   676→    line-height:1.75;
+   677→    letter-spacing: 0;
+   678→  }
+   679→
+   680→  /* -------- footer -------- */
+   681→  footer{
+   682→    margin-top:56px;
+   683→    padding-top:22px;
+   684→    border-top:1px solid var(--line-2);
+   685→    display:flex; justify-content:space-between; align-items:center;
+   686→    font-size:13px; color:var(--muted);
+   687→    gap:16px;
+   688→    line-height: 1.6;
+   689→  }
+   690→  footer a{ color:var(--muted); text-decoration:none; margin:0 12px }
+   691→  footer a:first-child{ margin-left:0 }
+   692→  footer a:last-child{ margin-right:0 }
+   693→  footer a:hover{ color:var(--ink) }
+   694→  footer .sep{ color:var(--line); }
+   695→  footer .icp{ font-size:12px; color:var(--soft); letter-spacing: 0 }
+   696→
+   697→  /* responsive */
+   698→  @media (max-width:980px){
+   699→    .tiers{ grid-template-columns:repeat(2,1fr) }
+   700→    .tier.selected{ transform:translateY(-4px) scale(1.01) }
+   701→    .faq-card{ grid-template-columns:1fr; gap:18px; padding:30px 26px }
+   702→  }
+   703→  @media (max-width:560px){
+   704→    .wrap{ padding:20px 16px 56px }
+   705→    nav.top{ grid-template-columns:1fr auto; margin-bottom:36px }
+   706→    .nav-center{ display:none }
+   707→    .nav-action{ font-size:12px; padding:7px 12px }
+   708→    .tiers{ grid-template-columns:1fr }
+   709→    .tier.selected{ transform:none }
+   710→    .pricing-hero{ margin-bottom:36px }
+   711→    footer{ flex-direction:column; align-items:flex-start; gap:8px }
+   712→  }
+   713→</style>
+   714→</head>
+   715→<body>
+   716→
+   717→<div class="sky" id="sky">
+   718→  <div class="sky-img" id="skyA"></div>
+   719→</div>
+   720→
+   721→<div class="wrap">
+   722→
+   723→  <nav class="top" aria-label="主导航">
+   724→    <a href="#" class="brand" aria-label="栖间">
+   725→      <span class="brand-mark">
+   726→        <svg viewBox="0 0 26 22" fill="currentColor" fill-rule="evenodd" aria-hidden="true">
+   727→          <!-- 屋顶填充 + evenodd 打孔成圆点 = 栖（鸟）+ 间（屋下空间） -->
+   728→          <path d="M13 2 L24 11 L22 11 L22 19 L4 19 L4 11 L2 11 Z M13 12.6 a1.8 1.8 0 1 0 0 3.6 a1.8 1.8 0 1 0 0 -3.6 Z"/>
+   729→        </svg>
+   730→      </span>
+   731→      <span class="brand-divider" aria-hidden="true"></span>
+   732→      <span class="brand-text">栖间<span class="reg">®</span></span>
+   733→    </a>
+   734→    <div class="nav-center glass" role="tablist">
+   735→      <a href="#" role="tab">案例</a>
+   736→      <a href="#" role="tab">关于</a>
+   737→      <a href="#" role="tab" class="active">定价</a>
+   738→    </div>
+   739→  </nav>
+   740→
+   741→  <header class="pricing-hero">
+   742→    <span class="eyebrow glass"><span class="pulse"></span>早期访问 · 2026 年第三季度开放</span>
+   743→    <h1 class="headline">
+   744→      选一个节奏，<em>慢慢搬进新家。</em>
+   745→    </h1>
+   746→    <p class="subhead">栖间用你拍下的房间照片，配上我们精选的当代家具，给出一份可被实现的居所提案。挑选适合你的入场方式，我们按批次发放席位。</p>
+   747→  </header>
+   748→
+   749→  <section aria-labelledby="tiers-title">
+   750→
+   751→    <div class="toggle-row">
+   752→      <div class="toggle glass" role="tablist" aria-label="订阅周期">
+   753→        <button class="on" data-cycle="reserve">预约保留</button>
+   754→        <button data-cycle="annual">按年订阅 <span class="save">省 <span class="num">15%</span></span></button>
+   755→      </div>
+   756→    </div>
+   757→
+   758→    <h2 id="tiers-title" style="position:absolute; left:-9999px;">选择你的入场批次</h2>
+   759→
+   760→    <div class="tiers" id="tiers">
+   761→      <article class="tier" data-tier="observer" tabindex="0"
+   762→        data-bg="https://images.unsplash.com/photo-1505144808419-1957a94ca61e?auto=format&fit=crop&w=1600&q=70">
+   763→        <span class="bg"></span><span class="scrim"></span><span class="frost"></span>
+   764→        <div class="label"><span>观望</span></div>
+   765→        <div class="price free" data-base="0" data-annual="0">免费</div>
+   766→        <div class="price-note">加入候补名单</div>
+   767→        <p class="pitch">先在队列里占个位置。等到你那一批开放，我们会给你写信。</p>
+   768→        <ul>
+   769→          <li>第四批 · <span class="num">2027 Q1</span> 入场</li>
+   770→          <li>工作室通讯与新品预告</li>
+   771→          <li>每月一次渲染预览</li>
+   772→        </ul>
+   773→        <button class="cta" type="button">
+   774→          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+   775→          选择此方案
+   776→        </button>
+   777→      </article>
+   778→
+   779→      <article class="tier selected" data-tier="early" tabindex="0"
+   780→        data-bg="https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1600&q=70">
+   781→        <span class="bg"></span><span class="scrim"></span><span class="frost"></span>
+   782→        <div class="label">
+   783→          <span>早鸟</span>
+   784→          <span class="badge">最受欢迎</span>
+   785→        </div>
+   786→        <div class="price" data-base="68" data-annual="58"><span class="sign">¥</span><span class="num">68</span></div>
+   787→        <div class="price-note">押金可退</div>
+   788→        <p class="pitch">直接跳到第二批。这笔押金会在你正式开通时折抵首月费用。</p>
+   789→        <ul>
+   790→          <li>第二批 · <span class="num">2026 Q4</span> 入场</li>
+   791→          <li>无限次预览渲染</li>
+   792→          <li>创始用户社群</li>
+   793→          <li>上线赠 <span class="num">¥68</span> 抵扣</li>
+   794→        </ul>
+   795→        <button class="cta" type="button">
+   796→          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+   797→          已选择
+   798→        </button>
+   799→      </article>
+   800→
+   801→      <article class="tier" data-tier="founder" tabindex="0"
+   802→        data-bg="https://images.unsplash.com/photo-1490604001847-b712b0c2f967?auto=format&fit=crop&w=1600&q=70">
+   803→        <span class="bg"></span><span class="scrim"></span><span class="frost"></span>
+   804→        <div class="label"><span>创始</span></div>
+   805→        <div class="price" data-base="198" data-annual="168"><span class="sign">¥</span><span class="num">198</span></div>
+   806→        <div class="price-note">终身锁价</div>
+   807→        <p class="pitch">移到第一批。价格终身锁定，并享有工作室周边权益。</p>
+   808→        <ul>
+   809→          <li>第一批 · <span class="num">2026 Q3</span> 入场</li>
+   810→          <li>价格终身锁定</li>
+   811→          <li>选品投票权</li>
+   812→          <li>三幅手工艺术微喷</li>
+   813→        </ul>
+   814→        <button class="cta" type="button">
+   815→          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+   816→          选择此方案
+   817→        </button>
+   818→      </article>
+   819→
+   820→      <article class="tier" data-tier="patron" tabindex="0"
+   821→        data-bg="https://images.unsplash.com/photo-1502472584811-0a2f2feb8968?auto=format&fit=crop&w=1600&q=70">
+   822→        <span class="bg"></span><span class="scrim"></span><span class="frost"></span>
+   823→        <div class="label"><span>甄选</span></div>
+   824→        <div class="price" data-base="498" data-annual="423"><span class="sign">¥</span><span class="num">498</span></div>
+   825→        <div class="price-note">甄选理事</div>
+   826→        <p class="pitch">和团队同处一室。每季度上海工作室聚会，赠签名限量版画。</p>
+   827→        <ul>
+   828→          <li>第零批 · 内测当下可入席</li>
+   829→          <li>每季度一次上海工作室聚会</li>
+   830→          <li>签名限量版画一幅</li>
+   831→          <li>团队直通通道</li>
+   832→        </ul>
+   833→        <button class="cta" type="button">
+   834→          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+   835→          选择此方案
+   836→        </button>
+   837→      </article>
+   838→    </div>
+   839→
+   840→    <div class="value-strip glass">
+   841→      <span>
+   842→        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+   843→        押金随时可退
+   844→      </span>
+   845→      <span class="dot"></span>
+   846→      <span>
+   847→        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 12l2 2 4-4"/></svg>
+   848→        方案之间可任意切换
+   849→      </span>
+   850→      <span class="dot"></span>
+   851→      <span>
+   852→        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>
+   853→        每八周开放一批新席位
+   854→      </span>
+   855→      <span class="dot"></span>
+   856→      <span>
+   857→        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-12V5l-8-3-8 3v5c0 8 8 12 8 12z"/></svg>
+   858→        图片不留存、不训练
+   859→      </span>
+   860→    </div>
+   861→  </section>
+   862→
+   863→  <section class="faq-card glass" aria-labelledby="faq-title">
+   864→    <h2 id="faq-title">常见问题<small>没找到想问的，写信到 hi@qijian.studio，<br/>我们每封都亲手回。</small></h2>
+   865→    <div class="faq-list">
+   866→      <details class="q" open>
+   867→        <summary>「押金可退」是什么意思？<span class="plus" aria-hidden="true"></span></summary>
+   868→        <p class="a">预约金只是冻结、不会被扣款。等你这一批开放，可以把它折抵首月费用，也可以一键全额退回——不需要理由，不设流程。</p>
+   869→      </details>
+   870→      <details class="q">
+   871→        <summary>我所在的批次什么时候开放？<span class="plus" aria-hidden="true"></span></summary>
+   872→        <p class="a">从 <span class="num">2026</span> 年第三季度起，大约每八周开放一批。每批的规模都刻意保持小，这样工作室才有余力亲手回每一封信。</p>
+   873→      </details>
+   874→      <details class="q">
+   875→        <summary>开通之后还能更换方案吗？<span class="plus" aria-hidden="true"></span></summary>
+   876→        <p class="a">可以。升级随时生效，我们会把你挪到对应方案的下一个开放批次；降级则保留原批次的位置，仅调整对应权益。</p>
+   877→      </details>
+   878→      <details class="q">
+   879→        <summary>上传的房间照片会被存下来吗？<span class="plus" aria-hidden="true"></span></summary>
+   880→        <p class="a">照片在内存里完成渲染后即从服务器删除，不会被分享给第三方，也不会被用于训练你账户之外的任何模型。</p>
+   881→      </details>
+   882→      <details class="q">
+   883→        <summary>选品库里都是真实买得到的家具吗？<span class="plus" aria-hidden="true"></span></summary>
+   884→        <p class="a">是。每一件家具都来自我们当面拜访过的设计师或品牌。如果在渲染图里看中了哪一件，可以申请一份「来源说明」，包含品牌、交期与价格。</p>
+   885→      </details>
+   886→    </div>
+   887→  </section>
+   888→
+   889→  <footer>
+   890→    <span>© <span class="num">2026</span> 栖间设计工作室 · 上海</span>
+   891→    <span>
+   892→      <a href="#">隐私政策</a><span class="sep">/</span>
+   893→      <a href="#">服务条款</a><span class="sep">/</span>
+   894→      <a href="#">hi@qijian.studio</a>
+   895→    </span>
+   896→    <span class="icp">沪 ICP 备 <span class="num">2026 0000</span> 号</span>
+   897→  </footer>
+   898→</div>
+   899→
+   900→<script>
+   901→  // ---- parallax sky ----
+   902→  (function(){
+   903→    const a = document.getElementById('skyA');
+   904→    if (!a) return;
+   905→    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+   906→
+   907→    const TILE_W = 2800;
+   908→    const probe = new Image();
+   909→    probe.onload = () => {
+   910→      if (probe.naturalWidth && probe.naturalHeight){
+   911→        const tileH = TILE_W * (probe.naturalHeight / probe.naturalWidth);
+   912→        document.documentElement.style.setProperty('--tile-h', tileH.toFixed(2) + 'px');
+   913→      }
+   914→    };
+   915→    probe.src = 'https://images.unsplash.com/photo-1601297183305-6df142704ea2?auto=format&fit=crop&w=2800&q=80';
+   916→
+   917→    const target = {x: 0, y: 0};
+   918→    const pos    = {x: 0, y: 0};
+   919→    const drift  = {x: 0.04, y: 0};
+   920→
+   921→    window.addEventListener('mousemove', (e) => {
+   922→      target.x = (e.clientX - window.innerWidth  / 2);
+   923→      target.y = (e.clientY - window.innerHeight / 2);
+   924→    }, {passive:true});
+   925→
+   926→    function tick(){
+   927→      pos.x -= 0.003 * target.x * 0.06 + drift.x;
+   928→      pos.y -= 0.003 * target.y * 0.06 + drift.y;
+   929→      const s = pos.x.toFixed(2) + 'px ' + pos.y.toFixed(2) + 'px';
+   930→      a.style.backgroundPosition = s;
+   931→      a.style.maskPosition = s;
+   932→      a.style.webkitMaskPosition = s;
+   933→      requestAnimationFrame(tick);
+   934→    }
+   935→    requestAnimationFrame(tick);
+   936→  })();
+   937→
+   938→  // ---- 主题切换按钮已移除（保留 body.dark 样式以备外部触发） ----
+   939→
+   940→  // ---- 方案选择 ----
+   941→  (function(){
+   942→    const tiers = document.querySelectorAll('.tier');
+   943→    tiers.forEach(card => {
+   944→      const url = card.dataset.bg;
+   945→      if (url) card.querySelector('.bg').style.backgroundImage = `url('${url}')`;
+   946→
+   947→      const select = () => {
+   948→        tiers.forEach(c => {
+   949→          c.classList.remove('selected');
+   950→          const btn = c.querySelector('.cta');
+   951→          if (btn) btn.lastChild.textContent = ' 选择此方案';
+   952→        });
+   953→        card.classList.add('selected');
+   954→        const btn = card.querySelector('.cta');
+   955→        if (btn) btn.lastChild.textContent = ' 已选择';
+   956→      };
+   957→      card.addEventListener('click', select);
+   958→      card.addEventListener('keydown', (e) => {
+   959→        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); }
+   960→      });
+   961→    });
+   962→  })();
+   963→
+   964→  // ---- 计费周期切换 ----
+   965→  (function(){
+   966→    const buttons = document.querySelectorAll('.toggle button');
+   967→    const cards = document.querySelectorAll('.tier');
+   968→    buttons.forEach(b => {
+   969→      b.addEventListener('click', () => {
+   970→        buttons.forEach(x => x.classList.remove('on'));
+   971→        b.classList.add('on');
+   972→        const annual = b.dataset.cycle === 'annual';
+   973→        cards.forEach(c => {
+   974→          const p = c.querySelector('.price');
+   975→          const note = c.querySelector('.price-note');
+   976→          const base = +p.dataset.base;
+   977→          const ann  = +p.dataset.annual;
+   978→          if (base === 0){
+   979→            p.classList.add('free');
+   980→            p.innerHTML = '免费';
+   981→            note.textContent = '加入候补名单';
+   982→            return;
+   983→          }
+   984→          p.classList.remove('free');
+   985→          if (annual){
+   986→            p.innerHTML = '<span class="sign">¥</span><span class="num">' + ann + '</span>';
+   987→            note.textContent = '每月 · 按年结算';
+   988→          } else {
+   989→            p.innerHTML = '<span class="sign">¥</span><span class="num">' + base + '</span>';
+   990→            note.textContent = base === 68 ? '押金可退'
+   991→                            : base === 198 ? '终身锁价'
+   992→                            :                '甄选理事';
+   993→          }
+   994→        });
+   995→      });
+   996→    });
+   997→  })();
+   998→
+   999→  // ---- FAQ 单开 ----
+  1000→  (function(){
+  1001→    const all = document.querySelectorAll('details.q');
+  1002→    all.forEach(d => {
+  1003→      d.addEventListener('toggle', () => {
+  1004→        if (d.open) all.forEach(o => { if (o !== d) o.open = false; });
+  1005→      });
+  1006→    });
+  1007→  })();
+  1008→</script>
+  1009→</body>
+  1010→</html>
+  1011→

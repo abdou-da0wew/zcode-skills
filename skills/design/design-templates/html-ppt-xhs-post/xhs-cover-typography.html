@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>中文排版的呼吸感 · 小红书封面</title>
+<title>The Breathing Room of Chinese Typography · Rednote Cover</title>
 <style>
   :root {
     --blue: #1652f0;
@@ -28,7 +28,7 @@
     padding: 40px 0;
   }
 
-  /* ===== 画布 1242×1660 (3:4) ===== */
+  /* ===== Canvas 1242×1660 (3:4) ===== */
   .cover {
     width: 1242px;
     height: 1660px;
@@ -38,7 +38,7 @@
     box-shadow: 0 30px 80px rgba(0,0,0,.4);
   }
 
-  /* ===== 顶部蓝色区:日期与时段 ===== */
+  /* ===== Top blue zone: date and time ===== */
   .top-bar {
     position: absolute;
     top: 60px;
@@ -84,7 +84,7 @@
     border-radius: 50%;
   }
 
-  /* ===== 米白折纸主体 ===== */
+  /* ===== Off-white folded-paper body ===== */
   .paper {
     position: absolute;
     top: 250px;
@@ -103,7 +103,7 @@
     z-index: 2;
   }
 
-  /* 右上"被折起的角":一个略深的三角,贴在 paper 右上 */
+  /* Top-right "folded corner": a slightly darker triangle stuck to the paper's top-right */
   .fold-corner-tr {
     position: absolute;
     top: 250px;
@@ -115,7 +115,7 @@
     z-index: 3;
   }
 
-  /* 右上折角的 N°007 编号(顺着折角倾斜) */
+  /* N°007 issue number on the folded corner (tilted along the fold) */
   .issue-tag {
     position: absolute;
     top: 296px;
@@ -136,7 +136,7 @@
     margin-right: 2px;
   }
 
-  /* ===== 折纸内文字主体 ===== */
+  /* ===== Text body inside the paper ===== */
   .content {
     position: absolute;
     top: 320px;
@@ -193,7 +193,7 @@
     opacity: .45;
   }
 
-  /* ===== Pexels 字体特写图条 ===== */
+  /* ===== Pexels type close-up photo strip ===== */
   .photo-strip {
     margin-top: 40px;
     width: 100%;
@@ -222,7 +222,7 @@
     z-index: 2;
   }
 
-  /* ===== 内容点列(2 列) ===== */
+  /* ===== Content points (2 columns) ===== */
   .points {
     margin-top: 36px;
     display: grid;
@@ -250,7 +250,7 @@
     font-weight: 600;
   }
 
-  /* ===== 折纸内左下的 logo 区 ===== */
+  /* ===== Logo area inside the paper, lower-left ===== */
   .logos {
     margin-top: 32px;
     display: flex;
@@ -289,7 +289,7 @@
     margin-top: 3px;
   }
 
-  /* ===== 底部蓝色区 footer ===== */
+  /* ===== Bottom blue footer ===== */
   .bottom-bar {
     position: absolute;
     left: 60px;
@@ -336,68 +336,68 @@
 
 <div class="cover">
 
-  <!-- 顶部日期 -->
+  <!-- Top date -->
   <div class="top-bar">
     <div class="date-row">
       <span>06.01</span>
       <span class="sep">|</span>
       <span>20:00&ndash;22:00</span>
-      <span class="week">(周一)</span>
+      <span class="week">(Monday)</span>
     </div>
     <div class="top-sub">
       <span class="dot"></span>
-      <span>「设计夜读」第 07 期 &nbsp;·&nbsp; Field Notes on Type</span>
+      <span>"Design Night Reads" · Issue 07 &nbsp;·&nbsp; Field Notes on Type</span>
     </div>
   </div>
 
-  <!-- 折纸主体 -->
+  <!-- Folded-paper body -->
   <div class="paper"></div>
   <div class="fold-corner-tr"></div>
 
-  <!-- 右上折角的期号 -->
+  <!-- Issue number on the folded corner -->
   <div class="issue-tag">N<sup>o</sup>007</div>
 
-  <!-- 折纸内的内容 -->
+  <!-- Content inside the paper -->
   <div class="content">
     <div class="eng-title">Breath of<br>Chinese Type</div>
 
     <div class="cn-title-wrap">
       <span class="hashtag">#</span>
-      <div class="cn-title">中文排版的<br>呼吸感</div>
+      <div class="cn-title">Breathing room<br>in Chinese type</div>
     </div>
 
     <div class="subtitle">
-      格律 <span class="pipe">/</span> 留白 <span class="pipe">/</span> 节奏 <span class="pipe">/</span> 灰度
+      Metrics <span class="pipe">/</span> Whitespace <span class="pipe">/</span> Rhythm <span class="pipe">/</span> Greyscale
     </div>
 
-    <!-- Pexels 字体特写图条 -->
+    <!-- Pexels type close-up strip -->
     <div class="photo-strip">
       <img src="https://images.pexels.com/photos/698327/pexels-photo-698327.jpeg?auto=compress&cs=tinysrgb&w=1600"
            alt="typewriter close-up by Matej from Pexels">
       <div class="photo-caption">PHOTO · PEXELS / MATEJ</div>
     </div>
 
-    <!-- 4 条要点 -->
+    <!-- 4 key points -->
     <div class="points">
-      <div class="point"><span class="num">#01</span><span class="txt">模数决定一切节奏</span></div>
-      <div class="point"><span class="num">#02</span><span class="txt">标题按词,不按字数</span></div>
-      <div class="point"><span class="num">#03</span><span class="txt">行长是字号的整数倍</span></div>
-      <div class="point"><span class="num">#04</span><span class="txt">留白本身就是设计</span></div>
+      <div class="point"><span class="num">#01</span><span class="txt">The modular scale sets every rhythm</span></div>
+      <div class="point"><span class="num">#02</span><span class="txt">Break headlines by word, not by character count</span></div>
+      <div class="point"><span class="num">#03</span><span class="txt">Line length is a whole multiple of the type size</span></div>
+      <div class="point"><span class="num">#04</span><span class="txt">Whitespace is itself the design</span></div>
     </div>
 
-    <!-- 折纸左下角的 logo 区 -->
+    <!-- Logo area, lower-left of the paper -->
     <div class="logos">
       <div class="logo-chip">TYPE<br>NOTES</div>
       <div class="logo-chip">EST.<br>2026</div>
-      <div class="logo-text">设计夜读<small>DESIGN&nbsp;·&nbsp;READING</small></div>
+      <div class="logo-text">Design Night Reads<small>DESIGN&nbsp;·&nbsp;READING</small></div>
     </div>
   </div>
 
-  <!-- 底部 footer -->
+  <!-- Bottom footer -->
   <div class="bottom-bar">
     <div class="brand">
       DESIGN NOTES
-      <span class="cn">设 计 夜 读</span>
+      <span class="cn">N I G H T · R E A D S</span>
     </div>
     <div class="meta">
       <span class="big">VOL.&nbsp;07&nbsp;/&nbsp;2026</span>

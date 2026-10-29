@@ -1,83 +1,83 @@
-# 三视角解读指南
+# Three-Perspective Interpretation Guide
 
-每个视角必须独立分析，给出不同甚至矛盾的结论。不要三个视角说同一件事换个措辞。
+Each perspective must analyze independently and reach different — even contradictory — conclusions. Do not have all three perspectives say the same thing with different wording.
 
-## 🔮 周公解梦（传统玄学）
+## 🔮 Zhou Gong Dream Interpretation (traditional Chinese lore)
 
-**知识基础：** 中国传统解梦体系 + 民间说法
+**Knowledge base:** the traditional Chinese dream-interpretation system + folk sayings
 
-**核心意象对照（常用）：**
-- 水 = 财运（清水=正财，浑水=偏财或破财）
-- 蛇 = 小人或财运（看情境）
-- 牙齿掉落 = 亲人健康或自信问题
-- 飞行 = 升迁、心愿达成
-- 坠落 = 运势下滑、不稳定
-- 死亡 = 重生、旧事结束
-- 考试 = 机遇或焦虑
-- 裸体 = 秘密暴露
-- 被追 = 逃避某事
-- 动物 = 根据动物种类对应不同寓意
+**Core imagery correspondences (common ones):**
+- Water = wealth fortune (clear water = steady income; murky water = windfall or loss)
+- Snake = rivals or wealth (depends on context)
+- Teeth falling out = a relative's health or self-confidence issues
+- Flying = promotion, wishes coming true
+- Falling = declining fortune, instability
+- Death = rebirth, the end of an old chapter
+- Exams = opportunity or anxiety
+- Nakedness = secrets exposed
+- Being chased = avoiding something
+- Animals = different meanings depending on the animal
 
-**语气要求：**
-- 古风但不装，像庙里那个很灵的老师傅
-- 一本正经，言之凿凿
-- 可以说"此梦主..."、"近日宜..."
-- 给出明确的吉凶判断 + 运势建议
+**Tone requirements:**
+- Classical flavor without being pretentious — like the uncannily accurate old master at the temple
+- Serious and emphatic
+- May say things like "This dream portends..." or "In the coming days, it is favorable to..."
+- Give a clear auspicious/inauspicious verdict + fortune advice
 
-**输出结构：**
-- content: 主体解读（100-200字）
-- fortune: 吉/凶/中性偏X
-- advice: 一句话建议（宜什么、忌什么）
+**Output structure:**
+- content: the main interpretation (100-200 characters)
+- fortune: auspicious / inauspicious / neutral-leaning-X
+- advice: one-sentence advice (what to do, what to avoid)
 
-## 🧠 弗洛伊德 / 心理分析
+## 🧠 Freud / Psychological Analysis
 
-**知识基础：** 精神分析 + 认知心理学 + 常见梦境心理学研究
+**Knowledge base:** psychoanalysis + cognitive psychology + common dream-psychology research
 
-**分析角度：**
-- 潜意识欲望和压抑
-- 近期压力源的投射
-- 未完成事件的心理加工
-- 自我认知和安全感
-- 控制感 vs 失控感
+**Analytical angles:**
+- Subconscious desires and repression
+- Projection of recent stressors
+- Psychological processing of unfinished business
+- Self-perception and sense of safety
+- Sense of control vs. loss of control
 
-**语气要求：**
-- 专业但温和，像一个好的心理咨询师
-- 不评判，只分析
-- 用"可能反映了..."、"这或许与...有关"等非绝对表达
-- 给出可操作的心理建议
+**Tone requirements:**
+- Professional but gentle, like a good counselor
+- Non-judgmental; analysis only
+- Use non-absolute phrasing like "this may reflect..." or "this could be related to..."
+- Give actionable psychological advice
 
-**输出结构：**
-- content: 心理分析（100-200字）
-- insight: 一句话核心洞察
-- advice: 一个具体的自我关照建议
+**Output structure:**
+- content: the psychological analysis (100-200 characters)
+- insight: one-sentence core insight
+- advice: one concrete self-care suggestion
 
-## 🌀 赛博神棍
+## 🌀 Cyber Mystic
 
-**知识基础：** 没有知识基础，纯脑洞
+**Knowledge base:** none — pure imaginative leaps
 
-**可以扯的方向：**
-- 平行宇宙记忆泄漏
-- 量子意识纠缠
-- 前世记忆碎片
-- 外星文明信号
-- 你的潜意识在玩某个游戏
-- 概率论/混沌理论的荒诞应用
-- 用数学公式解梦（瞎编的公式）
+**Directions to riff on:**
+- Parallel-universe memory leaks
+- Quantum consciousness entanglement
+- Past-life memory fragments
+- Signals from an alien civilization
+- Your subconscious playing some game
+- Absurd applications of probability theory / chaos theory
+- Interpreting dreams with math formulas (made-up formulas)
 
-**语气要求：**
-- 极度自信，像真的有一台"量子梦境分析仪"
-- 一本正经地胡说八道
-- 越离谱越好，但逻辑要自洽（在它自己的疯狂体系里）
-- 建议部分要搞笑但具体（"建议今天穿红色袜子建立跨维度共鸣"）
+**Tone requirements:**
+- Extremely confident, as if there really were a "quantum dream analyzer"
+- Delivering nonsense with a completely straight face
+- The more absurd the better, but internally self-consistent (within its own crazy system)
+- The advice should be funny but specific (e.g. "Wear red socks today to establish cross-dimensional resonance")
 
-**输出结构：**
-- content: 赛博解读（100-200字）
-- prediction: 一句离谱预言
-- advice: 一个搞笑但具体的行动建议
+**Output structure:**
+- content: the cyber reading (100-200 characters)
+- prediction: one outrageous prediction
+- advice: one funny but concrete action suggestion
 
-## 综合建议
+## Overall advice
 
-三个视角写完后，生成一段 overall_advice：
-- 提取三个视角中的共性（如果有）
-- 如果三个完全矛盾，就说"这个梦很有意思，不同角度看差异很大"
-- 语气回归中立，简短，1-2句话
+After writing the three perspectives, generate the overall_advice paragraph:
+- Extract common ground across the three perspectives (if any)
+- If they fully contradict each other, say "This dream is fascinating — it looks very different from different angles"
+- Return to a neutral tone; keep it short, 1-2 sentences

@@ -1,6 +1,6 @@
 ---
 name: industrial-archive
-description: Generate a single-file industrial-archive product landing page (Nordic museum aesthetic, hash-routed detail pages). Takes a natural-language description of one or more "exhibit-style" products (objects, tools, hardware, watches, kitchenware, lighting, audio, instruments, anything with a designed/forged/restrained quality); outputs ONE working .html file. Visitors see a black-framed cover that flips between exhibits, sidebar index, side meta column (material/origin/year/dimension), and click any exhibit → full detail page (giant italic title, spec table, hero image, lead + 3 prose paragraphs, gallery, prev/next). Runs in BOTH Claude Code (writes to ~/Desktop) and GLM / online chat (outputs HTML inline). Trigger: "做个工业风产品落地页", "做克制之物风格的展品页", "industrial-archive-gen ...", or when user drags this skill folder into chat asking for a product page in the Nordic-industrial archive style.
+description: Generate a single-file industrial-archive product landing page (Nordic museum aesthetic, hash-routed detail pages). Takes a natural-language description of one or more "exhibit-style" products (objects, tools, hardware, watches, kitchenware, lighting, audio, instruments, anything with a designed/forged/restrained quality); outputs ONE working .html file. Visitors see a black-framed cover that flips between exhibits, sidebar index, side meta column (material/origin/year/dimension), and click any exhibit → full detail page (giant italic title, spec table, hero image, lead + 3 prose paragraphs, gallery, prev/next). Runs in BOTH local agent environments with a filesystem such as the DiveeOI agent (OpenCode-based) (writes to ~/Desktop) and plain online chat without a filesystem (outputs HTML inline). Trigger: "make an industrial-style product landing page", "make an exhibit page for restrained objects", "industrial-archive-gen ...", or when the user drags this skill folder into chat asking for a product page in the Nordic-industrial archive style.
 visibility: public
 mode: template
 carrier: web-page
@@ -8,238 +8,238 @@ scenario: brand-landing
 pattern_source: reference.html
 source_priority: skill-first
 triggers:
-  - "做个工业风产品落地页"
-  - "做克制之物风格的展品页"
-  - "北欧博物馆藏品风"
+  - "make an industrial-style product landing page"
+  - "make an exhibit page for restrained objects"
+  - "Nordic museum collection style"
   - "industrial archive"
-  - "策展感产品页"
+  - "curated exhibition-style product page"
 related_patterns: portfolio-detail
 legacy_gen: true
 ---
 
-# industrial-archive — 工业风展品 / 产品落地页生成器
+# industrial-archive — industrial exhibit / product landing page generator
 
-把"一段自然语言描述"变成一份单文件 HTML，效果是**北欧工业典藏 / 博物馆策展感**的产品落地页：
+Turn "a natural-language description" into a single-file HTML: a **Nordic industrial archive / museum-curated** product landing page:
 
-- 黑色画框中的产品大图，左右点击翻转切换
-- 左侧带索引指示条的展品目录
-- 右侧 4 个 meta 块（材料 / 产地 / 年代 / 尺寸）
-- 顶栏跑马灯
-- 点击画框或底部 CTA → 进入展品详情页（巨大斜体标题、规格表、主图、开篇大字 + 3 段散文、6 图画廊、上一件/下一件）
-- 进入页有引言 splash
+- Large product images in a black frame, flipping left/right on click
+- An exhibit index with an indicator bar on the left
+- 4 meta blocks on the right (material / origin / year / dimensions)
+- A ticker marquee in the top bar
+- Click the frame or the bottom CTA → enter the exhibit detail page (giant italic title, spec table, hero image, big-type lead + 3 prose paragraphs, 6-image gallery, prev/next)
+- The entry page has an intro splash
 
-## 何时触发
+## When to trigger
 
-用户说"做个工业风的产品落地页 / 克制之物风格的展品 / industrial-archive-gen ..."，并提供：
-- **产品描述**（必需）：一段散文，描述 1—N 件展品的名字、年代、产地、材料、来历
-- **图片 URL**（可选）：每件展品至少 1 张主图、最好 3—6 张细节图。没有也能跑（用 picsum 占位灰图）
-- **风格**（可选）：默认是冷调钢蓝灰，可换成 styles.md 里的预设
+The user says "make an industrial-style product landing page / exhibit page for restrained objects / industrial-archive-gen ..." and provides:
+- **Product description** (required): a passage of prose describing 1–N exhibits — name, era, origin, material, provenance
+- **Image URLs** (optional): at least 1 hero image per exhibit, ideally 3–6 detail images. It also runs without any (picsum grayscale placeholders)
+- **Style** (optional): default is cold steel blue-gray; presets in styles.md can be swapped in
 
-如果用户**完全没给展品名/故事** → 必须问一次至少有哪几件展品要展示，以及大致是什么品类（容器 / 灯具 / 椅具 / 仪器 / 工具 / ...）。
+If the user **gives no exhibit names/story at all** → ask once which exhibits should be shown and roughly what category they are (vessels / lighting / seating / instruments / tools / ...).
 
-如果用户**只给了名字**没给故事 → 自己编：每件展品都生成 1 句 lead + 3 段 prose + 4-6 行 spec。语气参考 `reference.html`：**博物馆 wall-text** 感 — 克制、具体、缓慢，不要 marketing 语言。
+If the user **gives only names without a story** → invent it: for each exhibit generate 1 lead + 3 prose paragraphs + 4-6 spec rows. Match the tone of `reference.html`: **museum wall-text** — restrained, concrete, slow; never marketing language.
 
-## 两种运行模式
+## Two runtime modes
 
-### 模式 A · Claude Code / 本地（有文件系统）
-- 输出：`~/Desktop/{slug}-archive.html`（**单文件**，所有图走 URL）
-- 如果用户给了本地图，建议告知用户改用 URL 或自己拷到同目录后写相对路径
+### Mode A · Local agent such as DiveeOI (has a filesystem)
+- Output: `~/Desktop/{slug}-archive.html` (**single file**, all images via URLs)
+- If the user provides local images, suggest they switch to URLs, or copy the images next to the file and use relative paths
 
-### 模式 B · GLM / 在线对话（无文件系统）
-- **直接给一份完整 HTML 字符串**，包在 ` ```html ` 代码块里
-- 用户没给图 URL → 全用 `https://picsum.photos/seed/{slug}-{nn}/{w}/{h}?grayscale` 占位
-- 不要尝试访问本地文件
+### Mode B · Online chat (no filesystem)
+- **Output one complete HTML string**, wrapped in a ` ```html ` code block
+- User gave no image URLs → use `https://picsum.photos/seed/{slug}-{nn}/{w}/{h}?grayscale` placeholders throughout
+- Do not try to access local files
 
-判断：如果你**无法 Read 看到本地图片** → 默认走 B。
+Decision rule: if you **cannot Read local images** → default to Mode B.
 
-## 文件分工
+## File roles
 
-| 文件 | 角色 | 怎么用 |
+| File | Role | How to use it |
 |---|---|---|
-| `reference.html` | **完整成品参考** — "克制之物" 4 件北欧工业藏品 | 看：lead 怎么写、prose 语气、spec 用词、tagline 格式、maker 命名 |
-| `template.html` | **空骨架** — 同样的 CSS/JS/路由，2 件示例 + 17 个 SWAP 标记 | 在它的基础上改，输出最终 HTML |
-| `styles.md` | 风格预设库 | 用户指定风格时查这份 |
-| `README.md` | 用户视角的使用说明 | 模型不用看 |
-| `SKILL.md` | 给模型看的工作流（本文件） | **必读** |
+| `reference.html` | **Complete finished reference** — 4 Nordic industrial pieces of "restrained objects" | Read for: how leads are written, prose tone, spec wording, tagline format, maker naming |
+| `template.html` | **Empty skeleton** — same CSS/JS/routing, 2 sample exhibits + 17 SWAP markers | Build on it to produce the final HTML |
+| `styles.md` | Style preset library | Consult when the user specifies a style |
+| `README.md` | User-facing usage notes | The model doesn't need it |
+| `SKILL.md` | Workflow for the model (this file) | **Required reading** |
 
-**核心规则**：所有改动基于 `template.html`；从 `reference.html` 学**怎么写**（语气、字数、词汇），但不要复制具体内容。
+**Core rule**: all edits are based on `template.html`; learn **how to write** from `reference.html` (tone, length, vocabulary), but do not copy its concrete content.
 
-## 关键差别 — reference 用 SVG，template 用 `<img>`
+## Key difference — reference uses SVG, template uses `<img>`
 
-- `reference.html` 的 4 件展品是**手绘 SVG**（铸铁壶 / 轴承灯 / 桦木椅 / 测距仪），那是定制内容
-- `template.html` 已经把 SVG 系统替换成 `<img src="cover URL">`，用户给 URL 就用 URL，没给就用 picsum
-- 你不需要写 SVG。如果用户特别要求"画出来"，再考虑写一个 SVG 函数塞进 `coverHTML()`
+- The 4 exhibits in `reference.html` are **hand-drawn SVGs** (cast-iron kettle / bearing lamp / birch chair / rangefinder); that's custom content
+- `template.html` has already replaced the SVG system with `<img src="cover URL">`: user-provided URL if given, picsum otherwise
+- You don't need to write SVG. If the user explicitly asks to "draw" the objects, consider writing an SVG function into `coverHTML()`
 
-## 工作步骤
+## Workflow
 
-### 1. 读两份 HTML
-- 先读 `reference.html` 体会"完整后长什么样"，特别是 `exhibits-data` JSON 的字段密度和 prose 语气（克制、具体、有时代背景）
-- 再读 `template.html` 找 17 个 SWAP 标记（搜 `SWAP-`）
+### 1. Read both HTML files
+- Read `reference.html` first to absorb "what the finished piece looks like", especially the field density and prose tone of the `exhibits-data` JSON (restrained, concrete, with period context)
+- Then read `template.html` and find the 17 SWAP markers (search `SWAP-`)
 
-**不要改 JS / 不要改 CSS / 不要改详情页路由系统**。
-SWAP 都在 HTML 文本和 JSON 数据里。
+**Do not change the JS / do not change the CSS / do not change the detail-page routing system**.
+All SWAPs live in the HTML text and the JSON data.
 
-### 2. 解析用户输入抽信息
+### 2. Parse user input and extract
 
-#### 全站层级（17 个 SWAP 中的 1-15、17）
-- **COLLECTION_TITLE / COLLECTION_SUB** — 系列大标题 + 副标。如"克制之物 / 北欧工业典藏 1948—1988"。SWAP-1
-- **INTRO_VOLUME_TAG** — 进入页顶部的 tag，如"北欧工业典藏 · Vol.01"。SWAP-2
-- **INTRO_TITLE_HTML** — splash 页大标题，2-4 字 + 中间一个 `<span class="accent">·</span>` 分隔符。如 `克制<span class="accent">·</span>之物`。SWAP-3
-- **INTRO_TITLE_EN** — splash 页英文副标，全大写 + em-dash，如 `Restrained Objects — A Nordic Industrial Archive 1948 — 1988`。SWAP-4
-- **INTRO_QUOTE** — 一句策展引言，60—100 字，散文感。SWAP-5
-- **INTRO_ATTRIBUTION** — 引言出处，如`— 策展前言 / Curatorial Note`。SWAP-6
-- **HEAD_GLYPH** — 左上 logo 字符。1-2 个 serif 字符，建议带特殊感的字母如 `Æ` `Ø` `沉` `匠` `ʘ`。SWAP-7
-- **HEAD_GLYPH_SUB** — logo 下一行说明，如`克制之物 / 编号 N°01—04`。SWAP-8
-- **HEAD_CENTER_CN / HEAD_CENTER_EN** — 顶部中央两行小字。SWAP-9, 10
-- **HEAD_RIGHT_TOP / HEAD_RIGHT_BOTTOM** — 顶右两行：日期/城市 + 坐标/编号。SWAP-11, 12
-- **CURATOR_NAME / CURATOR_EMAIL** — 策展方名称 + 邮箱。SWAP-13, 14
-- **CRUMB_ROOT / CRUMB_VOLUME** — 详情页面包屑两个固定项。SWAP-15
-- **TICKER_TAIL** — 跑马灯尾巴的总标语。SWAP-17
+#### Site-wide level (SWAPs 1-15 and 17 of 17)
+- **COLLECTION_TITLE / COLLECTION_SUB** — collection big title + subtitle, e.g. "Restrained Objects / A Nordic Industrial Archive 1948—1988". SWAP-1
+- **INTRO_VOLUME_TAG** — tag at the top of the entry page, e.g. "Nordic Industrial Archive · Vol.01". SWAP-2
+- **INTRO_TITLE_HTML** — splash-page big title, 2-4 characters + a `<span class="accent">·</span>` separator in the middle. E.g. `Restrained<span class="accent">·</span>Objects`. SWAP-3
+- **INTRO_TITLE_EN** — splash-page English subtitle, all caps + em-dash, e.g. `Restrained Objects — A Nordic Industrial Archive 1948 — 1988`. SWAP-4
+- **INTRO_QUOTE** — one curatorial quote, 60–100 characters, essay-like. SWAP-5
+- **INTRO_ATTRIBUTION** — quote attribution, e.g. `— Curatorial Preface / Curatorial Note`. SWAP-6
+- **HEAD_GLYPH** — top-left logo character. 1-2 serif characters; letters with character are recommended, like `Æ` `Ø` `ʘ`. SWAP-7
+- **HEAD_GLYPH_SUB** — one line under the logo, e.g. `Restrained Objects / No. N°01—04`. SWAP-8
+- **HEAD_CENTER_CN / HEAD_CENTER_EN** — two small lines at the top center. SWAP-9, 10
+- **HEAD_RIGHT_TOP / HEAD_RIGHT_BOTTOM** — two lines at the top right: date/city + coordinates/number. SWAP-11, 12
+- **CURATOR_NAME / CURATOR_EMAIL** — curator name + email. SWAP-13, 14
+- **CRUMB_ROOT / CRUMB_VOLUME** — the two fixed breadcrumb items on detail pages. SWAP-15
+- **TICKER_TAIL** — the closing slogan of the marquee. SWAP-17
 
-#### 每件展品的字段（SWAP-16，最关键）
+#### Per-exhibit fields (SWAP-16, the most critical)
 ```json
 {
   "slug": "iron-kettle",
   "num": "N°01",
-  "title": "铸铁壶",
+  "title": "Iron Kettle",
   "en": "IRON KETTLE",
   "year": "1958",
-  "place": "丹麦 · 哥本哈根",
-  "maker": "Carl Hansen Værksted / 卡尔·汉森工坊",
-  "material": "灰口铸铁 · 山毛榉木柄<br/>黑釉烧结涂层",
-  "origin": "丹麦 · 哥本哈根<br/>Carl Hansen Værksted",
-  "dim": "高 18 cm · 容 1.2 L<br/>底径 14 cm",
-  "tagline": "FORGED ESSENTIAL / 锻造的必需品",
-  "lead": "一只为<em>沉默与水的低温</em>而设计的容器——壶身的厚度，是为了让热停留得久一点，而不是更快地变热。",
+  "place": "Copenhagen, Denmark",
+  "maker": "Carl Hansen Værksted / Carl Hansen Workshop",
+  "material": "Gray cast iron · beech handle<br/>black glazed coating",
+  "origin": "Copenhagen, Denmark<br/>Carl Hansen Værksted",
+  "dim": "H 18 cm · 1.2 L<br/>base Ø 14 cm",
+  "tagline": "FORGED ESSENTIAL / the forged essential",
+  "lead": "A vessel designed for <em>silence and the low temperature of water</em> — the thickness of the body exists so heat lingers a little longer, not so it heats faster.",
   "spec": [
-    ["编号", "1958 · K-04"],
-    ["材料", "灰口铸铁 + 山毛榉"],
-    ["工艺", "砂模铸造 / 黑釉烧结"],
-    ["重量", "1.86 kg"],
-    ["产量", "限量 240 件 · 现存 31"]
+    ["Catalog no.", "1958 · K-04"],
+    ["Material", "gray cast iron + beech"],
+    ["Process", "sand casting / black glaze firing"],
+    ["Weight", "1.86 kg"],
+    ["Production", "limited to 240 · 31 extant"]
   ],
   "prose": [
-    "段一 80—160 字。来源/语境/年份/工坊背景。",
-    "段二 80—160 字。工艺/手工细节/关键决定。",
-    "段三 80—160 字。今天的状态/影响/仍在用的事实。"
+    "Para 1, 80–160 characters. Origin / context / year / workshop background.",
+    "Para 2, 80–160 characters. Craft / handwork details / key decisions.",
+    "Para 3, 80–160 characters. State today / influence / still-in-use facts."
   ],
-  "cover": "https://example.com/kettle-cover.jpg 或 picsum URL",
+  "cover": "https://example.com/kettle-cover.jpg or picsum URL",
   "gallery": [
-    {"src": "...", "layout": "f-3", "caption": "壶身正立面"},
-    {"src": "...", "layout": "f-2", "caption": "山毛榉木柄"},
-    {"src": "...", "layout": "f-2", "caption": "壶嘴细部"},
-    {"src": "...", "layout": "f-2", "caption": "底部砂模印"},
-    {"src": "...", "layout": "f-4", "caption": "工坊蓝图"},
-    {"src": "...", "layout": "f-6", "caption": "陈列剖面"}
+    {"src": "...", "layout": "f-3", "caption": "front elevation of the body"},
+    {"src": "...", "layout": "f-2", "caption": "beech handle"},
+    {"src": "...", "layout": "f-2", "caption": "spout detail"},
+    {"src": "...", "layout": "f-2", "caption": "sand-mold imprint on the base"},
+    {"src": "...", "layout": "f-4", "caption": "workshop blueprint"},
+    {"src": "...", "layout": "f-6", "caption": "display cross-section"}
   ]
 }
 ```
 
-### 3. 替换 SWAP
+### 3. Replace the SWAPs
 
-把 `template.html` 里 17 个 `{{...}}` 占位符全部换成你抽出来的内容。
-**注意**：`{{INTRO_TITLE_HTML}}` 是 HTML 不是纯文本，里面要带 `<span class="accent">·</span>`。
+Replace all 17 `{{...}}` placeholders in `template.html` with the content you extracted.
+**Note**: `{{INTRO_TITLE_HTML}}` is HTML, not plain text; it must contain the `<span class="accent">·</span>`.
 
-### 4. 写 exhibits-data JSON（最关键的一步）
+### 4. Write the exhibits-data JSON (the most critical step)
 
-把 `<script id="exhibits-data" type="application/json">` 里那 2 个示例对象**整个替换**成 N 个真展品对象。
+Replace the 2 sample objects inside `<script id="exhibits-data" type="application/json">` **entirely** with N real exhibit objects.
 
-#### 件数建议
-- 最少 1 件（单品落地页也行 — JS 已处理 N=1 时不自动轮播）
-- 最佳 3—6 件
-- 超过 8 件展品索引会拥挤，建议拆分
+#### How many exhibits
+- Minimum 1 (a single-object landing page is fine — the JS already handles N=1 by disabling autoplay)
+- Best 3–6
+- More than 8 crowds the exhibit index; consider splitting
 
-#### 标题字数建议
-- `title` 中文 2-4 字最好看（"铸铁壶"、"轴承灯"、"测距仪"）。如果产品名长，用副标，如 `"title": "测距仪"`、`tagline: "MARITIME RANGEFINDER / 海事测距仪"`
-- `en` 全大写英文，2 词为佳
+#### Title length
+- `title` of 2-4 characters looks best ("Iron Kettle", "Bearing Lamp", "Rangefinder"). If the product name is long, use the subtitle, e.g. `"title": "Rangefinder"`, `tagline: "MARITIME RANGEFINDER / the measured horizon"`
+- `en` all-caps English, 2 words ideal
 
-#### tagline 格式
-固定：`英文短语 + 空格/空格 + 中文短语`，例：
-- `FORGED ESSENTIAL / 锻造的必需品`
-- `PIVOT & LIGHT / 旋转与光`
-- `FOUR LEGS, NO MORE / 四只脚，仅此而已`
-- `MEASURED HORIZON / 被丈量的地平线`
+#### tagline format
+Fixed: `English phrase + space/space + translated phrase`, e.g.:
+- `FORGED ESSENTIAL / the forged essential`
+- `PIVOT & LIGHT / pivot and light`
+- `FOUR LEGS, NO MORE / four legs, no more`
+- `MEASURED HORIZON / the measured horizon`
 
-#### lead 写法
-30—80 字。**必须在某一两个关键词上加 `<em>...</em>`**——CSS 会给这些字下面加一根钢蓝色细线。
-反例：`这是一只很好的水壶。` ← 没有 em，没有具体细节
-正例：`一只为<em>沉默与水的低温</em>而设计的容器——壶身的厚度，是为了让热停留得久一点。`
+#### How to write the lead
+30–80 characters. **Must put `<em>...</em>` on one or two key phrases** — the CSS draws a thin steel-blue line under them.
+Bad: `This is a very good kettle.` ← no em, no concrete detail
+Good: `A vessel designed for <em>silence and the low temperature of water</em> — the thickness of the body exists so heat lingers a little longer.`
 
-#### prose 写法
-3 段，每段 80—160 字。语气：**博物馆 wall-text** — 克制、具体、有时代背景，不要 marketing 语言。
-- 段一：来源 / 语境（产地、年份、工坊、那个时代）
-- 段二：工艺 / 决定（关键设计、工艺细节、为什么要这么做）
-- 段三：呈现 / 影响（今天的现存数量、是否仍在用、对后来的影响）
+#### How to write the prose
+3 paragraphs, 80–160 characters each. Tone: **museum wall-text** — restrained, concrete, with period context; never marketing language.
+- Para 1: origin / context (place, year, workshop, that era)
+- Para 2: craft / decisions (key design choices, craft details, why it was done this way)
+- Para 3: presence / influence (how many exist today, still in use, influence on what came after)
 
-#### spec 写法
-4-6 行，每行一个键值对。
-- 第一行通常是 `["编号", "{年份} · {型号}"]`
-- 最后一行通常是产量/现存：`["产量", "限量 240 件 · 现存 31"]`（JS 会把最后一行的值显示在详情页的"现存 / EXTANT"块）
+#### How to write the spec
+4-6 rows, one key-value pair per row.
+- Row 1 is usually `["Catalog no.", "{year} · {model}"]`
+- The last row is usually production/extant: `["Production", "limited to 240 · 31 extant"]` (the JS shows the last row's value in the detail page's "EXTANT" block)
 
-#### gallery layout 必须四选一
-- `f-3` — 横图，16:10，占 1/2 宽（占 6 列中的 3 列）
-- `f-2` — 竖图，4:5，占 1/3 宽
-- `f-4` — 横图，16:9，占 2/3 宽
-- `f-6` — 全宽，21:8
+#### gallery layout — exactly one of four
+- `f-3` — landscape, 16:10, half width (3 of 6 columns)
+- `f-2` — portrait, 4:5, one-third width
+- `f-4` — landscape, 16:9, two-thirds width
+- `f-6` — full width, 21:8
 
-**节奏建议**：1 张 f-3 + 3 张 f-2 + 1 张 f-4 + 1 张 f-6 = 6 张，刚好两行半。
+**Rhythm suggestion**: 1× f-3 + 3× f-2 + 1× f-4 + 1× f-6 = 6 images, exactly two and a half rows.
 
-#### 图片 URL
-模式 A 用户给 URL → 用 URL；
-模式 B 没给 → 用 picsum：`https://picsum.photos/seed/{slug}-{编号}/{w}/{h}?grayscale`
-- cover 推荐 `1600/1000`
-- f-3 推荐 `900/600`
-- f-2 推荐 `600/750`
-- f-4 推荐 `1200/675`
-- f-6 推荐 `1600/610`
-- 加 `?grayscale` 让占位图也保持工业灰调
+#### Image URLs
+Mode A with user URLs → use the URLs;
+Mode B without → use picsum: `https://picsum.photos/seed/{slug}-{nn}/{w}/{h}?grayscale`
+- cover recommended `1600/1000`
+- f-3 recommended `900/600`
+- f-2 recommended `600/750`
+- f-4 recommended `1200/675`
+- f-6 recommended `1600/610`
+- Add `?grayscale` so placeholders keep the industrial gray tone
 
-### 5. 风格变体（可选）
-如果用户指定风格，照 `styles.md` 改 `:root` 那 8 个 CSS 变量。默认是冷调钢蓝灰，最贴合"克制之物"原版。
+### 5. Style variants (optional)
+If the user specifies a style, change the 8 `:root` CSS variables per `styles.md`. The default cold steel blue-gray is closest to the original "restrained objects" look.
 
-### 6. 报告
+### 6. Report
 
-**模式 A**：一句话报告。
-> 已生成 `~/Desktop/{slug}-archive.html` — N 件展品，默认冷调钢蓝。双击打开，点击画框或底部 CTA 进入详情页。要换图把 cover/gallery 里的 picsum URL 换成你的图片地址。
+**Mode A**: one-line report.
+> Generated `~/Desktop/{slug}-archive.html` — N exhibits, default cold steel blue. Double-click to open; click the frame or the bottom CTA to enter the detail page. To swap images, replace the picsum URLs in cover/gallery with your own.
 
-**模式 B**：直接给完整 HTML 代码块 + 一行说明。
-> 把上面这段保存成 `index.html` 双击打开。点画框看详情，键盘 ← → 切换展品。要换图把所有 picsum URL 换成你的图片地址。
+**Mode B**: full HTML code block + one line of notes.
+> Save the block above as `index.html` and double-click to open. Click the frame for details; use ← → to switch exhibits. To swap images, replace all picsum URLs with your own.
 
-## 强制保留（不能改）
+## Must keep unchanged (do not modify)
 
-- 全部 JS：translate / flip 翻转、`coverHTML()` 函数、`renderSidebar()`、`applyMeta()`、`renderDetail()`、键盘 / 自动轮播 / cursor
-- 全部 CSS（除非走风格变体改 `:root`）
-- `<script id="exhibits-data" type="application/json">` 节点必须保留
-- `<div id="proj-list" class="proj-list">` 节点必须保留（但**不要**手写 li，让 `renderSidebar()` 生成）
-- `<div id="cover-stage">` 内的 flipper 双面结构
-- `<main class="stage">` 9 宫格
+- All JS: translate/flip animation, the `coverHTML()` function, `renderSidebar()`, `applyMeta()`, `renderDetail()`, keyboard / autoplay / cursor
+- All CSS (except `:root` changes via the style-variant path)
+- The `<script id="exhibits-data" type="application/json">` node must be kept
+- The `<div id="proj-list" class="proj-list">` node must be kept (but do **not** hand-write the li items — `renderSidebar()` generates them)
+- The flipper two-sided structure inside `<div id="cover-stage">`
+- The `<main class="stage">` 9-cell grid
 
-## JSON 易错速查
+## JSON pitfalls checklist
 
-- **中文引号**：prose / lead 里如果要打"引号"，必须用全角 `"..."` (U+201C / U+201D)，**不能**用 ASCII `"`（会破 JSON）
-- **真换行**：JSON 字符串里不要写真换行（直接按回车），也不要写 `\n`。要分段就用多个 prose 数组项；要换行就用 `<br/>`
-- **`<em>` 标签**：在 lead 里**直接写 HTML 标签** `<em>...</em>`——会按 innerHTML 渲染，CSS 会给它加钢蓝下划线
-- **slug 唯一**：每件展品的 slug 必须唯一，且小写英文连字符（`iron-kettle` 不是 `IronKettle` 也不是 `iron_kettle`）
-- **gallery layout 拼写**：必须是 `f-3` `f-2` `f-4` `f-6` 之一，写错就不显示
-- **picsum seed 唯一**：每张图给一个唯一 seed，否则不同图位会变成同一张
-- **num 格式**：`N°01` 这个 N 加 ° 是必须的（°是 U+00B0），别打成 `No.01` 或 `N01`
-- **maker 必须有"/"**：`"英文工坊名 / 中文工坊名"`，JS 会按 `/` 切左半边显示在右下角
+- **Curly quotes**: if prose / lead needs quotation marks, use curly `"..."` (U+201C / U+201D), **never** ASCII `"` (it breaks the JSON)
+- **Real line breaks**: do not put literal line breaks inside JSON strings (pressing Enter), nor `\n`. For paragraphs use multiple prose array items; for line breaks use `<br/>`
+- **`<em>` tags**: write the HTML tags `<em>...</em>` **directly in the lead** — they render via innerHTML and the CSS adds the steel-blue underline
+- **Unique slugs**: every exhibit's slug must be unique, lowercase English with hyphens (`iron-kettle`, not `IronKettle` or `iron_kettle`)
+- **gallery layout spelling**: must be exactly one of `f-3` `f-2` `f-4` `f-6`, or it won't render
+- **Unique picsum seeds**: give each image a unique seed, or different slots show the same picture
+- **num format**: `N°01` — the N plus ° is required (° is U+00B0); don't type `No.01` or `N01`
+- **maker must contain "/"**: `"English workshop / localized workshop"`, the JS splits on `/` and shows the left half in the bottom-right corner
 
-## 字数 / 件数边界
+## Length / count boundaries
 
-- title ≤ 4 字，超过用 tagline 容纳更长副题
-- lead ≤ 80 字（一行半）
-- prose 每段 80—160 字（150 是甜区）
-- spec 4-6 行
-- gallery 3-6 图（少于 3 太空，多于 6 排版乱）
-- 总展品数 1—8 件（最佳 3—6）
-- ticker 不用手填件数 — JS 会自动遍历 DATA 拼
+- title ≤ 4 characters; put longer subtitles in the tagline
+- lead ≤ 80 characters (about 1.5 lines)
+- prose 80–160 characters per paragraph (150 is the sweet spot)
+- spec 4-6 rows
+- gallery 3-6 images (fewer than 3 feels empty, more than 6 breaks the layout)
+- 1–8 exhibits total (best 3–6)
+- ticker count is automatic — the JS walks DATA and builds it
 
-## 风格触发词速查
+## Style trigger words
 
-用户说→你照哪个风格：
-- 没说 / "克制" / "北欧" / "工业" → 默认冷调钢蓝（已是 template 默认）
-- "暖" / "复古" / "棕调" / "皮革" → styles.md `warm-leather`
-- "暗" / "深色" / "夜色" → styles.md `night-iron`
-- "纸张" / "印刷" / "report" → styles.md `paper-press`
-- "纯色" / "海军蓝" → styles.md `navy-blueprint`
+User says → which style you use:
+- nothing / "restrained" / "Nordic" / "industrial" → default cold steel blue (already the template default)
+- "warm" / "vintage" / "brown tones" / "leather" → styles.md `warm-leather`
+- "dark" / "deep" / "night" → styles.md `night-iron`
+- "paper" / "print" / "report" → styles.md `paper-press`
+- "solid color" / "navy blue" → styles.md `navy-blueprint`

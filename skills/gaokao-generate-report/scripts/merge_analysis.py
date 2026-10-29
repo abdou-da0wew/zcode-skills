@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""合并 major_recommendation.json 与 school_recommendation.json 为 analysis.json。"""
+"""Merge major_recommendation.json and school_recommendation.json into analysis.json."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ def load_json(path: Path) -> dict:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
-        raise RuntimeError(f"无法读取 {path}: {e}") from e
+        raise RuntimeError(f"cannot read {path}: {e}") from e
 
 
 def merge(majors_data: dict, schools_data: dict) -> dict:
@@ -31,10 +31,10 @@ def merge(majors_data: dict, schools_data: dict) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="合并专业/院校推荐为 analysis.json")
+    parser = argparse.ArgumentParser(description="Merge major/school recommendations into analysis.json")
     parser.add_argument("--majors", type=Path, required=True, help="major_recommendation.json")
     parser.add_argument("--schools", type=Path, required=True, help="school_recommendation.json")
-    parser.add_argument("-o", "--output", type=Path, required=True, help="输出 analysis.json")
+    parser.add_argument("-o", "--output", type=Path, required=True, help="output analysis.json")
     args = parser.parse_args()
 
     try:
@@ -42,14 +42,14 @@ def main() -> int:
         schools_data = load_json(args.schools)
         result = merge(majors_data, schools_data)
     except RuntimeError as e:
-        print(f"错误: {e}", file=sys.stderr)
+        print(f"Error: {e}", file=sys.stderr)
         return 1
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(
-        f"已合并: {args.output}（专业 {len(result['recommended_majors'])}，"
-        f"学校 {len(result['recommended_schools'])}）"
+        f"Merged: {args.output} ({len(result['recommended_majors'])} majors, "
+        f"{len(result['recommended_schools'])} schools)"
     )
     return 0
 

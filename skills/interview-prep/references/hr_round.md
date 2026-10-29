@@ -1,103 +1,103 @@
-# HR 面 / 终面题库
+# HR Round / Final Round Question Bank
 
-HR 面通常在所有专业面之后，关注：稳定性、性格匹配、薪资期望、入职意愿。
+The HR round usually comes after all professional rounds and focuses on: stability, personality fit, salary expectations, and willingness to join.
 
-## 高频问题 + 推荐答法
+## High-Frequency Questions + Recommended Answers
 
-### 1. 你为什么离职 / 想换工作？
+### 1. Why are you leaving / looking to change jobs?
 
-❌ 错：吐槽前公司 / 同事 / 老板
-✅ 对：聚焦"成长 / 发展 / 业务方向" 三选一
-- "我目前的业务相对成熟，希望挑战 0-1 的环境"
-- "上一份工作积累了 ___ 经验，下一步想往 ___ 方向深入，贵司这个岗位正好契合"
-- "团队结构调整，业务方向不再是我的兴趣点，所以想找新的发展"
+❌ Wrong: badmouthing your previous company / colleagues / boss
+✅ Right: focus on one of three themes — "growth / development / business direction"
+- "My current business is relatively mature, and I want the challenge of a 0-to-1 environment"
+- "My last job gave me ___ experience; for my next step I want to go deeper in ___ , and this role at your company is a great fit"
+- "The team structure was reorganized and the business direction is no longer what excites me, so I'm looking for a new opportunity"
 
-### 2. 你为什么选我们公司 / 这个岗位？
+### 2. Why did you choose our company / this role?
 
-❌ 错：贵公司平台大 / 福利好
-✅ 对：show 你做了功课
-- 公司层面：业务 / 战略方向 / 你看好的趋势 + 1~2 个你具体了解的产品 / 案例
-- 岗位层面：JD 里的 ___ 与你的 ___ 经验高度契合
+❌ Wrong: "Your company is big / the benefits are great"
+✅ Right: show that you did your homework
+- Company level: business / strategy direction / a trend you believe in + 1-2 specific products / cases you've looked into
+- Role level: the ___ in the JD matches your ___ experience closely
 
-### 3. 你期望的薪资是多少？
+### 3. What are your salary expectations?
 
-策略：**永远不要先开口给一个数**
-- 如果可以反问：先问"贵司这个岗位的薪资带是多少？"
-- 如果必须给：给一个 range（不要给点），比如"40~55k × 14"，下限略高于你能接受的最低
-- 如果对方说"无可奉告，必须你先报"：基于市场数据 + 当前涨幅 30~50% 给一个略高的数
+Strategy: **never name a number first**
+- If you can turn it around: ask first, "What is the salary band for this role at your company?"
+- If you must give one: give a range (not a point), e.g. "40-55k × 14", with the lower bound slightly above your true minimum
+- If they say "We can't share that — you first": base it on market data + a 30-50% raise over your current package, quoted slightly high
 
-更详细的薪资谈判脚本见 `salary_negotiation.md`。
+For a detailed salary negotiation script see `salary_negotiation.md`.
 
-### 4. 你拿了几个 offer？什么进展？
+### 4. How many offers do you have? What's the progress?
 
-策略：**不撒谎，但策略性地说**
-- 有真实 offer：直接说，"目前手上有 X 公司的 ___ offer，基本盘是 ___"
-- 在面其他公司：说"还在面 X 类公司，预计 X 周内有结果"，给对方紧迫感
-- 完全没有：说"目前在重点投这一类岗位，进展中"
+Strategy: **don't lie, but be strategic**
+- Real offers in hand: say so directly — "I currently have an offer from Company X for ___, with the baseline being ___"
+- Interviewing elsewhere: "I'm still interviewing with X-type companies and expect results within X weeks" — creates urgency
+- Nothing at all: "I'm focusing my applications on this type of role; things are in progress"
 
-### 5. 我们 / 这个岗位有没有什么让你担心的？
+### 5. Is there anything about us / this role that concerns you?
 
-策略：**给一个真实但可解决的担忧**
-- "对 ___ 业务的快速迭代节奏，我需要一段时间适应"
-- "团队规模比我之前的大很多，如何融入是我会主动想的事"
+Strategy: **give one genuine but solvable concern**
+- "The rapid iteration pace of the ___ business will take me some time to adjust to"
+- "The team is much larger than my previous one; how to integrate well is something I'd proactively work on"
 
-不要答"没有任何顾虑"——显得不真诚。
+Never answer "I have no concerns at all" — it sounds insincere.
 
-### 6. 你最快什么时候能入职？
+### 6. When can you start?
 
-❌ 错：随时（显得急）
-✅ 对：基于实际 + 给一点缓冲
-- 在职：依法 30 天交接 + 1 周休息 = 5~6 周
-- 待业：2 周左右
-- 应届：可按毕业时间 / 学校要求
+❌ Wrong: "Anytime" (looks desperate)
+✅ Right: based on reality + a little buffer
+- Currently employed: legally required 30-day handover + 1 week to rest = 5-6 weeks
+- Between jobs: about 2 weeks
+- New graduate: per graduation date / school requirements
 
-### 7. 你最近读了什么书 / 最近在学什么 / 业余爱好？
+### 7. What have you read recently / what are you learning / hobbies?
 
-策略：**展示自驱力 + 个性**，不要硬凹"成长性"
-- 1 本与岗位有点关系的书 / 课程
-- 1 个真实的爱好（运动 / 艺术 / 写作 / 旅行 / 编程副业）
+Strategy: **show self-drive + personality**; don't force a "growth narrative"
+- 1 book / course loosely related to the role
+- 1 genuine hobby (sports / art / writing / travel / a coding side project)
 
-### 8. 你的优点 / 缺点（HR 复问版）
+### 8. Strengths / weaknesses (the HR re-ask)
 
-HR 复问通常更深，要求"举例"：
-- 优点：1 个核心优点 + 1 个具体故事 + 这个优点带来的成果
-- 缺点：1 个真实缺点 + 自我察觉的过程 + 正在做的改进
+HR often re-asks more deeply, demanding "examples":
+- Strength: 1 core strength + 1 concrete story + the results it produced
+- Weakness: 1 real weakness + how you became aware of it + the improvement in progress
 
-⚠️ 缺点不要选"完美主义、太投入工作、太认真"——这些会被识别为"反向夸自己"。
-推荐方向：表达 / 委派 / 公开演讲 / 优先级控制（这些是真缺点但可改进）。
+⚠️ Do not pick "perfectionism, too dedicated to work, too meticulous" — these get flagged as "reverse bragging".
+Recommended directions: public speaking / delegating / expressing disagreement / prioritization (real weaknesses that can improve).
 
-### 9. 你的 5 年 / 10 年规划
+### 9. Your 5-year / 10-year plan
 
-策略：**与公司路径绑定 + 留出灵活性**
-- "未来 3~5 年我希望在 ___ 方向深耕，从 IC 成长为能带小团队的 senior"
-- "5 年后希望能独立负责一条业务线 / 子产品"
-- 不要说"自己创业""转行" / "出国" / "做自媒体"
+Strategy: **tie it to the company's path + leave flexibility**
+- "Over the next 3-5 years I want to go deep in ___ , growing from IC into a senior who can lead a small team"
+- "In 5 years I'd like to independently own a business line / sub-product"
+- Don't say "start my own business" / "switch careers" / "move abroad" / "become an influencer"
 
-### 10. 还有什么想问我们的？
+### 10. Do you have any questions for us?
 
-**强信号题**——必须问问题，不能说"没了"。
+**A strong-signal question** — you must ask something; never say "no, nothing".
 
-参考问题（按 HR / 主管 / 终面分层）：
+Reference questions (tiered by HR / hiring manager / final round):
 
-**问 HR：**
-- 这个岗位的 onboarding 一般是怎么安排的？
-- 团队的组成、和我对接的同事的背景能介绍下吗？
-- 公司近期的业务重点 / 战略方向是什么？
+**Ask HR:**
+- What does onboarding for this role usually look like?
+- Could you tell me about the team composition and the backgrounds of the people I'd work with?
+- What are the company's recent business priorities / strategic direction?
 
-**问主管 / 业务面试官：**
-- 您觉得这个岗位最大的挑战是什么？
-- 团队最近的 OKR 是什么？
-- 您觉得在这个岗位做得好的人，半年 / 一年通常会做出哪些成果？
+**Ask the hiring manager / business interviewer:**
+- What do you see as the biggest challenge in this role?
+- What is the team's current OKR?
+- What do people who excel in this role typically accomplish in six months / a year?
 
-**问终面 / 大老板：**
-- 您看好的下一个三年的业务方向是什么？
-- 这个岗位 / 这条业务线在公司战略里的位置？
-- 您在公司最自豪的一个决策是什么？（拉近距离）
+**Ask the final round / senior executive:**
+- Which business direction do you see as the next big thing over the next three years?
+- Where do this role / this business line sit in the company's strategy?
+- What decision at the company are you most proud of? (builds rapport)
 
-❌ **不要问的**：薪资细节（HR 会主动给）、加班 / 出差（显得在挑刺）、五险一金（显得不专业）
+❌ **Do not ask about**: salary details (HR will bring it up), overtime / travel (sounds like nitpicking), benefits packages (sounds unprofessional)
 
-## HR 面综合心态
+## Overall HR-Round Mindset
 
-- HR 看似友好，实际在筛"性格 / 稳定性 / 文化匹配"，每句话都是评估
-- 答题保持"克制 + 真实"，不要为了讨好把答案变得不像自己
-- HR 一般不决定 offer 给不给，但能 **veto** —— 别在最后一公里翻车
+- HR seems friendly but is actually screening for "personality / stability / culture fit" — every sentence is an assessment
+- Answer with "restraint + authenticity"; don't bend your answers to please them into something that doesn't sound like you
+- HR usually doesn't decide whether you get the offer, but they can **veto** — don't crash in the last mile

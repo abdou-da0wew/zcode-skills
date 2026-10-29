@@ -1,103 +1,103 @@
-# 金融 / 咨询 / 商科 面试专题
+# Finance / Consulting / Business Interview Special Topics
 
-## 投行 / IBD
+## Investment Banking / IBD
 
-### Technical 题
-1. 三大报表勾稽关系
-2. WACC / DCF 公式 + 关键假设
-3. LBO 模型核心要素 + 退出回报怎么算
-4. M&A 交易中 accretion / dilution 分析怎么做
-5. 用 5 种以上方法估值一家公司
-6. EV vs Equity Value 区别 + 怎么转换
-7. 同行业可比公司怎么选 + 用什么倍数
-8. PE / PB / EV/EBITDA 各自适用场景
-9. 折旧、摊销、利息、营运资本变动 对现金流的影响
-10. 一家公司 IPO 流程是怎样的（A / 港 / 美股）
+### Technical Questions
+1. How the three financial statements link together
+2. WACC / DCF formulas + key assumptions
+3. Core elements of an LBO model + how exit returns are calculated
+4. How to run accretion / dilution analysis in an M&A deal
+5. Value a company using 5+ methods
+6. EV vs. Equity Value — the difference and how to convert
+7. How to pick comparable companies + which multiples to use
+8. When to use PE / PB / EV/EBITDA respectively
+9. Impact of depreciation, amortization, interest, and working-capital changes on cash flow
+10. What does a company's IPO process look like (A-shares / HK / US listings)
 
-### Fit 题（中外资差异）
-- 你为什么想做投行
-- 你愿意接受 100 小时 / 周的工作强度吗
-- 你最近 follow 的一个 deal 是哪个，谈谈你的看法
-- 给你一个新的 sector，你怎么从 0 开始研究
-- 一个分析模型出错了，但 deck 已经发出去了，你怎么处理
+### Fit Questions (differences between domestic and foreign firms)
+- Why do you want to do investment banking
+- Can you handle a 100-hour work week?
+- Which recent deal are you following, and what's your take?
+- Given a new sector, how would you research it from scratch?
+- An error slipped into your model, but the deck has already gone out — what do you do?
 
-### 行业 deal 题（必准备 1~2 个）
-准备 1~2 个最近的 sector deal，能讲清楚：
-- 交易结构（买方 / 卖方 / 估值 / 支付方式）
-- 战略意义
-- 估值倍数 / 溢价
-- 市场反应
-- 你的看法
+### Sector Deal Questions (prepare 1-2 — mandatory)
+Prepare 1-2 recent sector deals and be able to explain:
+- Deal structure (buyer / seller / valuation / payment method)
+- Strategic rationale
+- Valuation multiples / premium
+- Market reaction
+- Your own view
 
-## 咨询（Consulting）
+## Consulting
 
-### Case Interview（已在 case.md）
-重点训练：
-- Market sizing（每家必问）
+### Case Interview (covered in case.md)
+Focus your practice on:
+- Market sizing (every firm asks)
 - Profitability
 - Market entry
 - Growth strategy
 
-### Fit 题
-- 你为什么想做咨询
-- 你为什么选 MBB（或我们这家）
-- 讲一个你 lead / 推动事情的经验
-- 讲一个你和团队意见不合的经验
-- 你的 long-term career goal
+### Fit Questions
+- Why do you want to do consulting
+- Why MBB (or why our firm)
+- Describe an experience where you led / drove something
+- Describe an experience where you disagreed with your team
+- Your long-term career goal
 
-### Personal Experience Interview（PEI）—— McKinsey 必考
-PEI 三大类：
-1. **Personal Impact**（你说服 / 影响别人）
-2. **Entrepreneurial Drive**（你主动推动事情）
-3. **Inclusive Leadership**（你带领多元团队）
+### Personal Experience Interview (PEI) — McKinsey's signature
+The three PEI categories:
+1. **Personal Impact** (persuading / influencing others)
+2. **Entrepreneurial Drive** (proactively driving things forward)
+3. **Inclusive Leadership** (leading diverse teams)
 
-每类准备 1~2 个故事，按 STAR 讲，每个故事 5~6 分钟（McKinsey 喜欢深挖）。
+Prepare 1-2 stories per category, told in STAR, each 5-6 minutes long (McKinsey likes to dig deep).
 
-## 量化（Quant）
+## Quant
 
-### 概率 / 数学题（高频）
-1. 一根均匀的木棍随机折两次，能拼成三角形的概率
-2. 蒙提霍尔问题（三门）
-3. 醉汉问题（n 步后回到原点的概率）
-4. 给你一个不公平硬币，怎么模拟公平硬币
-5. 期望 / 方差 / 协方差 计算题
-6. 布朗运动 / Ito 公式 / Black-Scholes 推导（高级）
-7. Optimal stopping（秘书问题）
+### Probability / Math Questions (high frequency)
+1. Break a uniform stick at two random points — probability the three pieces form a triangle
+2. The Monty Hall problem (three doors)
+3. The drunkard's walk (probability of returning to the origin after n steps)
+4. Given a biased coin, how do you simulate a fair coin?
+5. Expectation / variance / covariance computation problems
+6. Brownian motion / Ito's lemma / Black-Scholes derivation (advanced)
+7. Optimal stopping (the secretary problem)
 
-### 编程题
-1. LeetCode 中等 / 困难（数组 / 字符串 / DP）
-2. 写一个回测框架（伪代码即可）
-3. C++ / Python 一些常考语言细节
+### Coding Questions
+1. LeetCode medium / hard (arrays / strings / DP)
+2. Write a backtesting framework (pseudocode is fine)
+3. Common language-specific details in C++ / Python
 
-### 策略题
-1. 你了解的策略类型有哪些
-2. 你做过的一个完整策略（信号 → 组合 → 回测 → 上线）
-3. 怎么处理过拟合 / out-of-sample 失效
-4. 怎么估算策略容量
-5. Sharpe / Sortino / Calmar / Max DD 各自含义和用法
+### Strategy Questions
+1. What types of strategies do you know?
+2. Walk through one complete strategy you built (signal → portfolio → backtest → production)
+3. How do you handle overfitting / out-of-sample degradation?
+4. How do you estimate strategy capacity?
+5. Sharpe / Sortino / Calmar / Max DD — meaning and usage of each
 
-### Brain Teaser（脑筋急转弯）
-- 100 个囚犯帽子问题
-- 海盗分金币
-- 8 个球称重找不同的（必备）
-- 烧绳子计时
+### Brain Teasers
+- The 100 prisoners and hats problem
+- Pirates dividing gold coins
+- 8 balls, one weighing different (must-know)
+- Burning ropes to measure time
 
-## 公募 / 私募 研究员
+## Public / Private Fund Research Analyst
 
-### 行业研究题
-1. 你 cover 哪个行业？目前的核心矛盾是什么？
-2. 你最看好 / 最不看好的 1 只股票，逻辑是什么
-3. ___ 公司最近股价涨了 / 跌了 X%，怎么解释
-4. 给你一个新行业，你怎么从 0 开始研究
-5. 你怎么判断管理层质量
-6. 行业景气度 vs 公司基本面，哪个更重要
+### Sector Research Questions
+1. Which sector do you cover? What's the core tension right now?
+2. Your single most / least favored stock, and the thesis
+3. Company ___'s stock rose / fell X% recently — how do you explain it?
+4. Given a new sector, how would you research it from zero?
+5. How do you judge management quality?
+6. Sector momentum vs. company fundamentals — which matters more?
 
-### 估值题
-1. ___ 公司你给多少估值，用什么方法
-2. PE 30x 算贵吗？怎么判断
-3. 价值 vs 成长 vs 周期 各自怎么估
-4. DCF 在 ___ 行业能不能用？为什么
+### Valuation Questions
+1. What valuation would you put on company ___, and with what method?
+2. Is PE 30x expensive? How do you judge?
+3. How do you value value / growth / cyclical stocks respectively?
+4. Can DCF be used in the ___ sector? Why?
 
-### 投资逻辑表达
-- 30 秒电梯演讲：3 句话讲清一只股票的投资逻辑
-- 5 分钟深度：背景 + 催化剂 + 风险 + 估值 + 时间
+### Communicating an Investment Thesis
+- 30-second elevator pitch: the stock's investment thesis in 3 sentences
+- 5-minute deep dive: background + catalysts + risks + valuation + timing

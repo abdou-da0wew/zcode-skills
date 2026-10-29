@@ -1,6 +1,6 @@
 ---
 name: portfolio-detail
-description: Generate a single-file Chinese atelier-style portfolio website (horizontal-row list + hover-reveal thumb interaction, art lishu typography "Alimama DaoLiTi" via CDN, light/dark theme, hash-routed detail pages). Takes a natural-language description of the studio (name, director, discipline, works) and outputs ONE working .html file. Runs in BOTH Claude Code (writes to ~/Desktop) and GLM / online chat (outputs HTML inline). Trigger phrases include "做个中式工作室作品集", "做个隶书作品集", "lishu-portfolio-gen ...", "做个白屋风格的作品集", or when user drags this skill folder into chat asking for an atelier-style site.
+description: Generate a single-file CJK atelier-style portfolio website (horizontal-row list + hover-reveal thumb interaction, art lishu typography "Alimama DaoLiTi" via CDN, light/dark theme, hash-routed detail pages). Takes a natural-language description of the studio (name, director, discipline, works) and outputs ONE working .html file. Runs in BOTH local agent environments with a filesystem such as the DiveeOI agent (OpenCode-based) (writes to ~/Desktop) and plain online chat without a filesystem (outputs HTML inline). Trigger phrases include "make a Chinese-style atelier portfolio", "make a lishu portfolio", "lishu-portfolio-gen ...", "make a BAIWU-style portfolio", or when the user drags this skill folder into chat asking for an atelier-style site.
 visibility: public
 mode: template
 carrier: web-page
@@ -8,181 +8,181 @@ scenario: portfolio
 pattern_source: reference.html
 source_priority: skill-first
 triggers:
-  - "做个中式工作室作品集"
-  - "做个隶书作品集"
-  - "做个白屋风格的作品集"
-  - "横排作品集"
-  - "刀隶体作品集"
+  - "make a Chinese-style atelier portfolio"
+  - "make a lishu portfolio"
+  - "make a BAIWU-style portfolio"
+  - "horizontal-row portfolio"
+  - "daoli typeface portfolio"
 related_patterns: vr-canvas, digital-eguide
 legacy_gen: true
 ---
 
-# portfolio-detail — 中式工作室 / 隶书作品集（带二级详情页）
+# portfolio-detail — CJK atelier / lishu portfolio (with second-level detail pages)
 
-## 一句话特征
-横排文字行 + hover 浮现右侧大图 + 阿里妈妈刀隶体艺术大字 + 黑白纯色 + light/dark + hash 路由详情页 + 列表/画册双视图。
+## One-line signature
+Horizontal text rows + hover-revealed large image on the right + Alimama DaoLiTi display type + pure black & white + light/dark themes + hash-routed detail pages + list/album dual views.
 
-## 与其他作品集 skill 的差别
+## How it differs from the other portfolio skills
 
-| skill | 核心模式 | 适合谁 |
+| skill | Core pattern | Best for |
 |---|---|---|
-| `portfolio-gen` | 无限拖拽画布 + tile 平铺 | 摄影师 / 平面设计师挂样品 |
-| `portfolio-museum-gen` | 英雄轮播 + 大卡 + 瀑布流 + 详情页（影像策展感） | 视频/影像/装置艺术家 |
-| `industrial-archive-gen` | 黑框翻页封面 + 侧栏档案 + 北欧工业 | 实物产品 / 器物 / 硬件 |
-| **`lishu-portfolio-gen`** | **横排文字行 + hover 显示右侧缩略图 + 隶书大字 + 中式克制** | **装帧 / 字体 / 工艺 / 中式工作室** |
+| `portfolio-gen` | Infinite drag canvas + tile grid | Photographers / graphic designers showing samples |
+| `portfolio-museum-gen` | Hero carousel + big cards + masonry + detail pages (image-curation feel) | Video / moving-image / installation artists |
+| `industrial-archive-gen` | Black-frame flipping covers + archive sidebar + Nordic industrial | Physical products / objects / hardware |
+| **`lishu-portfolio-gen`** | **Horizontal text rows + hover thumbnail on the right + lishu display type + Chinese restraint** | **Bookbinding / typeface / craft / CJK ateliers** |
 
-如果用户的项目是「书 / 字体 / 展览 / 静物 / 中草药 / 茶 / 陶 / 木 / 纸 / 香」这一类需要克制典雅气质的——用这一份。
+If the user's project is of the "book / typeface / exhibition / still life / herbal plates / tea / ceramics / wood / paper / incense" kind that needs a restrained, elegant temperament — use this one.
 
-## 何时触发
+## When to trigger
 
-用户说：
-- "做个中式 / 东方 / 古典风格的作品集"
-- "做个隶书风格的网站 / 工作室主页"
-- "做个白屋风格的作品集" / "做个像 Gurgel D'Alfonso 那样的横排列表网站"
+The user says:
+- "Make a Chinese / Eastern / classical-style portfolio"
+- "Make a lishu-style website / studio homepage"
+- "Make a BAIWU-style portfolio" / "Make a horizontal-list site like Gurgel D'Alfonso's"
 - "lishu-portfolio-gen ..."
 
-并提供：
-- **工作室描述**（必需）：名字、主理人、城市、学科、几件作品的标题与故事
-- **作品图片**（可选）：URL / 上传 / 路径。没有也能跑（用 picsum 占位）
+and provides:
+- **Studio description** (required): name, director, city, discipline, titles and stories of a few works
+- **Work images** (optional): URLs / uploads / paths. It also runs without them (picsum placeholders)
 
-如果用户**完全没给作品标题** → 必须问一次至少有哪几件作品要展示。
-如果用户**只给了标题**没给详情 → 自己写：每件作品都生成 1 句 lead + 3 段 prose + 6-8 行 specs + 3-6 张 picsum 图 + 几条 credits。语气与作品类型匹配（书 → 装帧 / 字 → 字体 / 物 → 静物 / 展 → 展览视觉）。
+If the user **gives no work titles at all** → ask once which works should be shown.
+If the user **gives only titles without details** → write them yourself: for each work generate 1 lead + 3 prose paragraphs + 6-8 spec rows + 3-6 picsum images + a few credits. Match tone to the work type (book → bookbinding / type → lettering / object → still life / exhibition → exhibition graphics).
 
-## 两种运行模式
+## Two runtime modes
 
-### 模式 A · Claude Code / 本地（有文件系统）
-- 用 `Bash` 列文件夹、`sips` 探每张图宽高
-- 输出位置：`~/Desktop/{slug}-portfolio.html`（**单文件**，所有图片走 URL）
-- 如果用户给了本地图片：拷到 `~/Desktop/{slug}-portfolio-images/` 并改 src 为相对路径
+### Mode A · Local agent such as DiveeOI (has a filesystem)
+- Use `Bash` to list folders and `sips` to probe each image's width/height
+- Output location: `~/Desktop/{slug}-portfolio.html` (**single file**, all images via URLs)
+- If the user provides local images: copy them to `~/Desktop/{slug}-portfolio-images/` and change src to relative paths
 
-### 模式 B · GLM / 在线对话（无文件系统）
-- 用户拖入 zip 解压后能看到 4 份文件
-- **只输出一份完整 HTML 字符串**，包在 ` ```html ` 代码块里
-- 用户上传图片但没给 URL → 全用 `https://picsum.photos/id/{id}/{w}/{h}` 占位（用已知存在的 ID）
-- 不要尝试访问本地文件、不要建议命令行操作
+### Mode B · Online chat (no filesystem)
+- After the user drags in the zip, 4 files are visible
+- **Output exactly one complete HTML string**, wrapped in a ` ```html ` code block
+- User uploaded images but gave no URLs → use `https://picsum.photos/id/{id}/{w}/{h}` placeholders (use known-good IDs)
+- Do not try to access local files; do not suggest command-line operations
 
-判断：如果你**无法 Read 看到本地图片** → 默认走 B。
+Decision rule: if you **cannot Read local images** → default to Mode B.
 
-## 文件分工
+## File roles
 
-| 文件 | 角色 | 怎么用 |
+| File | Role | How to use it |
 |---|---|---|
-| `reference.html` | **完整成品参考** — 白屋 BAIWU 6 件作品 | 看：list 项的措辞、prose 语气、specs 词汇、JSON 字段密度 |
-| `template.html` | **空骨架** — 同样的 CSS/JS/路由系统，2 件示例 + 20 个 SWAP 标记 | 在它的基础上改，输出最终 HTML |
-| `README.md` | 用户视角的使用说明 | 模型不用看 |
-| `SKILL.md` | 给模型看的工作流（本文件） | **必读** |
+| `reference.html` | **Complete finished reference** — BAIWU (White House) with 6 works | Read for: list-item wording, prose tone, specs vocabulary, JSON field density |
+| `template.html` | **Empty skeleton** — same CSS/JS/routing system, 2 sample works + 20 SWAP markers | Build on it to produce the final HTML |
+| `README.md` | User-facing usage notes | The model doesn't need it |
+| `SKILL.md` | Workflow for the model (this file) | **Required reading** |
 
-**核心规则**：所有改动基于 `template.html`；从 `reference.html` 学**怎么写**（语气、字数、tag 用词），但不要复制具体内容。
+**Core rule**: all edits are based on `template.html`; learn **how to write** from `reference.html` (tone, length, tag wording), but do not copy its concrete content.
 
-## 工作步骤
+## Workflow
 
-### 1. 读两份 HTML
-- 先读 `reference.html` 体会"完整后长什么样"（特别是 `works-data` JSON 的字段密度和 prose 语气）
-- 再读 `template.html` 找 20 个 SWAP 位置
+### 1. Read both HTML files
+- Read `reference.html` first to absorb "what the finished piece looks like" (especially the `works-data` JSON field density and prose tone)
+- Then read `template.html` and find the 20 SWAP locations
 
-**不要改 JS / 不要改 CSS / 不要改详情页路由系统 / 不要改字体引入**。
-SWAP 都在 HTML 文本和 JSON 数据里。
+**Do not change the JS / do not change the CSS / do not change the detail-page routing system / do not change the font imports**.
+All SWAPs live in the HTML text and the JSON data.
 
-### 2. 解析用户输入抽信息
+### 2. Parse user input and extract
 
-抽取：
-- **ATELIER_NAME_ZH** — 工作室中文名（2-4 字最佳，例如「白屋」「素园」「墨记」「青庐」「拙轩」）
-- **PINYIN** — 拼音（5-6 个英文字母，全大写：BAIWU / SUYUAN / MOJI）
-- **CHAR** — Logo 用的单字（通常是工作室名首字：白 / 素 / 墨 / 青 / 拙）
-- **CITY** — 城市
-- **DIRECTOR_ZH / DIRECTOR_EN** — 主理人姓名 + 拼音
-- **DISCIPLINE** — 3 个学科词（"装帧 · 字体 · 静物"）
-- **TAGLINE** — 一句话定位（20-40 字，楷体气质）
-- **YEAR_FOUNDED** — 成立年份（可用干支：乙未冬 / 甲辰春）
+Extract:
+- **ATELIER_NAME_ZH** — studio name in CJK characters (2-4 characters ideal, e.g. Baiwu "White House", Suyuan "Plain Garden", Moji "Ink Log", Qinglu "Green Hut", Zhuoxuan "Clumsy Studio")
+- **PINYIN** — romanization (5-6 letters, all caps: BAIWU / SUYUAN / MOJI)
+- **CHAR** — single character for the logo (usually the first character of the studio name)
+- **CITY** — city
+- **DIRECTOR_ZH / DIRECTOR_EN** — director's name + romanization
+- **DISCIPLINE** — 3 discipline words ("bookbinding · lettering · still life")
+- **TAGLINE** — one-line positioning (20-40 characters, kaiti flavor)
+- **YEAR_FOUNDED** — founding year (may use the sexagenary style: "Yiwei winter" / "Jiachen spring")
 
-每件作品抽：
-- **slug** — URL ID，小写英文连字符（`kong-shan-ji` / `wu-ming-shu`）
-- **title_zh** — 中文标题（2-5 字最佳，越精炼越有调性）
-- **title_en** — 英文副题（书名号风格：`An Anthology of Empty Mountains`）
-- **year** — 年份或干支年（`甲辰 / 2024` / `2025` / `乙巳 / 2025`）
-- **tag** — 顶部分类，方括号包，如 `[ 诗集 · 装帧设计 ]` / `[ 字体设计 · 中草药图谱 ]`
-- **cover** — 详情页大图 URL
-- **list 行 location** — `城市，年份 · 工艺/规格`（hover 时浮现）
-- **meta** — 4 个键值对（详情页 4 列摘要）
-- **lead** — 30-70 字开篇大字，可用 `<em>关键词</em>` 强调一处
-- **prose** — 3-4 段散文，每段 80-150 字
-- **specs** — 6-10 行规格表（开本/纸张/装订/字体/印量/印刷/工艺/定价等）
-- **gallery** — 3-6 张图，layout 三选一：`g-wide` / `g-half` / `g-third`
-- **credits** — 4-7 对职位/名字
+Per work, extract:
+- **slug** — URL ID, lowercase English hyphenated (`kong-shan-ji` / `wu-ming-shu`)
+- **title_zh** — CJK title (2-5 characters ideal; the more distilled, the stronger the tone)
+- **title_en** — English subtitle (title-page style: `An Anthology of Empty Mountains`)
+- **year** — year or sexagenary-style year (`Jiachen / 2024` / `2025` / `Yisi / 2025`)
+- **tag** — top category, wrapped in brackets, e.g. `[ poetry collection · bookbinding ]` / `[ lettering · herbal plates ]`
+- **cover** — detail-page hero image URL
+- **list row location** — `city, year · craft/spec` (revealed on hover)
+- **meta** — 4 key-value pairs (4-column summary on the detail page)
+- **lead** — 30-70 character opening display text; may use `<em>keyword</em>` on one phrase
+- **prose** — 3-4 essay paragraphs, 80-150 characters each
+- **specs** — 6-10 spec rows (format / paper / binding / typeface / edition / printing / craft / price …)
+- **gallery** — 3-6 images, layout one of: `g-wide` / `g-half` / `g-third`
+- **credits** — 4-7 role/name pairs
 
-如果用户只给一句话/没给故事 → **自己编**：根据作品标题和类型，写出符合作品调性的 lead 和 prose。语气参考 reference.html — 不要 marketing 语言，要有「博物馆 wall-text + 工作室札记」的感觉（克制、具体、缓慢、有手工痕迹）。
+If the user gives only a line or no story → **invent it**: based on the work titles and type, write lead and prose matching the work's tone. Reference tone: reference.html — never marketing language; aim for "museum wall-text + studio notebook" (restrained, concrete, slow, with traces of handwork).
 
-### 3. 列作品 + 探尺寸（仅模式 A）
+### 3. List works + probe sizes (Mode A only)
 
 ```bash
 ls -la "{works_path}"
 sips -g pixelWidth -g pixelHeight "{works_path}/{file}" 2>/dev/null
 ```
 
-得到每张图的 (filename, w, h, aspect)。优先选竖图作 list 缩略图（4:3 容器，竖图更上相）。
+This yields (filename, w, h, aspect) per image. Prefer portrait images for list thumbnails (the container is 4:3; portraits sit better).
 
-### 4. 替换 20 个 SWAP
+### 4. Fill the 20 SWAPs
 
-| SWAP | 位置 | 内容 |
+| SWAP | Location | Content |
 |---|---|---|
-| 1 | `<title>` | `{ATELIER_NAME} {PINYIN} — {DIRECTOR}作品集 / Studio` |
-| 2 | meta description | 一句网站简介 |
-| 3 | curtain 单字 | 工作室名首字（如「白」） |
-| 4 | logo SVG 内单字 | 同 SWAP-3 |
-| 5 | logo SVG 内拼音 | `{PINYIN}` 大写 |
-| 6 | 主导航 li | 通常 3 项：作品 / 关于 / 联系 |
-| 7 | brand-block 中文名 | `{ATELIER_NAME}` 拆字加空格（如 `白&nbsp;&nbsp;屋`） |
-| 8 | brand-block 英文 | `{PINYIN} Studio · {CITY}` |
-| 9 | tagline | 楷体一句话定位，20-40 字，可用 `<br>` 换行 |
-| 10 | **list 项 N 件** | 每件 `<a class="item" href="#work/{slug}">` 包含 num/project-name/en-name/location/photo-thumb |
-| 11 | **gallery 项 N 件** | 同样的 N 件作品，更紧凑的网格 — slug 必须和 list 一致 |
-| 12 | 关于标题 | `关&nbsp;于&nbsp;{name}<span class="en">About</span>` |
-| 13 | 关于段落 | 1-3 段楷体（成立背景 / 主理人 / 设计观），每段 60-120 字 |
-| 14 | 关于事实表 | 4-6 项 li (Founded/Location/Discipline/Director/Hours) |
-| 15 | 联系标题 | `来&nbsp;信<span class="en">Get in Touch</span>` |
-| 16 | 联系段落 | 1-2 段邀请来信 + 回信周期承诺 |
-| 17 | 联系事实表 | 4-6 项 (E-mail/Phone/Address/Instagram/公众号) |
-| 18 | rotating credit | `Site by {WHO}`（通常是工作室名） |
-| 19 | footer 三块 | © / ICP / 社交链接 |
-| 20 | **works-data JSON** | **N 件作品的完整详情数据（关键！）** |
+| 1 | `<title>` | `{ATELIER_NAME} {PINYIN} — {DIRECTOR} Portfolio / Studio` |
+| 2 | meta description | one-line site summary |
+| 3 | curtain single character | first character of the studio name |
+| 4 | single character inside logo SVG | same as SWAP-3 |
+| 5 | romanization inside logo SVG | `{PINYIN}` uppercase |
+| 6 | main nav li | usually 3 items: Works / About / Contact |
+| 7 | brand-block CJK name | `{ATELIER_NAME}` spaced per character (e.g. `BAI&nbsp;&nbsp;WU` for two glyphs) |
+| 8 | brand-block English | `{PINYIN} Studio · {CITY}` |
+| 9 | tagline | one-line kaiti positioning, 20-40 characters; may use `<br>` for lines |
+| 10 | **N list items** | each `<a class="item" href="#work/{slug}">` with num/project-name/en-name/location/photo-thumb |
+| 11 | **N gallery items** | the same N works in a tighter grid — slugs must match the list |
+| 12 | about title | `{name}&nbsp;small-caps<span class="en">About</span>` |
+| 13 | about paragraphs | 1-3 kaiti paragraphs (founding background / director / design philosophy), 60-120 characters each |
+| 14 | about facts table | 4-6 li items (Founded/Location/Discipline/Director/Hours) |
+| 15 | contact title | local-language contact heading `<span class="en">Get in Touch</span>` |
+| 16 | contact paragraphs | 1-2 paragraphs inviting letters + promised reply window |
+| 17 | contact facts table | 4-6 items (E-mail/Phone/Address/Instagram/WeChat) |
+| 18 | rotating credit | `Site by {WHO}` (usually the studio name) |
+| 19 | footer three blocks | © / ICP / social links |
+| 20 | **works-data JSON** | **complete detail data for N works (critical!)** |
 
-### 5. 写 works-data JSON（最关键的一步）
+### 5. Write the works-data JSON (the most critical step)
 
-每件作品都要在 JSON 数组里有一条，**slug 必须和 list/gallery 卡片 href 里的 `#work/SLUG` 完全一致**。
+Every work needs one entry in the JSON array; **the slug must exactly match the `#work/SLUG` in the list/gallery card hrefs**.
 
-JSON 字段：
+JSON fields:
 ```json
 {
   "slug": "kong-shan-ji",
-  "title_zh": "空山集",
+  "title_zh": "Kong Shan Ji",
   "title_en": "An Anthology of Empty Mountains",
-  "year": "甲辰 / 2024",
-  "tag": "[ 诗集 · 装帧设计 ]",
+  "year": "Jiachen / 2024",
+  "tag": "[ poetry collection · bookbinding ]",
   "cover": "https://picsum.photos/id/143/1800/1100",
   "meta": [
-    {"label": "Type / 类型", "value": "诗集装帧"},
-    {"label": "Year / 年份", "value": "2024"},
-    {"label": "Edition / 印量", "value": "首印 320 本"},
-    {"label": "Format / 开本", "value": "130 × 195 毫米"}
+    {"label": "Type", "value": "poetry binding"},
+    {"label": "Year", "value": "2024"},
+    {"label": "Edition", "value": "first printing 320 copies"},
+    {"label": "Format", "value": "130 × 195 mm"}
   ],
-  "lead": "三十六首关于山的诗。我们想做一本——读者翻开后，先听见<em>风声</em>，再读见字的书。",
+  "lead": "Thirty-six poems about mountains. We wanted a book where — once opened — you first hear the <em>wind</em>, then read the words.",
   "prose": [
-    "段落一：诗稿来源 / 设计语境。80—150 字。",
-    "段落二：制作中的关键决定 — 字体、纸张、装订选择。",
-    "段落三：最后呈现 / 留给读者的感受。"
+    "Para 1: manuscript origin / design context. 80-150 characters.",
+    "Para 2: key decisions during production — typeface, paper, binding choices.",
+    "Para 3: final presentation / what it leaves with the reader."
   ],
   "specs": [
-    ["开本 / Format", "130 × 195 毫米"],
-    ["页数 / Pages", "144 页"],
-    ["纸张 / Paper", "本色棉纸 90gsm"],
-    ["装订 / Binding", "线装四目"],
-    ["字体 / Typeface", "老宋（标题）· 楷体（正文）"],
-    ["印刷 / Printing", "单色凸印"],
-    ["印量 / Edition", "首印 320 本"],
-    ["定价 / Price", "¥ 388"]
+    ["Format", "130 × 195 mm"],
+    ["Pages", "144 pages"],
+    ["Paper", "unbleached cotton paper 90gsm"],
+    ["Binding", "four-hole thread stitching"],
+    ["Typeface", "old songti (titles) · kaiti (body)"],
+    ["Printing", "monochrome letterpress"],
+    ["Edition", "first printing 320 copies"],
+    ["Price", "¥ 388"]
   ],
   "gallery": [
-    {"src": "...", "layout": "g-wide", "caption": "封面"},
+    {"src": "...", "layout": "g-wide", "caption": "cover"},
     {"src": "...", "layout": "g-half"},
     {"src": "...", "layout": "g-half"},
     {"src": "...", "layout": "g-third"},
@@ -190,59 +190,57 @@ JSON 字段：
     {"src": "...", "layout": "g-third"}
   ],
   "credits": [
-    ["设计 / Design", "周墨白"],
-    ["手工装订 / Binding", "陈漱石（杭州·订书坊）"]
+    ["Design", "Zhou Mobai"],
+    ["Hand binding", "Chen Shushi (Hangzhou · bookbindery)"]
   ]
 }
 ```
 
-**JSON 易错 ⚠️**：
-- 中文 prose 里要用引号 → 必须用全角的 `「...」` 或 `"..."`（U+201C / U+201D），**不能**用 ASCII `"`（会破 JSON）
-- 不要在 JSON 字符串里写真换行；要换段落就在 prose 数组里多写一项
-- `<em>词</em>` 在 lead 里**直接写 HTML 标签**——渲染时按 innerHTML 出
-- gallery `layout` 必须三选一：`g-wide`（占满）/ `g-half`（占一半）/ `g-third`（占 1/3）
+**JSON pitfalls ⚠️**:
+- If CJK prose needs quotes → use curly `"..."` (U+201C / U+201D) or full-width corner brackets, **never** ASCII `"` (it breaks the JSON)
+- Do not put literal line breaks inside JSON strings; for new paragraphs add another prose array item
+- `<em>word</em>` is written **directly as HTML tags in the lead** — it renders via innerHTML
+- gallery `layout` must be one of: `g-wide` (full) / `g-half` (half) / `g-third` (one-third)
 
-### 6. 图片源选择
-- **picsum 占位**：用 `id/X` 形式而非 `seed/X`（更稳定）。已知好用的 ID：0, 20, 40, 51, 64, 76, 88, 91, 96, 119, 121, 130, 143, 145, 158, 164, 165, 175, 177, 180, 187, 195, 200
-- 同一作品的 cover / gallery 用相邻的几个 ID，能制造一致的色调
-- 不要用 `?grayscale` 参数（用户希望图片是彩色的）
+### 6. Choosing image sources
+- **picsum placeholders**: use the `id/X` form rather than `seed/X` (more stable). Known-good IDs: 0, 20, 40, 51, 64, 76, 88, 91, 96, 119, 121, 130, 143, 145, 158, 164, 165, 175, 177, 180, 187, 195, 200
+- For the same work, use adjacent IDs for cover / gallery to create a consistent palette
+- Do not use the `?grayscale` parameter (images should stay in color)
 
-### 7. 中文工作室命名灵感（如果用户没给）
-若用户让你"自己起一个" → 选 2 字 + 古朴：
-- 物名类：白屋 / 素园 / 墨记 / 青庐 / 拙轩 / 听雨 / 一勺 / 半亩
-- 字行类：素白 / 子衿 / 砚池 / 半山 / 寻常 / 浮云
-- 避免 "工作室 / 设计 / Studio" 这种功能词，让名字本身就是诗
+### 7. Atelier naming inspiration (if the user provides none)
+If the user says "make one up" → pick 2 CJK characters, archaic flavor. Ideas: Baiwu (White House), Suyuan (Plain Garden), Moji (Ink Log), Qinglu (Green Hut), Zhuoxuan (Clumsy Studio), Tingyu (Listening Rain), Yishao (One Spoon), Banmu (Half Acre); or Suzbai (Plain White), Zijin, Yanchi (Inkstone Pool), Banshan (Mid-Slope), Xunchang (Ordinary), Fuyun (Drifting Cloud).
+- Avoid functional words like "studio / design / Studio"; the name itself should be a poem
 
-### 8. 视频支持
-如果作品 cover 是 .mp4 / .webm / .mov，详情页会自动用 `<video autoplay muted loop>` 替代 `<img>`。模型只要在 cover URL 里给视频路径就行。
+### 8. Video support
+If a work's cover is .mp4 / .webm / .mov, the detail page automatically uses `<video autoplay muted loop>` instead of `<img>`. Just put the video path in the cover URL.
 
-### 9. 报告
+### 9. Report
 
-**模式 A**：一句话报告。
-> 已生成 ~/Desktop/baiwu-portfolio.html — 6 件作品，hover 行查看缩略图，点击进入详情页。Light/Dark 在左下，列表/画册在顶部居中。
+**Mode A**: one-line report.
+> Generated ~/Desktop/baiwu-portfolio.html — 6 works, hover a row to see the thumbnail, click to enter the detail page. Light/Dark bottom-left; list/album toggle top-center.
 
-**模式 B**：直接给完整 HTML 代码块 + 一行说明。
-> 把上面这段保存成 `index.html` 双击打开。鼠标移到任意作品名上看右侧浮现的缩略图，点击跳详情页。要换图把 picsum URL 换成你的图片地址。
+**Mode B**: full HTML code block + one line of notes.
+> Save the block above as `index.html` and double-click to open. Hover any work name to see the thumbnail appear on the right; click to jump to the detail page. To swap images, replace the picsum URLs with your own.
 
-## 强制保留（不能改）
+## Must keep unchanged (do not modify)
 
-- **字体引入**：`@font-face` 加载阿里妈妈刀隶体的 woff2 url（不要换字体源）
-- **CSS 变量系统**：light/dark 双主题
-- **全部 JS**：theme toggle、view mode toggle、hover-row 交互、rotating credit、详情页 hash 路由 `applyRoute()`、`renderDetail()`
-- **`<script id="works-data">`** 节点必须保留
-- **`<main id="detail-root">`** 必须保留（详情页挂载点）
-- **`body[data-view="home/detail"]` 和 `body[data-mode="list/gallery"]`** 状态系统
-- **#logo / #main-menu / .theme-toggle / #project-view / #svp-credit** 五个固定定位元素
+- **Font imports**: `@font-face` loading the Alimama DaoLiTi woff2 URL (do not change the font source)
+- **CSS variable system**: light/dark dual themes
+- **All JS**: theme toggle, view-mode toggle, hover-row interaction, rotating credit, detail-page hash routing `applyRoute()`, `renderDetail()`
+- **`<script id="works-data">`** node must be kept
+- **`<main id="detail-root">`** must be kept (detail-page mount point)
+- **`body[data-view="home/detail"]` and `body[data-mode="list/gallery"]`** state system
+- The five fixed-position elements **#logo / #main-menu / .theme-toggle / #project-view / #svp-credit**
 
-## 易错速查
+## Pitfalls checklist
 
-- **slug 不匹配**：list 项 `#work/kong-shan-ji` ↔ gallery 项 `#work/kong-shan-ji` ↔ JSON `"slug": "kong-shan-ji"` —— 三处必须完全一致
-- **JSON 引号**：中文内容里的引号一定用全角「」或 `"..."`，不是 ASCII `"`
-- **gallery 太多**：每件作品最多 6 张图，超了排版会乱
-- **prose 过长**：每段 80-150 字，超过 200 字阅读体验下降
-- **list / gallery 不同步**：必须包含同样的作品集（一一对应）
-- **picsum seed**：用 `id/X` 不要用 `seed/X`，避免随机 ID 命中已删除的图
-- **作品 < 3 件**：可以，最少 2 件就能跑
-- **作品 > 8 件**：建议分两批，太多 list 行会让页面变长
-- **首字下沉**：详情页的 `.detail__prose p:first-of-type::first-letter` 用刀隶体 — 第一段必须是中文开头（不要以 `<em>` 或英文开头）
-- **删了 picsum 的彩色**：图片应保持彩色，不要在 CSS 加 `filter: grayscale()`
+- **Slug mismatch**: list item `#work/kong-shan-ji` ↔ gallery item `#work/kong-shan-ji` ↔ JSON `"slug": "kong-shan-ji"` — all three must be identical
+- **JSON quotes**: quotes inside CJK content must be full-width corner brackets or curly `"..."`, not ASCII `"`
+- **Too many gallery images**: max 6 per work; more breaks the layout
+- **Overlong prose**: 80-150 characters per paragraph; past 200 the reading experience drops
+- **list / gallery out of sync**: must contain the same works (one-to-one)
+- **picsum seeds**: use `id/X` not `seed/X`, avoiding random IDs that hit deleted images
+- **Fewer than 3 works**: fine; 2 is the minimum to run
+- **More than 8 works**: consider two batches; too many list rows lengthen the page
+- **Drop cap**: the detail page's `.detail__prose p:first-of-type::first-letter` uses the DaoLi face — the first paragraph must start with a CJK glyph (not with `<em>` or an English letter)
+- **Don't kill the color**: images should stay in color; don't add `filter: grayscale()` in CSS

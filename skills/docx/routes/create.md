@@ -66,7 +66,7 @@ Covers use **7 validated layout recipes (R1–R7)**, auto-selected by `selectCov
 
 ⚠️ **Academic thesis cover:** Use `buildAcademicCover()` from `scenes/academic.md`.
 
-⚠️ **Thesis proposal report (开题报告):** Use `buildProposalCover()` from `scenes/academic.md`. Cover MUST be an independent section. Keywords: "开题报告" (Chinese), "thesis proposal", "research proposal" — NOT the same as business proposals (which use R4).
+⚠️ **Thesis proposal report:** Use `buildProposalCover()` from `scenes/academic.md`. Cover MUST be an independent section. Keywords: "thesis proposal", "research proposal", or the two-word Chinese term (match via Unicode escape `\u5f00\u9898\u62a5\u544a`) — NOT the same as business proposals (which use R4).
 
 ### Table of Contents?
 - **YES**: 3+ major sections (H1 headings)
@@ -114,9 +114,9 @@ When: data visualization, reports with charts → load `references/chart-templat
 
 Include ALL elements a scene specifies:
 - **Academic thesis:** Cover (`buildAcademicCover()` in its own section), abstract, TOC, references
-- **Thesis proposal report (thesis proposal / 开题报告):** Cover (`buildProposalCover()` in its own section), body sections per proposal template. Cover MUST be a separate section.
+- **Thesis proposal report:** Cover (`buildProposalCover()` in its own section), body sections per proposal template. Cover MUST be a separate section.
 - **Report:** Cover, executive summary, conclusions
-- **Contract:** Party info, recitals, complete clause closure, signature block, uniform `【】` placeholders
+- **Contract:** Party info, recitals, complete clause closure, signature block, uniform `[ ]` placeholders
 - **Official:** Correct document type, specific title, closing phrase matching type, proper numbering hierarchy, red header only when requested
 - **Exam:** Student info area, scoring criteria
 
@@ -137,7 +137,7 @@ Generate complete, substantive content — not skeletons.
 
 **All body chapter headings MUST use `heading: HeadingLevel.HEADING_X`** — never simulate with bold + large font (TOC cannot detect simulated headings).
 
-**Exception:** Cover title and TOC title ("目录") heading MUST NOT use Heading style.
+**Exception:** Cover title and TOC title ("Table of Contents") heading MUST NOT use Heading style.
 
 ### Blank Page Prevention
 

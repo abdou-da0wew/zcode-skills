@@ -8,12 +8,12 @@ scenario: internal-tool
 pattern_source: activity-stream.html
 source_priority: skill-first
 triggers:
-  - "做个团队 OKR 看板"
-  - "sprint 状态页"
-  - "团队周会 dashboard"
-  - "活动流看板"
-  - "team this week 页"
-  - "里程碑追踪页"
+  - "make a team OKR board"
+  - "sprint status page"
+  - "team weekly meeting dashboard"
+  - "activity feed board"
+  - "team this week page"
+  - "milestone tracker page"
 ---
 
 # Team OKRs Template
@@ -72,7 +72,7 @@ If your draft reduces to "for each item, render a row" and no zone above the lis
 
 Prefer:
 
-- Inter with OpenType features enabled (ss01, cv11) + PingFang SC for CJK
+- Inter with OpenType features enabled (ss01, cv11) + PingFang SC for CJK fallback
 - soft pastel status backgrounds with high-contrast colored dots, never tinting whole cards
 - overlapping owner-avatar stacks for shared work
 - chronological grouping in the activity feed (by day), with sub-grouped events under the day header

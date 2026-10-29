@@ -1,127 +1,127 @@
 ---
 name: jd-resume-tailor
-description: 给定一份 JD 和一份现有简历，做"JD 拆解 + 简历定向改写"。拆 JD 抽出硬技能、软技能、加分项；对照简历做 gap 分析；产出针对该岗位重写后的简历，突出相关经验、补齐关键词缺口、并保留候选人真实经历不编造。当用户说"针对这个岗位 / 这家公司改简历""帮我对一下这个 JD""我想投这个职位你看怎么改""把这份简历针对 X 公司优化""做一份定向版简历"，或同时给出 JD 文本 + 简历文件时，必须触发本 skill。**请勿用本 skill 做"从零写简历"**——那是 resume-builder 的事。
+description: Given a JD and an existing resume, performs "JD parsing + targeted resume rewriting". Parses the JD to extract hard skills, soft skills, and nice-to-haves; runs a gap analysis against the resume; produces a resume rewritten for that specific role — highlighting relevant experience, closing keyword gaps, and preserving the candidate's real history without fabricating anything. Trigger this skill when the user says "tailor my resume for this role / this company", "match my resume against this JD", "I want to apply to this job, how should I change my resume", "optimize this resume for company X", "make me a targeted version of this resume", or provides both JD text and a resume file. **Do NOT use this skill to write a resume from scratch** — that's resume-builder's job.
 ---
 
-# JD ⇄ Resume Tailor（JD 拆解 + 简历定向改写）
+# JD ⇄ Resume Tailor (JD parsing + targeted resume rewriting)
 
-这个 skill 的边界很窄：**只解决"已有 JD + 已有简历，要改一份命中率最高的版本"**。
+This skill's scope is narrow: **it only solves "you already have a JD + an existing resume, and you want the highest-hit-rate version"**.
 
-不做的事：
-- 写新简历（去 `resume-builder`）
-- 找方向 / 推荐岗位（去 `job-intent-tracker`）
-- 出面试题（去 `interview-prep`）
-
----
-
-## 何时触发
-
-强信号：
-- 用户给了 JD 链接 / JD 文本 + 一份简历 → **必触发**
-- "针对这个岗位帮我改简历"
-- "对照一下这个 JD"
-- "我想投 X 公司的 Y 岗，帮我看简历"
-- "做一份定向版"
-
-弱信号（先确认）：
-- 只给了 JD 没有简历 → 问"你的简历方便发我看一下吗？没有的话，我可以先帮你从零做一份（resume-builder）"
-- 只给了简历说"改简历" → 问"是针对哪个 JD 改？没有 JD 就用 resume-builder 通用优化"
+What it does not do:
+- Write a new resume (go to `resume-builder`)
+- Explore directions / recommend jobs (go to `job-intent-tracker`)
+- Generate interview questions (go to `interview-prep`)
 
 ---
 
-## 工作流
+## When to Trigger
 
-### Step 1: 解析 JD
+Strong signals:
+- User provides a JD link / JD text + a resume → **always triggers**
+- "Tailor my resume for this role"
+- "Compare my resume against this JD"
+- "I want to apply for role Y at company X, check my resume"
+- "Make a targeted version"
 
-输入可能是：
-- 纯文本（用户粘贴）
-- 链接（**不要**自动 fetch，提醒用户复制 JD 文本进来；若用户授权 fetch，使用 web_fetch）
-- 截图（用 OCR / 视觉识别，让用户确认抽取结果）
-- doc/pdf 文件
+Weak signals (confirm first):
+- JD provided but no resume → ask "Could you share your resume? If you don't have one yet, I can help you build one from scratch (resume-builder)"
+- Resume provided with just "improve my resume" → ask "Which JD is this for? Without a JD, use resume-builder for general optimization"
 
-调用脚本：
+---
+
+## Workflow
+
+### Step 1: Parse the JD
+
+Input may be:
+- Plain text (user pastes it)
+- A link (**do not** auto-fetch; ask the user to paste the JD text; if the user authorizes fetching, use web_fetch)
+- A screenshot (use OCR / vision recognition; have the user confirm the extraction)
+- A doc/pdf file
+
+Call the script:
 
 ```bash
 python scripts/parse_jd.py --jd-file <jd.txt> --out jd_parsed.json
 ```
 
-脚本会从 JD 抽出：
-- **硬技能 must-have**（"必须" / "要求" / "至少 X 年" 等强信号词后面的技能）
-- **硬技能 nice-to-have**（"加分" / "优先" / "熟悉者优先" 等弱信号）
-- **软技能信号**（沟通 / 推动 / 跨部门 / 抗压 等）
-- **职责动词 + 对象**（"负责 X" / "搭建 Y" / "推动 Z"）
-- **特殊要求**（出差 / 学历 / 证书 / 语言 / 城市）
+The script extracts from the JD:
+- **Hard skills, must-have** (skills following strong signal words like "must", "required", "at least X years")
+- **Hard skills, nice-to-have** (weak signals like "plus", "preferred", "familiarity with ___ is a plus")
+- **Soft-skill signals** (communication / driving initiatives / cross-team / working under pressure, etc.)
+- **Responsibility verbs + objects** ("own X" / "build Y" / "drive Z")
+- **Special requirements** (travel / education / certifications / languages / location)
 
-把结果展示给用户，让用户**确认 / 修正抽取是否准确**（关键 must-have 不能漏）。
+Show the results to the user and have them **confirm / correct the extraction** (no key must-haves may be missed).
 
-### Step 2: 解析简历
+### Step 2: Parse the Resume
 
-输入：用户上传的简历文件（.pdf / .docx / .md / .txt）。
+Input: the user's uploaded resume file (.pdf / .docx / .md / .txt).
 
-调用对应 skill 解析：
+Call the appropriate skill to parse:
 - pdf → pdf skill
 - docx → docx skill
 
-抽出：基本信息、教育、每段工作 / 项目经历的（公司、岗位、时间、职责 bullet）、技能列表。
+Extract: basic info, education, and for each work / project experience (company, role, dates, responsibility bullets), plus the skills list.
 
-### Step 3: Gap 分析
+### Step 3: Gap Analysis
 
-调用：
+Call:
 
 ```bash
 python scripts/jd_gap.py --jd jd_parsed.json --resume resume.txt --out gap.md
 ```
 
-脚本输出三类清单：
+The script outputs three lists:
 
-1. **完美命中**（JD must-have 在简历里有明确证据）
-2. **隐性命中**（JD 要求 X，简历里有 X 的近义经验，但用词不一样 → 改写时可以"提一下"）
-3. **真缺口**（JD 要求但简历完全没有）
+1. **Perfect hits** (JD must-haves with clear evidence in the resume)
+2. **Implicit hits** (the JD asks for X; the resume shows related experience with different wording → can be "mentioned" when rewriting)
+3. **True gaps** (required by the JD but entirely absent from the resume)
 
-对"真缺口"分两类：
-- **可补救**：简历里其实做过类似的事，只是没写出来 → 追问用户"你做过 X 吗？"
-- **不可补救**：用户确实没做过 → **不能编**，建议用户在 cover letter 或 summary 里诚实说明并强调 transferable skill
+Split "true gaps" into two kinds:
+- **Recoverable**: the user actually did something similar but never wrote it down → ask "Have you done X?"
+- **Unrecoverable**: the user genuinely hasn't done it → **never fabricate**; suggest the user honestly address it in the cover letter or summary and emphasize transferable skills
 
-### Step 4: 定向改写
+### Step 4: Targeted Rewriting
 
-按以下原则重写简历：
+Rewrite the resume following these principles:
 
-**a. 重排经历顺序**：与 JD 最相关的工作 / 项目放最前（不改时间真实性，但可以把项目经历拆成两块"相关项目 / 其他项目"）
+**a. Reorder experiences**: put the most JD-relevant work / projects first (don't change real dates, but you may split projects into "relevant projects / other projects")
 
-**b. 重写每条 bullet**：
-- 把 JD 里的"职责动词"自然嵌入 bullet（如 JD 说"主导 ___ 系统设计"，简历里就把"参与"改成"主导"——前提是用户确实主导了）
-- 数字保留并放大（"用户 100 万"是好事，别藏起来）
-- 补 JD 关键词（如 JD 说"A/B 测试"，但简历里写的是"灰度对比"，改成"A/B 测试（灰度对比）"）
+**b. Rewrite every bullet**:
+- Weave the JD's "responsibility verbs" naturally into bullets (e.g. if the JD says "lead ___ system design" and the resume says "participated", change it to "led" — only if the user actually led it)
+- Keep numbers and make them prominent ("1M users" is a good thing; don't hide it)
+- Add JD keywords (if the JD says "A/B testing" but the resume says "gray-release comparison", change it to "A/B testing (gray-release comparison)")
 
-**c. 重写 Summary**：用 2~3 行总结你为什么是这个岗位的合适人选，**直接对应 JD 的 must-have**
+**c. Rewrite the Summary**: 2-3 lines on why you're the right person for this role, **directly mapping to the JD's must-haves**
 
-**d. 调整技能列表**：把 JD 提到的技能移到最前面（前提是真的会）
+**d. Reorder the skills list**: move skills mentioned in the JD to the front (only if actually known)
 
-**e. 不改的事实**：
-- 公司名、岗位名、起止时间、学历 —— 一字不改
-- 项目规模、用户量、收入数据 —— 不能编，只能让用户确认后填准
+**e. Facts that must not change**:
+- Company names, role titles, start/end dates, education — unchanged, to the letter
+- Project scale, user counts, revenue figures — cannot be invented; only fill in exact values after the user confirms
 
-### Step 5: 自检 + 报告
+### Step 5: Self-Check + Report
 
-输出三个文件：
-1. `resume_tailored_<公司>_<岗位>.md`（改写后的简历）
-2. `gap_analysis.md`（gap 分析报告）
-3. 聊天里给一个 ATS 命中率对比："改前 X% → 改后 Y%"
+Output three files:
+1. `resume_tailored_<company>_<role>.md` (the rewritten resume)
+2. `gap_analysis.md` (the gap analysis report)
+3. An ATS hit-rate comparison in chat: "before: X% → after: Y%"
 
-附：诚实提醒用户**哪些 bullet 是基于现有信息推测改写的**，让用户复核后再投。
+Also: honestly flag **which bullets were rewritten by inference from existing information**, so the user can review before applying.
 
 ---
 
-## 反模式（不要做）
+## Anti-patterns (do not do)
 
-- ❌ 编造经历（"加上一段你没做过的项目"——绝对禁止，哪怕用户要求）
-- ❌ 把 JD 的整段话直接粘进简历（很容易被 HR 一眼识破，且 ATS 反作弊会标记）
-- ❌ 关键词堆砌（在末尾塞一长串技能词凑命中率，HR 一眼能看出）
-- ❌ 把"参与"改成"主导"但没有问用户实际角色 → 必须先核实
-- ❌ 不给用户看 gap，自己默默改 → 用户会失去对简历的"理解"
+- ❌ Fabricating experiences ("add a project you never did" — absolutely forbidden, even if the user asks)
+- ❌ Pasting whole JD paragraphs into the resume (HR spots it instantly, and ATS anti-cheat heuristics will flag it)
+- ❌ Keyword stuffing (a long list of skill words tacked on at the end to game the hit rate — HR sees through it)
+- ❌ Changing "participated" to "led" without asking the user about their actual role → must verify first
+- ❌ Not showing the user the gap analysis and silently rewriting → the user loses "ownership" of their resume
 
-## 与其他 skill 的协作
+## Collaboration with Other Skills
 
-- 改完后用户说"帮我准备这家公司的面试" → 转 `interview-prep`，把 JD + 改写简历传过去
-- 用户说"我想知道还能投哪些类似的岗" → 转 `job-intent-tracker`
-- 用户说"我现在简历不太行，能不能整体重做" → 转 `resume-builder`
+- After rewriting, the user says "help me prepare for this company's interview" → hand off to `interview-prep`, passing the JD + tailored resume
+- User says "I want to know what other similar roles I could apply to" → hand off to `job-intent-tracker`
+- User says "my resume is weak overall, can we redo it from scratch" → hand off to `resume-builder`

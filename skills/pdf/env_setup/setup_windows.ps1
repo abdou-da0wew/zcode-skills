@@ -236,9 +236,11 @@ if (Test-Path $SofficePath) {
 }
 Write-Host ""
 
-# ── Step 2h: Font Installation (from CDN) ──
+# ── Step 2h: Font Installation (from font mirror) ──
 Write-Host "--- [8/9] Font Installation ---"
-$FontCdnBase = "https://z-cdn.chatglm.cn/office-skill/fonts"
+# Point PDF_FONT_MIRROR_URL at any static HTTP server mirroring the /usr/share/fonts tree
+# (self-host the open-source fonts from their official upstream projects — see env_setup/setup.md).
+$FontCdnBase = $env:PDF_FONT_MIRROR_URL
 $FontList = Join-Path $ScriptDir "font_list.txt"
 
 $UserFontDir = Join-Path $env:LOCALAPPDATA "Microsoft\Windows\Fonts"
@@ -252,10 +254,14 @@ if (Test-Path $Marker) {
         Write-Fail "Font list not found: $FontList"
         $Errors++
     } else {
+        if (-not $FontCdnBase) {
+            Write-Warn "PDF_FONT_MIRROR_URL is not set; skipping font downloads."
+            Write-Warn "Set it to a mirror of the font tree (see env_setup/setup.md), or install fonts manually."
+        }
         $lines = Get-Content $FontList | Where-Object { $_.Trim() -ne "" }
         $Total = $lines.Count
         $Installed = 0; $Skipped = 0; $Failed = 0
-        Write-Info "Downloading $Total fonts from CDN..."
+        Write-Info "Downloading $Total fonts from font mirror..."
         
         foreach ($relPath in $lines) {
             $fname = Split-Path $relPath -Leaf

@@ -42,9 +42,9 @@ def _format_papers_as_markdown(papers: list[dict[str, Any]], profile_topics: lis
     """Render recommended papers as Markdown for the host to display."""
     lines: list[str] = []
     topic_hint = " / ".join(profile_topics[:5]) if profile_topics else ""
-    header = f"为你推荐 {len(papers)} 篇相关论文"
+    header = f"Recommended {len(papers)} papers for you"
     if topic_hint:
-        header += f"（研究方向：{topic_hint}）"
+        header += f" (research topics: {topic_hint})"
     lines.append(header)
 
     for idx, paper in enumerate(papers, start=1):
@@ -63,17 +63,17 @@ def _format_papers_as_markdown(papers: list[dict[str, Any]], profile_topics: lis
 
         meta_parts: list[str] = []
         if year:
-            meta_parts.append(f"年份：{year}")
+            meta_parts.append(f"Year: {year}")
         if keywords:
-            meta_parts.append(f"关键词：{' / '.join(str(k) for k in keywords[:5])}")
+            meta_parts.append(f"Keywords: {' / '.join(str(k) for k in keywords[:5])}")
         if meta_parts:
             lines.append(" | ".join(meta_parts))
 
         if authors:
-            author_str = "、".join(str(a) for a in authors[:6])
+            author_str = ", ".join(str(a) for a in authors[:6])
             if len(authors) > 6:
                 author_str += " et al."
-            lines.append(f"作者：{author_str}")
+            lines.append(f"Authors: {author_str}")
 
         if summary:
             truncated = summary if len(summary) <= 300 else summary[:300].rstrip() + "…"

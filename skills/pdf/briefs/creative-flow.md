@@ -185,7 +185,7 @@ Set `html, body { background }` to the document's dominant/darkest color. This p
 The following rules apply identically to both Creative Flow and Creative Blueprint pipelines:
 
 ### Character Encoding Safety
-Never use Japanese kana (の, が, は), rare symbols, or Private Use Area characters. They corrupt to U+FFFD (�) during LLM→file write→read transit. Replace with plain Chinese equivalents: `の`→`之/的/缔`.
+Never use Japanese kana (U+306E, U+304C, U+306F), rare symbols, or Private Use Area characters. They corrupt to U+FFFD during LLM→file write→read transit. Replace kana with plain CJK equivalents: U+306E ("no") → one of U+4E4B/U+7684/U+7F34, or omit it.
 
 ### Vertical Chinese Text
 When using `writing-mode: vertical-rl`:

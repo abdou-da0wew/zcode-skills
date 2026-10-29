@@ -1,21 +1,22 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>栖间 — 定价方案</title>
+<title>Qijian — Pricing</title>
 
-<!-- 西文用 Inter，仅用于数字 / 价格；中文走系统字体 -->
+<!-- Inter for Western text — digits / prices only; CJK falls back to system fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
 
 <style>
-  /* ---------- 字体回落陷阱处理 ----------
-     破折号、引号、省略号是中西共享码位字符。
-     如果把英文字体放在中文之前，浏览器会先用英文字体渲染这些标点 → 破折号下沉、断开。
-     方案：用 unicode-range 把 Inter 限制在拉丁码位（U+0000–007F + 拉丁补充），
-            中文字体优先承担所有中日韩字符与全角标点。 */
+  /* ---------- Font-fallback trap ----------
+     Em dashes, quotes and ellipses share code points between Latin and CJK fonts.
+     If the Latin font is listed before the CJK font, the browser renders these
+     punctuation marks with the Latin font → dashes sink and split apart.
+     Fix: use unicode-range to confine Inter to Latin code points (U+0000–007F + Latin supplement),
+          and let the CJK font take all CJK characters and fullwidth punctuation first. */
   @font-face{
     font-family:'Inter Latin';
     src: local('Inter'), local('Inter-Regular');
@@ -100,7 +101,7 @@
   html,body{margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
   body{
-    /* 中文优先：先苹方 / MiSans / HarmonyOS / 雅黑，再 Inter Latin 拉丁码位补位 */
+    /* CJK-first: PingFang / MiSans / HarmonyOS / YaHei, then Inter Latin covers Latin code points */
     font-family:
       "PingFang SC", "MiSans", "HarmonyOS Sans SC",
       "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei",
@@ -112,11 +113,11 @@
     -webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;
 
-    /* 中文正文不要碰字距 */
+    /* body text: never touch letter-spacing */
     letter-spacing: 0;
     line-height: 1.7;
 
-    /* 中文避头尾 + 不在字符内部断行 */
+    /* strict CJK line-breaking + no breaks inside words */
     line-break: strict;
     word-break: keep-all;
     overflow-wrap: break-word;
@@ -125,7 +126,7 @@
     transition: color .35s ease;
   }
 
-  /* 数字 / 价格用 Inter 等宽几何感 */
+  /* digits / prices use Inter for a geometric, tabular feel */
   .num{
     font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
     font-feature-settings: "tnum" 1, "lnum" 1;
@@ -200,7 +201,7 @@
     margin-bottom:56px;
   }
 
-  /* -------- brand：trademark 风胶囊 -------- */
+  /* -------- brand: trademark-style capsule -------- */
   .brand{
     display:inline-flex; align-items:stretch;
     height: 38px;
@@ -307,14 +308,14 @@
   }
 
   h1.headline{
-    /* 大标题用中文系统字体 + Medium 字重；不混 Helvetica 避免破折号问题 */
+    /* headline uses the CJK system stack + Medium weight; no Helvetica mixing to avoid dash issues */
     font-family:
       "PingFang SC", "MiSans", "HarmonyOS Sans SC",
       "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
     font-weight:500;
     font-size:clamp(40px, 6.4vw, 72px);
     line-height:1.18;
-    /* 大字号中文加 0.01–0.02em 字距，更从容；过多会破坏节奏 */
+    /* large sizes get 0.01–0.02em tracking, easier on the eye; more breaks the rhythm */
     letter-spacing: 0.01em;
     margin:0;
     max-width:860px;
@@ -335,11 +336,11 @@
     line-height: 1.75;
     max-width:560px;
     margin:0;
-    /* 段落正文严格不加字距 */
+    /* paragraphs: strictly no letter-spacing */
     letter-spacing: 0;
   }
 
-  /* -------- billing toggle 行 -------- */
+  /* -------- billing toggle row -------- */
   .toggle-row{
     display:flex; justify-content:center;
     margin-bottom:32px;
@@ -454,7 +455,7 @@
     font-size:13.5px; color:var(--muted);
     margin-bottom:16px;
     font-weight:500;
-    letter-spacing: 0.05em; /* 双字标签可疏排 */
+    letter-spacing: 0.05em; /* two-character labels can be tracked out */
     transition: color .35s ease;
   }
   .tier.selected .label{ color: rgba(255,255,255,.78) }
@@ -478,7 +479,7 @@
   }
 
   .tier .price{
-    /* 价格主体是数字 → 用 Inter；¥ 用中文字体也能渲染 */
+    /* the price is mostly digits → use Inter; ¥ renders fine from the CJK font too */
     font-family: "Inter", "Helvetica Neue", "PingFang SC", sans-serif;
     font-weight:500;
     font-size:44px;
@@ -577,7 +578,7 @@
   }
   .tier .cta svg{ width:14px; height:14px }
 
-  /* -------- 价值对比小条 -------- */
+  /* -------- value strip -------- */
   .value-strip{
     margin-top:28px;
     border-radius:var(--radius);
@@ -671,7 +672,7 @@
     margin-top:12px;
     color:var(--ink-2);
     font-size:14.5px;
-    /* 中文长段：行长护栏 + 1.75 行距 */
+    /* long passages: measure guard + 1.75 line-height */
     max-width:34em;
     line-height:1.75;
     letter-spacing: 0;
@@ -720,59 +721,59 @@
 
 <div class="wrap">
 
-  <nav class="top" aria-label="主导航">
-    <a href="#" class="brand" aria-label="栖间">
+  <nav class="top" aria-label="Main navigation">
+    <a href="#" class="brand" aria-label="Qijian">
       <span class="brand-mark">
         <svg viewBox="0 0 26 22" fill="currentColor" fill-rule="evenodd" aria-hidden="true">
-          <!-- 屋顶填充 + evenodd 打孔成圆点 = 栖（鸟）+ 间（屋下空间） -->
+          <!-- roof fill + evenodd punch-out dot = qi (to perch) + jian (space under a roof) -->
           <path d="M13 2 L24 11 L22 11 L22 19 L4 19 L4 11 L2 11 Z M13 12.6 a1.8 1.8 0 1 0 0 3.6 a1.8 1.8 0 1 0 0 -3.6 Z"/>
         </svg>
       </span>
       <span class="brand-divider" aria-hidden="true"></span>
-      <span class="brand-text">栖间<span class="reg">®</span></span>
+      <span class="brand-text">Qijian<span class="reg">®</span></span>
     </a>
     <div class="nav-center glass" role="tablist">
-      <a href="#" role="tab">案例</a>
-      <a href="#" role="tab">关于</a>
-      <a href="#" role="tab" class="active">定价</a>
+      <a href="#" role="tab">Work</a>
+      <a href="#" role="tab">About</a>
+      <a href="#" role="tab" class="active">Pricing</a>
     </div>
   </nav>
 
   <header class="pricing-hero">
-    <span class="eyebrow glass"><span class="pulse"></span>早期访问 · 2026 年第三季度开放</span>
+    <span class="eyebrow glass"><span class="pulse"></span>Early access · opening Q3 2026</span>
     <h1 class="headline">
-      选一个节奏，<em>慢慢搬进新家。</em>
+      Pick a pace, <em>and move in slowly.</em>
     </h1>
-    <p class="subhead">栖间用你拍下的房间照片，配上我们精选的当代家具，给出一份可被实现的居所提案。挑选适合你的入场方式，我们按批次发放席位。</p>
+    <p class="subhead">Qijian takes the room photos you shoot, pairs them with our curated contemporary furniture, and returns a living proposal you can actually realise. Pick the way in that suits you — seats are released in batches.</p>
   </header>
 
   <section aria-labelledby="tiers-title">
 
     <div class="toggle-row">
-      <div class="toggle glass" role="tablist" aria-label="订阅周期">
-        <button class="on" data-cycle="reserve">预约保留</button>
-        <button data-cycle="annual">按年订阅 <span class="save">省 <span class="num">15%</span></span></button>
+      <div class="toggle glass" role="tablist" aria-label="Billing cycle">
+        <button class="on" data-cycle="reserve">Reserve</button>
+        <button data-cycle="annual">Annual <span class="save">Save <span class="num">15%</span></span></button>
       </div>
     </div>
 
-    <h2 id="tiers-title" style="position:absolute; left:-9999px;">选择你的入场批次</h2>
+    <h2 id="tiers-title" style="position:absolute; left:-9999px;">Choose your entry batch</h2>
 
     <div class="tiers" id="tiers">
       <article class="tier" data-tier="observer" tabindex="0"
         data-bg="https://images.unsplash.com/photo-1505144808419-1957a94ca61e?auto=format&fit=crop&w=1600&q=70">
         <span class="bg"></span><span class="scrim"></span><span class="frost"></span>
-        <div class="label"><span>观望</span></div>
-        <div class="price free" data-base="0" data-annual="0">免费</div>
-        <div class="price-note">加入候补名单</div>
-        <p class="pitch">先在队列里占个位置。等到你那一批开放，我们会给你写信。</p>
+        <div class="label"><span>Observer</span></div>
+        <div class="price free" data-base="0" data-annual="0">Free</div>
+        <div class="price-note">Join the waitlist</div>
+        <p class="pitch">Hold a place in the queue. When your batch opens, we'll write to you.</p>
         <ul>
-          <li>第四批 · <span class="num">2027 Q1</span> 入场</li>
-          <li>工作室通讯与新品预告</li>
-          <li>每月一次渲染预览</li>
+          <li>Batch 4 · entry <span class="num">2027 Q1</span></li>
+          <li>Studio newsletter & collection previews</li>
+          <li>One render preview per month</li>
         </ul>
         <button class="cta" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          选择此方案
+          Choose this plan
         </button>
       </article>
 
@@ -780,59 +781,59 @@
         data-bg="https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1600&q=70">
         <span class="bg"></span><span class="scrim"></span><span class="frost"></span>
         <div class="label">
-          <span>早鸟</span>
-          <span class="badge">最受欢迎</span>
+          <span>Early bird</span>
+          <span class="badge">Most popular</span>
         </div>
         <div class="price" data-base="68" data-annual="58"><span class="sign">¥</span><span class="num">68</span></div>
-        <div class="price-note">押金可退</div>
-        <p class="pitch">直接跳到第二批。这笔押金会在你正式开通时折抵首月费用。</p>
+        <div class="price-note">Refundable deposit</div>
+        <p class="pitch">Jump straight to batch 2. The deposit is credited toward your first month when you go live.</p>
         <ul>
-          <li>第二批 · <span class="num">2026 Q4</span> 入场</li>
-          <li>无限次预览渲染</li>
-          <li>创始用户社群</li>
-          <li>上线赠 <span class="num">¥68</span> 抵扣</li>
+          <li>Batch 2 · entry <span class="num">2026 Q4</span></li>
+          <li>Unlimited preview renders</li>
+          <li>Founding members' community</li>
+          <li><span class="num">¥68</span> credit at launch</li>
         </ul>
         <button class="cta" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          已选择
+          Selected
         </button>
       </article>
 
       <article class="tier" data-tier="founder" tabindex="0"
         data-bg="https://images.unsplash.com/photo-1490604001847-b712b0c2f967?auto=format&fit=crop&w=1600&q=70">
         <span class="bg"></span><span class="scrim"></span><span class="frost"></span>
-        <div class="label"><span>创始</span></div>
+        <div class="label"><span>Founder</span></div>
         <div class="price" data-base="198" data-annual="168"><span class="sign">¥</span><span class="num">198</span></div>
-        <div class="price-note">终身锁价</div>
-        <p class="pitch">移到第一批。价格终身锁定，并享有工作室周边权益。</p>
+        <div class="price-note">Lifetime price lock</div>
+        <p class="pitch">Move up to batch 1. Your price is locked for life, with studio perks on top.</p>
         <ul>
-          <li>第一批 · <span class="num">2026 Q3</span> 入场</li>
-          <li>价格终身锁定</li>
-          <li>选品投票权</li>
-          <li>三幅手工艺术微喷</li>
+          <li>Batch 1 · entry <span class="num">2026 Q3</span></li>
+          <li>Price locked for life</li>
+          <li>Voting rights on new picks</li>
+          <li>Three hand-finished art prints</li>
         </ul>
         <button class="cta" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          选择此方案
+          Choose this plan
         </button>
       </article>
 
       <article class="tier" data-tier="patron" tabindex="0"
         data-bg="https://images.unsplash.com/photo-1502472584811-0a2f2feb8968?auto=format&fit=crop&w=1600&q=70">
         <span class="bg"></span><span class="scrim"></span><span class="frost"></span>
-        <div class="label"><span>甄选</span></div>
+        <div class="label"><span>Patron</span></div>
         <div class="price" data-base="498" data-annual="423"><span class="sign">¥</span><span class="num">498</span></div>
-        <div class="price-note">甄选理事</div>
-        <p class="pitch">和团队同处一室。每季度上海工作室聚会，赠签名限量版画。</p>
+        <div class="price-note">Patron circle</div>
+        <p class="pitch">In the room with the team. Quarterly gatherings at the Shanghai studio, plus a signed limited print.</p>
         <ul>
-          <li>第零批 · 内测当下可入席</li>
-          <li>每季度一次上海工作室聚会</li>
-          <li>签名限量版画一幅</li>
-          <li>团队直通通道</li>
+          <li>Batch 0 · beta seats open now</li>
+          <li>Quarterly Shanghai studio gathering</li>
+          <li>One signed limited-edition print</li>
+          <li>Direct line to the team</li>
         </ul>
         <button class="cta" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          选择此方案
+          Choose this plan
         </button>
       </article>
     </div>
@@ -840,60 +841,60 @@
     <div class="value-strip glass">
       <span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        押金随时可退
+        Deposits refundable anytime
       </span>
       <span class="dot"></span>
       <span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 12l2 2 4-4"/></svg>
-        方案之间可任意切换
+        Switch plans whenever you like
       </span>
       <span class="dot"></span>
       <span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>
-        每八周开放一批新席位
+        A new batch of seats every eight weeks
       </span>
       <span class="dot"></span>
       <span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-12V5l-8-3-8 3v5c0 8 8 12 8 12z"/></svg>
-        图片不留存、不训练
+        Photos never stored, never trained on
       </span>
     </div>
   </section>
 
   <section class="faq-card glass" aria-labelledby="faq-title">
-    <h2 id="faq-title">常见问题<small>没找到想问的，写信到 hi@qijian.studio，<br/>我们每封都亲手回。</small></h2>
+    <h2 id="faq-title">Common questions<small>Don't see yours? Write to hi@qijian.studio —<br/>every reply comes straight from us.</small></h2>
     <div class="faq-list">
       <details class="q" open>
-        <summary>「押金可退」是什么意思？<span class="plus" aria-hidden="true"></span></summary>
-        <p class="a">预约金只是冻结、不会被扣款。等你这一批开放，可以把它折抵首月费用，也可以一键全额退回——不需要理由，不设流程。</p>
+        <summary>What does “refundable deposit” mean?<span class="plus" aria-hidden="true"></span></summary>
+        <p class="a">The deposit is only placed on hold — never charged. When your batch opens, put it toward your first month, or refund it in full with one click. No reason required, no process to follow.</p>
       </details>
       <details class="q">
-        <summary>我所在的批次什么时候开放？<span class="plus" aria-hidden="true"></span></summary>
-        <p class="a">从 <span class="num">2026</span> 年第三季度起，大约每八周开放一批。每批的规模都刻意保持小，这样工作室才有余力亲手回每一封信。</p>
+        <summary>When does my batch open?<span class="plus" aria-hidden="true"></span></summary>
+        <p class="a">From Q3 <span class="num">2026</span>, a batch opens roughly every eight weeks. Each batch is kept deliberately small, so the studio can answer every letter by hand.</p>
       </details>
       <details class="q">
-        <summary>开通之后还能更换方案吗？<span class="plus" aria-hidden="true"></span></summary>
-        <p class="a">可以。升级随时生效，我们会把你挪到对应方案的下一个开放批次；降级则保留原批次的位置，仅调整对应权益。</p>
+        <summary>Can I change plans after activating?<span class="plus" aria-hidden="true"></span></summary>
+        <p class="a">Yes. Upgrades take effect right away — we move you to the next open batch of the new plan; downgrades keep your original batch position and simply adjust the benefits.</p>
       </details>
       <details class="q">
-        <summary>上传的房间照片会被存下来吗？<span class="plus" aria-hidden="true"></span></summary>
-        <p class="a">照片在内存里完成渲染后即从服务器删除，不会被分享给第三方，也不会被用于训练你账户之外的任何模型。</p>
+        <summary>Are the room photos I upload stored?<span class="plus" aria-hidden="true"></span></summary>
+        <p class="a">Photos are deleted from the server as soon as rendering completes in memory. They are never shared with third parties and never used to train any model outside your account.</p>
       </details>
       <details class="q">
-        <summary>选品库里都是真实买得到的家具吗？<span class="plus" aria-hidden="true"></span></summary>
-        <p class="a">是。每一件家具都来自我们当面拜访过的设计师或品牌。如果在渲染图里看中了哪一件，可以申请一份「来源说明」，包含品牌、交期与价格。</p>
+        <summary>Is everything in the catalog actually buyable?<span class="plus" aria-hidden="true"></span></summary>
+        <p class="a">Yes. Every piece comes from a designer or brand we have visited in person. If you fall for something in a render, request a “sourcing sheet” with the brand, lead time and price.</p>
       </details>
     </div>
   </section>
 
   <footer>
-    <span>© <span class="num">2026</span> 栖间设计工作室 · 上海</span>
+    <span>© <span class="num">2026</span> Qijian Design Studio · Shanghai</span>
     <span>
-      <a href="#">隐私政策</a><span class="sep">/</span>
-      <a href="#">服务条款</a><span class="sep">/</span>
+      <a href="#">Privacy</a><span class="sep">/</span>
+      <a href="#">Terms</a><span class="sep">/</span>
       <a href="#">hi@qijian.studio</a>
     </span>
-    <span class="icp">沪 ICP 备 <span class="num">2026 0000</span> 号</span>
+    <span class="icp">Shanghai ICP License <span class="num">No. 2026 0000</span></span>
   </footer>
 </div>
 
@@ -935,9 +936,9 @@
     requestAnimationFrame(tick);
   })();
 
-  // ---- 主题切换按钮已移除（保留 body.dark 样式以备外部触发） ----
+  // ---- theme toggle removed (body.dark styles kept for external triggering) ----
 
-  // ---- 方案选择 ----
+  // ---- plan selection ----
   (function(){
     const tiers = document.querySelectorAll('.tier');
     tiers.forEach(card => {
@@ -948,11 +949,11 @@
         tiers.forEach(c => {
           c.classList.remove('selected');
           const btn = c.querySelector('.cta');
-          if (btn) btn.lastChild.textContent = ' 选择此方案';
+          if (btn) btn.lastChild.textContent = ' Choose this plan';
         });
         card.classList.add('selected');
         const btn = card.querySelector('.cta');
-        if (btn) btn.lastChild.textContent = ' 已选择';
+        if (btn) btn.lastChild.textContent = ' Selected';
       };
       card.addEventListener('click', select);
       card.addEventListener('keydown', (e) => {
@@ -961,7 +962,7 @@
     });
   })();
 
-  // ---- 计费周期切换 ----
+  // ---- billing cycle toggle ----
   (function(){
     const buttons = document.querySelectorAll('.toggle button');
     const cards = document.querySelectorAll('.tier');
@@ -977,26 +978,26 @@
           const ann  = +p.dataset.annual;
           if (base === 0){
             p.classList.add('free');
-            p.innerHTML = '免费';
-            note.textContent = '加入候补名单';
+            p.innerHTML = 'Free';
+            note.textContent = 'Join the waitlist';
             return;
           }
           p.classList.remove('free');
           if (annual){
             p.innerHTML = '<span class="sign">¥</span><span class="num">' + ann + '</span>';
-            note.textContent = '每月 · 按年结算';
+            note.textContent = 'Per month · billed annually';
           } else {
             p.innerHTML = '<span class="sign">¥</span><span class="num">' + base + '</span>';
-            note.textContent = base === 68 ? '押金可退'
-                            : base === 198 ? '终身锁价'
-                            :                '甄选理事';
+            note.textContent = base === 68 ? 'Refundable deposit'
+                            : base === 198 ? 'Lifetime price lock'
+                            :                'Patron circle';
           }
         });
       });
     });
   })();
 
-  // ---- FAQ 单开 ----
+  // ---- FAQ: one open at a time ----
   (function(){
     const all = document.querySelectorAll('details.q');
     all.forEach(d => {

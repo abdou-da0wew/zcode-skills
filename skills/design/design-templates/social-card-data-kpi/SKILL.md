@@ -1,6 +1,7 @@
 ---
 name: social-card-data-kpi
-description: 数据驱动的小红书 / 公众号社交卡 — 一个 hero 数字 + 解释、KPI 塔（3-5 指标堆叠）、前后对比、横向迷你条形图、排行榜带高亮行、ROI 卡。必须标单位 / 时间窗 / 数据来源，必须一个数字视觉主导。触发："做个 KPI 卡 / 数据卡 / 排行榜卡 / 增长卡 / 复盘数字卡"。NOT 表情绪 / 引言 / 图主导的卡，NOT chartjunk。
+description: >-
+  Data-driven Xiaohongshu / WeChat official account social card — one hero number + explanation, KPI tower (3-5 stacked metrics), before/after comparison, horizontal mini bar chart, leaderboard with a highlighted row, ROI card. Units / time windows / data source must be labeled, and one number must dominate visually. Triggers: "make a KPI card / data card / leaderboard card / growth card / review numbers card". NOT mood / quote / image-led cards, NOT chartjunk.
 visibility: public
 mode: template
 carrier: fixed-image
@@ -8,13 +9,13 @@ scenario: social-content
 pattern_source: pattern.html
 source_priority: skill-first
 triggers:
-  - "做个 KPI 卡"
-  - "数据卡"
-  - "排行榜卡"
-  - "增长卡"
-  - "复盘数字卡"
-  - "前后对比卡"
-  - "ROI 卡"
+  - "make a KPI card"
+  - "data card"
+  - "leaderboard card"
+  - "growth card"
+  - "review numbers card"
+  - "before-after comparison card"
+  - "ROI card"
 related_patterns: social-card-swiss
 ---
 

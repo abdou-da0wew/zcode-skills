@@ -1,42 +1,42 @@
 ---
 name: ai-news-collector
-description: AI 新闻聚合与热度排序工具。当用户询问 AI 领域最新动态时触发，如："今天有什么 AI 新闻？""总结一下这周的 AI 动态""最近有什么火的 AI 产品？""AI 圈最近在讨论什么？"。覆盖：新产品发布、研究论文、行业动态、融资新闻、开源项目更新、社区病毒传播现象、AI 工具/Agent 热门项目。输出中文摘要列表，按热度排序，附带原文链接。
+description: AI news aggregation and buzz-ranking tool. Triggers when the user asks about the latest happenings in AI, e.g. "Any AI news today?", "Summarize this week's AI developments", "Any hot new AI products lately?", "What is the AI community talking about?". Coverage: new product launches, research papers, industry news, funding announcements, open-source project updates, community viral phenomena, trending AI tools/agent projects. Outputs an English summary list ranked by buzz, with links to the original sources.
 ---
 
 # AI News Collector
 
-收集、聚合并按热度排序 AI 领域新闻。
+Collect, aggregate, and rank AI news by buzz.
 
-## 核心原则
+## Core Principle
 
-**不要只搜"AI news today"。** 泛搜索返回的是 SEO 聚合页和趋势预测文章，会系统性遗漏社区级病毒传播现象（如开源工具爆火、Meme 级事件）。必须用多维度、分层搜索策略。
+**Do not just search "AI news today".** Generic searches return SEO aggregator pages and trend-prediction articles, and systematically miss community-level viral phenomena (e.g. open-source tools blowing up, meme-level events). You must use a multi-dimensional, layered search strategy.
 
-## 工作流程
+## Workflow
 
-### 1. 多维度分层搜索（最少 8 次，建议 10-12 次）
+### 1. Multi-dimensional layered search (minimum 8 searches, 10-12 recommended)
 
-按以下 **6 个维度** 依次执行搜索，每个维度至少 1 次：
+Run searches across the following **6 dimensions**, at least once per dimension:
 
-#### 维度 A：周报/Newsletter 聚合（最优先 🔑）
+#### Dimension A: Weekly roundups / newsletters (top priority 🔑)
 
-这是信息密度最高的来源，一篇文章可覆盖 10+ 条新闻。
+These are the highest-density sources — a single article can cover 10+ news items.
 
 ```
-搜索词：
-- "last week in AI" [当前月份年份]
-- "AI weekly roundup" [当前月份年份]
+Search terms:
+- "last week in AI" [current month year]
+- "AI weekly roundup" [current month year]
 - "the batch AI newsletter"
-- site:substack.com AI news [当前月份]
+- site:substack.com AI news [current month]
 ```
 
-发现周报后，用 web_fetch 获取全文，从中提取所有新闻线索。
+After finding a roundup, use web_fetch to get the full text and extract every news lead from it.
 
-#### 维度 B：社区热度/病毒传播（关键维度 🔑）
+#### Dimension B: Community buzz / virality (key dimension 🔑)
 
-捕捉自下而上的社区爆款，这类信息泛搜索几乎无法触达。
+Capture bottom-up community hits — generic searches almost never reach this layer.
 
 ```
-搜索词：
+Search terms:
 - "viral AI tool" OR "viral AI agent"
 - "AI trending" site:reddit.com OR site:news.ycombinator.com
 - "GitHub trending AI" OR "AI open source trending"
@@ -44,114 +44,114 @@ description: AI 新闻聚合与热度排序工具。当用户询问 AI 领域最
 - "most popular AI" this week
 ```
 
-#### 维度 C：产品发布与模型更新
+#### Dimension C: Product launches and model updates
 
 ```
-搜索词：
-- "AI model release" OR "LLM launch" [当前月份]
-- "AI product launch" [当前月份年份]
+Search terms:
+- "AI model release" OR "LLM launch" [current month]
+- "AI product launch" [current month year]
 - OpenAI OR Anthropic OR Google OR Meta AI announcement
-- "大模型 发布" OR "AI 新产品"
+- Chinese-language coverage: search jiqizhixin.com / qbitai.com with localized terms for "large model release" or "new AI product"
 ```
 
-#### 维度 D：融资与商业
+#### Dimension D: Funding and business
 
 ```
-搜索词：
-- "AI startup funding" [当前月份年份]
+Search terms:
+- "AI startup funding" [current month year]
 - "AI acquisition" OR "AI IPO"
-- "AI 融资" OR "人工智能投资"
+- Chinese-language coverage: localized terms for "AI funding" or "AI investment"
 ```
 
-#### 维度 E：研究突破
+#### Dimension E: Research breakthroughs
 
 ```
-搜索词：
-- "AI breakthrough" OR "AI paper" [当前月份]
+Search terms:
+- "AI breakthrough" OR "AI paper" [current month]
 - "state of the art" machine learning
-- "AI 论文" OR "机器学习突破"
+- Chinese-language coverage: localized terms for "AI paper" or "machine learning breakthrough"
 ```
 
-#### 维度 F：监管与政策
+#### Dimension F: Regulation and policy
 
 ```
-搜索词：
-- "AI regulation" OR "AI policy" [当前月份年份]
-- "AI law" OR "AI governance" 
-- "AI 监管" OR "人工智能法案"
+Search terms:
+- "AI regulation" OR "AI policy" [current month year]
+- "AI law" OR "AI governance"
+- Chinese-language coverage: localized terms for "AI regulation" or "AI act"
 ```
 
-### 2. 交叉验证与补漏
+### 2. Cross-validation and gap-filling
 
-初轮搜索完成后，检查是否有遗漏：
+After the first round of searches, check for gaps:
 
-- 如果 Newsletter 中提到了某个项目/事件但初轮搜索未覆盖 → 对该项目专项搜索
-- 如果同一事件被 3+ 个不同来源提及 → 大概率是热点，深入搜索获取更多细节
-- 如果中文媒体和英文媒体的热点完全不同 → 两边都要覆盖
+- If a newsletter mentioned a project/event that the first round did not cover → run a dedicated search for that project
+- If the same event is mentioned by 3+ different sources → it is very likely a hot topic; dig deeper for more details
+- If Chinese-language and English-language media highlight completely different stories → cover both sides
 
-### 3. 搜索关键词设计原则（反模式清单）
+### 3. Search keyword design principles (anti-pattern checklist)
 
-| ❌ 不要这样搜 | ✅ 应该这样搜 | 原因 |
+| ❌ Don't search like this | ✅ Search like this | Why |
 |---|---|---|
-| "AI news today February 2026" | "AI weekly roundup February 2026" | 前者返回聚合页，后者返回策划内容 |
-| "AI news today" | "viral AI tool" + "AI model release" 分开搜 | 泛搜无法覆盖社区现象 |
-| "artificial intelligence breaking news" | 按维度分类搜索 | 过于宽泛，返回噪音 |
-| 搜索词中加具体年月日 | 用 "this week" "today" "latest" | 日期反而会偏向预测/展望文章 |
-| 只搜 3 次就开始写 | 至少 8 次，覆盖 6 个维度 | 3 次搜索覆盖率不到 30% |
+| "AI news today February 2026" | "AI weekly roundup February 2026" | The former returns aggregator pages; the latter returns curated content |
+| "AI news today" | "viral AI tool" + "AI model release" searched separately | Generic searches cannot cover community phenomena |
+| "artificial intelligence breaking news" | Search by dimension | Too broad, returns noise |
+| Adding an exact year-month-day to the query | Use "this week" "today" "latest" | Exact dates skew toward prediction/outlook articles |
+| Writing after only 3 searches | At least 8 searches across 6 dimensions | 3 searches cover less than 30% |
 
-### 4. 热度综合判断
+### 4. Overall buzz assessment
 
-基于以下信号评估每条新闻热度（1-5 星）：
+Rate each news item's buzz (1-5 stars) based on these signals:
 
-| 信号 | 权重 | 说明 |
+| Signal | Weight | Notes |
 |------|------|------|
-| 多家媒体报道同一事件 | ⭐⭐⭐ 高 | 3+ 来源 = 确认热点 |
-| 社区病毒传播证据 | ⭐⭐⭐ 高 | GitHub star 暴涨、Twitter 刷屏、HN 首页 |
-| 来自权威来源（顶会、大厂官宣） | ⭐⭐⭐ 高 | 但注意大厂 PR 不等于真热点 |
-| 实际用户体验分享 | ⭐⭐ 中 | 有人真的在用 > 只是发布了 |
-| 技术突破性/影响范围 | ⭐⭐ 中 | |
-| 争议性（安全、伦理讨论） | ⭐⭐ 中 | 争议往往说明影响力大 |
-| 时效性（越新越热） | ⭐ 中低 | 辅助排序 |
+| Multiple outlets reporting the same event | ⭐⭐⭐ High | 3+ sources = confirmed hot topic |
+| Evidence of community virality | ⭐⭐⭐ High | GitHub stars surging, Twitter flooded, HN front page |
+| From an authoritative source (top conference, major vendor announcement) | ⭐⭐⭐ High | But note: vendor PR ≠ real buzz |
+| Actual user experience reports | ⭐⭐ Medium | People actually using it > just announced |
+| Technical significance / scope of impact | ⭐⭐ Medium | |
+| Controversy (safety, ethics debates) | ⭐⭐ Medium | Controversy often signals high impact |
+| Recency (newer = hotter) | ⭐ Low-Medium | Secondary ranking factor |
 
-### 5. 输出格式
+### 5. Output format
 
-按热度降序排列，输出 **15-25 条**新闻：
+Sort by buzz, descending, and output **15-25 items**:
 
 ```
-## 🔥 AI 新闻速递（YYYY-MM-DD）
+## 🔥 AI News Digest (YYYY-MM-DD)
 
-### ⭐⭐⭐⭐⭐ 热度最高
+### ⭐⭐⭐⭐⭐ Highest buzz
 
-1. **[新闻标题]**
-   > 一句话摘要（不超过 50 字）
-   > 🔗 [来源名称](URL)
+1. **[News title]**
+   > One-sentence summary (50 characters max)
+   > 🔗 [Source name](URL)
 
-### ⭐⭐⭐⭐ 高热度
+### ⭐⭐⭐⭐ High buzz
 
 2. ...
 
-### ⭐⭐⭐ 中等热度
+### ⭐⭐⭐ Medium buzz
 
 ...
 
 ---
-📊 本次共收集 XX 条新闻 | 搜索 XX 次 | 覆盖维度：A/B/C/D/E/F | 更新时间：HH:MM
+📊 Collected XX news items | XX searches | Dimensions covered: A/B/C/D/E/F | Updated: HH:MM
 ```
 
-### 6. 去重与合并
+### 6. Deduplication and merging
 
-- 同一事件被多家报道时，合并为一条，选择最权威/详细的来源
-- 在摘要中注明"多家媒体报道"以体现热度
-- 改名/更名的项目视为同一事件（如 Clawdbot → Moltbot → OpenClaw）
+- When the same event is reported by multiple outlets, merge into one entry and pick the most authoritative/detailed source
+- Note "reported by multiple outlets" in the summary to signal the buzz level
+- Renamed projects count as the same event (e.g. Clawdbot → Moltbot → OpenClaw)
 
-## 推荐新闻源
+## Recommended news sources
 
-详见 [references/sources.md](references/sources.md)。
+See [references/sources.md](references/sources.md).
 
-## 注意事项
+## Notes
 
-- 优先使用 HTTPS 链接
-- 遇到付费墙/无法访问的内容，标注"需订阅"
-- 保持客观，不对新闻内容做主观评价
-- 搜索不足 8 次不要开始输出
-- 如果某个维度搜索结果为空，换关键词再搜一次
+- Prefer HTTPS links
+- For paywalled/inaccessible content, mark it as "subscription required"
+- Stay objective; do not editorialize about the news content
+- Do not start writing until you have run at least 8 searches
+- If a dimension returns empty results, re-run it with different keywords

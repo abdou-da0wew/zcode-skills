@@ -1,227 +1,227 @@
-# Unicorn Studio 提取工作流
+# Unicorn Studio Extraction Workflow
 
-Unicorn Studio (unicorn.studio) 是一个 no-code WebGL 设计工具，使用 curtains.js 作为渲染引擎，Firebase/Firestore 作为后端。
+Unicorn Studio (unicorn.studio) is a no-code WebGL design tool that uses curtains.js as its rendering engine and Firebase/Firestore as its backend.
 
-## 识别特征
+## Recognition Signatures
 
-- URL 模式: `unicorn.studio/remix/{remixId}` 或 `unicorn.studio/edit/{designId}`
+- URL patterns: `unicorn.studio/remix/{remixId}` or `unicorn.studio/edit/{designId}`
 - Meta tag: `<meta name="ai:technical-stack" content="Vue 3, curtains.js, Firebase, JavaScript SDK">`
-- 嵌入 SDK: `unicornStudio-*.js`（~84KB embed 版本）
-- 主应用 bundle: `index-*.js`（~2.1MB，含 shader 模板）
+- Embedded SDK: `unicornStudio-*.js` (~84KB embed version)
+- Main app bundle: `index-*.js` (~2.1MB, contains the shader templates)
 
-## 数据获取路径
+## Data Fetching Paths
 
-### 路径 1: Firestore REST API（推荐，适用于 remix）
+### Path 1: Firestore REST API (recommended; works for remixes)
 
 ```bash
-# Firebase 配置（从 unicorn.studio 前端 JS bundle 中提取，每次提取时动态获取）
-# 获取方式：curl -s https://www.unicorn.studio/ | grep -oP 'apiKey:"[^"]+"' | head -1
-API_KEY="<从网站 bundle 动态提取>"
+# Firebase config (extracted from the unicorn.studio frontend JS bundle, fetched fresh on every extraction)
+# How to get it: curl -s https://www.unicorn.studio/ | grep -oP 'apiKey:"[^"]+"' | head -1
+API_KEY="<extracted dynamically from the site bundle>"
 PROJECT="unicorn-studio"
 
-# Step 1: 获取 remix 元数据（含 versionId、designId、cre建者信息）
+# Step 1: fetch the remix metadata (versionId, designId, creator info)
 curl -s "https://firestore.googleapis.com/v1/projects/$PROJECT/databases/(default)/documents/remixes/{REMIX_ID}?key=$API_KEY"
 
-# Step 2: 获取版本数据（含所有图层定义、参数、纹理引用）
-# versionId 从 Step 1 的 fields.versionId.stringValue 提取
+# Step 2: fetch the version data (all layer definitions, parameters, texture references)
+# versionId comes from Step 1's fields.versionId.stringValue
 curl -s "https://firestore.googleapis.com/v1/projects/$PROJECT/databases/(default)/documents/versions/{VERSION_ID}?key=$API_KEY"
 ```
 
-### 路径 2: GCS/CDN Embed 数据（适用于已发布的嵌入）
+### Path 2: GCS/CDN Embed Data (for published embeds)
 
 ```bash
-# 非 Pro 用户
+# Non-Pro users
 curl -s "https://storage.googleapis.com/unicornstudio-production/embeds/{DESIGN_ID}"
 
-# Pro 用户
+# Pro users
 curl -s "https://assets.unicorn.studio/embeds/{DESIGN_ID}"
 ```
 
-Embed JSON 格式: `{ options: {...}, layers/history: [...], modules: [...] }`
-包含 `compiledFragmentShaders[]` 和 `compiledVertexShaders[]`（已编译的 GLSL）。
+Embed JSON format: `{ options: {...}, layers/history: [...], modules: [...] }`
+Includes `compiledFragmentShaders[]` and `compiledVertexShaders[]` (compiled GLSL).
 
-### 路径 3: 从页面内嵌 JSON 提取
+### Path 3: Extract from inline page JSON
 
-Unicorn Studio 嵌入使用 `data-us-project` 或 `data-us-project-src` HTML 属性，
-SDK `init()` 会扫描这些属性并加载对应项目。
+Unicorn Studio embeds use the `data-us-project` or `data-us-project-src` HTML attributes;
+the SDK's `init()` scans for these attributes and loads the corresponding projects.
 
-## 先判断数据形态
+## Identify the Data Shape First
 
-Unicorn Studio 至少有两种常见数据形态：
+Unicorn Studio has at least two common data shapes:
 
 ### 1. embed/export scene
 
-- 一般是最终给 `addScene()` 的 scene JSON
-- 往往已经带 `compiledFragmentShaders[]` / `compiledVertexShaders[]`
-- 这种格式可以直接喂给 embed runtime
+- Usually the final scene JSON handed to `addScene()`
+- Often already carries `compiledFragmentShaders[]` / `compiledVertexShaders[]`
+- This format can be fed directly to the embed runtime
 
 ### 2. editor/version history
 
-- 常见来源是 Firestore `versions/{id}` 的 `history`
-- 这是编辑器原始层数据，**不能**直接喂给 `addScene()`
+- Usually comes from the `history` of Firestore `versions/{id}`
+- This is the editor's raw layer data and **cannot** be fed to `addScene()` directly
 
-如果把 `history` 误当 embed scene，典型症状是：
+If you mistakenly treat `history` as an embed scene, typical symptoms are:
 
 - `Plane: No fragment shader provided, will use a default one`
 - `Plane: No vertex shader provided, will use a default one`
 - `No composite shader data for element`
-- canvas 创建成功，但画面全黑或只剩默认层
+- The canvas is created, but the picture is all black or only the default layer remains
 
-## Firestore 集合结构
+## Firestore Collection Structure
 
-| Collection | 用途 | 关键字段 |
+| Collection | Purpose | Key fields |
 |---|---|---|
-| `designs` | 设计元数据 | creatorId, name, versionId, hasEmbed |
-| `versions` | 版本数据（核心） | history[], options |
-| `remixes` | 可 remix 设计 | designId, versionId, creatorId, thumbnail |
+| `designs` | design metadata | creatorId, name, versionId, hasEmbed |
+| `versions` | version data (core) | history[], options |
+| `remixes` | remixable designs | designId, versionId, creatorId, thumbnail |
 
-## 版本数据结构
+## Version Data Structure
 
-Firestore REST 返回格式用 `{stringValue, integerValue, arrayValue, mapValue, ...}` 包裹，需递归解析。
+Firestore REST responses wrap values as `{stringValue, integerValue, arrayValue, mapValue, ...}`, which need recursive parsing.
 
-`history` 数组中每个元素是一个图层：
+Each element of the `history` array is a layer:
 
 ```
 layerType: "effect" | "text" | "image" | "model" | "shape"
-type:      效果类型 (gradient, noiseFill, sdf_shape, glyphDither, bloomFast, ...)
+type:      effect type (gradient, noiseFill, sdf_shape, glyphDither, bloomFast, ...)
 ```
 
-### 图层参数（常见）
+### Layer parameters (common)
 
 - `pos`, `scale`, `speed`, `opacity`, `blendMode`
 - `trackMouse`, `trackAxes`, `mouseMomentum`
-- `parentLayer`: UUID 或 false（关联父元素）
-- `breakpoints[]`: 响应式断点配置
-- `states`: appear/scroll/hover/mousemove 动画
-- `customFragmentShaders[]`, `customVertexShaders[]`（通常为空，用内置效果时）
+- `parentLayer`: UUID or false (links to the parent element)
+- `breakpoints[]`: responsive breakpoint configuration
+- `states`: appear/scroll/hover/mousemove animations
+- `customFragmentShaders[]`, `customVertexShaders[]` (usually empty when using built-in effects)
 
-## 正确初始化策略
+## Correct Initialization Strategy
 
-如果拿到的是 Firestore `version/history`，优先模仿站点自己的初始化链路，不要硬套 embed API。
+If what you have is the Firestore `version/history`, prefer imitating the site's own initialization chain; do not force-fit the embed API.
 
-典型调用顺序：
+Typical call order:
 
-1. `unpackageHistory()` 或 `unpackVersion()`
+1. `unpackageHistory()` or `unpackVersion()`
 2. `createFontScript()`
 3. `createCurtains()`
 4. `handleItemPlanes()`
 5. `fullRedraw()`
 
-如果页面 bundle 里有专门的 Remix/Preview 组件，优先跟着它走，不要只看公开 UMD/SDK 文档。
+If the page bundle has a dedicated Remix/Preview component, follow it; don't rely only on the public UMD/SDK docs.
 
-### 资源本地化
+### Localizing assets
 
-- image/font/texture 尽量下载到本地
-- `history` 里的 `src`、`fontCSS.src` 要改成本地路径
-- 某些对象字段可能是数字 key 的 map，落地前要规整成数组
+- Download image/font/texture assets locally where possible
+- Rewrite `src` and `fontCSS.src` in `history` to local paths
+- Some object fields may be maps with numeric keys; normalize them into arrays before persisting
 
-### 效果类型特有参数
+### Effect-specific parameters
 
-| 效果 | 关键参数 |
+| Effect | Key parameters |
 |---|---|
 | gradient | fill[], stops[], gradientType, gradientAngle, wrap |
 | noiseFill | noiseType, turbulence, color1, color2, colorPhase, chroma, direction |
 | sdf_shape | shape(0-22), refraction, extrude, smoothing, axis, animationDirection, lightPosition |
-| glyphDither | characters, glyphSet, scale, gamma, monochrome, texture(sprite atlas) |
+| glyphDither | characters, glyphSet, scale, gamma, monochrome, texture (sprite atlas) |
 | bloomFast | amount, intensity, exposure, tint |
 
-## Shader 代码提取
+## Shader Code Extraction
 
-**关键发现**: Embed SDK（~84KB）不含 GLSL shader 代码。Shader 模板在主应用 bundle（~2.1MB）中，经 7 步编译管线处理后存入 embed JSON。
+**Key finding**: the Embed SDK (~84KB) contains no GLSL shader code. The shader templates live in the main app bundle (~2.1MB) and are stored into the embed JSON after a 7-step compilation pipeline.
 
-### Shader 在 App Bundle 中的位置
+### Where shaders live in the app bundle
 
-Shader 模板是字符串字面量，通过变量名标识：
+Shader templates are string literals identified by variable names:
 
 ```
-效果名           → 变量名
+Effect name        → variable name
 glyphDither     → X$ (fragment)
 noiseFill       → WY (fragment)
 sdf_shape       → XY (fragment)
 gradient        → eX (fragment)
 bloomFast       → Hj (fragment)
-通用顶点         → ye (vertex)
-梯度顶点         → ko (vertex)
-合成片段         → Uz (composite fragment)
-合成顶点         → Nz (composite vertex)
+Generic vertex   → ye (vertex)
+Gradient vertex  → ko (vertex)
+Composite fragment → Uz (composite fragment)
+Composite vertex   → Nz (composite vertex)
 ```
 
-注意：变量名会随构建版本变化，需搜索关键特征定位。
+Note: variable names change between builds; locate them by searching for key signatures.
 
-### 模板变量
+### Template variables
 
-Shader 模板中含 `${variable}` 占位符，编译时替换：
+Shader templates contain `${variable}` placeholders, replaced at compile time:
 
-| 变量 | 内容 |
+| Variable | Content |
 |---|---|
-| `${fe}` | mask 相关 uniform 声明 |
-| `${Vt}` | 图层混合辅助函数 (applyLayerMix, applyLayerMixAlpha, applyLayerMixClip) |
-| `${gt}` | PCG hash / 随机数函数 (pcg2d, randFibo) |
-| `${ht}` | 混合模式函数 (17 种模式: Normal, Add, Multiply, Screen, Overlay, ...) |
-| `${pe("var")}` | mask 应用 + fragColor 输出 |
+| `${fe}` | mask-related uniform declarations |
+| `${Vt}` | layer blending helpers (applyLayerMix, applyLayerMixAlpha, applyLayerMixClip) |
+| `${gt}` | PCG hash / random functions (pcg2d, randFibo) |
+| `${ht}` | blend mode functions (17 modes: Normal, Add, Multiply, Screen, Overlay, ...) |
+| `${pe("var")}` | mask application + fragColor output |
 | `${wf}` | BCC noise derivatives (OpenSimplex2S) |
-| `${Aa}` | Perlin noise 函数 |
-| `${yr}` | deband 抖动函数 |
-| `${cm}` | 渐变颜色/停止点 uniform 声明 |
-| `${xz}` | 高斯权重函数 (bloom blur) |
+| `${Aa}` | Perlin noise function |
+| `${yr}` | deband dithering function |
+| `${cm}` | gradient color/stop uniform declarations |
+| `${xz}` | Gaussian weight function (bloom blur) |
 
-### 编译管线
-
-```
-1. Fz(): 替换 uniform 值为常量
-2. Dz(): 处理渐变颜色数量（switch case 裁剪）
-3. Mz(): 求值常量 switch（死代码消除）
-4. Rz(): 处理 #ifelseopen/#ifelseclose 块（条件编译）
-5. Iz(): 移除未使用函数
-6. Cz(): 移除未使用 uniform 声明
-7. Bp(): 去注释、规范化空白
-```
-
-## 渲染管线（核心，移植时必须正确还原）
+### Compilation pipeline
 
 ```
-curtains.js WebGL2 渲染器
-├─ 每个效果图层 = 一个 Plane + 独立 FBO
-├─ 图层按 renderOrder 线性链式渲染，每个 plane 读前一个 FBO 为 uTexture
-├─ Element（shape/text/image）+ 子效果形成 render group：
-│   1. Element 自身 plane 先渲染 → FBO_elem
-│   2. 子效果按 effects 数组顺序依次渲染 → FBO_child1, FBO_child2, ...
-│   3. Composite plane 最后渲染：alpha-blend 子效果输出到背景场景
-├─ 独立后处理效果 (parentLayer=false) 处理全局场景
-└─ 最后一个 plane 直接输出到 canvas（无 FBO）
+1. Fz(): replace uniform values with constants
+2. Dz(): handle gradient color counts (switch-case trimming)
+3. Mz(): evaluate constant switches (dead-code elimination)
+4. Rz(): process #ifelseopen/#ifelseclose blocks (conditional compilation)
+5. Iz(): remove unused functions
+6. Cz(): remove unused uniform declarations
+7. Bp(): strip comments, normalize whitespace
 ```
 
-### Element + 子效果的 FBO 链（关键）
+## Render Pipeline (core; must be reproduced correctly when porting)
 
 ```
-以 shape group (sdf + noise) 为例：
+curtains.js WebGL2 renderer
+├─ Each effect layer = one Plane + an independent FBO
+├─ Layers render in a linear chain by renderOrder; each plane reads the previous FBO as uTexture
+├─ An Element (shape/text/image) + child effects form a render group:
+│   1. The Element's own plane renders first → FBO_elem
+│   2. Child effects render in effects array order → FBO_child1, FBO_child2, ...
+│   3. The composite plane renders last: alpha-blends the child effect output onto the background scene
+├─ Standalone post-processing effects (parentLayer=false) process the global scene
+└─ The last plane outputs directly to the canvas (no FBO)
+```
+
+### The Element + child-effect FBO chain (critical)
+
+```
+Take a shape group (sdf + noise) as an example:
 
 FBO_before ─────────────────────────────────────────┐
                                                      │
-Shape 自身 plane → FBO_shape (渲染基础几何)            │
+Shape's own plane → FBO_shape (renders the base geometry) │
     ↓                                                 │
 Child noiseFill → FBO_noise (uBgTexture = FBO_shape)  │
     ↓                                                 │
 Child sdf_shape → FBO_sdf (uTexture = FBO_noise)      │
-    ↓ (showBg=0: 形状外 = vec4(0) 透明)              │
+    ↓ (showBg=0: outside the shape = vec4(0) transparent) │
     ↓                                                 │
 Composite plane → FBO_result                          │
-    uTexture = FBO_sdf (最后一个子效果输出)             │
-    uBgTexture = FBO_before (element 之前的场景) ←─────┘
+    uTexture = FBO_sdf (last child effect output)       │
+    uBgTexture = FBO_before (scene before the element) ←───┘
     output = alpha_blend(fg, bg) = fg + bg * (1 - fg.a)
 ```
 
-### 子效果关联机制
+### Child-effect linkage mechanism
 
 ```js
-// Element 的 effects 数组 → 子效果的 parentLayer UUID 列表
+// The Element's effects array → list of child-effect parentLayer UUIDs
 shape.effects = ["e270a7cd-...", "fb591190-..."]
 
-// 每个子效果引用父 element 的 UUID
+// Each child effect references its parent element's UUID
 noiseFill.parentLayer = "e270a7cd-..."   // effects[0]
 sdf_shape.parentLayer = "fb591190-..."   // effects[1]
 
-// embed SDK 中查找子效果：
+// Finding child effects in the embed SDK:
 getChildEffectItems() {
     return this.effects.map(uuid =>
         state.layers.find(l => l.parentLayer === uuid)
@@ -229,56 +229,56 @@ getChildEffectItems() {
 }
 ```
 
-### uTime 时间基准（关键陷阱）
+### uTime time base (critical trap)
 
-Embed SDK 中 `uTime` **不是秒数**，而是逐帧累加：
+In the Embed SDK, `uTime` is **not seconds** — it accumulates per frame:
 ```js
-// setEffectPlaneUniforms() 中：
+// inside setEffectPlaneUniforms():
 t.uniforms.time.value += speed * 60 / this.fps;
 ```
 
-在 60fps 下：`uTime += speed` 每帧。1 秒后 `uTime = speed × 60`。
+At 60fps: `uTime += speed` every frame. After 1 second, `uTime = speed × 60`.
 
-| 效果层 | speed | 1 秒后 uTime |
+| Effect layer | speed | uTime after 1 second |
 |--------|-------|-------------|
 | noiseFill | 0.25 | 15 |
 | sdf_shape | 0.5 | 30 |
 | gradient | 0.25 | 15 |
 
-**移植时必须乘以 `speed × 60`**，否则动画慢 15-60 倍：
+**When porting you must multiply by `speed × 60`**, otherwise the animation runs 15-60x too slow:
 ```js
-// 正确：
+// Correct:
 uni1f(prog, 'uTime', elapsedSeconds * speed * 60);
-// 错误：
+// Wrong:
 uni1f(prog, 'uTime', elapsedSeconds);
 ```
 
-### showBg 参数的关键作用
+### The critical role of the showBg parameter
 
-- `showBg=0`：光线未命中几何体时输出 `vec4(0)` **透明**（不是黑色！）
-- `showBg=1`：光线未命中时采样 `uTexture/uBgTexture`（显示背景内容）
+- `showBg=0`: when a ray misses the geometry, output `vec4(0)` — **transparent** (not black!)
+- `showBg=1`: when a ray misses, sample `uTexture/uBgTexture` (show the background content)
 
-**移植时 showBg=0 是最常见的陷阱**：如果错误地输出 `vec4(0,0,0,1)` 不透明黑色，
-composite alpha blend 会被覆盖而不是透过下方图层。必须确保 alpha=0。
+**showBg=0 is the most common porting trap**: if you wrongly output opaque black `vec4(0,0,0,1)`,
+the composite alpha blend will paint over the layers below instead of showing through. Make sure alpha=0.
 
-## 移植策略
+## Porting Strategy
 
-1. **纯 2D 后处理效果** (glyphDither, bloomFast): 原生 WebGL2 全屏四边形
-2. **生成式效果** (noiseFill, gradient): 原生 WebGL2
-3. **3D SDF** (sdf_shape): 原生 WebGL2 raymarching
-4. **复杂场景** (多图层合成): 需要 multi-pass FBO 管线
-5. **文字图层**: Canvas 2D 渲染文字 → 作为纹理上传 WebGL
+1. **Pure 2D post-processing effects** (glyphDither, bloomFast): native WebGL2 fullscreen quad
+2. **Generative effects** (noiseFill, gradient): native WebGL2
+3. **3D SDF** (sdf_shape): native WebGL2 raymarching
+4. **Complex scenes** (multi-layer composites): requires a multi-pass FBO pipeline
+5. **Text layers**: render the text with Canvas 2D → upload to WebGL as a texture
 
-## Playwright 验证
+## Playwright Verification
 
-Playwright 默认 headless 环境可能没有可用 WebGL。出现下面症状时，先怀疑环境，不要立刻怀疑提取逻辑：
+Playwright's default headless environment may have no usable WebGL. When you see the symptoms below, suspect the environment first — not your extraction logic:
 
 - `Renderer: WebGL context could not be created`
 - `0 canvas(es) found`
 - `Error creating Curtains instance`
-- 截图纯黑
+- Pure black screenshots
 
-这时改用 `swiftshader` 再验证：
+In that case, switch to `swiftshader` and verify again:
 
 ```bash
 --use-angle=swiftshader
@@ -287,17 +287,17 @@ Playwright 默认 headless 环境可能没有可用 WebGL。出现下面症状�
 --ignore-gpu-blocklist
 ```
 
-建议验证顺序：
+Suggested verification order:
 
-1. 看 console 是 shader/runtime 错误，还是 WebGL context 创建失败
-2. 看 DOM 里是否真的生成了 `canvas`
-3. 用 `swiftshader` 截图
-4. 和原站缩略图或首屏截图做构图对比
+1. Check whether the console shows shader/runtime errors or a WebGL context creation failure
+2. Check whether a `canvas` was actually generated in the DOM
+3. Take a screenshot with `swiftshader`
+4. Compare composition against the original site's thumbnail or above-the-fold screenshot
 
-### Glyph Atlas 生成
+### Glyph Atlas Generation
 
-原始 glyph atlas 是 base64 PNG（存在跨浏览器兼容问题）。
-推荐用 Canvas 2D 动态生成：
+The original glyph atlas is a base64 PNG (with cross-browser compatibility issues).
+Generating it dynamically with Canvas 2D is recommended:
 
 ```js
 function createGlyphAtlas(chars, size = 40) {
@@ -318,36 +318,36 @@ function createGlyphAtlas(chars, size = 40) {
 }
 ```
 
-## Cloud Functions 端点
+## Cloud Functions Endpoints
 
-所有位于 `https://us-central1-unicorn-studio.cloudfunctions.net/`：
-- `publishEmbedTest` — 发布/更新 embed（需认证）
-- `getUserIdByUsername` — 用户名→userId
-- `handleVideos/handleModels/handleImages` — 资源处理
-- `generateImprovedMSDF` — MSDF 文字渲染
-- `generateDepthMap` — 深度图生成
-- `copyRemixAssets` — remix 资源复制
+All located at `https://us-central1-unicorn-studio.cloudfunctions.net/`:
+- `publishEmbedTest` — publish/update an embed (auth required)
+- `getUserIdByUsername` — username→userId
+- `handleVideos/handleModels/handleImages` — asset processing
+- `generateImprovedMSDF` — MSDF text rendering
+- `generateDepthMap` — depth map generation
+- `copyRemixAssets` — remix asset copying
 
-## 示例：完整提取流程
+## Example: Complete Extraction Flow
 
 ```bash
-# 1. 从 URL 提取 remix ID
+# 1. Extract the remix ID from the URL
 REMIX_ID="QZxhNFb1X1OaUqaJLT9S"
 
-# 2. 获取 remix 元数据
+# 2. Fetch the remix metadata
 curl -s "https://firestore.googleapis.com/v1/projects/unicorn-studio/databases/(default)/documents/remixes/$REMIX_ID?key=$API_KEY" > remix.json
 
-# 3. 提取 versionId
+# 3. Extract the versionId
 VERSION_ID=$(python3 -c "import json; print(json.load(open('remix.json'))['fields']['versionId']['stringValue'])")
 
-# 4. 获取版本数据
+# 4. Fetch the version data
 curl -s "https://firestore.googleapis.com/v1/projects/unicorn-studio/databases/(default)/documents/versions/$VERSION_ID?key=$API_KEY" > version.json
 
-# 5. 解析版本数据中的图层和参数 → 用 Python/Node 递归解析 Firestore REST 格式
+# 5. Parse the layers and parameters in the version data → recursively parse the Firestore REST format with Python/Node
 
-# 6. 从 app bundle 提取对应效果类型的 shader 模板
+# 6. Extract the shader templates for the relevant effect types from the app bundle
 curl -s "https://www.unicorn.studio/assets/index-*.js" > app-bundle.js
-# 搜索效果类型名定位 shader 代码
+# Search for the effect type names to locate the shader code
 
-# 7. 组合参数 + shader 模板 → 构建独立 WebGL2 项目
+# 7. Combine parameters + shader templates → build the standalone WebGL2 project
 ```

@@ -6,17 +6,17 @@ type: artifact-skill
 output_target: html-to-image
 primary_when:
   - social card
-  - 小红书封面
-  - 小红书图文
-  - 小红书卡片
+  - Xiaohongshu cover
+  - Xiaohongshu note
+  - Xiaohongshu card
   - Rednote carousel
-  - 微信公众号封面
-  - 视频号封面
-  - 抖音封面
-  - 社媒海报
-  - 知识卡片
-  - 长图
-  - 截图讲解卡
+  - WeChat official account cover
+  - video account cover
+  - Douyin cover
+  - social poster
+  - knowledge card
+  - long image
+  - screenshot explainer card
   - quote card
   - product brief card
   - product update card
@@ -28,16 +28,16 @@ primary_when:
   - hiring poster
   - report summary card
   - data summary card
-  - 社媒产品简报
-  - 产品更新图
-  - 功能发布图
-  - 版本说明图
-  - 产品发布图
-  - 活动预告图
-  - 招聘海报
-  - 公司动态图
-  - 报告摘要图
-  - 数据摘要图
+  - social product brief
+  - product update image
+  - feature launch image
+  - version note image
+  - product launch image
+  - event teaser image
+  - recruiting poster
+  - company update image
+  - report summary image
+  - data summary image
 avoid_when:
   - full slide deck / PPT / presentation
   - long-form webpage meant for scrolling and reading in-browser
@@ -145,7 +145,7 @@ Rules:
 
 ### WeChat Official Account Cover Pair
 
-Use when the user asks for 微信公众号封面, 公众号首图, article cover pair, or both main + square cover.
+Use when the user asks for a WeChat official account cover, an official account header image, an article cover pair, or both main + square cover.
 
 Rules:
 
@@ -156,7 +156,7 @@ Rules:
 
 ### Douyin / Video / Video Account Cover
 
-Use when the user asks for 抖音封面, 视频号封面, short-video cover, or vertical video thumbnail.
+Use when the user asks for a Douyin cover, a video account cover, a short-video cover, or a vertical video thumbnail.
 
 Rules:
 
@@ -182,7 +182,7 @@ Route by final medium, not topic keyword alone.
 - If the user wants a slide presentation, use `deck.md`.
 - If the user wants a product interface prototype, use `prototype.md`.
 - If the user wants a social-distribution image, image sequence, cover, poster, product brief image, update card, or long image, use `social-card.md`.
-- If the user says “产品简报 / 周报 / 报告摘要 / 发布图” without specifying slides or webpage, prefer `social-card.md` when the deliverable is clearly image-first.
+- If the user says "product brief / weekly report / report summary / release image" without specifying slides or webpage, prefer `social-card.md` when the deliverable is clearly image-first.
 
 ## Content Role Planning
 
@@ -361,9 +361,9 @@ Rules:
 
 Examples of compression direction:
 
-- `开源了一个 Skill，让 AI 接管你屏幕边那张便签纸` → `AI 接管便签纸`
-- `普通人如何理解 AI Agent 和聊天机器人的区别` → `Agent 不只是聊天`
-- `为什么你做的 AI 产品总是没人愿意第二次打开` → `为什么没人再打开`
+- `We open-sourced a Skill that lets AI take over the sticky note beside your screen` → `AI takes over your sticky note`
+- `How ordinary people can understand the difference between AI agents and chatbots` → `Agents are more than chat`
+- `Why nobody ever opens the AI product you built a second time` → `Why nobody opens it twice`
 
 This is layout adaptation, not copywriting polish. Do not invent claims the content does not support.
 

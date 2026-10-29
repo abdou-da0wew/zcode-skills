@@ -1,83 +1,83 @@
-# 技术 / 研发 / 数据 面试专题
+# Engineering / R&D / Data Interview Special Topics
 
-通用技术八股 + 系统设计在 `technical.md`，本文件聚焦：
-- 项目深挖话术
-- 算法 / LLM / 数据 岗位特定题
-- 团队 / 软技能题（技术岗也要答）
+Generic technical fundamentals + system design live in `technical.md`. This file focuses on:
+- Project deep-dive talking points
+- Role-specific questions for algorithm / LLM / data positions
+- Team / soft-skill questions (engineering candidates get them too)
 
-## 项目深挖（每家必问）
+## Project Deep-Dives (every company asks)
 
-面试官最喜欢"刨根问底"，一定要准备。
+Interviewers love "root-cause interrogation" — prepare for it.
 
-每个项目至少能回答以下 8 个问题：
+For every project, be able to answer at least these 8 questions:
 
-1. **背景** —— 这个项目为什么要做？业务问题是什么？
-2. **你的角色** —— 你在团队里是什么角色？做了 ___ 模块？
-3. **技术选型** —— 为什么选 X 而不是 Y？trade-off 是什么？
-4. **挑战** —— 遇到的最难的技术问题是什么？怎么解决的？
-5. **数据** —— 系统的 QPS / 数据量 / 延迟 / 可用性 是什么？
-6. **结果** —— 上线后效果怎么样？比基线提升 ___？
-7. **失败 / 坑** —— 踩过什么坑？怎么 debug？怎么避免？
-8. **改进** —— 现在让你重新做这个项目，会怎么做？
+1. **Background** — Why was this project built? What business problem did it solve?
+2. **Your role** — What was your role on the team? Which ___ module did you build?
+3. **Tech choices** — Why X instead of Y? What were the trade-offs?
+4. **Challenges** — What was the hardest technical problem? How did you solve it?
+5. **Data** — What were the system's QPS / data volume / latency / availability?
+6. **Results** — How did it perform after launch? Improvement over baseline ___?
+7. **Failures / pitfalls** — What pitfalls did you hit? How did you debug? How do you prevent them?
+8. **Improvement** — If you rebuilt this project today, what would you do differently?
 
-## 算法 / 机器学习 岗位特定
+## Algorithm / Machine Learning Role-Specific
 
-### 业务理解题
-1. 给你一个 ___ 业务，你怎么定义一个 ML 问题
-2. 你怎么和业务 / 产品 / 数据 协作
-3. 模型上线后效果不及预期，你怎么排查
-4. 模型 vs 规则，什么时候选哪个
-5. 你做的模型，下线 / 替代过吗？为什么
+### Business Understanding Questions
+1. Given a ___ business, how would you frame an ML problem?
+2. How do you collaborate with business / product / data teams?
+3. A model underperforms after launch — how do you troubleshoot?
+4. Model vs. rules — when do you choose which?
+5. Have any of your models been decommissioned / replaced? Why?
 
-### 算法岗"假大模型 / 真不深"识别题
-- 你说会 RLHF，那 PPO 的 KL 项是怎么加的？为什么这么加？
-- 你做了 RAG，召回准确率怎么算的？不同分块策略对比过吗？
-- 你说做了 Agent，你的 planning 模块是 ReAct / CoT / 还是自定义？错误恢复怎么做？
+### "Fake LLM Experience" Detection Questions for Algorithm Roles
+- You say you know RLHF — how exactly is the KL term added in PPO? Why that way?
+- You built RAG — how did you compute retrieval precision? Did you compare chunking strategies?
+- You say you built an Agent — is the planning module ReAct / CoT / custom? How does error recovery work?
 
-防身：**只写真做过的项目**，编造的 LLM 项目最容易翻车。
+Self-protection: **only list projects you actually did** — fabricated LLM projects are the easiest to get caught.
 
-## 数据 / 数仓 / 分析 岗位特定
+## Data / Data Warehouse / Analytics Role-Specific
 
-### 业务题（强烈高频）
-1. 你怎么衡量一个 ___ 业务的健康度
-2. DAU 跌了 5%，你怎么 diagnose
-3. 你做的最有价值的一个数据分析项目
-4. 你怎么和业务方 / 产品 / 老板 沟通分析结论
-5. 给你一个数据需求："分析下用户为什么流失"，你怎么做
+### Business Questions (very high frequency)
+1. How do you measure the health of a ___ business?
+2. DAU dropped 5% — how do you diagnose it?
+3. Your most valuable data-analysis project
+4. How do you communicate analysis conclusions to business stakeholders / product / leadership?
+5. Given the data request "analyze why users are churning", what do you do?
 
-### SQL 现场题（必考）
-- 写一段 SQL：每个用户的连续登录天数
-- 写一段 SQL：每个商品的复购率
-- 写一段 SQL：找出最近 7 天每天的新增用户
-- 写一段 SQL：A/B 测试结果对比 + 显著性
+### Live SQL Questions (guaranteed)
+- Write SQL: each user's consecutive login days
+- Write SQL: repurchase rate per product
+- Write SQL: new users per day for the last 7 days
+- Write SQL: A/B test result comparison + significance
 
-提示：**面试现场写 SQL 一定要边写边讲思路**，别闷头写。
+Tip: **when writing SQL live, narrate your thinking as you write** — don't code in silence.
 
-### 数仓建模题
-- 你怎么设计一个 ___ 业务的数据模型
-- 维度建模 vs 范式建模 怎么选
-- 拉链表 / 缓慢变化维度 怎么处理
-- 数据质量怎么保障（监控 / 巡检 / 复盘）
+### Data Warehouse Modeling Questions
+- How would you design a data model for a ___ business?
+- Dimensional modeling vs. normalized modeling — how do you choose?
+- How do you handle slowly changing dimensions / type-2 history tables?
+- How is data quality assured (monitoring / inspections / retrospectives)?
 
-## 软技能题（技术岗也要答）
+## Soft-Skill Questions (engineering candidates get them too)
 
-技术岗以为只考技术 = 大错。中级以上会问：
+Assuming engineering roles only test tech = a big mistake. Mid-level and above will be asked:
 
-1. 跟其他团队 / 产品经理 / 设计师 意见不合，你怎么办
-2. 你怎么 review 别人的代码 / 文档
-3. 你怎么带新人
-4. 一个技术决策没人响应，你怎么推动
-5. 你接手了一个屎山代码，怎么改造
-6. 你怎么管理自己的技术成长
+1. You disagree with another team / PM / designer — what do you do?
+2. How do you review other people's code / documents?
+3. How do you mentor new team members?
+4. Nobody responds to a technical decision you proposed — how do you drive it forward?
+5. You inherit a legacy codebase — how do you refactor it?
+6. How do you manage your own technical growth?
 
-## 反向提问（技术面 / leader 面）
+## Questions to Ask (technical / leader rounds)
 
-技术面：
-- 团队的技术栈和未来规划是什么？
-- 团队最近的技术挑战是什么？
-- code review / on-call / 周会 流程是怎样的？
+Technical round:
+- What is the team's tech stack and future roadmap?
+- What technical challenges is the team facing recently?
+- What do code review / on-call / weekly meeting processes look like?
 
-Leader 面：
-- 您怎么看 ___ 技术 / 业务方向的未来？
-- 团队的技术债务现在怎么样？
-- 您觉得在这个团队最有挑战的事情是什么？
+Leader round:
+- How do you see the future of ___ technology / business direction?
+- What shape is the team's technical debt in?
+- What do you find most challenging about this team?

@@ -14,28 +14,29 @@ def build_extraction_prompt(content: str) -> dict:
         dict with 'system_prompt' and 'user_prompt' keys.
     """
     system_prompt = (
-        "你是一个专业的题目解析助手。从用户提供的题目文件中识别并解析所有题目。\n"
-        "严格按照要求的 JSON 格式输出，不要输出任何其他内容。"
+        "You are a professional question-parsing assistant. Identify and parse every "
+        "question in the question file provided by the user.\n"
+        "Strictly output in the required JSON format; do not output anything else."
     )
 
-    user_prompt = f"""请从以下题目文件内容中解析出所有题目。
+    user_prompt = f"""Parse all questions from the following question file content.
 
-## 题目文件内容
+## Question file content
 
 {content}
 
-## 解析要求
-1. 识别每道题的类型：
-   - single_choice: 选择题（有 A/B/C/D 等选项）
-   - true_false: 判断题（判断对错）
-   - fill_blank: 填空题（有空格需要填写）
-   - short_answer: 简答题（需要文字回答）
-2. 提取题目的所有信息
-3. 如果题目有答案和解析，也一并提取
-4. 为每道题分配唯一 ID
+## Parsing requirements
+1. Identify each question's type:
+   - single_choice: multiple choice (has A/B/C/D style options)
+   - true_false: true/false (judge right or wrong)
+   - fill_blank: fill-in-the-blank (has blanks to fill in)
+   - short_answer: short answer (requires a written response)
+2. Extract all information for each question
+3. If a question has an answer and explanation, extract those too
+4. Assign a unique ID to each question
 
-## 输出格式
-输出纯 JSON 数组，每个元素格式如下：
+## Output format
+Output a plain JSON array; each element has the following shape:
 ```json
 [
   {{
@@ -43,24 +44,24 @@ def build_extraction_prompt(content: str) -> dict:
     "knowledge_point_ids": [],
     "level": 1,
     "type": "single_choice",
-    "prompt": "题目内容",
-    "options": ["A. 选项一", "B. 选项二", "C. 选项三", "D. 选项四"],
+    "prompt": "Question text",
+    "options": ["A. Option one", "B. Option two", "C. Option three", "D. Option four"],
     "answer": "A",
-    "explanation": "解析内容（如果有）"
+    "explanation": "Explanation (if available)"
   }}
 ]
 ```
 
-注意：
-- type 必须是 single_choice, true_false, fill_blank, short_answer 之一
-- 选择题的 answer 填选项字母（A/B/C/D）
-- 判断题的 answer 填 "True" 或 "False"
-- 填空题的 answer 填正确答案文本
-- 简答题的 answer 填参考答案（如果有）
-- 如果无法确定 knowledge_point_ids，留空数组
-- level 默认为 1，如果能从题目难度判断则相应调整
+Notes:
+- type must be one of single_choice, true_false, fill_blank, short_answer
+- For choice questions, answer is the option letter (A/B/C/D)
+- For true/false questions, answer is "True" or "False"
+- For fill-blank questions, answer is the correct answer text
+- For short-answer questions, answer is the reference answer (if available)
+- If knowledge_point_ids cannot be determined, leave an empty array
+- level defaults to 1; adjust it if the question's difficulty is apparent
 
-请直接输出 JSON 数组，不要包含 markdown 代码块标记或其他文字。"""
+Output the JSON array directly, without markdown code fences or any other text."""
 
     return {
         "system_prompt": system_prompt,

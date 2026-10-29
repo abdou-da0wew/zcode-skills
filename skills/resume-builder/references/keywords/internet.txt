@@ -1,45 +1,45 @@
-产品规划
-产品迭代
+product planning
+product iteration
 PRD
-需求评审
-用户访谈
-用户画像
-用户增长
-留存
-转化率
-A/B 测试
-漏斗分析
-数据驱动
-跨部门协作
-推动落地
+requirements review
+user interviews
+user personas
+user growth
+retention
+conversion rate
+A/B testing
+funnel analysis
+data-driven
+cross-team collaboration
+driving execution
 0-1
 1-N
-商业化
+monetization
 PMF
-增长黑客
+growth hacking
 AARRR
-私域
+private-domain traffic
 GMV
 ROI
 CAC
 LTV
 SOP
 SaaS
-B 端
-C 端
-内容运营
-社群运营
-活动运营
+B2B
+B2C
+content operations
+community operations
+campaign operations
 PMP
 Scrum
-看板
+Kanban
 Sprint
 Jira
 Confluence
 Notion
-飞书
+Lark
 SQL
 Tableau
 Figma
 Axure
-墨刀
+MockingBot

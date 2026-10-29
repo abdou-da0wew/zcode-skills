@@ -24,8 +24,8 @@ Single-column, clean layout optimised for Applicant Tracking Systems (ATS). No g
 
 ### Resume Line-Break Rules (Language-Aware)
 - **English**: Prefer breaking at word boundaries (spaces, hyphens). If a long word must be split to avoid excessive whitespace, break at a valid syllable boundary and insert a hyphen (`-`) - this is standard typographic practice (e.g., `experi-\nence`, `develop-\nment`). ReportLab supports `wordWrap='CJK'` only for CJK content; for English use default paragraph wrapping with `allowWidows=0, allowOrphans=0`.
-- **Chinese/CJK**: Break allowed between any two CJK characters. Never break between a CJK character and its adjacent punctuation (、。,)》 etc. must stay with the preceding character.
-- **Mixed content** (e.g., "Python 开发工程师"): Break at CJK boundaries or English word boundaries. Never split an English word in a CJK paragraph unless hyphenated.
+- **Chinese/CJK**: Break allowed between any two CJK characters. Never break between a CJK character and its adjacent punctuation (CJK comma/period/enum comma, closing brackets — e.g. U+3001 U+3002 U+FF0C U+FF09 U+300B) — they must stay with the preceding character.
+- **Mixed content** (e.g., a job title combining "Python" with a Chinese role name): Break at CJK boundaries or English word boundaries. Never split an English word in a CJK paragraph unless hyphenated.
 - **Contact line**: Email, phone, location separated by `|` or `·`. Each segment must stay on one line - if too long, move to next line at the separator, not mid-segment.
 - **Dates and ranges**: "Jan 2022 - Present" must stay as one unit. Never break a date range across lines.
 
@@ -150,7 +150,7 @@ doc = SimpleDocTemplate(
     leftMargin=1.5*cm, rightMargin=1.5*cm,
     topMargin=1.5*cm, bottomMargin=1.5*cm,
     title='Resume - Your Name',
-    author='Z.ai', creator='Z.ai'
+    author='DiveeOI', creator='DiveeOI'
 )
 
 story = []

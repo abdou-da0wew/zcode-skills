@@ -1,12 +1,14 @@
 ---
 name: ASR
-description: Implement speech-to-text (ASR/automatic speech recognition) capabilities using the z-ai-web-dev-sdk. Use this skill when the user needs to transcribe audio files, convert speech to text, build voice input features, or process audio recordings. Supports base64 encoded audio files and returns accurate text transcriptions.
+description: Implement speech-to-text (ASR/automatic speech recognition) capabilities using any OpenAI-compatible server that exposes the /audio/transcriptions endpoint. Use this skill when the user needs to transcribe audio files, convert speech to text, build voice input features, or process audio recordings. Supports multipart audio uploads and returns accurate text transcriptions. Works with any OpenAI-compatible LLM server (open-source or free), designed for the DiveeOI agent (OpenCode-based).
 license: MIT
 ---
 
 # ASR (Speech to Text) Skill
 
-This skill guides the implementation of speech-to-text (ASR) functionality using the z-ai-web-dev-sdk package, enabling accurate transcription of spoken audio into text.
+This skill guides the implementation of speech-to-text (ASR) functionality using plain HTTP calls to an OpenAI-compatible `/audio/transcriptions` endpoint (no SDK, no extra dependencies), enabling accurate transcription of spoken audio into text.
+
+It works with any OpenAI-compatible server that implements the audio transcription route (open-source or free) — faster-whisper-server, whisper.cpp server, Speaches, Groq, OpenAI, and most API gateways — and is designed for the DiveeOI agent (OpenCode-based).
 
 ## Skills Path
 
@@ -20,69 +22,109 @@ this skill is located at above path in your project.
 
 Speech-to-Text (ASR - Automatic Speech Recognition) allows you to build applications that convert spoken language in audio files into written text, enabling voice-controlled interfaces, transcription services, and audio content analysis.
 
-**IMPORTANT**: z-ai-web-dev-sdk MUST be used in backend code only. Never use it in client-side code.
+**IMPORTANT**: Keep your API key in backend code or environment variables only. Never hardcode credentials in client-side code.
 
 ## Prerequisites
 
-The z-ai-web-dev-sdk package is already installed. Import it as shown in the examples below.
+- Node.js 18+ (for the global `fetch`, `FormData`, and `Blob` APIs) or any HTTP client
+- An OpenAI-compatible server exposing `POST /audio/transcriptions`
+- No npm packages required — examples use built-in APIs only
+
+## Configuration (Environment Variables)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LLM_BASE_URL` | `http://localhost:11434/v1` | OpenAI-compatible base URL of the server hosting the transcription model |
+| `LLM_API_KEY` | (empty) | API key sent as `Authorization: Bearer <key>`; leave empty for local servers |
+| `ASR_MODEL` | `whisper-1` | Transcription model name (e.g. `whisper-1`, `whisper-large-v3`, `base.en`) |
+
+### Shared Client Helper
+
+All examples below use this helper (plain `fetch`, zero dependencies):
+
+```javascript
+const BASE_URL = process.env.LLM_BASE_URL ?? "http://localhost:11434/v1";
+const API_KEY = process.env.LLM_API_KEY ?? "";
+const ASR_MODEL = process.env.ASR_MODEL ?? "whisper-1";
+
+async function transcribeFile(filePath) {
+  const fs = await import('fs');
+  const audioBuffer = fs.readFileSync(filePath);
+  const blob = new Blob([audioBuffer]);
+
+  const form = new FormData();
+  form.append('file', blob, filePath.split('/').pop());
+  form.append('model', ASR_MODEL);
+  form.append('response_format', 'json');
+
+  const res = await fetch(`${BASE_URL}/audio/transcriptions`, {
+    method: 'POST',
+    headers: {
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: form,
+  });
+  if (!res.ok) throw new Error(`ASR request failed (${res.status}): ${await res.text()}`);
+  const data = await res.json();
+  return data.text;
+}
+```
 
 ## CLI Usage (For Simple Tasks)
 
-For simple audio transcription tasks, you can use the z-ai CLI instead of writing code. This is ideal for quick transcriptions, testing audio files, or batch processing.
+For simple audio transcription tasks, you can use `curl` instead of writing code. This is ideal for quick transcriptions, testing audio files, or batch processing.
 
 ### Basic Transcription from File
 
 ```bash
-# Transcribe an audio file
-z-ai asr --file ./audio.wav
+# Transcribe an audio file (multipart upload, OpenAI-style)
+curl -s "$LLM_BASE_URL/audio/transcriptions" \
+  ${LLM_API_KEY:+-H "Authorization: Bearer $LLM_API_KEY"} \
+  -F file=@./audio.wav \
+  -F model=whisper-1
 
 # Save transcription to JSON file
-z-ai asr -f ./recording.mp3 -o transcript.json
+curl -s "$LLM_BASE_URL/audio/transcriptions" \
+  -F file=@./recording.mp3 -F model=whisper-1 \
+  -o transcript.json
 
 # Transcribe and view output
-z-ai asr --file ./interview.wav --output result.json
+curl -s "$LLM_BASE_URL/audio/transcriptions" \
+  -F file=@./interview.wav -F model=whisper-1 -F response_format=json
 ```
 
-### Transcription from Base64
+### Transcription from Base64 (shell-decoded)
 
 ```bash
-# Transcribe from base64 encoded audio
-z-ai asr --base64 "UklGRiQAAABXQVZFZm10..." -o result.json
-
-# Using short option
-z-ai asr -b "base64_encoded_audio_data" -o transcript.json
-```
-
-### Streaming Output
-
-```bash
-# Stream transcription results
-z-ai asr -f ./audio.wav --stream
+# Decode a base64 audio payload to a temp file, then upload it
+echo "UklGRiQAAABXQVZFZm10..." | base64 -d > /tmp/audio.wav
+curl -s "$LLM_BASE_URL/audio/transcriptions" \
+  -F file=@/tmp/audio.wav -F model=whisper-1 -o result.json
 ```
 
 ### CLI Parameters
 
-- `--file, -f <path>`: **Required** (if not using --base64) - Audio file path
-- `--base64, -b <base64>`: **Required** (if not using --file) - Base64 encoded audio
-- `--output, -o <path>`: Optional - Output file path (JSON format)
-- `--stream`: Optional - Stream the transcription output
+- `file=@<path>`: **Required** - Audio file uploaded as multipart form data
+- `model=<name>`: **Required** - Transcription model (default: `whisper-1`, override with `ASR_MODEL`)
+- `response_format`: Optional - `json` (default), `text`, `srt`, `verbose_json` (server-dependent)
+- `language`: Optional - ISO-639-1 language hint (server-dependent)
 
 ### Supported Audio Formats
 
-The ASR service supports various audio formats including:
+The transcription route supports various audio formats including:
 - WAV (.wav)
 - MP3 (.mp3)
-- Other common audio formats
+- Other common audio formats (server-dependent: m4a, flac, ogg, webm)
 
-### When to Use CLI vs SDK
+### When to Use CLI vs Code
 
-**Use CLI for:**
+**Use curl for:**
 - Quick audio file transcriptions
 - Testing audio recognition accuracy
 - Simple batch processing scripts
 - One-off transcription tasks
 
-**Use SDK for:**
+**Use code for:**
 - Real-time audio transcription in applications
 - Integration with recording systems
 - Custom audio processing workflows
@@ -93,20 +135,28 @@ The ASR service supports various audio formats including:
 ### Simple Audio Transcription
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function transcribeAudio(audioFilePath) {
-  const zai = await ZAI.create();
-
-  // Read audio file and convert to base64
+  // Read audio file and upload it as multipart form data
   const audioFile = fs.readFileSync(audioFilePath);
-  const base64Audio = audioFile.toString('base64');
+  const blob = new Blob([audioFile]);
 
-  const response = await zai.audio.asr.create({
-    file_base64: base64Audio
+  const form = new FormData();
+  form.append('file', blob, 'audio.wav');
+  form.append('model', ASR_MODEL);
+  form.append('response_format', 'json');
+
+  const res = await fetch(`${BASE_URL}/audio/transcriptions`, {
+    method: 'POST',
+    headers: {
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: form,
   });
+  if (!res.ok) throw new Error(`ASR request failed (${res.status}): ${await res.text()}`);
 
+  const response = await res.json();
   return response.text;
 }
 
@@ -118,21 +168,29 @@ console.log('Transcription:', transcription);
 ### Transcribe Multiple Audio Files
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function transcribeBatch(audioFilePaths) {
-  const zai = await ZAI.create();
   const results = [];
 
   for (const filePath of audioFilePaths) {
     try {
       const audioFile = fs.readFileSync(filePath);
-      const base64Audio = audioFile.toString('base64');
+      const blob = new Blob([audioFile]);
 
-      const response = await zai.audio.asr.create({
-        file_base64: base64Audio
+      const form = new FormData();
+      form.append('file', blob, filePath.split('/').pop());
+      form.append('model', ASR_MODEL);
+
+      const res = await fetch(`${BASE_URL}/audio/transcriptions`, {
+        method: 'POST',
+        headers: {
+          ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+        },
+        body: form,
       });
+      if (!res.ok) throw new Error(`ASR request failed (${res.status})`);
+      const response = await res.json();
 
       results.push({
         file: filePath,
@@ -169,23 +227,30 @@ transcriptions.forEach(result => {
 ### Audio File Processing with Metadata
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 
 async function transcribeWithMetadata(audioFilePath) {
-  const zai = await ZAI.create();
-
   // Get file metadata
   const stats = fs.statSync(audioFilePath);
   const audioFile = fs.readFileSync(audioFilePath);
-  const base64Audio = audioFile.toString('base64');
+  const blob = new Blob([audioFile]);
+
+  const form = new FormData();
+  form.append('file', blob, path.basename(audioFilePath));
+  form.append('model', ASR_MODEL);
 
   const startTime = Date.now();
 
-  const response = await zai.audio.asr.create({
-    file_base64: base64Audio
+  const res = await fetch(`${BASE_URL}/audio/transcriptions`, {
+    method: 'POST',
+    headers: {
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: form,
   });
+  if (!res.ok) throw new Error(`ASR request failed (${res.status})`);
+  const response = await res.json();
 
   const endTime = Date.now();
 
@@ -208,21 +273,15 @@ console.log('Transcription Details:', JSON.stringify(result, null, 2));
 ### Real-time Audio Processing Service
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
+import crypto from 'crypto';
 
 class ASRService {
   constructor() {
-    this.zai = null;
     this.transcriptionCache = new Map();
   }
 
-  async initialize() {
-    this.zai = await ZAI.create();
-  }
-
   generateCacheKey(audioBuffer) {
-    const crypto = require('crypto');
     return crypto.createHash('md5').update(audioBuffer).digest('hex');
   }
 
@@ -238,12 +297,22 @@ class ASRService {
       };
     }
 
-    // Transcribe audio
-    const base64Audio = audioBuffer.toString('base64');
+    // Transcribe audio via multipart upload
+    const blob = new Blob([audioBuffer]);
 
-    const response = await this.zai.audio.asr.create({
-      file_base64: base64Audio
+    const form = new FormData();
+    form.append('file', blob, 'audio.wav');
+    form.append('model', ASR_MODEL);
+
+    const res = await fetch(`${BASE_URL}/audio/transcriptions`, {
+      method: 'POST',
+      headers: {
+        ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+      },
+      body: form,
     });
+    if (!res.ok) throw new Error(`ASR request failed (${res.status})`);
+    const response = await res.json();
 
     // Cache result
     if (useCache) {
@@ -267,7 +336,6 @@ class ASRService {
 
 // Usage
 const asrService = new ASRService();
-await asrService.initialize();
 
 const result1 = await asrService.transcribe('./audio.wav');
 console.log('First call (not cached):', result1);
@@ -279,16 +347,13 @@ console.log('Second call (cached):', result2);
 ### Directory Transcription
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 
 async function transcribeDirectory(directoryPath, outputJsonPath) {
-  const zai = await ZAI.create();
-
   // Get all audio files
   const files = fs.readdirSync(directoryPath);
-  const audioFiles = files.filter(file => 
+  const audioFiles = files.filter(file =>
     /\.(wav|mp3|m4a|flac|ogg)$/i.test(file)
   );
 
@@ -304,11 +369,21 @@ async function transcribeDirectory(directoryPath, outputJsonPath) {
 
     try {
       const audioFile = fs.readFileSync(filePath);
-      const base64Audio = audioFile.toString('base64');
+      const blob = new Blob([audioFile]);
 
-      const response = await zai.audio.asr.create({
-        file_base64: base64Audio
+      const form = new FormData();
+      form.append('file', blob, filename);
+      form.append('model', ASR_MODEL);
+
+      const res = await fetch(`${BASE_URL}/audio/transcriptions`, {
+        method: 'POST',
+        headers: {
+          ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+        },
+        body: form,
       });
+      if (!res.ok) throw new Error(`ASR request failed (${res.status})`);
+      const response = await res.json();
 
       results.transcriptions.push({
         filename: filename,
@@ -354,11 +429,10 @@ console.log(`Failed: ${results.transcriptions.filter(t => !t.success).length}`);
 ### 1. Audio Format Handling
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function transcribeAnyFormat(audioFilePath) {
-  // Supported formats: WAV, MP3, M4A, FLAC, OGG, etc.
+  // Supported formats: WAV, MP3, M4A, FLAC, OGG, etc. (server-dependent)
   const validExtensions = ['.wav', '.mp3', '.m4a', '.flac', '.ogg'];
   const ext = audioFilePath.toLowerCase().substring(audioFilePath.lastIndexOf('.'));
 
@@ -366,13 +440,22 @@ async function transcribeAnyFormat(audioFilePath) {
     throw new Error(`Unsupported audio format: ${ext}`);
   }
 
-  const zai = await ZAI.create();
   const audioFile = fs.readFileSync(audioFilePath);
-  const base64Audio = audioFile.toString('base64');
+  const blob = new Blob([audioFile]);
 
-  const response = await zai.audio.asr.create({
-    file_base64: base64Audio
+  const form = new FormData();
+  form.append('file', blob, audioFilePath.split('/').pop());
+  form.append('model', ASR_MODEL);
+
+  const res = await fetch(`${BASE_URL}/audio/transcriptions`, {
+    method: 'POST',
+    headers: {
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: form,
   });
+  if (!res.ok) throw new Error(`ASR request failed (${res.status})`);
+  const response = await res.json();
 
   return response.text;
 }
@@ -381,7 +464,6 @@ async function transcribeAnyFormat(audioFilePath) {
 ### 2. Error Handling
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function safeTranscribe(audioFilePath) {
@@ -394,19 +476,28 @@ async function safeTranscribe(audioFilePath) {
     // Check file size (e.g., limit to 100MB)
     const stats = fs.statSync(audioFilePath);
     const fileSizeMB = stats.size / (1024 * 1024);
-    
+
     if (fileSizeMB > 100) {
       throw new Error(`File too large: ${fileSizeMB.toFixed(2)}MB (max 100MB)`);
     }
 
     // Transcribe
-    const zai = await ZAI.create();
     const audioFile = fs.readFileSync(audioFilePath);
-    const base64Audio = audioFile.toString('base64');
+    const blob = new Blob([audioFile]);
 
-    const response = await zai.audio.asr.create({
-      file_base64: base64Audio
+    const form = new FormData();
+    form.append('file', blob, audioFilePath.split('/').pop());
+    form.append('model', ASR_MODEL);
+
+    const res = await fetch(`${BASE_URL}/audio/transcriptions`, {
+      method: 'POST',
+      headers: {
+        ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+      },
+      body: form,
     });
+    if (!res.ok) throw new Error(`ASR request failed (${res.status})`);
+    const response = await res.json();
 
     if (!response.text || response.text.trim().length === 0) {
       throw new Error('Empty transcription result');
@@ -448,18 +539,11 @@ function cleanTranscription(text) {
 }
 
 async function transcribeAndClean(audioFilePath) {
-  const zai = await ZAI.create();
-  
-  const audioFile = fs.readFileSync(audioFilePath);
-  const base64Audio = audioFile.toString('base64');
-
-  const response = await zai.audio.asr.create({
-    file_base64: base64Audio
-  });
+  const raw = await transcribeAudio(audioFilePath);
 
   return {
-    raw: response.text,
-    cleaned: cleanTranscription(response.text)
+    raw: raw,
+    cleaned: cleanTranscription(raw)
   };
 }
 ```
@@ -482,17 +566,10 @@ async function transcribeAndClean(audioFilePath) {
 ```javascript
 import express from 'express';
 import multer from 'multer';
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 const app = express();
 const upload = multer({ dest: 'uploads/' });
-
-let zaiInstance;
-
-async function initZAI() {
-  zaiInstance = await ZAI.create();
-}
 
 app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
   try {
@@ -501,11 +578,20 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
     }
 
     const audioFile = fs.readFileSync(req.file.path);
-    const base64Audio = audioFile.toString('base64');
+    const blob = new Blob([audioFile]);
 
-    const response = await zaiInstance.audio.asr.create({
-      file_base64: base64Audio
+    const form = new FormData();
+    form.append('file', blob, req.file.originalname || 'audio.wav');
+    form.append('model', ASR_MODEL);
+
+    const res = await fetch(`${BASE_URL}/audio/transcriptions`, {
+      method: 'POST',
+      headers: {
+        ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+      },
+      body: form,
     });
+    const response = await res.json();
 
     // Clean up uploaded file
     fs.unlinkSync(req.file.path);
@@ -528,17 +614,15 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
   }
 });
 
-initZAI().then(() => {
-  app.listen(3000, () => {
-    console.log('ASR API running on port 3000');
-  });
+app.listen(3000, () => {
+  console.log('ASR API running on port 3000');
 });
 ```
 
 ## Troubleshooting
 
-**Issue**: "SDK must be used in backend"
-- **Solution**: Ensure z-ai-web-dev-sdk is only imported in server-side code
+**Issue**: "Credentials exposed in client code"
+- **Solution**: Read `LLM_API_KEY` from environment variables in server-side code only
 
 **Issue**: Empty or incorrect transcription
 - **Solution**: Verify audio quality and format. Check if audio contains clear speech
@@ -552,9 +636,12 @@ initZAI().then(() => {
 **Issue**: Memory errors with large files
 - **Solution**: Process files in chunks or increase Node.js memory limit
 
+**Issue**: 404 on `/audio/transcriptions`
+- **Solution**: Your server does not implement the OpenAI audio route. Point `LLM_BASE_URL` at a gateway or ASR server that does (faster-whisper-server, Speaches, Groq, etc.)
+
 ## Performance Tips
 
-1. **Reuse SDK Instance**: Create once, use multiple times
+1. **Reuse HTTP Connections**: `fetch` with keep-alive reuses connections across requests
 2. **Implement Caching**: Cache transcriptions for duplicate files
 3. **Batch Processing**: Process multiple files efficiently with proper queuing
 4. **Audio Optimization**: Compress audio files before processing when possible
@@ -571,9 +658,12 @@ For best transcription results:
 
 ## Remember
 
-- Always use z-ai-web-dev-sdk in backend code only
-- The SDK is already installed - import as shown in examples
-- Audio files must be converted to base64 before processing
+- Works with any OpenAI-compatible server exposing `/audio/transcriptions` (faster-whisper-server, whisper.cpp server, Speaches, Groq, OpenAI, ...)
+- Designed for the DiveeOI agent (OpenCode-based)
+- Configuration via environment variables: `LLM_BASE_URL`, `LLM_API_KEY`, `ASR_MODEL`
+- Audio files are uploaded as multipart form data (`file` + `model` fields)
+- The endpoint returns JSON with a `text` field containing the transcription
+- Keep your API key in server-side code only
 - Implement proper error handling for production applications
 - Consider audio quality for best transcription accuracy
 - Clean up temporary files after processing

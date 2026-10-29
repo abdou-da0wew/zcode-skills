@@ -1,6 +1,6 @@
 ---
 name: wechat-cover-pair
-description: 微信公众号封面对模板 — 主图（headline + subline + 视觉锚点）+ 次图/分享图（短标题 + logo / 账号标签）+ 长图头（文章标题 + 章节预览）。比小红书封面要求更强的标题腿粗、更明确的安全区、更克制的阅读节奏。必须按当前微信尺寸读 canvas-and-device.md。触发："做个公众号封面 / 微信首图次图对 / 视频号封面 / 公众号分享图 / 长图头"。NOT XHS 3:4 尺寸，NOT XHS 贴纸密集风。
+description: WeChat official-account cover pair template — main cover (headline + subline + visual anchor) + secondary/share cover (short title + logo / account label) + long-image header (article title + section preview). Demands stronger headline weight, clearer safe areas, and a calmer reading rhythm than XHS covers. Always read canvas-and-device.md for current WeChat dimensions. Triggers: "make an official-account cover / WeChat main+secondary cover pair / WeChat Channels cover / official-account share image / long-image header". NOT XHS 3:4 dimensions, NOT XHS sticker-crowded style.
 visibility: public
 mode: template
 carrier: fixed-image
@@ -8,18 +8,18 @@ scenario: social-content
 pattern_source: pattern.html
 source_priority: skill-first
 triggers:
-  - "做个公众号封面"
-  - "微信首图次图对"
-  - "视频号封面"
-  - "公众号分享图"
-  - "长图头封面"
-  - "微信生态封面"
+  - "make an official-account cover"
+  - "WeChat main and secondary cover pair"
+  - "WeChat Channels cover"
+  - "official-account share image"
+  - "long-image header cover"
+  - "WeChat ecosystem cover"
 related_patterns: social-card-editorial
 ---
 
 # WeChat Cover Pair Template
 
-Use for 微信公众号首图、封面图、分享图、视频号/微信生态封面等 fixed-image surfaces.
+Use for WeChat official-account hero images, covers, share images, and WeChat Channels / WeChat-ecosystem fixed-image surfaces.
 
 ## Core Rule
 

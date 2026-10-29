@@ -1,0 +1,1419 @@
+     1→<!DOCTYPE html>
+     2→<html lang="zh-CN">
+     3→<head>
+     4→<meta charset="UTF-8">
+     5→<meta name="viewport" content="width=device-width, initial-scale=1.0">
+     6→<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+     7→<title>📚 {{TITLE}}</title>
+     8→<style>
+     9→*{margin:0;padding:0;box-sizing:border-box}
+    10→body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',Roboto,sans-serif;background:#f5f7fb;color:#2d3142;height:100vh;overflow:hidden;display:flex;flex-direction:column;transition:background .2s,color .2s}
+    11→
+    12→/* ============ 顶部条 ============ */
+    13→.topbar{background:#fff;border-bottom:1px solid #e8eaf2;padding:10px 20px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+    14→.topbar-row1{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    15→.topbar-row2{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px dashed #f0f2f7}
+    16→.topbar h1{font-size:16px;color:#5b8def;white-space:nowrap;font-weight:700}
+    17→.topbar h1 .subtitle{font-size:12px;color:#8a8fa3;font-weight:400;margin-left:6px}
+    18→
+    19→.cat-filter{display:flex;align-items:center;gap:6px;flex-wrap:wrap;width:100%}
+    20→.cat-filter-label{font-size:12px;color:#8a8fa3;white-space:nowrap;font-weight:600}
+    21→.cat-chip{font-size:12px;padding:4px 12px;border-radius:14px;border:1px solid #e0e3ed;background:#fff;cursor:pointer;user-select:none;transition:all .15s;color:#8a8fa3;white-space:nowrap}
+    22→.cat-chip:hover{border-color:#5b8def}
+    23→.cat-chip.active{background:#5b8def;color:#fff;border-color:#5b8def}
+    24→.cat-chip .chip-count{font-size:10px;opacity:.75;margin-left:4px}
+    25→
+    26→.stat-filters{display:flex;gap:6px;align-items:center}
+    27→.sf-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:18px;border:1px solid #e0e3ed;background:#fff;cursor:pointer;transition:all .15s;user-select:none;font-size:12px;color:#8a8fa3}
+    28→.sf-btn:hover{border-color:#5b8def}
+    29→.sf-btn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:opacity .15s}
+    30→.sf-btn .dot.green{background:#52c785}
+    31→.sf-btn .dot.gray{background:#b8bdcc}
+    32→.sf-btn .dot.red{background:#ff7a90}
+    33→.sf-btn .dot.yellow{background:#ffc857}
+    34→.sf-btn .num{font-weight:700;min-width:16px;color:#2d3142}
+    35→.sf-btn.off{opacity:.4}
+    36→
+    37→.io-btns{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}
+    38→.io-btns button{font-size:12px;padding:5px 10px;border-radius:7px;border:1px solid #e0e3ed;background:#fff;color:#5b6172;cursor:pointer;transition:all .15s}
+    39→.io-btns button:hover{border-color:#5b8def;color:#5b8def}
+    40→.io-btns button.exam{background:#fef0f3;border-color:#ffd1d9;color:#ff5d77}
+    41→.io-btns button.exam:hover{background:#ff5d77;color:#fff;border-color:#ff5d77}
+    42→.io-btns button.danger:hover{border-color:#ff7a90;color:#ff7a90}
+    43→.io-btns .theme-toggle{padding:5px 9px;border-radius:50%;font-size:14px}
+    44→
+    45→/* ============ 主体 ============ */
+    46→.main{display:flex;flex:1;overflow:hidden}
+    47→.left{width:300px;min-width:300px;background:#fff;border-right:1px solid #e8eaf2;display:flex;flex-direction:column;flex-shrink:0}
+    48→.left-header{padding:12px 16px;border-bottom:1px solid #e8eaf2;font-size:13px;color:#8a8fa3;display:flex;justify-content:space-between;align-items:center}
+    49→.left-header .progress{font-weight:700;color:#5b8def}
+    50→.left-scroll{flex:1;overflow-y:auto;padding:6px 0}
+    51→.left-scroll::-webkit-scrollbar{width:6px}
+    52→.left-scroll::-webkit-scrollbar-thumb{background:#d8dce8;border-radius:3px}
+    53→
+    54→.cat-group{margin-bottom:2px}
+    55→.cat-top{padding:8px 16px;font-size:13px;font-weight:700;color:#2d3142;background:#fafbfd;display:flex;align-items:center;gap:6px;position:sticky;top:0;z-index:1;border-bottom:1px solid #f0f2f7}
+    56→.cat-count{font-size:11px;color:#a8adbd;font-weight:normal}
+    57→.cat-law{padding:8px 16px 4px 16px;font-size:12px;font-weight:600;color:#5a607a;display:flex;gap:6px;align-items:flex-start;line-height:1.45;border-top:1px solid #f5f6fa}
+    58→.cat-law:first-of-type{border-top:none}
+    59→.cat-law-name{flex:1;word-break:break-word}
+    60→.cat-law-count{font-size:10px;color:#a8adbd;font-weight:normal;background:#f0f2f7;padding:1px 6px;border-radius:8px;flex-shrink:0;margin-top:2px}
+    61→.cat-sub{padding:4px 16px 6px 24px}
+    62→.cat-sub-flat{padding:10px 16px 12px 16px}
+    63→.cat-sub-name{font-size:11px;color:#a8adbd;margin-bottom:5px;line-height:1.4}
+    64→.cat-nums{display:flex;flex-wrap:wrap;gap:3px}
+    65→.qnum{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:26px;padding:0 6px;border-radius:5px;font-size:12px;cursor:pointer;transition:all .15s;border:1.5px solid transparent;background:#f5f6fa;color:#5b6172;font-weight:600}
+    66→.qnum:hover{border-color:#5b8def;color:#5b8def;transform:translateY(-1px)}
+    67→.qnum.active{border-color:#5b8def!important;color:#fff!important;background:#5b8def!important;box-shadow:0 2px 6px rgba(91,141,239,0.3)}
+    68→.qnum.mastered{color:#3fb371;background:rgba(82,199,133,0.15)}
+    69→.qnum.unstudied{color:#8a8fa3;background:#f0f2f7}
+    70→.qnum.error{color:#ff5d77;background:rgba(255,122,144,0.15)}
+    71→.qnum.filtered-out{display:none!important}
+    72→
+    73→/* ============ 右侧 ============ */
+    74→.right{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+    75→.right-inner{flex:1;overflow-y:auto;padding:24px 32px}
+    76→.right-inner::-webkit-scrollbar{width:8px}
+    77→.right-inner::-webkit-scrollbar-thumb{background:#d8dce8;border-radius:4px}
+    78→
+    79→.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#a8adbd;font-size:15px;gap:12px;text-align:center}
+    80→.empty-state .icon{font-size:54px}
+    81→.empty-state .hint{font-size:13px;color:#b8bdcc}
+    82→
+    83→.q-card{max-width:780px;margin:0 auto}
+    84→.q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+    85→.q-id{font-size:18px;font-weight:800;color:#5b8def}
+    86→.q-tag{font-size:11px;padding:3px 9px;border-radius:11px;font-weight:600;white-space:nowrap}
+    87→.q-tag.type-choice{background:#e8f0ff;color:#5b8def}
+    88→.q-tag.type-tf{background:#e8f6ed;color:#52c785}
+    89→.q-tag.type-blank{background:#fff4e0;color:#e9a82c}
+    90→.q-tag.type-short{background:#f0e8ff;color:#9168e8}
+    91→.q-tag.level{background:#f0f2f7;color:#8a8fa3}
+    92→.q-state-btn{font-size:11px;padding:4px 10px 4px 12px;border-radius:11px;border:1px solid #e0e3ed;background:#fff;cursor:pointer;color:#8a8fa3;transition:all .15s;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+    93→.q-state-btn:hover{border-color:#5b8def;color:#5b8def;box-shadow:0 2px 6px rgba(91,141,239,0.15);transform:translateY(-1px)}
+    94→.q-state-btn.mastered{color:#3fb371;border-color:#a3dcbb;background:#f0faf3}
+    95→.q-state-btn.error{color:#ff5d77;border-color:#ffb8c4;background:#fff5f6}
+    96→.q-knowledge{font-size:12px;color:#8a8fa3;margin-left:auto;max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    97→
+    98→.q-text{font-size:16px;line-height:1.85;color:#2d3142;margin-bottom:20px;font-weight:500;white-space:pre-wrap}
+    99→
+   100→.opts{display:flex;flex-direction:column;gap:9px;margin-bottom:16px}
+   101→.opt{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;border-radius:10px;border:1.5px solid #e8eaf2;background:#fff;cursor:pointer;transition:all .15s;font-size:14px;line-height:1.6}
+   102→.opt:hover{border-color:#5b8def;background:#f8faff}
+   103→.opt .letter{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#f0f2f7;color:#5b6172;font-weight:700;flex-shrink:0;font-size:12px;transition:all .15s}
+   104→.opt:hover .letter{background:#5b8def;color:#fff}
+   105→.opt .text{flex:1;padding-top:2px;color:#2d3142}
+   106→.opt.selected{border-color:#5b8def;background:#f0f5ff}
+   107→.opt.selected .letter{background:#5b8def;color:#fff}
+   108→.opt.correct{border-color:#52c785;background:#f0faf3}
+   109→.opt.correct .letter{background:#52c785;color:#fff}
+   110→.opt.wrong{border-color:#ff7a90;background:#fff5f6}
+   111→.opt.wrong .letter{background:#ff7a90;color:#fff}
+   112→.opt.disabled{pointer-events:none}
+   113→
+   114→.q-input{width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid #e8eaf2;font-size:15px;font-family:inherit;background:#fff;color:#2d3142;outline:none;transition:all .15s;resize:vertical;margin-bottom:14px}
+   115→.q-input:focus{border-color:#5b8def;background:#f8faff}
+   116→.q-input.short{min-height:48px}
+   117→.q-input.long{min-height:120px}
+   118→.q-input:disabled{background:#f5f6fa;color:#8a8fa3}
+   119→
+   120→.q-actions{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+   121→.q-actions button{padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s}
+   122→.btn-submit{background:#5b8def;color:#fff}
+   123→.btn-submit:hover{background:#4a7adb}
+   124→.btn-submit:disabled{background:#b8bdcc;cursor:not-allowed}
+   125→.btn-reveal{background:#f0f2f7;color:#5b6172}
+   126→.btn-reveal:hover{background:#e0e3ed}
+   127→.btn-reset{background:#fff;color:#8a8fa3;border:1.5px solid #e0e3ed!important}
+   128→.btn-reset:hover{border-color:#ff7a90!important;color:#ff7a90}
+   129→
+   130→.auto-state-hint{font-size:13px;padding:9px 14px;border-radius:8px;margin-bottom:14px;display:none;font-weight:600}
+   131→.auto-state-hint.mastered{display:block;background:rgba(82,199,133,0.12);color:#3fb371;border:1px solid rgba(82,199,133,0.3)}
+   132→.auto-state-hint.error{display:block;background:rgba(255,122,144,0.12);color:#ff5d77;border:1px solid rgba(255,122,144,0.3)}
+   133→.auto-state-hint.retry{display:block;background:rgba(255,200,87,0.18);color:#d68b00;border:1px solid rgba(255,200,87,0.4);animation:slideIn .25s}
+   134→@keyframes slideIn{from{transform:translateY(-4px);opacity:0}to{transform:translateY(0);opacity:1}}
+   135→.opt.wrong-shake{animation:shake .5s;border-color:#ff7a90;background:#fff5f6}
+   136→@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+   137→
+   138→.analysis{display:none;margin-top:14px;padding:14px 18px;background:#fafbfd;border-radius:10px;border-left:4px solid #5b8def}
+   139→.analysis.visible{display:block}
+   140→.analysis.correct{border-left-color:#52c785;background:#f0faf3}
+   141→.analysis.wrong{border-left-color:#ff7a90;background:#fff5f6}
+   142→.ans-line{font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+   143→.analysis .ans-line{color:#3fb371}
+   144→.analysis.wrong .ans-line{color:#ff5d77}
+   145→.ans-text{font-size:13px;color:#5b6172;line-height:1.75;margin-bottom:6px}
+   146→.ans-text strong{color:#2d3142}
+   147→.ans-text em{color:#5b8def;font-style:normal;font-weight:600}
+   148→.ans-text code{background:rgba(91,141,239,0.1);padding:1px 6px;border-radius:4px;font-size:12px;color:#5b8def}
+   149→.tip{font-size:13px;color:#d68b00;line-height:1.7;padding:8px 12px;background:rgba(255,200,87,0.15);border-radius:6px;margin-top:8px;display:none}
+   150→.tip.visible{display:block}
+   151→.kw{font-size:12px;color:#a8adbd;margin-top:8px}
+   152→
+   153→/* ============ 导航条 ============ */
+   154→.nav-bar{padding:12px 32px;border-top:1px solid #e8eaf2;display:flex;align-items:center;justify-content:space-between;background:#fafbfd;flex-shrink:0}
+   155→.nav-btn{padding:7px 18px;border-radius:7px;border:1px solid #e0e3ed;background:#fff;color:#5b6172;cursor:pointer;font-size:13px;transition:all .15s}
+   156→.nav-btn:hover:not(:disabled){border-color:#5b8def;color:#5b8def}
+   157→.nav-btn:disabled{opacity:.4;cursor:default}
+   158→.nav-info{font-size:12px;color:#8a8fa3}
+   159→.kbd-hint{font-size:11px;color:#a8adbd;flex:1;text-align:center}
+   160→@media(max-width:900px){.kbd-hint{display:none}}
+   161→
+   162→/* ============ Modal ============ */
+   163→.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
+   164→.modal-overlay.visible{display:flex}
+   165→.modal{background:#fff;border-radius:14px;padding:24px 28px;max-width:480px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.15)}
+   166→.modal h3{font-size:17px;color:#2d3142;margin-bottom:10px}
+   167→.modal p{font-size:13px;color:#8a8fa3;line-height:1.6;margin-bottom:16px}
+   168→.modal-row{margin-bottom:14px}
+   169→.modal-row label{display:block;font-size:12px;color:#5b6172;margin-bottom:6px;font-weight:600}
+   170→.modal-row .opts-row{display:flex;flex-wrap:wrap;gap:6px}
+   171→.modal-btn{padding:7px 14px;border-radius:7px;border:1px solid #e0e3ed;background:#fff;color:#5b6172;cursor:pointer;font-size:13px;transition:all .15s}
+   172→.modal-btn:hover{border-color:#5b8def;color:#5b8def}
+   173→.modal-btn.selected{border-color:#5b8def;background:#5b8def;color:#fff}
+   174→.modal-textarea{width:100%;min-height:140px;padding:10px;border-radius:8px;border:1.5px solid #e8eaf2;font-family:monospace;font-size:12px;resize:vertical;outline:none}
+   175→.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+   176→.modal-actions .primary{background:#5b8def;color:#fff;border:none;padding:8px 18px;border-radius:7px;cursor:pointer;font-weight:600}
+   177→.modal-actions .primary:hover{background:#4a7adb}
+   178→.modal-actions .danger{border-color:#ff7a90;color:#ff5d77}
+   179→
+   180→/* ============ 模拟考模式 ============ */
+   181→.exam-overlay{display:none;position:fixed;inset:0;background:#f5f7fb;z-index:2000;flex-direction:column;overflow:hidden}
+   182→.exam-overlay.visible{display:flex}
+   183→.exam-topbar{background:#fff;border-bottom:1px solid #e8eaf2;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0;flex-wrap:wrap;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+   184→.exam-topbar h2{font-size:15px;color:#5b8def;font-weight:700}
+   185→.exam-progress{flex:1;display:flex;align-items:center;gap:8px;min-width:120px}
+   186→.exam-progress-bar{flex:1;height:6px;background:#e8eaf2;border-radius:3px;overflow:hidden}
+   187→.exam-progress-fill{height:100%;background:linear-gradient(90deg,#5b8def,#7a9fff);border-radius:3px;transition:width .3s}
+   188→.exam-progress-text{font-size:12px;color:#8a8fa3;white-space:nowrap}
+   189→.exam-timer{font-size:13px;color:#e9a82c;font-weight:700}
+   190→.exam-body{flex:1;overflow-y:auto;padding:20px 28px}
+   191→.exam-q-card{max-width:780px;margin:0 auto 16px;background:#fff;border:1px solid #e8eaf2;border-radius:12px;padding:18px 22px;box-shadow:0 2px 6px rgba(0,0,0,0.03)}
+   192→.exam-q-num{font-size:13px;color:#5b8def;font-weight:700;margin-bottom:8px}
+   193→.exam-q-text{font-size:15px;line-height:1.75;color:#2d3142;margin-bottom:12px;white-space:pre-wrap}
+   194→.exam-opts{display:flex;flex-direction:column;gap:6px}
+   195→.exam-opt{padding:9px 14px;border-radius:8px;border:1.5px solid #e8eaf2;background:#fff;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.55}
+   196→.exam-opt:hover{border-color:#5b8def;background:#f8faff}
+   197→.exam-opt.selected{border-color:#5b8def;background:#f0f5ff}
+   198→.exam-opt .letter{font-weight:700;min-width:22px;color:#5b6172;flex-shrink:0}
+   199→.exam-opt.selected .letter{color:#5b8def}
+   200→.exam-input{width:100%;padding:9px 12px;border-radius:7px;border:1.5px solid #e8eaf2;font-size:13px;outline:none;font-family:inherit;resize:vertical;min-height:42px}
+   201→.exam-input:focus{border-color:#5b8def}
+   202→.exam-submit-bar{padding:14px 28px;border-top:1px solid #e8eaf2;background:#fff;display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0}
+   203→.exam-submit-btn{padding:9px 28px;border-radius:8px;border:none;background:#5b8def;color:#fff;cursor:pointer;font-size:14px;font-weight:700}
+   204→.exam-submit-btn:hover{background:#4a7adb}
+   205→.exam-quit-btn{padding:9px 18px;border-radius:8px;border:1px solid #e0e3ed;background:#fff;color:#8a8fa3;cursor:pointer;font-size:13px}
+   206→.exam-quit-btn:hover{border-color:#ff7a90;color:#ff5d77}
+   207→
+   208→/* 结果页 */
+   209→.exam-results{display:none;position:fixed;inset:0;background:#f5f7fb;z-index:2000;flex-direction:column;overflow:hidden}
+   210→.exam-results.visible{display:flex}
+   211→.results-header{background:#fff;border-bottom:1px solid #e8eaf2;padding:24px;text-align:center;flex-shrink:0}
+   212→.results-score{font-size:54px;font-weight:900;margin-bottom:4px;line-height:1}
+   213→.results-score.pass{color:#52c785}
+   214→.results-score.fail{color:#ff5d77}
+   215→.results-detail{font-size:14px;color:#8a8fa3;margin-bottom:14px}
+   216→.results-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+   217→.results-actions button{padding:8px 18px;border-radius:7px;border:1px solid #e0e3ed;background:#fff;color:#5b6172;cursor:pointer;font-size:13px}
+   218→.results-actions button:hover{border-color:#5b8def;color:#5b8def}
+   219→.results-actions button.primary{background:#5b8def;color:#fff;border-color:#5b8def}
+   220→.results-body{flex:1;overflow-y:auto;padding:18px 24px}
+   221→.result-item{max-width:780px;margin:0 auto 12px;background:#fff;border:1px solid #e8eaf2;border-radius:10px;padding:14px 18px}
+   222→.result-item.is-correct{border-left:4px solid #52c785}
+   223→.result-item.is-wrong{border-left:4px solid #ff7a90}
+   224→.result-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+   225→.result-badge{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:700}
+   226→.result-badge.correct{background:#f0faf3;color:#3fb371}
+   227→.result-badge.wrong{background:#fff5f6;color:#ff5d77}
+   228→.result-qid{font-size:12px;color:#5b8def;font-weight:700}
+   229→.result-text{font-size:13px;line-height:1.7;color:#2d3142;margin-bottom:6px;white-space:pre-wrap}
+   230→.result-answers{font-size:12px;color:#5b6172;margin-bottom:6px}
+   231→.result-answers .correct-ans{color:#3fb371;font-weight:700}
+   232→.result-answers .wrong-ans{color:#ff5d77;text-decoration:line-through}
+   233→.result-analysis{font-size:12px;color:#5b6172;line-height:1.7;padding:7px 11px;background:#fafbfd;border-radius:6px;margin-bottom:6px}
+   234→.result-tip{font-size:12px;color:#d68b00;line-height:1.6;padding:6px 10px;background:rgba(255,200,87,0.15);border-radius:6px;margin-bottom:6px}
+   235→
+   236→/* ============ 移动端 ============ */
+   237→.sidebar-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:999;width:48px;height:48px;border-radius:50%;background:#5b8def;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+   238→.sidebar-toggle:active{transform:scale(0.92)}
+   239→@media(max-width:768px){
+   240→  .left{width:100%;min-width:100%;max-height:50vh;border-right:none;border-bottom:1px solid #e8eaf2;transition:max-height .3s ease}
+   241→  .left.hidden{max-height:0;overflow:hidden;border-bottom:none}
+   242→  .main{flex-direction:column}
+   243→  .topbar{gap:8px;padding:8px 12px}
+   244→  .topbar h1{font-size:14px}
+   245→  .cat-filter{order:10;width:100%}
+   246→  .io-btns{margin-left:0;width:100%;justify-content:flex-end}
+   247→  .right-inner{padding:14px}
+   248→  .sidebar-toggle{display:flex;align-items:center;justify-content:center}
+   249→  .nav-bar{padding:10px 14px}
+   250→}
+   251→
+   252→/* ============ Dark Mode ============ */
+   253→body.dark{background:#1a1a2e;color:#e0e3ed}
+   254→body.dark .topbar{background:#16213e;border-bottom-color:#0f3460;box-shadow:none}
+   255→body.dark .topbar h1{color:#e88ca5}
+   256→body.dark .cat-filter-label,body.dark .cat-sub-name,body.dark .left-header,body.dark .nav-info,body.dark .empty-state,body.dark .ans-text,body.dark .modal p{color:#888}
+   257→body.dark .cat-chip{background:transparent;border-color:#333;color:#888}
+   258→body.dark .cat-chip.active{background:#e88ca5;color:#fff;border-color:#e88ca5}
+   259→body.dark .sf-btn{background:transparent;border-color:#333;color:#aaa}
+   260→body.dark .sf-btn:hover{border-color:#e88ca5}
+   261→body.dark .sf-btn .num{color:#e0e3ed}
+   262→body.dark .io-btns button{background:transparent;border-color:#333;color:#aaa}
+   263→body.dark .io-btns button:hover{border-color:#e88ca5;color:#e88ca5}
+   264→body.dark .io-btns button.exam{background:rgba(232,140,165,0.15);border-color:#e88ca5;color:#e88ca5}
+   265→body.dark .left{background:#16213e;border-right-color:#0f3460}
+   266→body.dark .left-scroll::-webkit-scrollbar-thumb{background:#333}
+   267→body.dark .cat-top{background:#16213e;color:#e0e3ed;border-bottom-color:#0f3460}
+   268→body.dark .cat-law{color:#c5cad8;border-top-color:#1f2a44}
+   269→body.dark .cat-law-count{background:#1f2a44;color:#888}
+   270→body.dark .cat-count{color:#666}
+   271→body.dark .qnum{background:rgba(100,100,100,0.15);color:#777;border-color:transparent}
+   272→body.dark .qnum:hover{border-color:#e88ca5;color:#fff}
+   273→body.dark .qnum.active{background:#e88ca5!important;border-color:#e88ca5!important;color:#fff!important}
+   274→body.dark .qnum.mastered{background:rgba(110,197,168,0.15);color:#6ec5a8}
+   275→body.dark .qnum.unstudied{background:rgba(100,100,100,0.15);color:#888}
+   276→body.dark .qnum.error{background:rgba(232,140,165,0.15);color:#e88ca5}
+   277→body.dark .right-inner::-webkit-scrollbar-thumb{background:#333}
+   278→body.dark .q-text{color:#e0e3ed}
+   279→body.dark .q-id{color:#e88ca5}
+   280→body.dark .q-tag.type-choice{background:rgba(91,141,239,0.15);color:#7a9fff}
+   281→body.dark .q-tag.type-tf{background:rgba(110,197,168,0.15);color:#6ec5a8}
+   282→body.dark .q-tag.type-blank{background:rgba(255,200,87,0.15);color:#f4a261}
+   283→body.dark .q-tag.type-short{background:rgba(145,104,232,0.15);color:#b08fff}
+   284→body.dark .q-tag.level{background:rgba(100,100,100,0.2);color:#888}
+   285→body.dark .q-state-btn{background:transparent;border-color:#333;color:#aaa}
+   286→body.dark .q-knowledge{color:#666}
+   287→body.dark .opt{background:#1f2541;border-color:#333;color:#e0e3ed}
+   288→body.dark .opt:hover{background:rgba(232,140,165,0.05);border-color:#555}
+   289→body.dark .opt .text{color:#e0e3ed}
+   290→body.dark .opt .letter{background:#333;color:#888}
+   291→body.dark .opt.selected{background:rgba(232,140,165,0.1);border-color:#e88ca5}
+   292→body.dark .opt.correct{background:rgba(110,197,168,0.1);border-color:#6ec5a8}
+   293→body.dark .opt.wrong{background:rgba(232,140,165,0.1);border-color:#e88ca5}
+   294→body.dark .q-input{background:#1f2541;border-color:#333;color:#e0e3ed}
+   295→body.dark .q-input:focus{background:#1a1a2e;border-color:#e88ca5}
+   296→body.dark .btn-submit{background:#e88ca5}
+   297→body.dark .btn-submit:hover{background:#d97a93}
+   298→body.dark .btn-reveal{background:#333;color:#aaa}
+   299→body.dark .btn-reset{background:transparent;color:#888}
+   300→body.dark .analysis{background:#1a1a2e;border-left-color:#e88ca5}
+   301→body.dark .analysis.correct{background:#1a1a2e;border-left-color:#6ec5a8}
+   302→body.dark .analysis.wrong{background:#1a1a2e;border-left-color:#e88ca5}
+   303→body.dark .nav-bar{background:#16213e;border-top-color:#0f3460}
+   304→body.dark .nav-btn{background:transparent;border-color:#333;color:#aaa}
+   305→body.dark .kbd-hint{color:#555}
+   306→body.dark .modal{background:#16213e;color:#e0e3ed}
+   307→body.dark .modal h3{color:#e0e3ed}
+   308→body.dark .modal-btn{background:transparent;border-color:#333;color:#aaa}
+   309→body.dark .modal-btn.selected{background:#e88ca5;border-color:#e88ca5;color:#fff}
+   310→body.dark .modal-textarea{background:#1f2541;border-color:#333;color:#e0e3ed}
+   311→body.dark .exam-overlay,body.dark .exam-results{background:#1a1a2e}
+   312→body.dark .exam-topbar,body.dark .exam-submit-bar,body.dark .results-header{background:#16213e;border-color:#0f3460}
+   313→body.dark .exam-q-card,body.dark .result-item{background:#16213e;border-color:#0f3460}
+   314→body.dark .exam-q-text,body.dark .result-text{color:#e0e3ed}
+   315→body.dark .exam-opt{background:#1f2541;border-color:#333;color:#e0e3ed}
+   316→body.dark .exam-opt.selected{background:rgba(232,140,165,0.1);border-color:#e88ca5}
+   317→body.dark .result-analysis{background:#1a1a2e;color:#aaa}
+   318→body.dark .auto-state-hint.mastered{background:rgba(110,197,168,0.1);color:#6ec5a8;border-color:rgba(110,197,168,0.3)}
+   319→body.dark .auto-state-hint.error{background:rgba(232,140,165,0.1);color:#e88ca5;border-color:rgba(232,140,165,0.3)}
+   320→</style>
+   321→</head>
+   322→<body class="light">
+   323→
+   324→<div class="topbar">
+   325→  <div class="topbar-row1">
+   326→    <h1>📚 {{TITLE}} <span class="subtitle">{{SUBTITLE}}</span></h1>
+   327→    <div class="stat-filters" id="statFilters">
+   328→      <div class="sf-btn" data-f="mastered" onclick="toggleFilter('mastered',this)"><span class="dot green"></span><span class="num" id="numMastered">0</span><span>已掌握</span></div>
+   329→      <div class="sf-btn" data-f="unstudied" onclick="toggleFilter('unstudied',this)"><span class="dot gray"></span><span class="num" id="numUnstudied">0</span><span>未做</span></div>
+   330→      <div class="sf-btn" data-f="error" onclick="toggleFilter('error',this)"><span class="dot red"></span><span class="num" id="numError">0</span><span>错题</span></div>
+   331→    </div>
+   332→    <div class="io-btns">
+   333→      <button class="exam" onclick="showExamModal()">📝 模拟考</button>
+   334→      <button onclick="randomQ()">🎲 随机</button>
+   335→      <button onclick="exportProgress()">💾 导出进度</button>
+   336→      <button class="danger" onclick="showResetModal()">🗑️ 重置</button>
+   337→      <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">☀️</button>
+   338→    </div>
+   339→  </div>
+   340→  <div class="topbar-row2">
+   341→    <div class="cat-filter" id="catFilter"><span class="cat-filter-label">📂 分类：</span></div>
+   342→  </div>
+   343→</div>
+   344→
+   345→<button class="sidebar-toggle" onclick="toggleSidebar()">📋</button>
+   346→
+   347→<div class="main">
+   348→  <div class="left" id="sidebar">
+   349→    <div class="left-header"><span>📚 题号目录</span><span class="progress" id="progressTxt">0/0</span></div>
+   350→    <div class="left-scroll" id="leftScroll"></div>
+   351→  </div>
+   352→  <div class="right">
+   353→    <div class="right-inner" id="rightInner">
+   354→      <div class="empty-state">
+   355→        <div class="icon">📖</div>
+   356→        <div>选择左侧题号开始学习</div>
+   357→        <div class="hint">点击题号查看，做完会自动记录到本地</div>
+   358→      </div>
+   359→    </div>
+   360→    <div class="nav-bar" id="navBar" style="display:none;">
+   361→      <button class="nav-btn" id="prevBtn" onclick="goPrev()" title="← 上一题">← 上一题</button>
+   362→      <span class="nav-info" id="navInfo"></span>
+   363→      <span class="kbd-hint">⌨️ A/B/C/D 选项 · Enter 提交 · ← → 切题 · Space 看答案</span>
+   364→      <button class="nav-btn" id="nextBtn" onclick="goNext()" title="→ 下一题">下一题 →</button>
+   365→    </div>
+   366→  </div>
+   367→</div>
+   368→
+   369→<!-- ===== 模拟考 modal ===== -->
+   370→<div class="modal-overlay" id="examModal">
+   371→  <div class="modal">
+   372→    <h3>📝 开始模拟考</h3>
+   373→    <p id="examPoolSize">从当前题池中随机抽题作答</p>
+   374→    <div class="modal-row">
+   375→      <label>题量</label>
+   376→      <div class="opts-row">
+   377→        <button class="modal-btn" data-n="5" onclick="selectExamCount(5)">5题</button>
+   378→        <button class="modal-btn selected" data-n="10" onclick="selectExamCount(10)">10题</button>
+   379→        <button class="modal-btn" data-n="20" onclick="selectExamCount(20)">20题</button>
+   380→        <button class="modal-btn" data-n="30" onclick="selectExamCount(30)">30题</button>
+   381→        <button class="modal-btn" data-n="50" onclick="selectExamCount(50)">50题</button>
+   382→      </div>
+   383→    </div>
+   384→    <div class="modal-row">
+   385→      <label>每题限时</label>
+   386→      <div class="opts-row">
+   387→        <button class="modal-btn selected" data-t="0" onclick="selectExamTime(0)">不限时</button>
+   388→        <button class="modal-btn" data-t="30" onclick="selectExamTime(30)">30秒</button>
+   389→        <button class="modal-btn" data-t="60" onclick="selectExamTime(60)">1分钟</button>
+   390→        <button class="modal-btn" data-t="90" onclick="selectExamTime(90)">1.5分钟</button>
+   391→        <button class="modal-btn" data-t="120" onclick="selectExamTime(120)">2分钟</button>
+   392→      </div>
+   393→    </div>
+   394→    <div class="modal-actions">
+   395→      <button class="modal-btn" onclick="hideExamModal()">取消</button>
+   396→      <button class="primary" onclick="startExam()">🚀 开考</button>
+   397→    </div>
+   398→  </div>
+   399→</div>
+   400→
+   401→<!-- ===== 导入 modal ===== -->
+   402→<div class="modal-overlay" id="importModal">
+   403→  <div class="modal">
+   404→    <h3 id="importTitle">📥 导入</h3>
+   405→    <p id="importHint">粘贴 JSON 内容</p>
+   406→    <textarea class="modal-textarea" id="importText" placeholder=""></textarea>
+   407→    <div class="modal-actions">
+   408→      <button class="modal-btn" onclick="hideImportModal()">取消</button>
+   409→      <button class="primary" onclick="doImport()">导入</button>
+   410→    </div>
+   411→  </div>
+   412→</div>
+   413→
+   414→<!-- ===== 重置 modal ===== -->
+   415→<div class="modal-overlay" id="resetModal">
+   416→  <div class="modal">
+   417→    <h3>🗑️ 重置答题记录</h3>
+   418→    <p>这会清空所有"已掌握 / 错题 / 答题状态"，但题目本身不会删除。确定吗？</p>
+   419→    <div class="modal-actions">
+   420→      <button class="modal-btn" onclick="hideResetModal()">取消</button>
+   421→      <button class="primary danger" style="background:#ff5d77;" onclick="doReset()">确认重置</button>
+   422→    </div>
+   423→  </div>
+   424→</div>
+   425→
+   426→<!-- ===== 模拟考答题界面 ===== -->
+   427→<div class="exam-overlay" id="examOverlay">
+   428→  <div class="exam-topbar">
+   429→    <h2>📝 模拟考</h2>
+   430→    <div class="exam-progress">
+   431→      <div class="exam-progress-bar"><div class="exam-progress-fill" id="examProgressFill" style="width:0%"></div></div>
+   432→      <span class="exam-progress-text" id="examProgressText">0 / 0</span>
+   433→    </div>
+   434→    <span class="exam-timer" id="examTimer">⏱ 0:00</span>
+   435→    <button class="exam-quit-btn" onclick="quitExam()">退出</button>
+   436→  </div>
+   437→  <div class="exam-body" id="examBody"></div>
+   438→  <div class="exam-submit-bar">
+   439→    <button class="exam-submit-btn" id="examSubmitBtn" onclick="submitExam()">📤 提交答卷</button>
+   440→  </div>
+   441→</div>
+   442→
+   443→<!-- ===== 成绩页 ===== -->
+   444→<div class="exam-results" id="examResults">
+   445→  <div class="results-header">
+   446→    <div class="results-score" id="resultsScore">0</div>
+   447→    <div class="results-detail" id="resultsDetail"></div>
+   448→    <div class="results-actions">
+   449→      <button class="primary" onclick="closeResults()">返回</button>
+   450→      <button onclick="retakeExam()">🔄 再考一次</button>
+   451→    </div>
+   452→  </div>
+   453→  <div class="results-body" id="resultsBody"></div>
+   454→</div>
+   455→
+   456→<!-- ===== 题库数据（脚本注入） ===== -->
+   457→<script>
+   458→window.__QUIZ_DATA__ = {{QUIZ_DATA}};
+   459→window.__META__ = {{META}};
+   460→</script>
+   461→
+   462→<script>
+   463→'use strict';
+   464→
+   465→/* ============================================
+   466→ * Quiz Engine - K12 StudyBuddy 4.0
+   467→ * 受 v15 启发，针对 K12 多学科多题型优化
+   468→ * ============================================ */
+   469→const META = window.__META__ || {};
+   470→const STORAGE_KEY = 'k12_quiz_' + (META.id || 'default');
+   471→const FILTER_KEY = STORAGE_KEY + '_filter';
+   472→const CATS_KEY = STORAGE_KEY + '_cats';
+   473→const THEME_KEY = 'k12_quiz_theme';
+   474→
+   475→const TYPE_LABELS = {
+   476→  single_choice: { txt: '选择', cls: 'type-choice' },
+   477→  true_false:    { txt: '判断', cls: 'type-tf' },
+   478→  fill_blank:    { txt: '填空', cls: 'type-blank' },
+   479→  short_answer:  { txt: '简答', cls: 'type-short' }
+   480→};
+   481→const LEVEL_LABELS = { 1: 'L1·识记', 2: 'L2·理解', 3: 'L3·应用' };
+   482→const STATE_LABELS = { mastered: '✅ 已掌握', unstudied: '⬜ 未做', error: '❌ 错题' };
+   483→
+   484→let QS = [];                 // 全部题目（含 id）
+   485→let states = {};             // {id: 'mastered'|'unstudied'|'error'}
+   486→let answered = {};           // {id: userAnswer}
+   487→let activeFilters = { mastered: true, unstudied: true, error: true };
+   488→let activeCats = new Set();  // 当前激活的学科
+   489→let currentId = null;
+   490→let filteredIds = [];
+   491→
+   492→/* ===== 启动 ===== */
+   493→function init() {
+   494→  // 主题恢复（默认 light）
+   495→  try {
+   496→    const t = localStorage.getItem(THEME_KEY);
+   497→    if (t === 'dark') {
+   498→      document.body.classList.remove('light');
+   499→      document.body.classList.add('dark');
+   500→      document.querySelector('.theme-toggle').textContent = '🌙';
+   501→    }
+   502→  } catch (e) {}
+   503→
+   504→  // 强制按数组下标重排 id：忽略题目原始 id 字段（可能是字符串或冲突值）
+   505→  QS = (window.__QUIZ_DATA__ || []).map((q, i) => Object.assign({}, q, { id: i + 1, _origId: q.id }));
+   506→  if (QS.length === 0) {
+   507→    document.getElementById('leftScroll').innerHTML = '<div style="padding:20px;color:#a8adbd;font-size:13px;text-align:center;">题库为空，请先导入题目</div>';
+   508→    return;
+   509→  }
+   510→
+   511→  loadState();
+   512→  loadFilters();
+   513→  buildCatChips();
+   514→  buildSidebar();
+   515→  applyFilters();
+   516→  updateStats();
+   517→
+   518→  // 默认选中筛选结果中的第 1 题（首次进入不再是空白态）
+   519→  if (filteredIds.length > 0) selectQ(filteredIds[0]);
+   520→}
+   521→
+   522→function loadState() {
+   523→  try {
+   524→    const raw = localStorage.getItem(STORAGE_KEY);
+   525→    if (raw) {
+   526→      const obj = JSON.parse(raw);
+   527→      states = obj.states || {};
+   528→      answered = obj.answered || {};
+   529→    }
+   530→  } catch (e) { states = {}; answered = {}; }
+   531→  QS.forEach(q => { if (!states[q.id]) states[q.id] = 'unstudied'; });
+   532→}
+   533→
+   534→function saveState() {
+   535→  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ states, answered })); } catch (e) {}
+   536→}
+   537→
+   538→function loadFilters() {
+   539→  try {
+   540→    const raw = localStorage.getItem(FILTER_KEY);
+   541→    if (raw) activeFilters = Object.assign(activeFilters, JSON.parse(raw));
+   542→  } catch (e) {}
+   543→  document.querySelectorAll('.sf-btn').forEach(btn => {
+   544→    if (!activeFilters[btn.dataset.f]) btn.classList.add('off');
+   545→  });
+   546→
+   547→  // 学科：默认全选（只取一级分类）
+   548→  const cats = [...new Set(QS.map(getCatKey))];
+   549→  try {
+   550→    const raw = localStorage.getItem(CATS_KEY);
+   551→    const arr = raw ? JSON.parse(raw) : null;
+   552→    activeCats = new Set(Array.isArray(arr) && arr.length ? arr : cats);
+   553→  } catch (e) { activeCats = new Set(cats); }
+   554→}
+   555→
+   556→/* ===== 分类解析 =====
+   557→   category 形如 "通用类 / 1.中华人民共和国证券法（…）"：
+   558→     一级（顶部 chip + 侧栏顶 cat-top）= 斜杠前的 "通用类"
+   559→     二级（侧栏 cat-sub-top，法规名）  = 斜杠后剩余部分
+   560→   knowledge_point 形如 "一、法律/1.中华人民共和国证券法（…）/《证券法》适用范围"：
+   561→     真正的知识点 = 最后一段 "《证券法》适用范围"
+   562→   既兼容旧扁平数据（无斜杠），又把 badcase 里冗余的层级路径清掉。
+   563→*/
+   564→function splitCat(raw) {
+   565→  const s = (raw || '通用').trim();
+   566→  const i = s.indexOf('/');
+   567→  if (i < 0) return { top: s, sub: '' };
+   568→  return { top: s.slice(0, i).trim() || '通用', sub: s.slice(i + 1).trim() };
+   569→}
+   570→function getCatKey(q) {
+   571→  return splitCat(q.category).top;
+   572→}
+   573→function getSubCat(q) {
+   574→  return splitCat(q.category).sub;
+   575→}
+   576→function getKpLeaf(q) {
+   577→  const raw = (q.knowledge_point || q.knowledge || '').trim();
+   578→  if (!raw) return '未分类';
+   579→  const parts = raw.split('/').map(s => s.trim()).filter(Boolean);
+   580→  return parts.length ? parts[parts.length - 1] : '未分类';
+   581→}
+   582→function buildCatChips() {
+   583→  const cats = [...new Set(QS.map(getCatKey))];
+   584→  const counts = {};
+   585→  cats.forEach(c => { counts[c] = QS.filter(q => getCatKey(q) === c).length; });
+   586→
+   587→  const wrap = document.getElementById('catFilter');
+   588→  wrap.querySelectorAll('.cat-chip').forEach(el => el.remove());
+   589→  cats.forEach(c => {
+   590→    const chip = document.createElement('span');
+   591→    chip.className = 'cat-chip' + (activeCats.has(c) ? ' active' : '');
+   592→    chip.dataset.cat = c;
+   593→    chip.innerHTML = `${escapeHtml(c)}<span class="chip-count">${counts[c]}</span>`;
+   594→    chip.onclick = () => toggleCat(c, chip);
+   595→    wrap.appendChild(chip);
+   596→  });
+   597→}
+   598→
+   599→function toggleCat(cat, el) {
+   600→  if (activeCats.has(cat)) {
+   601→    if (activeCats.size <= 1) return;  // 至少保留一个
+   602→    activeCats.delete(cat);
+   603→    el.classList.remove('active');
+   604→  } else {
+   605→    activeCats.add(cat);
+   606→    el.classList.add('active');
+   607→  }
+   608→  try { localStorage.setItem(CATS_KEY, JSON.stringify([...activeCats])); } catch (e) {}
+   609→  buildSidebar();
+   610→  applyFilters();
+   611→}
+   612→
+   613→/* ===== 侧栏 ===== */
+   614→function buildSidebar() {
+   615→  // 三层：一级分类 → 法规（category 后段） → 知识点（knowledge_point 最后一段）
+   616→  const groups = {};
+   617→  QS.forEach(q => {
+   618→    const cat = getCatKey(q);
+   619→    if (!activeCats.has(cat)) return;
+   620→    const law = getSubCat(q) || '通用';   // 二级：法规名
+   621→    const kp = getKpLeaf(q);              // 三级：知识点叶子
+   622→    if (!groups[cat]) groups[cat] = {};
+   623→    if (!groups[cat][law]) groups[cat][law] = {};
+   624→    if (!groups[cat][law][kp]) groups[cat][law][kp] = [];
+   625→    groups[cat][law][kp].push(q);
+   626→  });
+   627→
+   628→  const container = document.getElementById('leftScroll');
+   629→  container.innerHTML = '';
+   630→  Object.keys(groups).forEach(cat => {
+   631→    const laws = groups[cat];
+   632→    const lawKeys = Object.keys(laws);
+   633→    const total = Object.values(laws).reduce(
+   634→      (s, kps) => s + Object.values(kps).reduce((n, arr) => n + arr.length, 0), 0
+   635→    );
+   636→
+   637→    // 兜底：如果该一级下没有任何有效二级 / 三级（法规名都是"通用" 且 知识点都是"未分类"），
+   638→    // 直接平铺题号，避免出现一个孤零零的"未分类"中间层
+   639→    const hasLaw = lawKeys.some(l => l && l !== '通用');
+   640→    const hasKp = lawKeys.some(l => Object.keys(laws[l]).some(k => k && k !== '未分类'));
+   641→    const flat = !hasLaw && !hasKp;
+   642→
+   643→    let html = `<div class="cat-group"><div class="cat-top">📂 ${escapeHtml(cat)} <span class="cat-count">${total}题</span></div>`;
+   644→
+   645→    if (flat) {
+   646→      // 收集所有题号，按 id 排序后一把铺出来
+   647→      const allQs = [];
+   648→      lawKeys.forEach(l => Object.values(laws[l]).forEach(arr => allQs.push(...arr)));
+   649→      allQs.sort((a, b) => a.id - b.id);
+   650→      html += `<div class="cat-sub cat-sub-flat"><div class="cat-nums">`;
+   651→      allQs.forEach(q => {
+   652→        const st = states[q.id] || 'unstudied';
+   653→        html += `<span class="qnum ${st}" data-id="${q.id}" onclick="selectQ(${q.id})">${q.id}</span>`;
+   654→      });
+   655→      html += `</div></div>`;
+   656→    } else {
+   657→      lawKeys.forEach(law => {
+   658→        const kps = laws[law];
+   659→        const lawTotal = Object.values(kps).reduce((n, arr) => n + arr.length, 0);
+   660→        // 法规名长，可能换行；用 title 兜底显示完整原文
+   661→        if (law && law !== '通用') {
+   662→          html += `<div class="cat-law" title="${escapeHtml(law)}"><span class="cat-law-name">${escapeHtml(law)}</span><span class="cat-law-count">${lawTotal}</span></div>`;
+   663→        }
+   664→        Object.keys(kps).forEach(kp => {
+   665→          html += `<div class="cat-sub"><div class="cat-sub-name" title="${escapeHtml(kp)}">${escapeHtml(kp)}</div><div class="cat-nums">`;
+   666→          kps[kp].forEach(q => {
+   667→            const st = states[q.id] || 'unstudied';
+   668→            html += `<span class="qnum ${st}" data-id="${q.id}" onclick="selectQ(${q.id})">${q.id}</span>`;
+   669→          });
+   670→          html += `</div></div>`;
+   671→        });
+   672→      });
+   673→    }
+   674→
+   675→    html += `</div>`;
+   676→    container.insertAdjacentHTML('beforeend', html);
+   677→  });
+   678→}
+   679→
+   680→function applyStatesToDOM() {
+   681→  document.querySelectorAll('.qnum').forEach(el => {
+   682→    el.classList.remove('mastered', 'unstudied', 'error');
+   683→    const id = parseInt(el.dataset.id, 10);
+   684→    el.classList.add(states[id] || 'unstudied');
+   685→  });
+   686→}
+   687→
+   688→function updateStats() {
+   689→  let m = 0, u = 0, e = 0;
+   690→  QS.forEach(q => {
+   691→    if (!activeCats.has(getCatKey(q))) return;
+   692→    const s = states[q.id] || 'unstudied';
+   693→    if (s === 'mastered') m++;
+   694→    else if (s === 'error') e++;
+   695→    else u++;
+   696→  });
+   697→  document.getElementById('numMastered').textContent = m;
+   698→  document.getElementById('numUnstudied').textContent = u;
+   699→  document.getElementById('numError').textContent = e;
+   700→  const total = m + u + e;
+   701→  document.getElementById('progressTxt').textContent = `${m}/${total}`;
+   702→}
+   703→
+   704→/* ===== 过滤 ===== */
+   705→function toggleFilter(type, btn) {
+   706→  activeFilters[type] = !activeFilters[type];
+   707→  btn.classList.toggle('off', !activeFilters[type]);
+   708→  try { localStorage.setItem(FILTER_KEY, JSON.stringify(activeFilters)); } catch (e) {}
+   709→  applyFilters();
+   710→}
+   711→
+   712→function applyFilters() {
+   713→  filteredIds = [];
+   714→  document.querySelectorAll('.qnum').forEach(el => {
+   715→    const id = parseInt(el.dataset.id, 10);
+   716→    const st = states[id] || 'unstudied';
+   717→    const visible = activeFilters[st];
+   718→    el.classList.toggle('filtered-out', !visible);
+   719→    if (visible) filteredIds.push(id);
+   720→  });
+   721→  updateStats();
+   722→  updateNav();
+   723→}
+   724→
+   725→/* ===== 选题 + 渲染 ===== */
+   726→window.selectQ = function (id) {
+   727→  id = parseInt(id, 10);  // 防御：onclick 传进来如果是字符串先转 int
+   728→  currentId = id;
+   729→  document.querySelectorAll('.qnum').forEach(el => {
+   730→    el.classList.toggle('active', parseInt(el.dataset.id, 10) === id);
+   731→  });
+   732→  const q = QS.find(x => x.id === id);
+   733→  if (!q) { console.error('[selectQ] 找不到题目 id=' + id + '，QS 中 id 列表：', QS.map(x => x.id)); return; }
+   734→  renderQuestion(q);
+   735→  document.getElementById('navBar').style.display = 'flex';
+   736→  updateNav();
+   737→  // 移动端：选完自动收起侧栏
+   738→  if (window.innerWidth <= 768) {
+   739→    document.getElementById('sidebar').classList.add('hidden');
+   740→  }
+   741→};
+   742→
+   743→function renderQuestion(q) {
+   744→  const typeInfo = TYPE_LABELS[q.type] || { txt: '题', cls: 'type-choice' };
+   745→  const lvl = LEVEL_LABELS[q.level] || '';
+   746→  const kp = q.knowledge_point || q.knowledge || '';
+   747→  const st = states[q.id] || 'unstudied';
+   748→
+   749→  let html = `<div class="q-card">
+   750→    <div class="q-meta">
+   751→      <span class="q-id">Q${q.id}</span>
+   752→      <span class="q-tag ${typeInfo.cls}">${typeInfo.txt}</span>
+   753→      ${lvl ? `<span class="q-tag level">${lvl}</span>` : ''}
+   754→      <button class="q-state-btn ${st}" id="qStateBtn" onclick="cycleState()" title="点击手动切换：未做 → 已掌握 → 错题">${STATE_LABELS[st]} <span style="opacity:.5;font-weight:400;">▾</span></button>
+   755→      ${kp ? `<span class="q-knowledge" title="${escapeHtml(kp)}">🏷️ ${escapeHtml(kp)}</span>` : ''}
+   756→    </div>
+   757→    <div class="q-text">${renderMD(q.prompt || q.question)}</div>`;
+   758→
+   759→  if (q.type === 'single_choice') {
+   760→    html += `<div class="opts" id="qOpts">`;
+   761→    (q.options || []).forEach((opt, i) => {
+   762→      const m = opt.match(/^([A-Z])[\.\、]\s*(.+)/);
+   763→      const letter = m ? m[1] : String.fromCharCode(65 + i);
+   764→      const text = m ? m[2] : opt;
+   765→      html += `<div class="opt" data-key="${letter}" onclick="chooseOpt(this,'${letter}',${q.id})">
+   766→        <span class="letter">${letter}</span><span class="text">${renderMD(text)}</span>
+   767→      </div>`;
+   768→    });
+   769→    html += `</div>`;
+   770→  } else if (q.type === 'true_false') {
+   771→    html += `<div class="opts" id="qOpts">
+   772→      <div class="opt" data-key="True" onclick="chooseOpt(this,'True',${q.id})"><span class="letter">✓</span><span class="text">正确</span></div>
+   773→      <div class="opt" data-key="False" onclick="chooseOpt(this,'False',${q.id})"><span class="letter">✗</span><span class="text">错误</span></div>
+   774→    </div>`;
+   775→  } else if (q.type === 'fill_blank') {
+   776→    html += `<input class="q-input short" id="qInput" placeholder="在这里输入你的答案..." />`;
+   777→  } else if (q.type === 'short_answer') {
+   778→    html += `<textarea class="q-input long" id="qInput" placeholder="在这里写下你的回答..."></textarea>`;
+   779→  }
+   780→
+   781→  if (q.type === 'fill_blank' || q.type === 'short_answer') {
+   782→    html += `<div class="q-actions">
+   783→      <button class="btn-submit" id="btnSubmit" onclick="submitTextAnswer(${q.id})">提交 (Enter)</button>
+   784→      <button class="btn-reveal" onclick="revealAnswer(${q.id})">查看答案</button>
+   785→      <button class="btn-reset" onclick="resetQ(${q.id})">↻ 重做</button>
+   786→    </div>`;
+   787→  } else {
+   788→    html += `<div class="q-actions">
+   789→      <button class="btn-submit" id="btnSubmit" onclick="submitChoice(${q.id})" disabled>提交 (Enter)</button>
+   790→      <button class="btn-reveal" onclick="revealAnswer(${q.id})">查看答案</button>
+   791→      <button class="btn-reset" onclick="resetQ(${q.id})">↻ 重做</button>
+   792→    </div>`;
+   793→  }
+   794→
+   795→  html += `<div class="auto-state-hint" id="autoHint"></div>
+   796→    <div class="analysis" id="analysis">
+   797→      <div class="ans-line" id="ansLine"></div>
+   798→      <div class="ans-text" id="ansText"></div>
+   799→      <div class="tip" id="tipBox"></div>
+   800→      <div class="kw" id="kwDetail"></div>
+   801→    </div>
+   802→  </div>`;
+   803→
+   804→  document.getElementById('rightInner').innerHTML = html;
+   805→
+   806→  // 恢复已答状态
+   807→  if (answered[q.id] !== undefined) {
+   808→    if (q.type === 'single_choice' || q.type === 'true_false') {
+   809→      const el = document.querySelector(`#qOpts .opt[data-key="${answered[q.id]}"]`);
+   810→      if (el) showChoiceAnswer(q, answered[q.id]);
+   811→    } else {
+   812→      const inp = document.getElementById('qInput');
+   813→      if (inp) { inp.value = answered[q.id]; inp.disabled = true; }
+   814→      showTextAnswer(q, answered[q.id]);
+   815→    }
+   816→  }
+   817→}
+   818→
+   819→/* ===== 选择题 / 判断题作答 =====
+   820→ * 新逻辑：选择 ≠ 提交
+   821→ * - 点选项：仅高亮，不锁定，不判分
+   822→ * - 点【提交】或按 Enter：判分；答错首次仅提示「再想想」并允许重选
+   823→ * - 答错第二次：才显示答案 + 标错题
+   824→ */
+   825→window.__pendingChoice = null;
+   826→window.__wrongTriedOnce = {};  // {id: true} 记录这题是否已经错过一次
+   827→
+   828→window.chooseOpt = function (el, key, id) {
+   829→  // 已最终提交过的不能再选
+   830→  if (answered[id] !== undefined) return;
+   831→  window.__pendingChoice = key;
+   832→  document.querySelectorAll('#qOpts .opt').forEach(o => {
+   833→    o.classList.remove('selected');
+   834→  });
+   835→  el.classList.add('selected');
+   836→  // 启用提交按钮
+   837→  const btn = document.getElementById('btnSubmit');
+   838→  if (btn) btn.disabled = false;
+   839→};
+   840→
+   841→window.submitChoice = function (id) {
+   842→  const q = QS.find(x => x.id === id);
+   843→  if (!q) return;
+   844→  const key = window.__pendingChoice;
+   845→  if (!key) { showRetryHint('先选一个选项呀～ 😊'); return; }
+   846→  const stdU = String(q.answer || '').toUpperCase();
+   847→  const correct = key.toUpperCase() === stdU;
+   848→
+   849→  if (correct) {
+   850→    answered[id] = key;
+   851→    window.__wrongTriedOnce[id] = false;
+   852→    showChoiceAnswer(q, key, true);
+   853→    autoUpdateState(q, true);
+   854→  } else {
+   855→    if (!window.__wrongTriedOnce[id]) {
+   856→      // 第一次错：给一次重试机会，不锁，不标错题
+   857→      window.__wrongTriedOnce[id] = true;
+   858→      const errOpt = document.querySelector(`#qOpts .opt[data-key="${key}"]`);
+   859→      if (errOpt) {
+   860→        errOpt.classList.add('wrong-shake');
+   861→        setTimeout(() => errOpt.classList.remove('wrong-shake'), 600);
+   862→      }
+   863→      showRetryHint('🤔 不对哦，再想想？（这次错不算，可以重选）');
+   864→      window.__pendingChoice = null;
+   865→      if (errOpt) errOpt.classList.remove('selected');
+   866→      return;
+   867→    }
+   868→    // 第二次错：真正锁定 + 标错题
+   869→    answered[id] = key;
+   870→    showChoiceAnswer(q, key, false);
+   871→    autoUpdateState(q, false);
+   872→  }
+   873→};
+   874→
+   875→function showRetryHint(msg) {
+   876→  const hint = document.getElementById('autoHint');
+   877→  hint.className = 'auto-state-hint retry';
+   878→  hint.textContent = msg;
+   879→  // 自动消失
+   880→  clearTimeout(window.__retryTimer);
+   881→  window.__retryTimer = setTimeout(() => {
+   882→    if (hint.classList.contains('retry')) {
+   883→      hint.className = 'auto-state-hint';
+   884→      hint.textContent = '';
+   885→    }
+   886→  }, 3500);
+   887→}
+   888→
+   889→function showChoiceAnswer(q, chosen, correct) {
+   890→  const stdU = String(q.answer || '').toUpperCase();
+   891→  document.querySelectorAll('#qOpts .opt').forEach(el => {
+   892→    el.classList.add('disabled');
+   893→    el.classList.remove('selected');
+   894→    const k = el.dataset.key.toUpperCase();
+   895→    if (k === stdU) el.classList.add('correct');
+   896→    if (k === String(chosen).toUpperCase() && k !== stdU) el.classList.add('wrong');
+   897→  });
+   898→  // 提交按钮锁死
+   899→  const btn = document.getElementById('btnSubmit');
+   900→  if (btn) { btn.disabled = true; btn.textContent = '已提交'; }
+   901→  showAnalysis(q, chosen, correct);
+   902→}
+   903→
+   904→/* ===== 填空 / 简答作答 ===== */
+   905→window.submitTextAnswer = function (id) {
+   906→  const q = QS.find(x => x.id === id);
+   907→  if (!q) return;
+   908→  const inp = document.getElementById('qInput');
+   909→  const userAns = (inp && inp.value || '').trim();
+   910→  if (!userAns) { alert('先写点答案再提交呀～ ✍️'); return; }
+   911→  answered[id] = userAns;
+   912→  inp.disabled = true;
+   913→  document.getElementById('btnSubmit').disabled = true;
+   914→  document.getElementById('btnSubmit').textContent = '已提交';
+   915→
+   916→  if (q.type === 'fill_blank') {
+   917→    const correct = fuzzyMatch(userAns, q.answer);
+   918→    showAnalysis(q, userAns, correct);
+   919→    autoUpdateState(q, correct);
+   920→  } else {
+   921→    // 简答题：不强判
+   922→    showAnalysis(q, userAns, null);
+   923→    // 状态不动，由用户手动判定（点 q-state-btn）
+   924→    saveState();
+   925→  }
+   926→};
+   927→
+   928→window.revealAnswer = function (id) {
+   929→  const q = QS.find(x => x.id === id);
+   930→  if (!q) return;
+   931→  showAnalysis(q, answered[id] || '', null);
+   932→};
+   933→
+   934→function showTextAnswer(q, userAns) {
+   935→  if (q.type === 'fill_blank') {
+   936→    const correct = fuzzyMatch(userAns, q.answer);
+   937→    showAnalysis(q, userAns, correct);
+   938→  } else {
+   939→    showAnalysis(q, userAns, null);
+   940→  }
+   941→  const btn = document.getElementById('btnSubmit');
+   942→  if (btn) { btn.disabled = true; btn.textContent = '已提交'; }
+   943→}
+   944→
+   945→function fuzzyMatch(a, b) {
+   946→  if (a === null || b === null || a === undefined || b === undefined) return false;
+   947→  const norm = s => String(s).replace(/[\s\.,，。、；;:：!！?？""''""()（）]/g, '').toLowerCase();
+   948→  return norm(a) === norm(b);
+   949→}
+   950→
+   951→/* ===== 显示解析 ===== */
+   952→function showAnalysis(q, userAns, correct) {
+   953→  const an = document.getElementById('analysis');
+   954→  const line = document.getElementById('ansLine');
+   955→  const txt = document.getElementById('ansText');
+   956→  const tip = document.getElementById('tipBox');
+   957→  const kw = document.getElementById('kwDetail');
+   958→
+   959→  an.classList.remove('correct', 'wrong');
+   960→  let lineHtml = '';
+   961→  if (q.type === 'short_answer') {
+   962→    lineHtml = `📝 参考答案：${renderMD(String(q.answer || ''))}`;
+   963→  } else if (correct) {
+   964→    an.classList.add('correct');
+   965→    lineHtml = `🎉 答对啦！正确答案：<strong>${renderMD(String(q.answer || ''))}</strong>`;
+   966→  } else if (correct === false) {
+   967→    an.classList.add('wrong');
+   968→    lineHtml = `❌ 你的答案是 <span style="text-decoration:line-through;opacity:.7;">${escapeHtml(userAns)}</span>，正确答案是 <strong>${renderMD(String(q.answer || ''))}</strong>`;
+   969→  } else {
+   970→    lineHtml = `📌 正确答案：<strong>${renderMD(String(q.answer || ''))}</strong>`;
+   971→  }
+   972→  line.innerHTML = lineHtml;
+   973→
+   974→  txt.innerHTML = q.explanation ? '<strong>💡 解析：</strong><br>' + renderMD(q.explanation) : '';
+   975→  if (q.memory_tip) { tip.innerHTML = '🧠 ' + renderMD(q.memory_tip); tip.classList.add('visible'); }
+   976→  else { tip.classList.remove('visible'); tip.innerHTML = ''; }
+   977→  const knp = q.knowledge_point || q.knowledge;
+   978→  kw.innerHTML = knp ? '📚 知识点：' + escapeHtml(knp) : '';
+   979→
+   980→  an.classList.add('visible');
+   981→}
+   982→
+   983→/* ===== 状态自动 / 手动 ===== */
+   984→function autoUpdateState(q, correct) {
+   985→  const prev = states[q.id] || 'unstudied';
+   986→  if (prev !== 'unstudied') { saveState(); return; }  // 已有状态不覆盖
+   987→  states[q.id] = correct ? 'mastered' : 'error';
+   988→  saveState();
+   989→
+   990→  const hint = document.getElementById('autoHint');
+   991→  if (correct) {
+   992→    hint.className = 'auto-state-hint mastered';
+   993→    hint.textContent = '✅ 回答正确，状态自动更新为「已掌握」';
+   994→  } else {
+   995→    hint.className = 'auto-state-hint error';
+   996→    hint.textContent = '❌ 这题答错了，已加入「错题本」～ 别灰心，多看看解析就掌握啦';
+   997→  }
+   998→  document.getElementById('qStateBtn').className = 'q-state-btn ' + states[q.id];
+   999→  document.getElementById('qStateBtn').textContent = STATE_LABELS[states[q.id]];
+  1000→  applyStatesToDOM();
+  1001→  applyFilters();
+  1002→}
+  1003→
+  1004→window.cycleState = function () {
+  1005→  if (!currentId) return;
+  1006→  const order = ['unstudied', 'mastered', 'error'];
+  1007→  const cur = states[currentId] || 'unstudied';
+  1008→  const next = order[(order.indexOf(cur) + 1) % order.length];
+  1009→  states[currentId] = next;
+  1010→  saveState();
+  1011→  document.getElementById('qStateBtn').className = 'q-state-btn ' + next;
+  1012→  document.getElementById('qStateBtn').textContent = STATE_LABELS[next];
+  1013→  applyStatesToDOM();
+  1014→  applyFilters();
+  1015→};
+  1016→
+  1017→window.resetQ = function (id) {
+  1018→  states[id] = 'unstudied';
+  1019→  delete answered[id];
+  1020→  saveState();
+  1021→  selectQ(id);
+  1022→  applyStatesToDOM();
+  1023→  applyFilters();
+  1024→};
+  1025→
+  1026→/* ===== 导航 ===== */
+  1027→function updateNav() {
+  1028→  const info = document.getElementById('navInfo');
+  1029→  const prev = document.getElementById('prevBtn');
+  1030→  const next = document.getElementById('nextBtn');
+  1031→  if (!currentId || filteredIds.length === 0) { info.textContent = ''; prev.disabled = true; next.disabled = true; return; }
+  1032→  const idx = filteredIds.indexOf(currentId);
+  1033→  if (idx < 0) { info.textContent = `当前题在筛选外`; prev.disabled = true; next.disabled = true; return; }
+  1034→  info.textContent = `${idx + 1} / ${filteredIds.length}（当前筛选）`;
+  1035→  prev.disabled = idx <= 0;
+  1036→  next.disabled = idx >= filteredIds.length - 1;
+  1037→}
+  1038→
+  1039→window.goPrev = function () { const i = filteredIds.indexOf(currentId); if (i > 0) selectQ(filteredIds[i - 1]); };
+  1040→window.goNext = function () { const i = filteredIds.indexOf(currentId); if (i >= 0 && i < filteredIds.length - 1) selectQ(filteredIds[i + 1]); };
+  1041→
+  1042→/* ===== 随机抽题 ===== */
+  1043→window.randomQ = function () {
+  1044→  if (filteredIds.length === 0) { alert('当前筛选下没有题目 🙃'); return; }
+  1045→  selectQ(filteredIds[Math.floor(Math.random() * filteredIds.length)]);
+  1046→};
+  1047→
+  1048→/* ===== 导入导出 ===== */
+  1049→window.exportProgress = function () {
+  1050→  const data = { meta: META, states, answered, exportedAt: new Date().toISOString() };
+  1051→  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  1052→  const url = URL.createObjectURL(blob);
+  1053→  const a = document.createElement('a');
+  1054→  a.href = url; a.download = `quiz_progress_${(META.id || 'quiz')}_${Date.now()}.json`; a.click();
+  1055→  URL.revokeObjectURL(url);
+  1056→};
+  1057→
+  1058→let importMode = 'questions';
+  1059→window.showImportModal = function (mode) {
+  1060→  importMode = mode;
+  1061→  document.getElementById('importTitle').textContent = mode === 'questions' ? '📥 导入题库' : '📂 导入进度';
+  1062→  document.getElementById('importHint').textContent = mode === 'questions'
+  1063→    ? '粘贴题目 JSON 数组（会覆盖当前题库）'
+  1064→    : '粘贴之前导出的进度 JSON';
+  1065→  document.getElementById('importText').value = '';
+  1066→  document.getElementById('importText').placeholder = mode === 'questions'
+  1067→    ? '[\n  {"type":"single_choice","prompt":"...","options":["A. ...","B. ..."],"answer":"A","explanation":"...","category":"数学","knowledge_point":"分数"}\n]'
+  1068→    : '{"states":{...},"answered":{...}}';
+  1069→  document.getElementById('importModal').classList.add('visible');
+  1070→};
+  1071→window.hideImportModal = function () { document.getElementById('importModal').classList.remove('visible'); };
+  1072→
+  1073→window.doImport = function () {
+  1074→  const txt = document.getElementById('importText').value.trim();
+  1075→  if (!txt) { alert('先粘贴点东西嘛 😊'); return; }
+  1076→  try {
+  1077→    const obj = JSON.parse(txt);
+  1078→    if (importMode === 'questions') {
+  1079→      if (!Array.isArray(obj)) { alert('题目必须是数组格式'); return; }
+  1080→      window.__QUIZ_DATA__ = obj;
+  1081→      states = {}; answered = {};
+  1082→      localStorage.removeItem(STORAGE_KEY);
+  1083→      QS = obj.map((q, i) => Object.assign({}, q, { id: i + 1, _origId: q.id }));
+  1084→      QS.forEach(q => { states[q.id] = 'unstudied'; });
+  1085→      buildCatChips();
+  1086→      buildSidebar();
+  1087→      applyFilters();
+  1088→      updateStats();
+  1089→      hideImportModal();
+  1090→      alert(`✅ 导入 ${obj.length} 道题`);
+  1091→    } else {
+  1092→      if (!obj.states) { alert('进度文件格式不对'); return; }
+  1093→      states = obj.states;
+  1094→      answered = obj.answered || {};
+  1095→      saveState();
+  1096→      applyStatesToDOM();
+  1097→      applyFilters();
+  1098→      hideImportModal();
+  1099→      alert('✅ 进度已恢复');
+  1100→    }
+  1101→  } catch (e) {
+  1102→    alert('❌ JSON 解析失败：' + e.message);
+  1103→  }
+  1104→};
+  1105→
+  1106→window.showResetModal = function () { document.getElementById('resetModal').classList.add('visible'); };
+  1107→window.hideResetModal = function () { document.getElementById('resetModal').classList.remove('visible'); };
+  1108→window.doReset = function () {
+  1109→  states = {}; answered = {};
+  1110→  QS.forEach(q => { states[q.id] = 'unstudied'; });
+  1111→  saveState();
+  1112→  applyStatesToDOM();
+  1113→  applyFilters();
+  1114→  hideResetModal();
+  1115→  document.getElementById('rightInner').innerHTML = '<div class="empty-state"><div class="icon">✨</div><div>已重置，重新开始！</div></div>';
+  1116→  document.getElementById('navBar').style.display = 'none';
+  1117→  currentId = null;
+  1118→};
+  1119→
+  1120→/* ===== 主题 ===== */
+  1121→window.toggleTheme = function () {
+  1122→  const isDark = document.body.classList.contains('dark');
+  1123→  document.body.classList.toggle('dark', !isDark);
+  1124→  document.body.classList.toggle('light', isDark);
+  1125→  document.querySelector('.theme-toggle').textContent = isDark ? '☀️' : '🌙';
+  1126→  try { localStorage.setItem(THEME_KEY, isDark ? 'light' : 'dark'); } catch (e) {}
+  1127→};
+  1128→
+  1129→/* ===== 侧栏（移动） ===== */
+  1130→window.toggleSidebar = function () {
+  1131→  document.getElementById('sidebar').classList.toggle('hidden');
+  1132→};
+  1133→
+  1134→/* ============================================
+  1135→ * 模拟考模式
+  1136→ * ============================================ */
+  1137→let examConfig = { count: 10, timeLimit: 0 };
+  1138→let examQuestions = [];
+  1139→let examAnswers = {};
+  1140→let examTimerInterval = null;
+  1141→let examTimeLeft = 0;
+  1142→let examStartTime = 0;
+  1143→
+  1144→window.selectExamCount = function (n) {
+  1145→  examConfig.count = n;
+  1146→  document.querySelectorAll('#examModal [data-n]').forEach(b => {
+  1147→    b.classList.toggle('selected', parseInt(b.dataset.n, 10) === n);
+  1148→  });
+  1149→};
+  1150→window.selectExamTime = function (t) {
+  1151→  examConfig.timeLimit = t;
+  1152→  document.querySelectorAll('#examModal [data-t]').forEach(b => {
+  1153→    b.classList.toggle('selected', parseInt(b.dataset.t, 10) === t);
+  1154→  });
+  1155→};
+  1156→
+  1157→window.showExamModal = function () {
+  1158→  const pool = QS.filter(q => activeCats.has(getCatKey(q)));
+  1159→  document.getElementById('examPoolSize').textContent = `当前题池：${pool.length} 题（按学科筛选）`;
+  1160→  document.getElementById('examModal').classList.add('visible');
+  1161→};
+  1162→window.hideExamModal = function () { document.getElementById('examModal').classList.remove('visible'); };
+  1163→
+  1164→window.startExam = function () {
+  1165→  hideExamModal();
+  1166→  const pool = QS.filter(q => activeCats.has(getCatKey(q))).slice();
+  1167→  if (pool.length === 0) { alert('题池为空'); return; }
+  1168→  // shuffle
+  1169→  for (let i = pool.length - 1; i > 0; i--) {
+  1170→    const j = Math.floor(Math.random() * (i + 1));
+  1171→    [pool[i], pool[j]] = [pool[j], pool[i]];
+  1172→  }
+  1173→  examQuestions = pool.slice(0, Math.min(examConfig.count, pool.length));
+  1174→  examAnswers = {};
+  1175→  examStartTime = Date.now();
+  1176→
+  1177→  let html = '';
+  1178→  examQuestions.forEach((q, idx) => {
+  1179→    const typeInfo = TYPE_LABELS[q.type] || { txt: '', cls: '' };
+  1180→    html += `<div class="exam-q-card" id="eq-${q.id}">
+  1181→      <div class="exam-q-num">第 ${idx + 1} 题 · ${typeInfo.txt}</div>
+  1182→      <div class="exam-q-text">${renderMD(q.prompt || q.question)}</div>`;
+  1183→    if (q.type === 'single_choice') {
+  1184→      html += `<div class="exam-opts">`;
+  1185→      (q.options || []).forEach((opt, i) => {
+  1186→        const m = opt.match(/^([A-Z])[\.\、]\s*(.+)/);
+  1187→        const letter = m ? m[1] : String.fromCharCode(65 + i);
+  1188→        const text = m ? m[2] : opt;
+  1189→        html += `<div class="exam-opt" data-qid="${q.id}" data-key="${letter}" onclick="examChoose(this,${q.id},'${letter}')">
+  1190→          <span class="letter">${letter}</span><span>${renderMD(text)}</span>
+  1191→        </div>`;
+  1192→      });
+  1193→      html += `</div>`;
+  1194→    } else if (q.type === 'true_false') {
+  1195→      html += `<div class="exam-opts">
+  1196→        <div class="exam-opt" data-qid="${q.id}" data-key="True" onclick="examChoose(this,${q.id},'True')"><span class="letter">✓</span><span>正确</span></div>
+  1197→        <div class="exam-opt" data-qid="${q.id}" data-key="False" onclick="examChoose(this,${q.id},'False')"><span class="letter">✗</span><span>错误</span></div>
+  1198→      </div>`;
+  1199→    } else {
+  1200→      const tag = q.type === 'short_answer' ? 'textarea class="exam-input" rows="3"' : 'input class="exam-input"';
+  1201→      html += `<${tag} data-qid="${q.id}" oninput="examTextInput(${q.id},this.value)" placeholder="输入答案..."></${q.type === 'short_answer' ? 'textarea' : 'input'}>`;
+  1202→    }
+  1203→    html += `</div>`;
+  1204→  });
+  1205→  document.getElementById('examBody').innerHTML = html;
+  1206→  updateExamProgress();
+  1207→  document.getElementById('examOverlay').classList.add('visible');
+  1208→  document.getElementById('examSubmitBtn').disabled = false;
+  1209→  document.getElementById('examSubmitBtn').textContent = '📤 提交答卷';
+  1210→
+  1211→  // 计时
+  1212→  if (examTimerInterval) clearInterval(examTimerInterval);
+  1213→  if (examConfig.timeLimit > 0) {
+  1214→    examTimeLeft = examConfig.timeLimit * examQuestions.length;
+  1215→    updateExamTimer();
+  1216→    examTimerInterval = setInterval(() => {
+  1217→      examTimeLeft--;
+  1218→      updateExamTimer();
+  1219→      if (examTimeLeft <= 0) { clearInterval(examTimerInterval); submitExam(); }
+  1220→    }, 1000);
+  1221→  } else {
+  1222→    updateElapsed();
+  1223→    examTimerInterval = setInterval(updateElapsed, 1000);
+  1224→  }
+  1225→};
+  1226→
+  1227→function updateExamTimer() {
+  1228→  const el = document.getElementById('examTimer');
+  1229→  const m = Math.floor(examTimeLeft / 60), s = examTimeLeft % 60;
+  1230→  el.textContent = '⏱ ' + m + ':' + (s < 10 ? '0' : '') + s;
+  1231→  el.style.color = examTimeLeft <= 10 ? '#ff5d77' : '';
+  1232→}
+  1233→function updateElapsed() {
+  1234→  const e = Math.floor((Date.now() - examStartTime) / 1000);
+  1235→  const m = Math.floor(e / 60), s = e % 60;
+  1236→  document.getElementById('examTimer').textContent = '⏱ ' + m + ':' + (s < 10 ? '0' : '') + s;
+  1237→}
+  1238→
+  1239→window.examChoose = function (el, qid, key) {
+  1240→  examAnswers[qid] = key;
+  1241→  document.querySelectorAll(`#eq-${qid} .exam-opt`).forEach(o => o.classList.remove('selected'));
+  1242→  el.classList.add('selected');
+  1243→  updateExamProgress();
+  1244→};
+  1245→window.examTextInput = function (qid, val) {
+  1246→  examAnswers[qid] = val;
+  1247→  updateExamProgress();
+  1248→};
+  1249→
+  1250→function updateExamProgress() {
+  1251→  const total = examQuestions.length;
+  1252→  const done = Object.keys(examAnswers).filter(k => String(examAnswers[k] || '').trim() !== '').length;
+  1253→  document.getElementById('examProgressText').textContent = `${done} / ${total}`;
+  1254→  document.getElementById('examProgressFill').style.width = (total > 0 ? (done / total * 100) : 0) + '%';
+  1255→}
+  1256→
+  1257→window.submitExam = function () {
+  1258→  if (examTimerInterval) clearInterval(examTimerInterval);
+  1259→  document.getElementById('examOverlay').classList.remove('visible');
+  1260→  showResults();
+  1261→};
+  1262→
+  1263→window.quitExam = function () {
+  1264→  if (!confirm('确定退出本次模拟考？答题进度会丢失')) return;
+  1265→  if (examTimerInterval) clearInterval(examTimerInterval);
+  1266→  document.getElementById('examOverlay').classList.remove('visible');
+  1267→};
+  1268→
+  1269→function showResults() {
+  1270→  let correct = 0, gradable = 0;
+  1271→  const items = [];
+  1272→  examQuestions.forEach((q, idx) => {
+  1273→    const userAns = examAnswers[q.id];
+  1274→    let isCorrect = null;
+  1275→    if (q.type === 'single_choice' || q.type === 'true_false') {
+  1276→      gradable++;
+  1277→      isCorrect = String(userAns || '').toUpperCase() === String(q.answer || '').toUpperCase();
+  1278→      if (isCorrect) correct++;
+  1279→    } else if (q.type === 'fill_blank') {
+  1280→      gradable++;
+  1281→      isCorrect = fuzzyMatch(userAns, q.answer);
+  1282→      if (isCorrect) correct++;
+  1283→    }
+  1284→    // 同步主答题状态
+  1285→    if (isCorrect === true) states[q.id] = 'mastered';
+  1286→    else if (isCorrect === false) states[q.id] = 'error';
+  1287→    if (userAns !== undefined) answered[q.id] = userAns;
+  1288→    items.push({ q, userAns, isCorrect, idx });
+  1289→  });
+  1290→  saveState();
+  1291→  applyStatesToDOM();
+  1292→  applyFilters();
+  1293→
+  1294→  const score = gradable > 0 ? Math.round(correct / gradable * 100) : 0;
+  1295→  const passed = score >= 60;
+  1296→  const scoreEl = document.getElementById('resultsScore');
+  1297→  scoreEl.textContent = score;
+  1298→  scoreEl.className = 'results-score ' + (passed ? 'pass' : 'fail');
+  1299→  document.getElementById('resultsDetail').textContent =
+  1300→    `${examQuestions.length} 题 · 答对 ${correct}/${gradable}${gradable < examQuestions.length ? ` · ${examQuestions.length - gradable} 题需自评` : ''}`;
+  1301→
+  1302→  let html = '';
+  1303→  items.forEach(it => {
+  1304→    const { q, userAns, isCorrect, idx } = it;
+  1305→    const cls = isCorrect === true ? 'is-correct' : isCorrect === false ? 'is-wrong' : '';
+  1306→    const badge = isCorrect === true
+  1307→      ? '<span class="result-badge correct">✓ 正确</span>'
+  1308→      : isCorrect === false
+  1309→      ? '<span class="result-badge wrong">✗ 错误</span>'
+  1310→      : '<span class="result-badge" style="background:#fff4e0;color:#e9a82c;">📝 待自评</span>';
+  1311→
+  1312→    let ansHtml = '';
+  1313→    if (q.type === 'single_choice' || q.type === 'true_false' || q.type === 'fill_blank') {
+  1314→      if (isCorrect) {
+  1315→        ansHtml = `<div class="result-answers">✓ 你答：<span class="correct-ans">${escapeHtml(String(userAns || ''))}</span></div>`;
+  1316→      } else {
+  1317→        ansHtml = `<div class="result-answers">你答：<span class="wrong-ans">${escapeHtml(String(userAns || '（未作答）'))}</span> · 正确答案：<span class="correct-ans">${renderMD(String(q.answer || ''))}</span></div>`;
+  1318→      }
+  1319→    } else {
+  1320→      ansHtml = `<div class="result-answers">你答：${escapeHtml(String(userAns || '（未作答）'))}</div>
+  1321→        <div class="result-answers">参考：<span class="correct-ans">${renderMD(String(q.answer || ''))}</span></div>`;
+  1322→    }
+  1323→
+  1324→    html += `<div class="result-item ${cls}">
+  1325→      <div class="result-top">
+  1326→        <span class="result-qid">第${idx + 1}题 · Q${q.id}</span>
+  1327→        ${badge}
+  1328→      </div>
+  1329→      <div class="result-text">${renderMD(q.prompt || q.question)}</div>
+  1330→      ${ansHtml}
+  1331→      ${q.explanation ? `<div class="result-analysis">💡 ${renderMD(q.explanation)}</div>` : ''}
+  1332→      ${q.memory_tip ? `<div class="result-tip">🧠 ${renderMD(q.memory_tip)}</div>` : ''}
+  1333→    </div>`;
+  1334→  });
+  1335→  document.getElementById('resultsBody').innerHTML = html;
+  1336→  document.getElementById('examResults').classList.add('visible');
+  1337→}
+  1338→
+  1339→window.closeResults = function () { document.getElementById('examResults').classList.remove('visible'); };
+  1340→window.retakeExam = function () { closeResults(); startExam(); };
+  1341→
+  1342→/* ===== 工具 ===== */
+  1343→function escapeHtml(s) {
+  1344→  if (s === null || s === undefined) return '';
+  1345→  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  1346→}
+  1347→function renderMD(s) {
+  1348→  if (s === null || s === undefined) return '';
+  1349→  return escapeHtml(s)
+  1350→    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  1351→    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+  1352→    .replace(/`(.+?)`/g, '<code>$1</code>')
+  1353→    .replace(/\n/g, '<br>')
+  1354→    .replace(/____+/g, '<span style="display:inline-block;min-width:80px;border-bottom:2px solid currentColor;margin:0 4px;opacity:.5;">&nbsp;</span>');
+  1355→}
+  1356→
+  1357→/* ===== 键盘快捷键 ===== */
+  1358→document.addEventListener('keydown', (e) => {
+  1359→  // 在 input/textarea 内时，只允许 Enter 触发提交，其它不拦截
+  1360→  const inExam = document.getElementById('examOverlay').classList.contains('visible');
+  1361→  const inResults = document.getElementById('examResults').classList.contains('visible');
+  1362→  const inModal = document.querySelector('.modal-overlay.visible');
+  1363→  if (inExam || inResults || inModal) {
+  1364→    // 模拟考也支持 Enter 提交
+  1365→    if (inExam && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+  1366→      e.preventDefault();
+  1367→      submitExam();
+  1368→    }
+  1369→    return;
+  1370→  }
+  1371→
+  1372→  const tag = (e.target.tagName || '').toLowerCase();
+  1373→  const inField = tag === 'input' || tag === 'textarea';
+  1374→
+  1375→  // Enter 提交（在文本框里只有 Ctrl/Cmd+Enter）
+  1376→  if (e.key === 'Enter') {
+  1377→    if (inField && !(e.ctrlKey || e.metaKey)) return;
+  1378→    e.preventDefault();
+  1379→    const btn = document.getElementById('btnSubmit');
+  1380→    if (btn && !btn.disabled) btn.click();
+  1381→    return;
+  1382→  }
+  1383→
+  1384→  if (inField) return;  // 文本框内不再处理其它快捷键
+  1385→
+  1386→  // A/B/C/D 选项
+  1387→  if (/^[a-dA-D]$/.test(e.key)) {
+  1388→    const letter = e.key.toUpperCase();
+  1389→    const el = document.querySelector(`#qOpts .opt[data-key="${letter}"]`);
+  1390→    if (el && !el.classList.contains('disabled')) { el.click(); e.preventDefault(); }
+  1391→    return;
+  1392→  }
+  1393→  // T/F 判断题
+  1394→  if (e.key === 't' || e.key === 'T') {
+  1395→    const el = document.querySelector('#qOpts .opt[data-key="True"]');
+  1396→    if (el && !el.classList.contains('disabled')) { el.click(); e.preventDefault(); }
+  1397→    return;
+  1398→  }
+  1399→  if (e.key === 'f' || e.key === 'F') {
+  1400→    const el = document.querySelector('#qOpts .opt[data-key="False"]');
+  1401→    if (el && !el.classList.contains('disabled')) { el.click(); e.preventDefault(); }
+  1402→    return;
+  1403→  }
+  1404→  // 上下题
+  1405→  if (e.key === 'ArrowLeft') { goPrev(); e.preventDefault(); return; }
+  1406→  if (e.key === 'ArrowRight') { goNext(); e.preventDefault(); return; }
+  1407→  // Space: 查看答案
+  1408→  if (e.key === ' ') {
+  1409→    if (currentId !== null) { revealAnswer(currentId); e.preventDefault(); }
+  1410→    return;
+  1411→  }
+  1412→});
+  1413→
+  1414→document.addEventListener('DOMContentLoaded', init);
+  1415→</script>
+  1416→
+  1417→</body>
+  1418→</html>
+  1419→

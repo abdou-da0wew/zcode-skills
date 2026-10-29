@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>墨思 — 智能思维编织工作台</title>
+<title>Inkweave — an intelligent thought-weaving workbench</title>
 <style>
 :root{
   --bg:#05060f;
@@ -18,9 +18,9 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{background:var(--bg);color:var(--fg);font-family:"Songti SC","STSong","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;font-size:14px;line-height:1.8;-webkit-font-smoothing:antialiased}
-/* 中文段落均使用宋体 */
+/* All prose paragraphs use the serif face */
 :lang(zh),.intro-text,.showcase-text p,.showcase-text h3,.info-big,.hero-title,.card-title,.price .desc,.cell{font-family:"Songti SC","STSong","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif}
-/* 数字 / 拉丁字母仍保持等宽，但中文遇到等宽会 fallback 回宋体 */
+/* Numbers / Latin letters stay monospaced; CJK glyphs fall back to the serif face when monospaced */
 .header-logo,.nav a,.hero-meta,.hero-sub,.sec-head,.scroll-cue,.tag,.card-num,.card-tags,.spec-row b,.price h4,.price .num,.platforms,.footer,.here{font-family:"SF Mono","Menlo","Consolas","Songti SC","STSong","SimSun",serif}
 a{color:inherit;text-decoration:none;cursor:pointer}
 ::selection{background:var(--accent);color:var(--bg)}
@@ -53,7 +53,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 .hero-title .em{font-style:italic;color:var(--accent)}
 .hero-sub{font-size:14px;letter-spacing:0.3em;color:var(--dim);margin-bottom:36px}
 
-/* ASCII 大标题 */
+/* ASCII big title */
 .ascii-title{font-family:"SF Mono","Menlo","Consolas",monospace;color:var(--accent);white-space:pre;display:inline-block;text-align:left;line-height:1;font-weight:700;margin:0 auto;letter-spacing:0;text-shadow:0 0 12px rgba(139,233,255,.5),0 0 2px rgba(199,146,234,.4)}
 .ascii-title.lg{font-size:clamp(8px,1.25vw,14px);line-height:1.05}
 .ascii-title.md{font-size:clamp(6px,.85vw,10px);color:var(--fg)}
@@ -63,7 +63,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 .ascii-cn{display:none}
 .sec-ascii{display:block;color:var(--accent);white-space:pre;font-family:"SF Mono",monospace;font-size:14px;line-height:1;margin-bottom:10px;opacity:.85;letter-spacing:0.4em}
 
-/* 中文真字宋体大标题 + ASCII 网点背景 */
+/* Serif display title with ASCII dot-matrix backdrop */
 .brand-block{text-align:center;line-height:1;display:inline-block;padding:36px 64px;position:relative}
 .brand-block::before{
   content:"";position:absolute;inset:0;
@@ -72,7 +72,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   pointer-events:none;
   opacity:.85;
   z-index:0;
-  /* 中间淡四角浓的渐隐遮罩，像深空尘埃 */
+  /* Fade-out mask, faint at center and dense at corners, like deep-space dust */
   -webkit-mask-image:radial-gradient(ellipse at center, transparent 30%, #000 90%);
           mask-image:radial-gradient(ellipse at center, transparent 30%, #000 90%);
 }
@@ -88,7 +88,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   position:relative;
   z-index:1;
 
-  /* 字内填充：星云网点，模拟字符画/星尘 */
+  /* In-glyph fill: nebula dot-matrix, mimicking character art / stardust */
   background-image:
     radial-gradient(circle, var(--accent) 0.95px, transparent 1.3px),
     radial-gradient(circle, var(--accent2) 0.45px, transparent 0.85px);
@@ -99,7 +99,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   color:transparent;
   -webkit-text-fill-color:transparent;
 
-  /* 极细描边 */
+  /* Ultra-thin outline */
   -webkit-text-stroke:0.4px rgba(139,233,255,.55);
   text-shadow:0 0 8px rgba(139,233,255,.3);
 }
@@ -152,7 +152,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 .card-tags span{font-size:10px;letter-spacing:0.16em;color:var(--dim);padding:2px 8px;border:1px solid var(--line);text-transform:uppercase}
 .card.hidden{display:none}
 
-/* SHOWCASE / UI 截图 */
+/* SHOWCASE / UI screenshots */
 .showcase{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center;margin-top:24px}
 .showcase-shot{border:1px solid var(--line);background:var(--paper);padding:14px;position:relative;box-shadow:0 8px 28px -16px rgba(139,233,255,.3)}
 .showcase-shot .bar{display:flex;gap:6px;margin-bottom:10px}
@@ -209,7 +209,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 /* FOOTER */
 .footer{padding:24px 32px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:0.18em;color:var(--dim);border-top:1px solid var(--line);flex-wrap:wrap;gap:12px;background:var(--paper)}
 
-/* HERO 后景柔光遮罩，仅在中心给标题留出可读区，四周让 ASCII 充分显现 */
+/* HERO backdrop soft-light mask: leaves a readable zone for the title only at the center, lets the ASCII show fully around it */
 .hero::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(82vw,1100px);height:min(58vh,520px);background:radial-gradient(ellipse at center,rgba(5,6,15,.85) 0%,rgba(5,6,15,.6) 40%,rgba(5,6,15,0) 80%);pointer-events:none;z-index:1;border-radius:50%}
 
 @media(max-width:900px){
@@ -230,20 +230,20 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 
 <!-- HEADER -->
 <div class="header">
-  <div class="header-logo"><a href="#top">墨思</a></div>
+  <div class="header-logo"><a href="#top">INKWEAVE</a></div>
   <nav class="nav">
     <ul>
-      <li><a href="#features">功能</a></li>
-      <li><a href="#showcase">界面</a></li>
-      <li><a href="#spec">规格</a></li>
-      <li><a href="#price">订阅</a></li>
-      <li><a href="#info">关于</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#showcase">Interface</a></li>
+      <li><a href="#spec">Specs</a></li>
+      <li><a href="#price">Pricing</a></li>
+      <li><a href="#info">About</a></li>
     </ul>
   </nav>
 </div>
 
 <!-- HEY -->
-<div class="here">你好<br><span class="blink">▮</span> 现在是 凌晨 03:14</div>
+<div class="here">Hello<br><span class="blink">▮</span> it is 03:14 am</div>
 
 <!-- HERO -->
 <section class="hero" id="top">
@@ -262,68 +262,68 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 ██║██║ ╚██╗██║██║  ██╗╚███╔███╔╝███████╗██║  ██║ ╚████╔╝ ███████╗
 ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝
 </pre>
-      <div class="brand-cn-sub">墨　思</div>
+      <div class="brand-cn-sub">INKWEAVE</div>
     </div>
-    <div class="hero-sub" style="margin-top:28px">让 散 落 的 想 法，自 己 长 出 经 纬</div>
+    <div class="hero-sub" style="margin-top:28px">LET SCATTERED THOUGHTS GROW THEIR OWN WARP AND WEFT</div>
     <div class="hero-meta">
-      <span>版本 <b>v3.2 / 2026.05</b></span>
-      <span>类型 <b>本地智能笔记 / 知识星图</b></span>
-      <span>平台 <b>桌面 / 移动 / 网页</b></span>
+      <span>Version <b>v3.2 / 2026.05</b></span>
+      <span>Type <b>local-first smart notes / knowledge constellation</b></span>
+      <span>Platform <b>desktop / mobile / web</b></span>
     </div>
   </div>
-  <div class="scroll-cue">↓ 向 下 滚 动 探 索 ↓</div>
+  <div class="scroll-cue">↓ scroll down to explore ↓</div>
 </section>
 
 <!-- INTRO -->
 <section class="sec">
-  <div class="sec-head"><h2><pre class="sec-ascii">═══ ❖ ═══</pre>关于</h2><div class="idx">[ 01 / 05 ]</div></div>
+  <div class="sec-head"><h2><pre class="sec-ascii">═══ ❖ ═══</pre>About</h2><div class="idx">[ 01 / 05 ]</div></div>
   <div class="intro">
     <p class="intro-text">
-      <span class="pt" data-text="墨思">墨思</span> 是一款 <span class="em">本地优先</span> 的智能思维工作台。
-      它会在你写字时，悄悄读懂上下文，
-      把你过去 <span class="pt" data-text="三年">三年</span> 写过的 <span class="pt" data-text="所有笔记、网页摘录、文献批注">所有笔记、网页摘录、文献批注</span>
-      自动织成一张 <span class="em">双向链接图谱</span>。
-      所有推理 <span class="pt" data-text="完全在你的电脑上运行">完全在你的电脑上运行</span>，
-      你的想法 <span class="em">永远不离开本机</span>。
+      <span class="pt" data-text="Inkweave">Inkweave</span> is a <span class="em">local-first</span> intelligent thinking workbench.
+      As you write, it quietly reads the context around you,
+      weaving everything you have written over the <span class="pt" data-text="past three years">past three years</span> — <span class="pt" data-text="every note, web excerpt, and literature annotation">every note, web excerpt, and literature annotation</span> —
+      into a <span class="em">bidirectionally linked graph</span>.
+      All inference <span class="pt" data-text="runs entirely on your own computer">runs entirely on your own computer</span>;
+      your ideas <span class="em">never leave the machine</span>.
     </p>
     <div class="intro-grid">
-      <div class="cell"><b>✦ 本地优先</b>内置量化大模型，主流芯片可全程离线运行，不依赖任何云端接口。</div>
-      <div class="cell"><b>✦ 双链图谱</b>每一个想法都是一颗节点，智能模型自动发现它们之间的潜在引用，让旧笔记重新被点亮。</div>
-      <div class="cell"><b>✦ 端到端加密</b>多端同步走点对点链路，密钥只在你的设备里，连我们也读不到。</div>
+      <div class="cell"><b>✦ Local-first</b>A quantized LLM is built in; on mainstream chips everything runs fully offline, with no dependence on any cloud API.</div>
+      <div class="cell"><b>✦ Backlinked graph</b>Every idea is a node; the model automatically discovers latent references between them, lighting old notes back up.</div>
+      <div class="cell"><b>✦ End-to-end encryption</b>Multi-device sync runs over peer-to-peer links; keys live only on your devices — not even we can read them.</div>
     </div>
   </div>
 </section>
 
 <!-- FEATURES GRID -->
 <section class="sec" id="features">
-  <div class="sec-head"><h2><pre class="sec-ascii">═══ ❍ ═══</pre>核心功能</h2><div class="idx">[ 02 / 05 ]</div></div>
+  <div class="sec-head"><h2><pre class="sec-ascii">═══ ❍ ═══</pre>Core Features</h2><div class="idx">[ 02 / 05 ]</div></div>
   <div class="filter">
-    <a class="tag active" data-cat="all"><span class="dot"></span>全部</a>
-    <a class="tag" data-cat="ai"><span class="dot"></span>智能协作</a>
-    <a class="tag" data-cat="write"><span class="dot"></span>写作</a>
-    <a class="tag" data-cat="graph"><span class="dot"></span>图谱</a>
-    <a class="tag" data-cat="sync"><span class="dot"></span>同步</a>
+    <a class="tag active" data-cat="all"><span class="dot"></span>All</a>
+    <a class="tag" data-cat="ai"><span class="dot"></span>Intelligence</a>
+    <a class="tag" data-cat="write"><span class="dot"></span>Writing</a>
+    <a class="tag" data-cat="graph"><span class="dot"></span>Graph</a>
+    <a class="tag" data-cat="sync"><span class="dot"></span>Sync</a>
   </div>
   <div class="grid" id="grid">
 
     <div class="card" data-cat="ai write">
       <div class="card-img">
-        <img src="../assets/ai-01-search.jpg" alt="AI 续写">
+        <img src="../assets/ai-01-search.jpg" alt="AI continue-writing">
         <pre class="ascii-overlay">▌ AI ▍▎▏
   ╭─────╮
   │ ... │
   ╰──→──╯</pre>
       </div>
       <div class="card-meta">
-        <div class="card-title"><span class="pt" data-text="智能续写">智能续写</span><small>本机模型</small></div>
+        <div class="card-title"><span class="pt" data-text="Smart continue-writing">Smart continue-writing</span><small>on-device model</small></div>
         <div class="card-num">/01</div>
       </div>
-      <div class="card-tags"><span>智能</span><span>写作</span></div>
+      <div class="card-tags"><span>AI</span><span>Writing</span></div>
     </div>
 
     <div class="card" data-cat="graph">
       <div class="card-img">
-        <img src="../assets/ai-02-document.jpg" alt="知识图谱">
+        <img src="../assets/ai-02-document.jpg" alt="Knowledge graph">
         <pre class="ascii-overlay">  ●─●─●
   │\ │ /│
   ● ●─● ●
@@ -331,31 +331,31 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   ●─●─●</pre>
       </div>
       <div class="card-meta">
-        <div class="card-title"><span class="pt" data-text="思维双链图谱">思维双链图谱</span><small>反向链接</small></div>
+        <div class="card-title"><span class="pt" data-text="Thought backlink graph">Thought backlink graph</span><small>backlinks</small></div>
         <div class="card-num">/02</div>
       </div>
-      <div class="card-tags"><span>图谱</span></div>
+      <div class="card-tags"><span>Graph</span></div>
     </div>
 
     <div class="card" data-cat="ai">
       <div class="card-img">
-        <img src="../assets/ai-03-video.jpg" alt="语义搜索">
+        <img src="../assets/ai-03-video.jpg" alt="Semantic search">
         <pre class="ascii-overlay">┌─────────┐
-│ ⌕ 找到 │
-│  3 处   │
-│  相似   │
+│ ⌕ found │
+│  3 hits │
+│  matches│
 └─────────┘</pre>
       </div>
       <div class="card-meta">
-        <div class="card-title"><span class="pt" data-text="语义搜索">语义搜索</span><small>向量检索</small></div>
+        <div class="card-title"><span class="pt" data-text="Semantic search">Semantic search</span><small>vector retrieval</small></div>
         <div class="card-num">/03</div>
       </div>
-      <div class="card-tags"><span>智能</span><span>搜索</span></div>
+      <div class="card-tags"><span>AI</span><span>Search</span></div>
     </div>
 
     <div class="card" data-cat="write">
       <div class="card-img">
-        <img src="../assets/ai-04-orchestration.jpg" alt="Markdown 编辑">
+        <img src="../assets/ai-04-orchestration.jpg" alt="Markdown editing">
         <pre class="ascii-overlay"># Heading
 - list
   - item
@@ -363,15 +363,15 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 **bold**</pre>
       </div>
       <div class="card-meta">
-        <div class="card-title"><span class="pt" data-text="纯文本写作">纯文本写作</span><small>原生标记</small></div>
+        <div class="card-title"><span class="pt" data-text="Plain-text writing">Plain-text writing</span><small>native markup</small></div>
         <div class="card-num">/04</div>
       </div>
-      <div class="card-tags"><span>写作</span></div>
+      <div class="card-tags"><span>Writing</span></div>
     </div>
 
     <div class="card" data-cat="sync">
       <div class="card-img">
-        <img src="../assets/ai-05-voice.jpg" alt="多端同步">
+        <img src="../assets/ai-05-voice.jpg" alt="Multi-device sync">
         <pre class="ascii-overlay"> ▣ ⇄ ▢
   ╲   ╱
    ⇅
@@ -379,24 +379,24 @@ a{color:inherit;text-decoration:none;cursor:pointer}
  ▤ ⇄ ▥</pre>
       </div>
       <div class="card-meta">
-        <div class="card-title"><span class="pt" data-text="端到端同步">端到端同步</span><small>全程加密</small></div>
+        <div class="card-title"><span class="pt" data-text="End-to-end sync">End-to-end sync</span><small>encrypted throughout</small></div>
         <div class="card-num">/05</div>
       </div>
-      <div class="card-tags"><span>同步</span><span>加密</span></div>
+      <div class="card-tags"><span>Sync</span><span>Encrypted</span></div>
     </div>
 
     <div class="card" data-cat="ai graph">
       <div class="card-img">
-        <img src="../assets/ai-06-integration.jpg" alt="时光回溯">
+        <img src="../assets/ai-06-integration.jpg" alt="Time travel">
         <pre class="ascii-overlay">←─◆─◆─◆─◆─→
   2023 24 25 26
   ░░▒▒▓▓██</pre>
       </div>
       <div class="card-meta">
-        <div class="card-title"><span class="pt" data-text="时间线回溯">时间线回溯</span><small>变迁追踪</small></div>
+        <div class="card-title"><span class="pt" data-text="Timeline rewind">Timeline rewind</span><small>change tracking</small></div>
         <div class="card-num">/06</div>
       </div>
-      <div class="card-tags"><span>图谱</span><span>智能</span></div>
+      <div class="card-tags"><span>Graph</span><span>AI</span></div>
     </div>
 
   </div>
@@ -404,22 +404,22 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 
 <!-- SHOWCASE -->
 <section class="sec" id="showcase">
-  <div class="sec-head"><h2><pre class="sec-ascii">═══ ◈ ═══</pre>界面预览</h2><div class="idx">[ 03 / 05 ]</div></div>
+  <div class="sec-head"><h2><pre class="sec-ascii">═══ ◈ ═══</pre>Interface Preview</h2><div class="idx">[ 03 / 05 ]</div></div>
 
   <div class="showcase">
     <div class="showcase-shot">
       <div class="bar"><i></i><i></i><i></i></div>
-      <img src="../assets/ai-07-hero.jpg" alt="编辑器界面">
+      <img src="../assets/ai-07-hero.jpg" alt="Editor interface">
     </div>
     <div class="showcase-text">
 <pre class="mini-ascii">┌──────────────────────┐
 │ ▓▓░░░░░░░░░░░░░░░░░  │
 └──────────────────────┘</pre>
-      <h3>一个 <span class="em">极克制</span> 的写作环境，<br>但每一行都被静静听见。</h3>
-      <p><span class="pt" data-text="左侧">左侧</span> 是无限层级的笔记本，
-        <span class="pt" data-text="中间">中间</span> 是纯净的写作区域，
-        <span class="pt" data-text="右侧">右侧</span> 折叠面板里，正在为你浮现三条相关旧笔记。</p>
-      <p>没有花里胡哨的图标，没有打扰你的弹窗。所有的智能，<span class="pt" data-text="都安静地待在角落">都安静地待在角落</span>，等你召唤。</p>
+      <h3>A <span class="em">deeply restrained</span> writing environment,<br>yet every line is quietly heard.</h3>
+      <p><span class="pt" data-text="On the left">On the left</span>, notebooks nest infinitely deep;
+        <span class="pt" data-text="in the middle">in the middle</span> sits a pure writing surface;
+        <span class="pt" data-text="on the right">on the right</span>, a folded panel surfaces three related old notes for you.</p>
+      <p>No flashy icons, no interrupting pop-ups. All of the intelligence <span class="pt" data-text="waits quietly in the corner">waits quietly in the corner</span> until you summon it.</p>
     </div>
   </div>
 
@@ -430,87 +430,87 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   ●─●─●─●
   │╱│╲│╱│
   ●─●─●─●</pre>
-      <h3>用 <span class="em">图谱视图</span>，<br>看见你思考的<span class="em">形状</span>。</h3>
-      <p>每一个 <span class="pt" data-text="双向链接">双向链接</span> 都会变成一条引力线。后台持续计算笔记之间的语义距离，让相关的想法在画布上相互靠近。</p>
-      <p>支持 <span class="pt" data-text="立体力导向布局、自由排布、时间线视图">立体力导向布局、自由排布、时间线视图</span>，鼠标滚轮缩放穿越十万个节点也不卡顿。</p>
+      <h3>With the <span class="em">graph view</span>,<br>see the <span class="em">shape</span> of your thinking.</h3>
+      <p>Every <span class="pt" data-text="backlink">backlink</span> becomes a line of gravity. The background continuously computes semantic distance between notes, pulling related ideas closer on the canvas.</p>
+      <p>Supports <span class="pt" data-text="3D force-directed layouts, free arrangement, timeline view">3D force-directed layouts, free arrangement, timeline view</span>; zooming through a hundred thousand nodes with the scroll wheel never stutters.</p>
     </div>
     <div class="showcase-shot">
       <div class="bar"><i></i><i></i><i></i></div>
-      <img src="../assets/ai-08-architecture.jpg" alt="图谱视图">
+      <img src="../assets/ai-08-architecture.jpg" alt="Graph view">
     </div>
   </div>
 </section>
 
 <!-- SPEC -->
 <section class="sec" id="spec">
-  <div class="sec-head"><h2><pre class="sec-ascii">═══ ✦ ═══</pre>技术规格</h2><div class="idx">[ 04 / 05 ]</div></div>
+  <div class="sec-head"><h2><pre class="sec-ascii">═══ ✦ ═══</pre>Tech Specs</h2><div class="idx">[ 04 / 05 ]</div></div>
   <div class="spec-wrap">
     <div class="spec-visual">
-      <img src="../assets/ai-01-search.jpg" alt="技术架构">
-      <div class="label">✦ 本地推理 / 跨平台 / 开源核心</div>
+      <img src="../assets/ai-01-search.jpg" alt="Technical architecture">
+      <div class="label">✦ local inference / cross-platform / open-source core</div>
     </div>
     <div class="spec-table">
-      <div class="spec-row"><b>软件版本</b><span class="pt" data-text="墨思 v3.2.1，构建 26513">墨思 v3.2.1，构建 26513</span></div>
-      <div class="spec-row"><b>支持平台</b><span class="pt" data-text="桌面三端 / 手机平板 / 网页">桌面三端 / 手机平板 / 网页</span></div>
-      <div class="spec-row"><b>本机模型</b><span class="pt" data-text="千问 7B / 羊驼 8B 量化">千问 7B / 羊驼 8B 量化</span></div>
-      <div class="spec-row"><b>云端模型</b><span class="pt" data-text="可选接入主流大模型，或自托管">可选接入主流大模型，或自托管</span></div>
-      <div class="spec-row"><b>数据格式</b><span class="pt" data-text="纯文本标记 + 本地索引数据库">纯文本标记 + 本地索引数据库</span></div>
-      <div class="spec-row"><b>同步协议</b><span class="pt" data-text="冲突自由 / 点对点 / 端到端加密">冲突自由 / 点对点 / 端到端加密</span></div>
-      <div class="spec-row"><b>插件系统</b><span class="pt" data-text="脚本 + 沙盒，已有 280 余款插件">脚本 + 沙盒，已有 280 余款插件</span></div>
-      <div class="spec-row"><b>导入导出</b><span class="pt" data-text="兼容主流笔记软件迁移">兼容主流笔记软件迁移</span></div>
-      <div class="spec-row"><b>离线能力</b><span class="pt" data-text="完全可用，同步可选，无需账号">完全可用，同步可选，无需账号</span></div>
-      <div class="spec-row"><b>开源情况</b><span class="pt" data-text="核心引擎开源，星标超 25k">核心引擎开源，星标超 25k</span></div>
+      <div class="spec-row"><b>Version</b><span class="pt" data-text="Inkweave v3.2.1, build 26513">Inkweave v3.2.1, build 26513</span></div>
+      <div class="spec-row"><b>Platforms</b><span class="pt" data-text="macOS / Windows / Linux, phones &amp; tablets, web">macOS / Windows / Linux, phones &amp; tablets, web</span></div>
+      <div class="spec-row"><b>On-device models</b><span class="pt" data-text="qwen 7B / llama 8B, quantized">qwen 7B / llama 8B, quantized</span></div>
+      <div class="spec-row"><b>Cloud models</b><span class="pt" data-text="optionally connect any OpenAI-compatible LLM, or self-host">optionally connect any OpenAI-compatible LLM, or self-host</span></div>
+      <div class="spec-row"><b>Data format</b><span class="pt" data-text="plain-text markup + local index database">plain-text markup + local index database</span></div>
+      <div class="spec-row"><b>Sync protocol</b><span class="pt" data-text="conflict-free / peer-to-peer / end-to-end encrypted">conflict-free / peer-to-peer / end-to-end encrypted</span></div>
+      <div class="spec-row"><b>Plugin system</b><span class="pt" data-text="scripts + sandbox; 280+ plugins already available">scripts + sandbox; 280+ plugins already available</span></div>
+      <div class="spec-row"><b>Import / export</b><span class="pt" data-text="compatible with migrations from mainstream note apps">compatible with migrations from mainstream note apps</span></div>
+      <div class="spec-row"><b>Offline</b><span class="pt" data-text="fully usable; sync optional; no account needed">fully usable; sync optional; no account needed</span></div>
+      <div class="spec-row"><b>Open source</b><span class="pt" data-text="core engine open-sourced, 25k+ stars">core engine open-sourced, 25k+ stars</span></div>
     </div>
   </div>
 </section>
 
 <!-- PRICING -->
 <section class="sec" id="price">
-  <div class="sec-head"><h2><pre class="sec-ascii">═══ ❑ ═══</pre>订阅方案</h2><div class="idx">[ 05 / 05 ]</div></div>
+  <div class="sec-head"><h2><pre class="sec-ascii">═══ ❑ ═══</pre>Pricing</h2><div class="idx">[ 05 / 05 ]</div></div>
   <div class="price-grid">
 
     <div class="price">
-      <h4>个人版</h4>
-      <div class="num">¥0<small>/ 永久免费</small></div>
-      <p class="desc">适合个人写作者、学生、研究者</p>
+      <h4>Personal</h4>
+      <div class="num">$0<small>/ free forever</small></div>
+      <p class="desc">For individual writers, students, and researchers</p>
       <ul>
-        <li>所有本地功能 不限笔记数</li>
-        <li>本机智能模型</li>
-        <li>两台设备局域网同步</li>
-        <li>社区插件 主题</li>
-        <li>核心代码开源 可自托管</li>
+        <li>All local features, unlimited notes</li>
+        <li>On-device AI model</li>
+        <li>LAN sync between two devices</li>
+        <li>Community plugins &amp; themes</li>
+        <li>Open-source core, self-hostable</li>
       </ul>
-      <a class="btn pt" data-text="立即下载 ↓">立即下载 ↓</a>
+      <a class="btn pt" data-text="Download now ↓">Download now ↓</a>
     </div>
 
     <div class="price featured">
-      <h4>★ 专业版</h4>
-      <div class="num">¥38<small>/ 月，年付 ¥328</small></div>
-      <p class="desc">为创作者提供云同步与高级智能</p>
+      <h4>★ Pro</h4>
+      <div class="num">$6<small>/ mo, $58 billed yearly</small></div>
+      <p class="desc">Cloud sync and advanced intelligence for creators</p>
       <ul>
-        <li>包含个人版全部功能</li>
-        <li>无限设备 端到端加密同步</li>
-        <li>云端大模型接入</li>
-        <li>语义搜索 自动双链建议</li>
-        <li>高级图谱视图 主题市场</li>
-        <li>优先邮件支持</li>
+        <li>Everything in Personal</li>
+        <li>Unlimited devices, end-to-end encrypted sync</li>
+        <li>Cloud LLM connectivity</li>
+        <li>Semantic search, automatic backlink suggestions</li>
+        <li>Advanced graph view, theme marketplace</li>
+        <li>Priority email support</li>
       </ul>
-      <a class="btn pt" data-text="开始 14 天试用 →">开始 14 天试用 →</a>
+      <a class="btn pt" data-text="Start 14-day trial →">Start 14-day trial →</a>
     </div>
 
     <div class="price">
-      <h4>团队版</h4>
-      <div class="num">¥98<small>/ 人 / 月</small></div>
-      <p class="desc">适合 5–50 人的研究 创作团队</p>
+      <h4>Team</h4>
+      <div class="num">$14<small>/ user / mo</small></div>
+      <p class="desc">For research and creative teams of 5–50</p>
       <ul>
-        <li>包含专业版全部功能</li>
-        <li>共享工作区 多人协作编辑</li>
-        <li>权限分级 审计日志</li>
-        <li>统一身份认证</li>
-        <li>私有部署 内网托管</li>
-        <li>专属客户成功经理</li>
+        <li>Everything in Pro</li>
+        <li>Shared workspaces, multiplayer editing</li>
+        <li>Tiered permissions, audit logs</li>
+        <li>Unified identity and sign-on</li>
+        <li>Private deployment, intranet hosting</li>
+        <li>Dedicated customer success manager</li>
       </ul>
-      <a class="btn pt" data-text="联系销售 ✉">联系销售 ✉</a>
+      <a class="btn pt" data-text="Contact sales ✉">Contact sales ✉</a>
     </div>
 
   </div>
@@ -519,26 +519,26 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 <!-- INFO / CTA -->
 <section class="sec info" id="info">
   <div class="info-orbit"><pre id="info-ascii"></pre></div>
-  <div class="info-big">让你的 <span class="em">想法</span>，<br>开始彼此对话。</div>
-  <div class="hero-sub">v3.2 已上线 / 桌面、移动、网页全平台</div>
+  <div class="info-big">Let your <span class="em">ideas</span>,<br>start talking to each other.</div>
+  <div class="hero-sub">v3.2 is live / desktop, mobile, and web</div>
   <div class="info-links">
-    <a class="pt" data-text="下载墨思 ↓">下载墨思 ↓</a>
-    <a class="pt" data-text="网页版打开 →">网页版打开 →</a>
-    <a class="pt" data-text="开发者文档 ✦">开发者文档 ✦</a>
+    <a class="pt" data-text="Download Inkweave ↓">Download Inkweave ↓</a>
+    <a class="pt" data-text="Open in browser →">Open in browser →</a>
+    <a class="pt" data-text="Developer docs ✦">Developer docs ✦</a>
   </div>
   <div class="platforms">
-    <span>★ 苹果电脑</span><span>★ 视窗系统</span><span>★ 开源系统</span><span>★ 苹果手机</span><span>★ 平板</span><span>★ 安卓</span><span>★ 网页</span>
+    <span>★ macOS</span><span>★ Windows</span><span>★ Linux</span><span>★ iPhone</span><span>★ iPad</span><span>★ Android</span><span>★ Web</span>
   </div>
 </section>
 
 <div class="footer">
-  <span>© 2026 墨思工作室，版权所有</span>
-  <span>以 ASCII 与 茶 写就于 凌晨三点</span>
+  <span>© 2026 Inkweave Studio. All rights reserved.</span>
+  <span>Written in ASCII and tea, at 3 a.m.</span>
 </div>
 
 <script>
 /* ============================================================
-   1. HERO ASCII ：旋转球体 + 行星轨道 + 星点场
+   1. HERO ASCII : rotating sphere + planetary orbits + star field
    ============================================================ */
 (function(){
   const elNeb = document.getElementById('ascii-nebula');
@@ -553,7 +553,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   let comets = [];
   let nebulae = [];
 
-  // 不规则小行星形状（多种轮廓 + 表面陨石坑）
+  // Irregular asteroid shapes (multiple outlines + surface craters)
   const ASTEROID_SHAPES = [
     [
       "  .-~~-. ",
@@ -671,7 +671,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
     const bufAst = newBuf();
     const bufComet = newBuf();
 
-    // 星云气体
+    // Nebula gas
     for(const n of nebulae){
       const cx = n.x + Math.sin(t*0.2 + n.seed)*3;
       const cy = n.y + Math.cos(t*0.15 + n.seed)*2;
@@ -692,7 +692,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       }
     }
 
-    // 闪烁星点
+    // Twinkling stars
     for(const s of stars){
       const xi = Math.floor((s.x + Math.sin(t*0.3 + s.y)*0.3 + cols)%cols);
       const yi = Math.floor(s.y);
@@ -702,7 +702,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       }
     }
 
-    // 旋转行星
+    // Rotating planet
     const cx = cols/2, cy = rows/2;
     const R = Math.min(cols,rows*2)*0.18;
     const aspect = 0.5;
@@ -725,7 +725,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       }
     }
 
-    // 行星轨道与卫星
+    // Planetary orbits and satellites
     for(let i=0; i<3; i++){
       const orbR = R*(1.6 + i*0.5);
       const tilt = 0.35 + i*0.1;
@@ -745,7 +745,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       if(sx>=0&&sx<cols&&sy>=0&&sy<rows) bufPlanet[sy][sx] = (i===0?'◉':(i===1?'◎':'○'));
     }
 
-    // 彗星拖尾
+    // Comet trails
     for(const c of comets){
       c.x += c.vx; c.y += c.vy; c.life++;
       if(c.x>cols+10 || c.y>rows+5){
@@ -762,7 +762,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       }
     }
 
-    // 漂浮的小行星
+    // Drifting asteroids
     for(const a of asteroids){
       a.x += a.vx; a.y += a.vy; a.rot += a.rs;
       if(a.x<-6) a.x = cols+6;
@@ -784,14 +784,14 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 })();
 
 /* ============================================================
-   2. INFO 区小型轨道
+   2. INFO section mini orbit
    ============================================================ */
 (function(){
   const el = document.getElementById('info-ascii');
   if(!el) return;
   const W=44, H=22;
   let t=0;
-  // 小行星带的随机位置
+  // Random positions of the asteroid belt
   const belt = [];
   for(let i=0;i<14;i++){
     belt.push({
@@ -806,7 +806,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
     const buf = Array.from({length:H},()=>new Array(W).fill(' '));
     const cx=W/2, cy=H/2;
 
-    // 散落的星点背景
+    // Scattered star-dot background
     for(let i=0;i<24;i++){
       const x = Math.floor((Math.sin(i*7.3)+1)*W/2);
       const y = Math.floor((Math.cos(i*5.1)+1)*H/2);
@@ -814,7 +814,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       if(x>=0&&x<W&&y>=0&&y<H && tw>0.6) buf[y][x]='.';
     }
 
-    // 行星轨道
+    // Planetary orbits
     for(let i=0;i<4;i++){
       const r = 3+i*2.6;
       for(let a=0;a<Math.PI*2;a+=0.18){
@@ -828,7 +828,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       if(x>=0&&x<W&&y>=0&&y<H) buf[y][x]='★';
     }
 
-    // 外侧小行星带
+    // Outer asteroid belt
     for(const b of belt){
       const ang = b.a + t*b.sp*0.3;
       const x = Math.floor(cx + b.r*Math.cos(ang));
@@ -836,7 +836,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       if(x>=0&&x<W&&y>=0&&y<H) buf[y][x]=b.ch;
     }
 
-    // 中心恒星与日冕
+    // Central star and corona
     if(buf[Math.floor(cy)]) buf[Math.floor(cy)][Math.floor(cx)]='◉';
     const halo = [[-1,0,'-'],[1,0,'-'],[0,-1,'|'],[0,1,'|']];
     for(const [dx,dy,ch] of halo){
@@ -851,8 +851,8 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 })();
 
 /* ============================================================
-   3. PROTEXT ：文本乱码-解码效果
-   悬停或进入视口时，文字先打乱再逐字"解密"显现
+   3. PROTEXT : text scramble-then-decode effect
+   On hover or viewport entry, text scrambles first, then "decrypts" character by character
    ============================================================ */
 (function(){
   const glyphs = "★☆✶✦✧◉◎○●∙•~≈≋▁▂▃▄▅▆▇█ABCDEFGHJKLMNPQRSTUVWXYZ0123456789@#%&*";
@@ -904,7 +904,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 })();
 
 /* ============================================================
-   4. 标签筛选
+   4. Tag filtering
    ============================================================ */
 (function(){
   const tags = document.querySelectorAll('.tag');
@@ -926,7 +926,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 })();
 
 /* ============================================================
-   5. 平滑滚动
+   5. Smooth scrolling
    ============================================================ */
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click', e=>{
@@ -939,7 +939,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 });
 
 /* ============================================================
-   6. 实时时钟
+   6. Live clock
    ============================================================ */
 (function(){
   const el = document.querySelector('.here');
@@ -947,7 +947,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   function fmt(n){return n<10?'0'+n:n}
   function tick(){
     const d = new Date();
-    el.innerHTML = '你好<br><span class="blink">▮</span> 现在是 ' + fmt(d.getHours())+':'+fmt(d.getMinutes())+':'+fmt(d.getSeconds());
+    el.innerHTML = 'Hello<br><span class="blink">▮</span> it is ' + fmt(d.getHours())+':'+fmt(d.getMinutes())+':'+fmt(d.getSeconds());
     setTimeout(tick, 1000);
   }
   tick();

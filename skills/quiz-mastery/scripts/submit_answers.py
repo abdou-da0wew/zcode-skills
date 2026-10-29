@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""提交测验答案并评分。
+"""Submit quiz answers and grade them.
 
-用法：python3 submit_answers.py <user_id> <document_id> <session_id> <answers_json>
+Usage: python3 submit_answers.py <user_id> <document_id> <session_id> <answers_json>
 
-参数：
-  user_id:      用户标识
-  document_id:  文档标识
-  session_id:   测验会话 ID
-  answers_json: JSON 格式的答案字典，如 '{"q_001":"A","q_002":"True"}'
+Arguments:
+  user_id:      User identifier
+  document_id:  Document identifier
+  session_id:   Quiz session ID
+  answers_json: Answers dictionary in JSON format, e.g. '{"q_001":"A","q_002":"True"}'
 
-输出：评分结果 JSON（score, total, accuracy, results）。
+Output: the grading result as JSON (score, total, accuracy, results).
 """
 from pathlib import Path
 import json

@@ -8,7 +8,7 @@ Usage:
     from templates.base import *
 
     # To switch palette based on user prompt (call BEFORE creating styles):
-    use_palette("帮我做一个温暖的销售月报")  # Chinese prompt example
+    use_palette("Make me a warm sales monthly report")  # example prompt
     # → All color tokens and style factories now use 'warm' palette.
 
     # Or manually:
@@ -126,7 +126,7 @@ def use_palette(prompt: str):
       3. No match → professional (safe default)
 
     Example:
-        use_palette("帮我做一个温暖的销售月报")  # Chinese prompt example
+        use_palette("Make me a warm sales monthly report")  # example prompt
         # → 'warm' palette applied
     """
     from templates.palettes import resolve_palette_with_info
@@ -295,8 +295,8 @@ def make_chart_title(text, size_pt=12, bold=True, axis=False, max_line_chars=6):
         """Insert \\n before parentheses when text exceeds max_chars."""
         if not max_chars or len(text) <= max_chars:
             return text
-        # Insert \n before '(' or '（'
-        result = re.sub(r'(?=[（(])', '\n', text, count=1)
+        # Insert \n before '(' or the fullwidth parenthesis
+        result = re.sub(r'(?=[\uff08(])', '\n', text, count=1)
         return result
 
     # For axis titles, insert line breaks to prevent overlap

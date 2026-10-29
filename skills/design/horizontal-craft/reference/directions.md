@@ -1,277 +1,276 @@
-# 排版方向 Text Direction：横排 / 直排 / 混排
+# Text Direction: Horizontal / Vertical / Mixed
 
-中文是世界上少数能**横竖两套排版系统并行**的文字。"用什么方向"是任何中文排版项目的第一个决策，而不是默认横排。本文给出方向决策树、参数对照、CSS 实现、地区风格差异。
+Chinese is one of the few scripts in the world that runs **two parallel typesetting systems, horizontal and vertical**. "Which direction?" is the first decision of any Chinese typesetting project, not a default to horizontal. This file gives the direction decision tree, a parameter comparison, CSS implementation, and regional style differences.
 
-## 一、方向决策树
+## 1. Direction decision tree
 
 ```
-内容主要属性是什么？
+What are the content's dominant attributes?
 │
-├─ 古籍 / 文言 / 诗词 / 书法集 / 题词 / 对联 ────────────→ 直排
-├─ 邀请函 / 请柬 / 礼仪文书 / 书信复古 ──────────────→ 直排
-├─ 博物馆图录 / 艺术画册中"诗题画跋"页 ────────────→ 直排
-├─ 杂志 / 报纸 / 教材 / 学术论文 / 商务文档 ───────→ 横排
-├─ 现代小说 / 散文 / 网页 / H5 / App ───────────────→ 横排
-└─ 工具书 / 字典 / 辞海 ───────────────────────→ 横排（直排版多见于民国老版本）
+├─ Classical texts / literary Chinese / poetry / calligraphy collections / inscriptions / couplets ────→ Vertical
+├─ Invitations / ceremony documents / letters with a vintage feel ──────────────→ Vertical
+├─ Museum catalogs / art books' "poem-title-painting-colophon" pages ────────────→ Vertical
+├─ Magazines / newspapers / textbooks / academic papers / business documents ───────→ Horizontal
+├─ Modern novels / essays / web pages / H5 / App ───────────────→ Horizontal
+└─ Reference books / dictionaries ───────────────────────→ Horizontal (vertical editions mostly found in old Republican-era prints)
 
-需不需要混排？
+Is mixed writing needed?
 │
-├─ 直排中遇 1 字英文/缩略词 ────→ 正立排（保持横向单字）
-├─ 直排中遇 2-3 位阿拉伯数字 ───→ 纵中横排 tate-chu-yoko（保持横向小组）
-├─ 直排中遇整段西文/词组 ───────→ 顺时针 90° 旋转
-├─ 直排中遇竖排小注 ──────────→ 双行夹注（注文两行平行，字号 1/2）
-├─ 横排中遇直排标题/匾额 ──────→ 局部 writing-mode: vertical-rl
-└─ 横排中遇直排小段诗词引文 ───→ 局部直排（"插秧式"）
+├─ A 1-letter English word/abbreviation inside vertical text ────→ Upright setting (single glyph stays horizontal)
+├─ 2–3 digit Arabic numerals inside vertical text ───→ Tate-chu-yoko (a small horizontal group)
+├─ A whole Western word/phrase/paragraph inside vertical text ───────→ Rotate 90° clockwise
+├─ A small vertical annotation inside vertical text ──────────→ Double-line interlinear note (two parallel note lines, half font size)
+├─ A vertical title/plaque inside horizontal text ──────→ Local writing-mode: vertical-rl
+└─ A short vertical poetry quote inside horizontal text ───→ Local vertical block ("transplant style")
 ```
 
-## 二、横排 vs 直排参数对照
+## 2. Horizontal vs vertical parameter comparison
 
-| 维度 | 横排 | 直排 |
+| Dimension | Horizontal | Vertical |
 |---|---|---|
-| 文字方向 | 左 → 右 | 上 → 下 |
-| 行方向 | 上 → 下 | **右 → 左** |
-| 翻页方向 | 从左向右翻（**左侧装订**） | 从右向左翻（**右侧装订**） |
-| 正面页位置 | 右页（奇数页） | 左页（奇数页） |
-| 分栏方向 | 垂直切分（左中右栏） | 水平切分（上中下栏） |
-| 图/表标题位置 | 上方 / 下方 | 左侧 / 右侧 |
-| 表头行位置 | 上方 | 右侧 |
-| 表头列位置 | 左侧 | 上方 |
-| 末页多栏行数 | 各栏尽量对齐，余空在末栏末尾 | 顺其结束，各栏行数可不齐 |
-| 行长上限 | ≤ 48 字 | ≤ 55 字 |
-| 行长下限 | ≥ 10 字 | ≥ 10 字 |
-| CSS writing-mode | `horizontal-tb`（默认） | `vertical-rl` |
+| Text direction | Left → right | Top → bottom |
+| Line direction | Top → bottom | **Right → left** |
+| Page-turn direction | Left to right (**bound on the left**) | Right to left (**bound on the right**) |
+| Front-page position | Right page (odd pages) | Left page (odd pages) |
+| Column split direction | Vertical cuts (left/middle/right columns) | Horizontal cuts (top/middle/bottom columns) |
+| Figure/table caption position | Above / below | Left / right |
+| Table header row position | Top | Right |
+| Table header column position | Left | Top |
+| Last-page multi-column line counts | Align columns; leftover space at the end of the last column | Let it end naturally; column line counts may be uneven |
+| Line-length cap | ≤ 48 characters | ≤ 55 characters |
+| Line-length floor | ≥ 10 characters | ≥ 10 characters |
+| CSS writing-mode | `horizontal-tb` (default) | `vertical-rl` |
 
-## 三、标点在横/直排中的差异（大陆 GB/T 15834-2011）
+## 3. Punctuation differences in horizontal/vertical (Mainland GB/T 15834-2011)
 
-**关键差异点。错配会让版面瞬间显业余。**
+**Key differences. Mismatches make a layout look instantly amateur.**
 
-| 标点 | 横排（大陆） | 直排（大陆） | 港台 |
+| Punctuation | Horizontal (Mainland) | Vertical (Mainland) | HK/TW |
 |---|---|---|---|
-| 句号 。 | 字面左下角 | 字面右上角 | 字面正中 |
-| 逗号 ， | 字面左下角 | 字面右上角 | 字面正中 |
-| 顿号 、 | 字面左下角 | 字面右上角 | 字面正中 |
-| 冒号 ： | 字面左下角，直立 | **直立偏右**（不转 90°） | 居中直立 |
-| 分号 ； | 字面左下角，直立 | **直立偏右**（不转 90°） | 居中直立 |
-| 问号 ？ | 字面左下角，直立 | **直立**（不转 90°） | 居中直立 |
-| 叹号 ！ | 字面左下角，直立 | **直立**（不转 90°） | 居中直立 |
-| 引号（双） | 弯引号 " " | **直角引号 「」**（双） | 直角引号 |
-| 引号（单） | 弯引号 ' ' | 直角引号 『』 | 直角引号 |
-| 书名号 | 《》〈〉 | 《》（直立） | 甲式波浪 ﹏（台湾）/ 乙式《》 |
-| 破折号 | —— 占 2 字水平居中 | **占 2 字垂直居中** | 同 |
-| 省略号 | …… 占 2 字，6 点水平居中 | 占 2 字，6 点**垂直居中** | 同 |
+| Full stop (U+3002) | Bottom-left of glyph face | Top-right of glyph face | Centered |
+| Comma (U+FF0C) | Bottom-left of glyph face | Top-right of glyph face | Centered |
+| Ideographic comma / dunhao (U+3001) | Bottom-left of glyph face | Top-right of glyph face | Centered |
+| Colon (U+FF1A) | Bottom-left, upright | **Upright, shifted right** (not rotated 90°) | Centered, upright |
+| Semicolon (U+FF1B) | Bottom-left, upright | **Upright, shifted right** (not rotated 90°) | Centered, upright |
+| Question mark (U+FF1F) | Bottom-left, upright | **Upright** (not rotated 90°) | Centered, upright |
+| Exclamation (U+FF01) | Bottom-left, upright | **Upright** (not rotated 90°) | Centered, upright |
+| Double quotes | Curly quotes (U+201C/U+201D) | **Corner brackets (U+300C/U+300D)** | Corner brackets |
+| Single quotes | Curly quotes (U+2018/U+2019) | Corner brackets (U+300E/U+300F) | Corner brackets |
+| Book-title marks | U+300A/U+300B, U+3008/U+3009 | U+300A/U+300B (upright) | Style A wavy underline (Taiwan) / Style B U+300A/U+300B |
+| Em dash | —— spans 2 cells, horizontally centered | **spans 2 cells, vertically centered** | Same |
+| Ellipsis | …… spans 2 cells, 6 dots horizontal-centered | spans 2 cells, 6 dots **vertically centered** | Same |
 
-**反例（要避免）**：
-- 把日文规则套用到中文直排：冒号、分号、问号、叹号在日文直排转 90° 躺倒；**中文必须保持直立**。某代 macOS 因 Unicode UAX#50 早期不完善曾把中文比照日文，是错误案例。
-- 直排正文用弯引号 " "（应改用直角「」）。
+**Counter-examples (avoid)**:
+- Applying Japanese rules to Chinese vertical text: Japanese vertical colons/semicolons/question marks/exclamations rotate 90° and lie down; **in Chinese they must stay upright**. One macOS release once rendered Chinese like Japanese due to early Unicode UAX#50 immaturity — a documented mistake.
+- Using curly quotes (U+201C/U+201D) in vertical body text (switch to corner brackets U+300C/U+300D).
 
-## 四、直排中混排西文的 3 种方法（W3C CLReq §2.1.3）
+## 4. Three methods for Western text inside vertical (W3C CLReq §2.1.3)
 
-直排文本中遇到西文/数字时，根据长度选用：
+When vertical text meets Western words/numbers, choose by length:
 
-### 方法 1：正立排（Upright）
-- 用于：**单个字母、首字母缩略词**（如 GDP、CPU、A）
-- 做法：用与汉字等宽的字体或全角字符，与汉字同方向逐字排
-- CSS：`text-orientation: upright`
-- 示例：`一个 G D P 增速…` （G、D、P 各占一格，与汉字同方向）
+### Method 1: Upright
+- For: **single letters, initialisms** (e.g. GDP, CPU, A)
+- Method: use a monospaced-for-Han font or fullwidth characters; set letter by letter in the same direction as the Han glyphs
+- CSS: `text-orientation: upright`
+- Example: `one G D P growth…` (G, D, P each occupy one cell, same direction as the Han glyphs)
 
-### 方法 2：顺时针 90° 旋转（Rotated）
-- 用于：**一般单词 / 句子 / 4 位以上数字**（如 "JavaScript"、"2024"、"the quick brown fox"）
-- 做法：用比例字体，整词整句旋转
-- 汉字与西文之间间距 **≤ 1/4 汉字宽**；西文位于行首/行尾时**不加空白**
-- CSS：`text-orientation: sideways`（即默认行为）
+### Method 2: Rotated 90° clockwise
+- For: **ordinary words / sentences / numbers of 4+ digits** (e.g. "JavaScript", "2024", "the quick brown fox")
+- Method: proportional font; rotate the whole word or sentence
+- Gap between Han and Western text **≤ 1/4 Han width**; when Western text sits at line start/end, **add no extra whitespace**
+- CSS: `text-orientation: sideways` (the default behavior)
 
-### 方法 3：纵中横排（Tate-chu-yoko 縦中横）
-- 用于：**2–3 位阿拉伯数字、短缩写**（如 "3.0"、"A+"、"2B"、"21"、"AM"、"99"）
-- 做法：比例字体，保持正方向横置；宽度与行幅相当或稍出
-- 活字时代严格不超过 1 个汉字宽；现今可凸出行间
-- CSS：`text-combine-upright: all`
-- 示例：年龄 `21` 岁、`3.0` 升发动机、温度 `25` ℃
+### Method 3: Tate-chu-yoko (horizontal-in-vertical)
+- For: **2–3 digit Arabic numerals, short abbreviations** (e.g. "3.0", "A+", "2B", "21", "AM", "99")
+- Method: proportional font kept in normal horizontal orientation; width ≈ one line pitch or slightly wider
+- In the metal-type era it strictly never exceeded 1 Han width; today it may protrude slightly into the line gap
+- CSS: `text-combine-upright: all`
+- Example: age `21`, a `3.0`-liter engine, temperature `25` °C
 
-### 混排间距规则（直排同横排）
-- 直排中**通常不用弯引号**（应改用直角引号）
-- 若引用西文且用弯引号，需跟随被引文旋转
-- 直排中阿拉伯数字内部不可分行，破折号/省略号不可分行
+### Mixed-writing spacing rules (vertical same as horizontal)
+- Vertical text **normally avoids curly quotes** (use corner brackets instead)
+- If quoting Western text with curly quotes, the quotes rotate with the quoted text
+- In vertical text, Arabic numerals must not split across lines; em dashes/ellipses must not split
 
-## 五、横排中嵌入直排
+## 5. Vertical embedded in horizontal
 
-现代横排文档中嵌入小段直排的场景：
+Scenarios where modern horizontal documents embed small vertical blocks:
 
-- 标题 / 匾额 / 题字
-- 古诗引文（一首七绝直排展示，强化古意）
-- 对联（两幅竖排平行展示）
-- 印章、闲章、款识
-- 杂志专题"穿插式"页面
+- Titles / plaques / calligraphic inscriptions
+- Classical poetry quotes (a full quatrain set vertically to strengthen the classical feel)
+- Couplets (two vertical strips shown in parallel)
+- Seals, leisure seals, colophons
+- Magazine feature "interleaved" pages
 
-**CSS 实现**：
+**CSS implementation**:
 ```css
 .vertical-quote {
-  writing-mode: vertical-rl;       /* 直排：从右向左 */
-  text-orientation: mixed;          /* 汉字直立，西文转横 */
+  writing-mode: vertical-rl;       /* vertical: lines run right to left */
+  text-orientation: mixed;          /* Han glyphs upright, Western rotated */
   height: 20em;
   margin: 0 1em;
 }
 ```
 
-**注意事项**：
-- 直排段在横排里要"做容器"——给定明确高度，不要让它自由撑开
-- 直排标点要切换到右上角形态；不要直接搬横排标点
-- 嵌入位置遵守"文意停顿"——句间嵌入而非词间
+**Notes**:
+- A vertical block inside horizontal text must be "given a container" — set an explicit height; don't let it stretch freely
+- Vertical punctuation must switch to the top-right forms; never reuse the horizontal forms directly
+- Embed at "semantic pauses" — between sentences, not between words
 
-## 六、装订与翻页方向
+## 6. Binding and page-turn direction
 
-装订方向直接影响版心位置和阅读体验，不能搞反。
+Binding direction directly affects type-area position and reading experience; never get it backwards.
 
-| 方向 | 装订侧 | 翻页方向 | 第一页（正面）位置 | 用途 |
+| Direction | Binding side | Page turn | First page (front) position | Used for |
 |---|---|---|---|---|
-| **横排左翻** | 左侧 | 从左向右 | **右页**（奇数页） | 现代中文书、教材、报告、所有英文书 |
-| **直排右翻** | 右侧 | 从右向左 | **左页**（奇数页） | 古籍、文言、诗集、传统书法集 |
-| **直排左翻（错的）** | 左侧 | 从左向右 | — | 中日韩三国都不用 |
+| **Horizontal, left-turning** | Left | Left to right | **Right page** (odd pages) | Modern Chinese books, textbooks, reports, all English books |
+| **Vertical, right-turning** | Right | Right to left | **Left page** (odd pages) | Classical texts, literary Chinese, poetry collections, traditional calligraphy collections |
+| **Vertical, left-turning (wrong)** | Left | Left to right | — | Used in none of China/Japan/Korea |
 
-**关键检查项**：
-- 大标题必须出现在**正面页**（横排右页 / 直排左页），不能开在反面页
-- 章节末页留出余白时，留白方向匹配阅读方向（横排留下方、直排留下方）
-- 跨页大图：横排左页向右延展、直排右页向左延展
+**Key checks**:
+- Major titles must open on the **front page** (right page for horizontal / left page for vertical), never on a verso
+- When a chapter's final page leaves whitespace, the whitespace direction matches reading direction (below for both horizontal and vertical)
+- Cross-spread images: horizontal left page extends rightward; vertical right page extends leftward
 
-## 七、CSS writing-mode 完整指南
+## 7. Complete CSS writing-mode guide
 
 ```css
-/* 横排（默认） */
+/* Horizontal (default) */
 .horizontal {
   writing-mode: horizontal-tb;     /* horizontal, top-to-bottom */
 }
 
-/* 直排（中文、日文、传统蒙文） */
+/* Vertical (Chinese, Japanese, traditional Mongolian) */
 .vertical {
   writing-mode: vertical-rl;       /* vertical, right-to-left lines */
-  text-orientation: mixed;          /* 汉字立、半角西文转 90° */
+  text-orientation: mixed;          /* Han upright, halfwidth Western rotated 90° */
 }
 
-/* 直排但行从左向右（少见，部分新蒙文） */
+/* Vertical but lines run left-to-right (rare; some new Mongolian) */
 .vertical-lr {
   writing-mode: vertical-lr;
 }
 
-/* 直排内单字符强制立起来（缩略词、单字母） */
+/* Force single characters upright inside vertical (abbreviations, single letters) */
 .upright {
   text-orientation: upright;
 }
 
-/* 纵中横排（数字小组保持横置） */
+/* Tate-chu-yoko (small number groups stay horizontal) */
 .tcy {
   text-combine-upright: all;
 }
 ```
 
-完整 HTML 示例：
+Full HTML example (pinyin transcription of Li Bai's "Quiet Night Thoughts" — substitute the real Chinese text in production):
 ```html
 <article style="writing-mode: vertical-rl; height: 30em;">
   <p>
-    秦时明月汉时关，万里长征人未还。
-    但使<span style="text-combine-upright: all;">21</span>世纪有李广，
-    不教胡马度阴山。
+    chuang qian ming yue guang, yi shi di shang shuang.
+    ju tou wang ming yue, di tou si gu gu-<span style="text-combine-upright: all;">21</span>-xiang.
   </p>
 </article>
 ```
 
-## 八、地区风格三大体系
+## 8. The three regional style systems
 
-地区差异的索引表——一个项目锁定一个地区，按下面维度逐项对齐。具体执行细节看对应文件：标点详见 `punctuation.md`、字体详见 `fonts.md`、避头尾详见 `punctuation.md § 四`。
+An index table of regional differences — lock one region per project and align each dimension below. Execution details live in the corresponding files: punctuation in `punctuation.md`, fonts in `fonts.md`, kinsoku in `punctuation.md §4`.
 
-| 维度 | 大陆简体 | 港台繁体 | 日文 |
+| Dimension | Mainland Simplified | HK/TW Traditional | Japanese |
 |---|---|---|---|
-| 标点位置 | **横排左下、直排右上** | **居中**（横直排都一样） | 横排左下、直排右上（同大陆） |
-| 避头尾严格度 | GB 级 / strict 级 | 多不严格（标点居中无突兀） | 严格 |
-| 标点风格 | 开明式（句末全宽、句内半宽）多 | 居中式 + 多不调宽度 | 开明式 + 严格挤压 |
-| 直排冒号分号 | 直立偏右 | 居中直立 | **转 90° 躺倒** |
-| 引号 | 弯引号 ""''（横）/ 直角「」（直） | 直角「」『』（先单后双） | 直角「」 |
-| 书名号 | 《》〈〉 | 甲式波浪 ﹏（书底）+ 乙式《》 | 二重括号 『』 |
-| 间隔号 · | 占**半字宽** | 占**全字宽** | 占全字宽 |
-| 公文字体 | **仿宋** | **楷体** | 明朝体 |
+| Punctuation position | **Horizontal: bottom-left; vertical: top-right** | **Centered** (same in both directions) | Horizontal bottom-left, vertical top-right (same as Mainland) |
+| Kinsoku strictness | GB level / strict level | Usually relaxed (centered punctuation never looks abrupt) | Strict |
+| Punctuation style | Mostly Kaiming style (fullwidth at sentence end, halfwidth within sentences) | Centered, widths mostly unadjusted | Kaiming style + strict squeezing |
+| Vertical colon/semicolon | Upright, shifted right | Centered, upright | **Rotated 90°, lying down** |
+| Quotation marks | Curly (horizontal) / corner brackets (vertical) | Corner brackets (single outside, double inside) | Corner brackets |
+| Book-title marks | U+300A/U+300B, U+3008/U+3009 | Style A wavy underline + Style B U+300A/U+300B | Double corner brackets (U+300E/U+300F) |
+| Middle dot · | **Half Han width** | **Full Han width** | Full Han width |
+| Official-document font | **FangSong** | **Kai** | Mincho |
 
-**核心心法**：项目开始就锁定地区风格，不要"中港台日"混用。
+**Core discipline**: lock the regional style at project start; never mix Mainland/HK/TW/Japanese conventions.
 
-## 九、什么时候直排？什么时候横排？
+## 9. When vertical? When horizontal?
 
-### 必须直排
-- 古籍影印 / 古籍今译保留原貌
-- 文言文学校教材（部分台湾教材）
-- 中医典籍、佛经、道经
-- 书法作品集、字帖
-- 传统戏曲剧本（旧版）
-- 朱批奏折、家书复刻
+### Must be vertical
+- Facsimile editions of classical texts / modern translations that preserve the original look
+- Literary-Chinese school textbooks (some Taiwan textbooks)
+- Traditional medicine, Buddhist, Taoist scriptures
+- Calligraphy collections, model-copybooks
+- Traditional opera scripts (older editions)
+- Vermilion-annotated memorials, replicated family letters
 
-### 强烈推荐直排
-- 当代古典诗词集
-- 茶艺 / 香道 / 国画相关书籍
-- 高端艺术画册"诗题画跋"页
-- 邀请函 / 请柬 / 谢卡（小段）
-- 博物馆图录的部分内页（混合）
-- 题字 / 题词 / 闲章
+### Strongly recommend vertical
+- Contemporary classical poetry collections
+- Tea ceremony / incense / traditional painting books
+- High-end art books' "poem-title-painting-colophon" pages
+- Invitations / ceremony cards / thank-you cards (short passages)
+- Some museum-catalog inner pages (mixed)
+- Inscriptions / dedications / leisure seals
 
-### 可以选直排（增加古意 / 仪式感）
-- 散文集封面
-- 招贴海报标题
-- 茶包装、白酒包装文案
-- 婚礼喜帖
-- 复古风咖啡店菜单
+### Vertical optional (adds classical feel / ritual sense)
+- Essay-collection covers
+- Poster titles
+- Tea packaging, baijiu packaging copy
+- Wedding invitations
+- Vintage-style cafe menus
 
-### 不要直排
-- 现代长文（用户已习惯横向扫视）
-- 表格密集的文档（直排表格难做）
-- 大量中英混排的技术 / 学术内容
-- 网页正文（写读不便、生态差）
-- App / H5（小屏直排压力大）
+### Do not use vertical
+- Modern long-form (users are habituated to horizontal scanning)
+- Table-dense documents (vertical tables are hard)
+- Technical/academic content with heavy Chinese-English mixing
+- Web body text (hard to write/read; poor ecosystem support)
+- App / H5 (small screens strain vertical layouts)
 
-## 十、混排（横直交叉）的进阶玩法
+## 10. Advanced mixed writing (horizontal-vertical crossover)
 
-不要把"混排"理解为"破格"——这是中文排版的基础语法。常见 5 种：
+Never treat "mixed writing" as breaking the rules — it is basic Chinese typesetting grammar. Five common patterns:
 
-### 1. 横排正文 + 直排引文
-正文横排，引用的古诗、对联、题词单段直排，与正文形成节奏对比。
+### 1. Horizontal body + vertical quote
+Body text horizontal; a quoted poem, couplet, or inscription set vertically as one block, forming a rhythm contrast with the body.
 
 ```html
 <article class="horizontal-body">
-  <p>李白《静夜思》写道：</p>
+  <p>Li Bai writes in "Quiet Night Thoughts":</p>
   <blockquote class="vertical-quote">
-    床前明月光，疑是地上霜。<br>
-    举头望明月，低头思故乡。
+    chuang qian ming yue guang, yi shi di shang shuang.<br>
+    ju tou wang ming yue, di tou si gu xiang.
   </blockquote>
-  <p>这首诗体现了…</p>
+  <p>This poem shows…</p>
 </article>
 ```
 
-### 2. 直排正文 + 横排数据
-古籍今译类，正文直排，但年表、数据表、地图说明等横排。靠纸张/底色区分。
+### 2. Vertical body + horizontal data
+Classical-text modern translations: body vertical, but chronologies, data tables, and map notes horizontal. Distinguished by paper/background color.
 
-### 3. 跨页"半横半直"
-左页直排（古文原文）、右页横排（今译），翻页对照。常见于古籍今译。
+### 3. Spread "half horizontal, half vertical"
+Left page vertical (the classical original), right page horizontal (the modern translation), compared page by page. Common in classical-text modern translations.
 
-### 4. 标题直排、正文横排
-封面 / 章首页用直排大字标题，营造仪式感；内页正文回到横排实用。
+### 4. Vertical titles, horizontal body
+Covers / chapter openers use vertical display titles for ceremony; inner-page body returns to horizontal for utility.
 
-### 5. 双行夹注（小注）
-直排正文中插入双行夹注：两行小注同高，字号为正文 1/2，平行排列。古籍标配。
+### 5. Double-line interlinear notes (small notes)
+Inside vertical body text, insert interlinear notes: two note lines of equal height at half the body size, running in parallel. Standard equipment in classical editions.
 
 ```
-正┃ 双行夹注：
-文┃ 上行注┃下行注
-正┃ 上行注┃下行注
-文┃
+TEXT│ Double-line note:
+    │ upper note│ lower note
+TEXT│ upper note│ lower note
+    │
 ```
 
-## 十一、检查清单（方向相关）
+## 11. Checklist (direction-related)
 
-排印完成前必过：
+Must pass before finalizing:
 
-- [ ] 排版方向（横 / 直 / 混）是否与内容气质匹配？
-- [ ] 装订方向是否与排版方向对应？（横左翻 / 直右翻）
-- [ ] 大标题是否在正面页（横右页 / 直左页）？
-- [ ] 直排中数字是否用了纵中横排？
-- [ ] 直排中单字英文是否用了正立排？
-- [ ] 直排标点是否切换到右上角形态？
-- [ ] 直排冒号分号是否保持直立（没躺成日式）？
-- [ ] 直排引号是否改用了直角「」？
-- [ ] 地区风格是否一致？（没把港台居中标点 + 大陆 GB 避头尾混用）
-- [ ] 横排嵌直排的段落是否给了明确高度？
-- [ ] 图表标题方向是否匹配主排版方向？
-- [ ] CSS `writing-mode` 和 `text-orientation` 是否成对设置？
+- [ ] Does the writing direction (horizontal / vertical / mixed) match the content's temperament?
+- [ ] Does binding direction correspond to writing direction? (horizontal → left-turning; vertical → right-turning)
+- [ ] Are major titles on the front page (right page for horizontal / left page for vertical)?
+- [ ] Do numbers in vertical text use tate-chu-yoko?
+- [ ] Do single English letters in vertical text use upright setting?
+- [ ] Has vertical punctuation switched to the top-right forms?
+- [ ] Do vertical colons/semicolons stay upright (not lying down Japanese-style)?
+- [ ] Have vertical quotes switched to corner brackets (U+300C/U+300D)?
+- [ ] Is the regional style consistent? (no mixing HK/TW centered punctuation with Mainland GB kinsoku)
+- [ ] Do vertical blocks inside horizontal text have explicit heights?
+- [ ] Do figure/table caption directions match the main writing direction?
+- [ ] Are CSS `writing-mode` and `text-orientation` set as a pair?

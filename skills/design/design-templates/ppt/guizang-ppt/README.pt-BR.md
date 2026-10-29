@@ -1,11 +1,10 @@
 # Magazine Web PPT · Skill de PPT estilo revista eletrônica em web
 
-> 🌏 **English version: [README.en.md](./README.en.md)**
-> 🌏 **中文版: [README.md](./README.md)**
+> 🌏 **English: [README.md](./README.md)**
 
-Uma skill do [Claude Code / Claude Agent Skills](https://agentskills.io/) para gerar **PPTs HTML em arquivo único com swipe horizontal**. O tom visual é "**revista eletrônica × tinta digital**" — como se a *Monocle* tivesse colado código.
+Uma skill de [agente](https://agentskills.io/) para o agente DiveeOI (baseado em OpenCode) para gerar **PPTs HTML em arquivo único com swipe horizontal**. O tom visual é "**revista eletrônica × tinta digital**" — como se a *Monocle* tivesse colado código.
 
-> Destilada por [歸藏](https://x.com/op7418) em palestras presenciais como "Empresa de uma pessoa só: a organização dobrada pela IA" e "Uma nova forma de trabalhar"; cada armadilha que ele já pisou virou linha em `checklist.md`.
+> Destilada por [Guizang](https://x.com/op7418) em palestras presenciais como "Empresa de uma pessoa só: a organização dobrada pela IA" e "Uma nova forma de trabalhar"; cada armadilha que ele já pisou virou linha em `checklist.md`.
 
 ![Demonstração do Magazine Web PPT](https://github.com/user-attachments/assets/5dc316a2-401c-4e37-9123-ea081b6ae470)
 
@@ -28,24 +27,24 @@ Uma skill do [Claude Code / Claude Agent Skills](https://agentskills.io/) para g
 
 ### Forma 1: mande o texto abaixo direto para a IA (recomendado)
 
-> Me ajude a instalar a skill `guizang-ppt-skill` do Claude Code. Siga estes passos:
+> Me ajude a instalar a skill `guizang-ppt` para o meu agente DiveeOI (baseado em OpenCode). Siga estes passos:
 >
-> 1. Garanta que o diretório `~/.claude/skills/` existe (crie se não existir)
-> 2. Rode `git clone https://github.com/op7418/guizang-ppt-skill.git ~/.claude/skills/magazine-web-ppt`
-> 3. Verifique: `ls ~/.claude/skills/magazine-web-ppt/` deve mostrar `SKILL.md`, `assets/` e `references/`
+> 1. Garanta que o diretório de skills do agente existe (crie se não existir, ex.: `~/.opencode/skills/`)
+> 2. Rode `git clone https://github.com/op7418/guizang-ppt-skill.git <skills-dir>/magazine-web-ppt`
+> 3. Verifique: `ls <skills-dir>/magazine-web-ppt/` deve mostrar `SKILL.md`, `assets/` e `references/`
 > 4. Me avise quando estiver instalado; depois disso, quando eu disser "faça um PPT estilo revista" ou similar, essa skill é disparada
 
-Cole esse texto no Claude Code / Cursor / qualquer agente de IA com permissão de shell, e ele faz a instalação automaticamente.
+Cole esse texto no agente DiveeOI ou em qualquer agente de IA com permissão de shell, e ele faz a instalação automaticamente.
 
 ### Forma 2: linha de comando manual
 
 ```bash
-git clone https://github.com/op7418/guizang-ppt-skill.git ~/.claude/skills/magazine-web-ppt
+git clone https://github.com/op7418/guizang-ppt-skill.git <skills-dir>/magazine-web-ppt
 ```
 
 ### Como disparar
 
-Depois de instalada, o Claude Code descobre e chama a skill automaticamente na conversa. Palavras-chave de gatilho:
+Depois de instalada, o agente descobre e chama a skill automaticamente na conversa. Palavras-chave de gatilho:
 
 - "me faça um PPT estilo revista"
 - "gere um horizontal swipe deck"
@@ -54,7 +53,7 @@ Depois de instalada, o Claude Code descobre e chama a skill automaticamente na c
 
 ## Fluxo de uso
 
-A skill é um workflow estruturado de 6 passos; o Claude conduz:
+A skill é um workflow estruturado de 6 passos; o agente conduz:
 
 1. **Esclarecimento de requisitos** — checklist de 6 perguntas: audiência, duração, material, imagens, tema, restrições rígidas
 2. **Cópia do template** — `assets/template.html` → diretório do projeto, ajuste `<title>`, troque a paleta
@@ -69,15 +68,15 @@ Detalhes em [`SKILL.md`](./SKILL.md).
 
 ```
 magazine-web-ppt/
-├── SKILL.md              ← Skill 主文件:工作流、原则、常见错误
-├── README.md             ← 本文件
+├── SKILL.md              ← arquivo principal da skill: workflow, princípios, erros comuns
+├── README.md             ← este arquivo
 ├── assets/
-│   └── template.html     ← 完整可运行的种子 HTML(CSS + WebGL + 翻页 JS 全配好)
+│   └── template.html     ← HTML semente completo e executável (CSS + WebGL + JS de navegação pré-configurados)
 └── references/
-    ├── components.md     ← 组件手册(字体、色、网格、图标、callout、stat、pipeline)
-    ├── layouts.md        ← 10 种页面布局骨架(可直接粘贴)
-    ├── themes.md         ← 5 套主题色预设(只能选不能自定义)
-    └── checklist.md      ← 质量检查清单(P0 / P1 / P2 / P3 分级)
+    ├── components.md     ← manual de componentes (fontes, cores, grids, ícones, callouts, stats, pipeline)
+    ├── layouts.md        ← 10 esqueletos de layout (prontos para colar)
+    ├── themes.md         ← 5 paletas predefinidas (somente escolha, sem customização)
+    └── checklist.md      ← checklist de qualidade (níveis P0 / P1 / P2 / P3)
 ```
 
 ## Paletas predefinidas
@@ -106,7 +105,7 @@ Para trocar a paleta basta substituir as 6 linhas de variáveis dentro do `:root
 
 - Diagramação da revista [*Monocle*](https://monocle.com)
 - "Thin Harness, Fat Skills" do Garry Tan (YC)
-- Série de PPTs de palestras presenciais do 歸藏
+- Série de PPTs de palestras presenciais do Guizang
 
 ## Contribuindo
 

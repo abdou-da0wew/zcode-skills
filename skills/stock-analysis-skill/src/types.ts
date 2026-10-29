@@ -1,14 +1,14 @@
 /**
- * types.ts — 统一类型定义
+ * types.ts — unified type definitions
  */
 
 export type Market = "CN" | "HK" | "US";
 export type FetchMode = "full" | "quote";
 export type OutputFormat = "markdown" | "pdf" | "word";
-export type Verdict = "买入" | "强烈买入" | "观望" | "卖出";
+export type Verdict = "Strong Buy" | "Buy" | "Hold" | "Sell";
 export type PositionStatus = "empty" | "holding";
 
-// ── 持仓信息 ──────────────────────────────────────────────
+// ── Position info ─────────────────────────────────────────
 
 export interface PositionInfo {
   status: PositionStatus;
@@ -16,7 +16,7 @@ export interface PositionInfo {
   shares?: number;
 }
 
-// ── 股票数据 ──────────────────────────────────────────────
+// ── Stock data ────────────────────────────────────────────
 
 export interface StockData {
   code: string;
@@ -65,7 +65,7 @@ export interface StockData {
   error?: string;
 }
 
-// ── 分析结果 ──────────────────────────────────────────────
+// ── Analysis result ───────────────────────────────────────
 
 export interface AnalysisResult {
   code: string;
@@ -78,7 +78,7 @@ export interface AnalysisResult {
   generatedAt: string;
 }
 
-// ── 股息分析 ──────────────────────────────────────────────
+// ── Dividend analysis ─────────────────────────────────────
 
 export type PayoutStatus = "safe" | "moderate" | "high" | "unsustainable" | "no_dividend" | "unknown";
 export type IncomeRating = "excellent" | "good" | "moderate" | "poor" | "no_dividend";
@@ -102,13 +102,13 @@ export interface DividendAnalysis {
   summary: string;
 }
 
-// ── 传闻扫描 ──────────────────────────────────────────────
+// ── Rumor scan ────────────────────────────────────────────
 
 export type RumorType = "ma" | "insider" | "analyst" | "regulatory" | "earnings" | "general";
 
 export interface RumorItem {
   type: RumorType;
-  ticker: string | null;        // 相关股票代码（可能为 null）
+  ticker: string | null;        // related stock ticker (may be null)
   headline: string;
   source: string;
   impactScore: number;          // 1-10
@@ -120,11 +120,11 @@ export interface RumorItem {
 export interface RumorScanResult {
   scannedAt: string;
   rumors: RumorItem[];
-  topTickers: { ticker: string; count: number }[];  // 最受关注的股票
+  topTickers: { ticker: string; count: number }[];  // most-discussed stocks
   summary: string;
 }
 
-// ── 自选股 ────────────────────────────────────────────────
+// ── Watchlist ─────────────────────────────────────────────
 
 export type AlertType = "target_hit" | "stop_hit" | "signal_change";
 
@@ -151,7 +151,7 @@ export interface WatchlistAlert {
   timestamp: string;
 }
 
-// ── Skill 入参 ────────────────────────────────────────────
+// ── Skill inputs ──────────────────────────────────────────
 
 export interface StockInput {
   code: string;

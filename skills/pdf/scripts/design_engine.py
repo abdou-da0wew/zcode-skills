@@ -33,7 +33,8 @@ import sys
 #
 # Core constraint: Saturation MUST be between 0.05 and 0.25.
 # This eliminates candy-colored, web-app-looking outputs and locks
-# everything into the "high-end grey" (高级灰) tonal range.
+# everything into the "high-end grey" tonal range (the premium desaturated grey
+# palette prized in high-end print design).
 #
 # Two modes:
 #   - Dark:  background L < 0.10, text L > 0.85
@@ -64,35 +65,35 @@ INTENT_HUES = {
 # for these keywords and map to the closest intent.
 THEME_KEYWORDS = {
     # Technology / Data / Analytics
-    "tech": "cold", "数据": "cold", "data": "cold", "AI": "cold",
-    "科技": "cold", "digital": "cold", "analytics": "cold", "分析": "cold",
+    "tech": "cold", "\u6570\u636e": "cold", "data": "cold", "AI": "cold",
+    "\u79d1\u6280": "cold", "digital": "cold", "analytics": "cold", "\u5206\u6790": "cold",
     # Nature / Environment / Sustainability
-    "green": "nature", "绿色": "nature", "环保": "nature", "eco": "nature",
-    "sustainability": "nature", "生态": "nature", "forest": "nature",
+    "green": "nature", "\u7eff\u8272": "nature", "\u73af\u4fdd": "nature", "eco": "nature",
+    "sustainability": "nature", "\u751f\u6001": "nature", "forest": "nature",
     # Business / Finance / Corporate
-    "report": "neutral", "报告": "neutral", "finance": "neutral", "财务": "neutral",
-    "annual": "neutral", "年度": "neutral", "corporate": "neutral",
+    "report": "neutral", "\u62a5\u544a": "neutral", "finance": "neutral", "\u8d22\u52a1": "neutral",
+    "annual": "neutral", "\u5e74\u5ea6": "neutral", "corporate": "neutral",
     # Creative / Marketing / Social
-    "marketing": "energy", "运营": "energy", "social": "energy", "品牌": "energy",
-    "campaign": "energy", "活动": "energy", "launch": "energy",
+    "marketing": "energy", "\u8fd0\u8425": "energy", "social": "energy", "\u54c1\u724c": "energy",
+    "campaign": "energy", "\u6d3b\u52a8": "energy", "launch": "energy",
     # Authority / Formal / Premium / Luxury
-    "luxury": "authority", "奢华": "authority", "fashion": "authority", "时尚": "authority",
-    "premium": "authority", "高端": "authority", "gala": "authority",
-    "formal": "authority", "正式": "authority", "professional": "authority", "专业": "authority",
-    "government": "authority", "政府": "authority", "bidding": "authority", "投标": "authority",
-    "政府报告": "authority", "政府文书": "authority", "公文": "authority",
-    "thesis": "authority", "毕业论文": "authority", "dissertation": "authority",
-    "开题": "authority", "开题报告": "authority", "proposal": "authority", "学位": "authority",
+    "luxury": "authority", "\u5962\u534e": "authority", "fashion": "authority", "\u65f6\u5c1a": "authority",
+    "premium": "authority", "\u9ad8\u7aef": "authority", "gala": "authority",
+    "formal": "authority", "\u6b63\u5f0f": "authority", "professional": "authority", "\u4e13\u4e1a": "authority",
+    "government": "authority", "\u653f\u5e9c": "authority", "bidding": "authority", "\u6295\u6807": "authority",
+    "\u653f\u5e9c\u62a5\u544a": "authority", "\u653f\u5e9c\u6587\u4e66": "authority", "\u516c\u6587": "authority",
+    "thesis": "authority", "\u6bd5\u4e1a\u8bba\u6587": "authority", "dissertation": "authority",
+    "\u5f00\u9898": "authority", "\u5f00\u9898\u62a5\u544a": "authority", "proposal": "authority", "\u5b66\u4f4d": "authority",
     # Calm / Meditation / Healthcare / Minimalist
-    "health": "calm", "健康": "calm", "meditation": "calm",
-    "wellness": "calm", "calm": "calm", "医疗": "calm",
-    "minimalist": "calm", "极简": "calm", "simple": "calm", "简约": "calm",
+    "health": "calm", "\u5065\u5eb7": "calm", "meditation": "calm",
+    "wellness": "calm", "calm": "calm", "\u533b\u7597": "calm",
+    "minimalist": "calm", "\u6781\u7b80": "calm", "simple": "calm", "\u7b80\u7ea6": "calm",
     # Urgent / Warning / Emergency
-    "urgent": "tension", "warning": "tension", "紧急": "tension",
+    "urgent": "tension", "warning": "tension", "\u7d27\u6025": "tension",
     "alert": "tension", "crisis": "tension",
     # Warm / Food / Lifestyle
-    "food": "warmth", "美食": "warmth", "lifestyle": "warmth",
-    "生活": "warmth", "home": "warmth", "家居": "warmth",
+    "food": "warmth", "\u7f8e\u98df": "warmth", "lifestyle": "warmth",
+    "\u751f\u6d3b": "warmth", "home": "warmth", "\u5bb6\u5c45": "warmth",
 }
 
 

@@ -1,0 +1,3 @@
+design/design-templates/digital-eguide/social-carousel.html
+design/design-templates/waitlist-page/层云-waitlist.html
+design/design-templates/xianying-tool/index.standalone.html

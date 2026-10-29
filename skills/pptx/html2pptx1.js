@@ -74,7 +74,7 @@ const DEFAULT_FONT_CONFIG = {
 const COMPENSATION = {
   HEADING_WIDTH: 0.10, SINGLE_LINE_NARROW: 0.10, SINGLE_LINE_NORMAL: 0.10,
   MULTI_LINE: 0.05, SHORT_TEXT_EXTRA: 0.18, NUMERIC_TEXT_EXTRA: 0.08,
-  // Very-short text (1–5 chars) — single labels like "学", "Apply", "→"
+  // Very-short text (1–5 chars) — single labels like "Apply", "→"
   // are the most likely to wrap when a wider PPT font substitutes the
   // browser-measured glyph. Stack this on top of SHORT_TEXT_EXTRA.
   VERY_SHORT_TEXT_EXTRA: 0.30,
@@ -205,7 +205,7 @@ function checkElementBounds(slideData, sw, sh) {
     const p = textTypes.has(el.type) ? getVisualCheckPosition(el, rawP) : rawP;
     if (p.x < -tol) w.push(`⚠ BOUNDS: "${getElementLabel(el)}" extends ${(-p.x*72).toFixed(0)}pt beyond LEFT`);
     if (p.y < -tol) w.push(`⚠ BOUNDS: "${getElementLabel(el)}" extends ${(-p.y*72).toFixed(0)}pt beyond TOP`);
-    // 已禁用：右侧溢出（beyond RIGHT）告警噪声较大，按需关闭
+    // Disabled: the right-overflow (beyond RIGHT) warning is fairly noisy; re-enable as needed
     // if (p.x+p.w > sw+tol) w.push(`⚠ BOUNDS: "${getElementLabel(el)}" extends ${((p.x+p.w-sw)*72).toFixed(0)}pt beyond RIGHT`);
     if (p.y+p.h > sh+tol) w.push(`⚠ BOUNDS: "${getElementLabel(el)}" extends ${((p.y+p.h-sh)*72).toFixed(0)}pt beyond BOTTOM`);
   }
@@ -236,7 +236,7 @@ function checkTextOverlaps(slideData) {
       const ow = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
       const oh = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
       if (ow > tol && oh > tol) {
-        // 已禁用：文本重叠（OVERLAP）告警噪声较大，按需关闭
+        // Disabled: the text-overlap (OVERLAP) warning is fairly noisy; re-enable as needed
         // w.push(`⚠ OVERLAP: "${getElementLabel(te[i])}" overlaps "${getElementLabel(te[j])}"`);
       }
     }
@@ -345,7 +345,7 @@ function calculateWidthCompensation(el, slideWidthIn) {
   if (txt.length>0 && txt.length<10) f += COMPENSATION.SHORT_TEXT_EXTRA;
   // Extra punch for 1–5 char labels — these are the worst offenders for
   // wrapping when PPT swaps to a wider font (e.g. Inter→Carlito on "Apply"
-  // or YaHei→Noto on "学").
+  // or YaHei→Noto on a single hanzi label).
   if (txt.length > 0 && txt.length <= 5) f += COMPENSATION.VERY_SHORT_TEXT_EXTRA;
   if (/^[\d\s\.\,\-\/\+\%\$\#\@\!\?\:\;\(\)\[\]]+$/.test(txt)) f += COMPENSATION.NUMERIC_TEXT_EXTRA;
   if (el.noWrap) f += COMPENSATION.NOWRAP_EXTRA;
@@ -398,7 +398,7 @@ function calculateWidthCompensation(el, slideWidthIn) {
 
 // ── Emphasis fonts (post-extraction, Node.js scope) ──
 const hasCJKCharsNode = (text = "") => /[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]/.test(text);
-const hasDigitCharsNode = (text = "") => /[0-9０-９]/.test(text);
+const hasDigitCharsNode = (text = "") => /[0-9\uFF10-\uFF19]/.test(text);
 const hasEmojiCharsNode = (text = "") => /[\u2600-\u27BF]|[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(text);
 const hasIconSymbolCharsNode = (text = "") => /[\u2190-\u21FF\u2300-\u23FF\u2900-\u297F\u2460-\u24FF\u25A0-\u27BF\u2B00-\u2BFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(text);
 
@@ -407,7 +407,7 @@ function isIconOnlyTextNode(text = "") {
   if (!t) return false;
   const compact = t.replace(/[\s\uFE0E\uFE0F\u200D\u20E3]/g, "");
   if (!compact || Array.from(compact).length > 4) return false;
-  if (hasCJKCharsNode(compact) || /[A-Za-z0-9０-９]/.test(compact)) return false;
+  if (hasCJKCharsNode(compact) || /[A-Za-z0-9\uFF10-\uFF19]/.test(compact)) return false;
   return hasIconSymbolCharsNode(compact);
 }
 
@@ -416,7 +416,7 @@ function shouldUseNumericEmphasisText(text = "") {
   if (!t || hasCJKCharsNode(t) || !hasDigitCharsNode(t)) return false;
   if (t.length > 36) return false;
   const compact = t.replace(/\s+/g, "");
-  const useful = compact.replace(/[^0-9０-９A-Za-z.,:;_#%+\-\/()\[\]·]/g, "");
+  const useful = compact.replace(/[^0-9\uFF10-\uFF19A-Za-z.,:;_#%+\-\/()\[\]·]/g, "");
   const ratio = useful.length / Math.max(1, compact.length);
   const labelPrefix = /^(?:lv|no|honor|resource|step|part|section|chapter|page|slide|p|q|a|item|case|fig|table)\b/i.test(compact);
   return ratio >= 0.65 || labelPrefix;
@@ -731,7 +731,7 @@ async function getBodyDimensions(page) {
   const heightOverflowPt = heightOverflowPx * PT_PER_PX;
 
   const OVERFLOW_TOLERANCE_PT = 12;
-  // Severe overflow ("超长很多") — content spills past the canvas by more than
+  // Severe overflow (content far beyond the canvas) — content spills past the canvas by more than
   // ~1 inch. This is almost always real content getting silently clipped, so we
   // escalate it to a louder, must-fix CRITICAL message. Output is NOT blocked
   // (pptx still writes, exit code stays 0) — the message is the signal that the
@@ -1264,14 +1264,16 @@ async function extractSlideData(page, slideDims) {
       return SINGLE_WEIGHT_FONTS.includes(normalizedFont);
     };
 
-    // Known CJK font name fragments (lowercase) — presence means the element targets CJK text
+    // Known CJK font name fragments (lowercase) — presence means the element targets CJK text.
+    // Non-ASCII font names are written as \uXXXX escapes to keep this source ASCII-only;
+    // the runtime strings are identical to the literal names.
     const CJK_FONT_FRAGMENTS = [
-      'yahei', '雅黑', 'noto sans sc', '黑体', 'noto serif sc', '宋体', 'kaiti', '楷体',
-      'fangsong', '仿宋', 'pingfang', 'hiragino', 'noto sans cjk', 'noto sans sc',
-      'noto sans tc', 'noto sans hk', 'source han sans', '思源黑体', '思源宋体',
-      'wenquanyi', 'lxgw wenkai', '霞鹜文楷', 'arial unicode', 'yugothic', 'meiryo', 'ms gothic', 'ms mincho',
+      'yahei', '\u96c5\u9ed1', 'noto sans sc', '\u9ed1\u4f53', 'noto serif sc', '\u5b8b\u4f53', 'kaiti', '\u6977\u4f53',
+      'fangsong', '\u4eff\u5b8b', 'pingfang', 'hiragino', 'noto sans cjk', 'noto sans sc',
+      'noto sans tc', 'noto sans hk', 'source han sans', '\u601d\u6e90\u9ed1\u4f53', '\u601d\u6e90\u5b8b\u4f53',
+      'wenquanyi', 'lxgw wenkai', '\u971e\u9e5c\u6587\u6977', 'arial unicode', 'yugothic', 'meiryo', 'ms gothic', 'ms mincho',
       'malgun gothic', 'apple sd gothic', 'heiti', 'songti', 'wawati', 'weibei',
-      'libian', 'xingkai', 'baoli', 'yuanti', 'dengxian', '等线', 'stxihei',
+      'libian', 'xingkai', 'baoli', 'yuanti', 'dengxian', '\u7b49\u7ebf', 'stxihei',
       'stheiti', 'stkaiti', 'stsong', 'stfangsong'
     ];
 
@@ -1294,10 +1296,10 @@ async function extractSlideData(page, slideDims) {
       'noto sans cjk sc': 'Microsoft YaHei', 'noto serif sc': 'SimSun',
       'source han sans sc': 'Microsoft YaHei', 'source han serif sc': 'SimSun',
       'source han sans': 'Microsoft YaHei', 'source han serif': 'SimSun',
-      '思源黑体': 'Microsoft YaHei', '思源宋体': 'SimSun',
-      '阿里巴巴普惠体': 'Microsoft YaHei',
+      '\u601d\u6e90\u9ed1\u4f53': 'Microsoft YaHei', '\u601d\u6e90\u5b8b\u4f53': 'SimSun',
+      '\u963f\u91cc\u5df4\u666e\u60e0\u4f53': 'Microsoft YaHei',
       'lxgw wenkai': 'KaiTi', 'lxgw wenkai tc': 'KaiTi',
-      'lxgw wenkai gb': 'KaiTi', '霞鹜文楷': 'KaiTi', '霞鹜文楷 tc': 'KaiTi',
+      'lxgw wenkai gb': 'KaiTi', '\u971e\u9e5c\u6587\u6977': 'KaiTi', '\u971e\u9e5c\u6587\u6977 tc': 'KaiTi',
       'fredoka': 'Arial Rounded MT Bold', 'fredoka one': 'Arial Rounded MT Bold',
       'system-ui': 'Carlito', '-apple-system': 'Carlito', 'blinkmacsystemfont': 'Carlito',
       'segoe ui': 'Carlito', 'helvetica neue': 'Liberation Sans', 'helvetica': 'Liberation Sans',
@@ -1387,41 +1389,41 @@ async function extractSlideData(page, slideDims) {
       'zcool xiaowei': 'SimSun', 'zcool qingke huangyou': 'KaiTi',
       'long cang': 'KaiTi', 'ma shan zheng': 'KaiTi',
       'liu jian mao cao': 'KaiTi',
-      'kaiti': 'KaiTi', '楷体': 'KaiTi',
-      'fangsong': 'KaiTi', '仿宋': 'KaiTi',
-      'dengxian': 'Microsoft YaHei', '等线': 'Microsoft YaHei',
-      '黑体': 'Microsoft YaHei', '宋体': 'SimSun',
+      'kaiti': 'KaiTi', '\u6977\u4f53': 'KaiTi',
+      'fangsong': 'KaiTi', '\u4eff\u5b8b': 'KaiTi',
+      'dengxian': 'Microsoft YaHei', '\u7b49\u7ebf': 'Microsoft YaHei',
+      '\u9ed1\u4f53': 'Microsoft YaHei', '\u5b8b\u4f53': 'SimSun',
       'simhei': 'Microsoft YaHei', 'simsun': 'SimSun',
       'microsoft yahei': 'Microsoft YaHei',
       // Modern Chinese-friendly variants
       'harmonyos sans': 'Microsoft YaHei', 'harmonyos sans sc': 'Microsoft YaHei',
       'opposans': 'Microsoft YaHei', 'oppo sans': 'Microsoft YaHei',
       'misans': 'Microsoft YaHei', 'mi sans': 'Microsoft YaHei',
-      '小米兰亭': 'Microsoft YaHei', 'xiaomi lanting': 'Microsoft YaHei',
-      '霞鹜文楷': 'KaiTi', 'lxgw wenkai gb': 'KaiTi',
-      '阿里妈妈数黑体': 'Microsoft YaHei', 'alimama shuheiti': 'Microsoft YaHei',
+      '\u5c0f\u7c73\u5170\u4ead': 'Microsoft YaHei', 'xiaomi lanting': 'Microsoft YaHei',
+      '\u971e\u9e5c\u6587\u6977': 'KaiTi', 'lxgw wenkai gb': 'KaiTi',
+      '\u963f\u91cc\u5988\u5988\u6570\u9ed1\u4f53': 'Microsoft YaHei', 'alimama shuheiti': 'Microsoft YaHei',
       'noto serif hk': 'SimSun', 'noto sans hk': 'Microsoft YaHei',
       'noto sans tc': 'Microsoft YaHei', 'noto serif tc': 'SimSun',
       'noto sans jp': 'Microsoft YaHei', 'noto serif jp': 'SimSun',
       'noto sans kr': 'Microsoft YaHei', 'noto serif kr': 'SimSun',
       // Calligraphic/handwriting Chinese → KaiTi (warmest substitute)
-      '楷书': 'KaiTi', '行楷': 'KaiTi', '隶书': 'KaiTi',
+      '\u6977\u4e66': 'KaiTi', '\u884c\u6977': 'KaiTi', '\u9696\u4e66': 'KaiTi',
       'cangerjinkai': 'KaiTi', 'cangermingbo': 'SimSun',
       // Additional commonly-referenced Chinese families
       'wenquanyi micro hei': 'Microsoft YaHei', 'wenquanyi zen hei': 'Microsoft YaHei',
-      '文泉驿微米黑': 'Microsoft YaHei', '文泉驿正黑': 'Microsoft YaHei',
+      '\u6587\u6cc7\u9a7f\u5fae\u7c73\u9ed1': 'Microsoft YaHei', '\u6587\u6cc7\u6b63\u9ed1\u4f53': 'Microsoft YaHei',
       'adobe heiti std': 'Microsoft YaHei', 'adobe fangsong std': 'KaiTi',
       'adobe kaiti std': 'KaiTi', 'adobe song std': 'SimSun',
       'ar pl ukai cn': 'KaiTi', 'ar pl uming cn': 'SimSun',
       'fzhei': 'Microsoft YaHei', 'fzkai': 'KaiTi', 'fzsong': 'SimSun',
-      '方正黑体': 'Microsoft YaHei', '方正楷体': 'KaiTi', '方正宋体': 'SimSun',
-      '方正书宋': 'SimSun', '方正仿宋': 'KaiTi',
-      '汉仪旗黑': 'Microsoft YaHei', '汉仪文黑': 'Microsoft YaHei',
+      '\u65b9\u6b63\u9ed1\u4f53': 'Microsoft YaHei', '\u65b9\u6b63\u6977\u4f53': 'KaiTi', '\u65b9\u6b63\u5b8b\u4f53': 'SimSun',
+      '\u65b9\u6b63\u4e66\u5b8b': 'SimSun', '\u65b9\u6b63\u4eff\u5b8b': 'KaiTi',
+      '\u6c49\u4eea\u65d7\u9ed1': 'Microsoft YaHei', '\u6c49\u4eea\u6587\u9ed1': 'Microsoft YaHei',
       'hyqihei': 'Microsoft YaHei', 'hywenhei': 'Microsoft YaHei',
-      'ruiziyun': 'Microsoft YaHei', '锐字': 'Microsoft YaHei',
-      'dingtalk jinbuti': 'Microsoft YaHei', '钉钉进步体': 'Microsoft YaHei',
-      'youshebiaotihei': 'Microsoft YaHei', '优设标题黑': 'Microsoft YaHei',
-      'pangmen': 'Microsoft YaHei', '庞门正道标题体': 'Microsoft YaHei',
+      'ruiziyun': 'Microsoft YaHei', '\u9510\u5b57': 'Microsoft YaHei',
+      'dingtalk jinbuti': 'Microsoft YaHei', '\u9489\u9489\u8fdb\u6b65\u4f53': 'Microsoft YaHei',
+      'youshebiaotihei': 'Microsoft YaHei', '\u4f18\u8bbe\u6807\u9898\u9ed1': 'Microsoft YaHei',
+      'pangmen': 'Microsoft YaHei', '\u5e9e\u95e8\u6b63\u9053\u6807\u9898\u4f53': 'Microsoft YaHei',
       'aocomic': 'KaiTi', 'maoken': 'KaiTi',
       'tw-kai': 'KaiTi', 'mingliu': 'SimSun', 'pmingliu': 'SimSun',
       // Korean web fonts
@@ -1502,15 +1504,15 @@ async function extractSlideData(page, slideDims) {
 
       // ── CJK keyword routing ────────────────────────────────────────────
       // Heiti / sans-style Chinese
-      if (/(\bhei\b|黑|gothic|gothik|sans.*(cn|sc|tc|hk|jp|kr|cjk|chinese|chn|han|hans|hant)|(cn|sc|tc|hk|jp|kr|cjk|chinese|chn|han|hans|hant).*sans)/.test(cleaned)) {
+      if (/(\bhei\b|\u9ed1|gothic|gothik|sans.*(cn|sc|tc|hk|jp|kr|cjk|chinese|chn|han|hans|hant)|(cn|sc|tc|hk|jp|kr|cjk|chinese|chn|han|hans|hant).*sans)/.test(cleaned)) {
         return 'Microsoft YaHei';
       }
       // Songti / Mincho / serif Chinese
-      if (/(\bsong\b|宋|\bming\b|明朝|明体|mincho|serif.*(cn|sc|tc|hk|jp|kr|cjk|chinese|han|hans|hant)|(cn|sc|tc|hk|jp|kr|cjk|chinese|han|hans|hant).*serif)/.test(cleaned)) {
+      if (/(\bsong\b|\u5b8b|\bming\b|\u660e\u671d|\u660e\u4f53|mincho|serif.*(cn|sc|tc|hk|jp|kr|cjk|chinese|han|hans|hant)|(cn|sc|tc|hk|jp|kr|cjk|chinese|han|hans|hant).*serif)/.test(cleaned)) {
         return 'SimSun';
       }
       // Kaiti / Fangsong / handwriting / brush
-      if (/(\bkai\b|楷|fangsong|仿宋|xing(kai|shu)?|行楷|行书|li ?bian|隶书|maru|手写|brush|caoshu|草书|手书|hand|script)/.test(cleaned)) {
+      if (/(\bkai\b|\u6977|fangsong|\u4eff\u5b8b|xing(kai|shu)?|\u884c\u6977|\u884c\u4e66|li ?bian|\u9696\u4e66|maru|\u624b\u5199|brush|caoshu|\u8349\u4e66|\u624b\u4e66|hand|script)/.test(cleaned)) {
         return 'KaiTi';
       }
       // Any other recognisable CJK-script tag → Microsoft YaHei default
@@ -1617,7 +1619,7 @@ async function extractSlideData(page, slideDims) {
     };
 
     const hasLatinChars = (text = "") => /[A-Za-z]/.test(text);
-    const hasDigitChars = (text = "") => /[0-9０-９]/.test(text);
+    const hasDigitChars = (text = "") => /[0-9\uFF10-\uFF19]/.test(text);
     const hasEmojiChars = (text = "") => /[\u2600-\u27BF]|[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(text);
     const hasIconSymbolChars = (text = "") => /[\u2190-\u21FF\u2300-\u23FF\u2900-\u297F\u2460-\u24FF\u25A0-\u27BF\u2B00-\u2BFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(text);
     const isIconOnlyText = (text = "") => {
@@ -1625,7 +1627,7 @@ async function extractSlideData(page, slideDims) {
       if (!t) return false;
       const compact = t.replace(/[\s\uFE0E\uFE0F\u200D\u20E3]/g, "");
       if (!compact || Array.from(compact).length > 4) return false;
-      if (hasCJKChars(compact) || /[A-Za-z0-9０-９]/.test(compact)) return false;
+      if (hasCJKChars(compact) || /[A-Za-z0-9\uFF10-\uFF19]/.test(compact)) return false;
       return hasIconSymbolChars(compact);
     };
     const shouldApplyPptBold = (fontWeight) => fontWeight === "bold" || (parseInt(fontWeight, 10) || 0) >= 700;
@@ -1636,7 +1638,7 @@ async function extractSlideData(page, slideDims) {
       if (!t || hasCJKChars(t) || !hasDigitChars(t)) return false;
       if (t.length > 36) return false;
       const compact = t.replace(/\s+/g, "");
-      const useful = compact.replace(/[^0-9０-９A-Za-z.,:;_#%+\-\/()\[\]·]/g, "");
+      const useful = compact.replace(/[^0-9\uFF10-\uFF19A-Za-z.,:;_#%+\-\/()\[\]·]/g, "");
       const ratio = useful.length / Math.max(1, compact.length);
       const labelPrefix = /^(?:lv|no|honor|resource|step|part|section|chapter|page|slide|p|q|a|item|case|fig|table)\b/i.test(compact);
       return ratio >= 0.65 || labelPrefix;
@@ -1820,7 +1822,7 @@ async function extractSlideData(page, slideDims) {
     //   transparency = (1 − finalOpacity) × 100
     // Returns null when neither dimension reduces visibility (i.e. fully opaque).
     //
-    // This is what the user's `<span class="watermark">液</span>` case needs:
+    // This is what a watermark span like `<span class="watermark">…</span>` needs:
     // its color is opaque rgb(...) but `opacity: 0.05` makes it nearly invisible.
     // Without this helper, the watermark renders at 100% opacity in PPT.
     const computeTransparency = (colorStr, opacityStr) => {
@@ -2253,7 +2255,7 @@ async function extractSlideData(page, slideDims) {
               tag === 'MARK' || tag === 'CODE' || tag === 'SMALL' || tag === 'BIG' || tag === 'CITE' || tag === 'ABBR' ||
               tag === 'TIME' || tag === 'LABEL') {
             // If this inline-tag has been promoted to block-display via CSS
-            // (e.g. <h1>看见<span class="accent" style="display:block">无家可归者</span></h1>
+            // (e.g. <h1>The visible<span class="accent" style="display:block">homeless</span></h1>
             // where `.accent { display:block }` puts the span on its own
             // visual line), insert a newline so the run starts on a new
             // paragraph line in PowerPoint instead of continuing inline.
@@ -2509,7 +2511,7 @@ async function extractSlideData(page, slideDims) {
       done: '✓', done_all: '✓', done_outline: '✓', verified: '✓',
       task_alt: '✓', fact_check: '✓', playlist_add_check: '✓',
       close: '✕', cancel: '✕', highlight_off: '✕', block: '⊘', do_not_disturb: '⊘',
-      add: '＋', add_circle: '⊕', add_circle_outline: '⊕', remove: '−',
+      add: '\uFF0B', add_circle: '⊕', add_circle_outline: '⊕', remove: '−',
       remove_circle: '⊖', remove_circle_outline: '⊖',
       edit: '✎', mode_edit: '✎', create: '✎', draw: '✎', border_color: '✎',
       delete: '✕', delete_outline: '✕', delete_forever: '✕',
@@ -2642,7 +2644,7 @@ async function extractSlideData(page, slideDims) {
       light_mode: '☀', nightlight: '☾', bedtime: '☾',
       cloud: '☁', wb_cloudy: '☁', cloudy_snowing: '☁',
       thunderstorm: '⚡', umbrella: '☂', beach_access: '☂', ac_unit: '❄',
-      water: '◐', waves: '〜', terrain: '△',
+      water: '◐', waves: '\u301C', terrain: '△',
       // Misc / objects
       inventory: '▣', inventory_2: '▣', category: '▣',
       backpack: '▣', luggage: '▣', shopping_bag: '▣',
@@ -2673,7 +2675,7 @@ async function extractSlideData(page, slideDims) {
       'circle-check': '✓', 'square-check': '✓',
       'xmark': '✕', 'times': '✕', 'times-circle': '✕', 'circle-xmark': '✕',
       'ban': '⊘', 'minus': '−', 'minus-circle': '⊖', 'circle-minus': '⊖',
-      'plus': '＋', 'plus-circle': '⊕', 'circle-plus': '⊕',
+      'plus': '\uFF0B', 'plus-circle': '⊕', 'circle-plus': '⊕',
       'pen': '✎', 'pencil': '✎', 'pen-to-square': '✎', 'edit': '✎',
       'trash': '✕', 'trash-can': '✕', 'trash-alt': '✕',
       'rotate': '↻', 'rotate-right': '↻', 'rotate-left': '↺',
@@ -2802,7 +2804,7 @@ async function extractSlideData(page, slideDims) {
       'check': '✓', 'check2': '✓', 'check-circle': '✓', 'check2-circle': '✓',
       'check-square': '✓', 'check-all': '✓',
       'x': '✕', 'x-circle': '✕', 'x-square': '✕', 'x-lg': '✕',
-      'plus': '＋', 'plus-circle': '⊕', 'plus-lg': '＋', 'plus-square': '⊕',
+      'plus': '\uFF0B', 'plus-circle': '⊕', 'plus-lg': '\uFF0B', 'plus-square': '⊕',
       'dash': '−', 'dash-circle': '⊖', 'dash-lg': '−',
       'pencil': '✎', 'pencil-square': '✎', 'pencil-fill': '✎',
       'trash': '✕', 'trash-fill': '✕', 'trash3': '✕',
@@ -2894,7 +2896,7 @@ async function extractSlideData(page, slideDims) {
       [/check|done|tick|verified|complete|ok\b/, '✓'],
       [/close|cancel|xmark|times|wrong|reject/, '✕'],
       [/ban|block|disable|forbidden|prohibit/, '⊘'],
-      [/plus|add|create|new\b/, '＋'],
+      [/plus|add|create|new\b/, '\uFF0B'],
       [/minus|subtract|less|reduce/, '−'],
       [/edit|pencil|pen|write|compose|modify/, '✎'],
       [/trash|delete|bin|remove/, '✕'],
@@ -3001,7 +3003,7 @@ async function extractSlideData(page, slideDims) {
       [/eco|plant|leaf|tree|flower|garden|park|forest|nature|grass|sprout|seed/, '✿'],
       [/water|drop|liquid/, '◐'],
       [/snow|frost|cold|ice|winter/, '❄'],
-      [/wave|ocean|sea|beach/, '〜'],
+      [/wave|ocean|sea|beach/, '\u301C'],
       [/sun|sunny|bright|day|light[\s_-]*mode/, '☀'],
       [/moon|night|dark[\s_-]*mode|bedtime/, '☾'],
       [/rain|storm|thunder|umbrella/, '☂'],
@@ -4465,7 +4467,7 @@ async function extractSlideData(page, slideDims) {
       if (isVerticalWM && hasCJKChars(text)) {
         const nonSpace = text.replace(/\s/g, '');
         const cjkCount = Array.from(nonSpace).filter(c =>
-          /[一-鿿぀-ヿ가-힯]/.test(c)
+          /[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]/.test(c)
         ).length;
         if (nonSpace.length > 0 && cjkCount / nonSpace.length >= 0.7) {
           cjkVerticalStack = true;
@@ -4639,7 +4641,7 @@ async function extractSlideData(page, slideDims) {
       if (textShadow) baseStyle.shadow = textShadow;
 
       // Combine color alpha + element opacity. The watermark span case in
-      // 五粮液 cover.html is the canonical example: color is opaque rgb(...) but
+      // The Wuliangye cover.html is the canonical example: color is opaque rgb(...) but
       // opacity is 0.05, so without folding opacity in, the giant character
       // renders at full strength in PowerPoint.
       if (textPaint.transparency !== null) baseStyle.transparency = textPaint.transparency;
@@ -4757,7 +4759,7 @@ async function extractSlideData(page, slideDims) {
         // CJK vertical text: use native PowerPoint East Asian vertical
         // layout. The old fallback emitted one character per paragraph; that
         // made spaces around separators become blank lines and could overflow
-        // short vertical labels such as "千年汴梁 · 梵音塔影".
+        // short vertical labels such as "Qian Nian Bian Liang · Fan Yin Ta Ying" (phrase-per-column vertical text).
         const cjkStyle = { ...baseStyle };
         if (cjkVerticalStack) {
           transformedText = transformedText.trim();

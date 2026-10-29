@@ -47,7 +47,7 @@ Confirm with the user:
 **Title Page (Cover) Rules:**
 - **Academic route covers are generated via HTML/Playwright**, using Templates 03-04 and 06 from `typesetting/cover.md`. Templates 03-04 replicate LaTeX title page aesthetics (dark backgrounds, serif titles, symmetric layouts) in HTML/CSS. **Template 06 (Institutional)** is for thesis proposals, dissertations, and formal institutional submissions (white bg + black border frame).
 - **Pipeline:** Generate body PDF via Tectonic (no title page in `.tex`) → Generate cover HTML (Template 03/04/05/06) → Playwright `page.pdf()` → Merge cover as page 0 via pypdf
-- **Template selection:** For thesis proposals (开题报告), dissertations (毕业论文), and institutional submissions → **default to Template 06**. For research papers, preprints, journal submissions → Templates 03-04.
+- **Template selection:** For thesis proposals, dissertations, and institutional submissions → **default to Template 06**. For research papers, preprints, journal submissions → Templates 03-04.
 - **NEVER use `\maketitle`** - it produces ugly default output with cramped spacing
 - **NEVER use `\begin{titlepage}...\end{titlepage}`** - the cover is generated separately via HTML/Playwright
 - **NEVER use LaTeX TikZ overlay for full-page covers** - TikZ `current page` coordinates are unreliable with `margin=0pt`, causing backgrounds to not fill the page (right/bottom white edges). HTML/CSS full-bleed is pixel-exact.
@@ -166,8 +166,8 @@ Write the preamble. Start from this foundation and customise per document:
 - System fonts via `\setmainfont{}`: probe first with `fc-list :lang=XX`
 - ** Margin symmetry:** `\geometry{left=X, right=X}` - left and right MUST be equal. Asymmetric margins = off-center content = critical bug
 - ** Minimum margins with fancyhdr:** When using `fancyhdr` for headers/footers, `geometry` margins must leave enough room. **Minimum: `top >= 2.0cm`, `bottom >= 1.8cm`**. Also set `\setlength{\headheight}{14pt}` in the preamble. Margins smaller than this cause headers/footers to be pushed outside the page boundary (negative y-coordinates), making them invisible in print.
-- ** Quotation marks (English):** NEVER use straight quotes `"..."`。English text must use LaTeX curly quotes: ` ``left quote'' ` for double, `` `single' `` for single. Straight `"` in LaTeX means right double quote only.
-- ** Quotation marks (Chinese — CRITICAL):** Chinese quoted text like "北漂" MUST use Unicode smart quotes "…" (U+201C/U+201D) directly in the `.tex` source. **NEVER use ASCII `"` for Chinese quotes** — LaTeX interprets `"` as a right double quote (`"`), so `"北漂"` renders as `"北漂"` (two right quotes, no left quote). The correct LaTeX source is: `"北漂"` (literal Unicode characters). `\usepackage{csquotes}` is a safety net but does NOT fix raw ASCII `"` in Chinese text.
+- ** Quotation marks (English):** NEVER use straight quotes `"..."`. English text must use LaTeX curly quotes: ` ``left quote'' ` for double, `` `single' `` for single. Straight `"` in LaTeX means right double quote only.
+- ** Quotation marks (CJK — CRITICAL):** CJK quoted terms (e.g., a colloquial term like "beipiao") MUST use Unicode smart quotes (U+201C/U+201D) directly in the `.tex` source. **NEVER use ASCII `"` for CJK quotes** — LaTeX interprets `"` as a right double quote, so `"beipiao"` renders with two right quotes and no left quote. The correct LaTeX source is the literal Unicode characters "…" (U+201C/U+201D). `\usepackage{csquotes}` is a safety net but does NOT fix raw ASCII `"` in CJK text.
   - **Scope:** This rule applies ONLY to Chinese-language body text. Do NOT replace `"` in English paragraphs (use ` ``...'' ` instead), `verbatim`/`lstlisting`/`minted` environments, `\texttt{}`/`\verb||`/`\url{}`/`\href{}{}` arguments, or BibTeX `.bib` field values.
 - ** Title page isolation:** Cover is generated via HTML/Playwright and merged as page 0 via pypdf - isolation is inherent in the merge pipeline. `\tableofcontents` should be the first page of the `.tex` body. Verify: does TOC start on the page immediately after the cover in the merged PDF?
 - ** TOC requires a cover page:** Unless the user explicitly requests no cover, if the document has `\tableofcontents`, it MUST have a cover page. Structure: Cover (page 1) → TOC (page 2) → Content (page 3+). Do not generate a TOC without a preceding cover page. This rule is consistent with `briefs/report.md`.
@@ -783,14 +783,14 @@ Initialize $\theta$ randomly\;
 % ❌ WRONG — blank line between number and text = new paragraph + parskip gap
 \noindent\textbf{3.}
 
-某工厂原计划生产1200件产品……
+A factory planned to produce 1200 units...
 
 % ❌ ALSO WRONG — even without blank line, if \parskip is large
 \noindent\textbf{3.}  % line break here
-某工厂原计划生产1200件产品……  % LaTeX treats this as same paragraph, but confusing
+A factory planned to produce 1200 units...  % LaTeX treats this as same paragraph, but confusing
 
 % ✅ CORRECT — number and text on the SAME LINE, no break
-\noindent\textbf{3.}\;某工厂原计划生产1200件产品……
+\noindent\textbf{3.}\;A factory planned to produce 1200 units...
 ```
 
 ### Iron Rules
@@ -812,12 +812,12 @@ Instead of manual `\noindent\textbf{1.}\;`, prefer `enumitem` with custom format
 ```latex
 \usepackage{enumitem}
 
-% Section-level numbering: 一、二、三
+% Section-level numbering: CJK enumeration style (e.g. \u4e00\u3001 \u4e8c\u3001 \u4e09\u3001)
 % Question-level: use enumerate with custom label
 \begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=0pt, itemindent=2em,
                    labelsep=0.5em, itemsep=0.8em, parsep=0pt]
-  \item 2024年巴黎奥运会共设有32个大项……
-  \item 中国空间站“天宫”在距地面……
+  \item The 2024 Paris Olympics featured 32 sports...
+  \item The Chinese space station Tiangong orbits at...
 \end{enumerate}
 ```
 This guarantees number and text are in the same paragraph (LaTeX `\item` handles it internally).
@@ -845,7 +845,7 @@ This guarantees number and text are in the same paragraph (LaTeX `\item` handles
 | Drawing / graphing | TikZ grid or `\vspace{4cm}` |
 
 **Rule E6 — Page breaks for exams:**
-- `page-break-after: always` between major sections (一、二、三) is OK
+- `page-break-after: always` between major sections (CJK-numbered sections) is OK
 - NEVER break within a single question (keep question + options + answer space together)
 - Use `\needspace{5cm}` before long questions to prevent orphaning
 
@@ -870,7 +870,7 @@ This guarantees number and text are in the same paragraph (LaTeX `\item` handles
 \newcommand{\blank}[1]{\underline{\hspace{#1}}}
 \newcommand{\fn}[2]{\dfrac{#1}{#2}}
 
-% Section header: 一、填空题（每空1分，共计10分）
+% Section header format: CJK number + section name + points per blank + total points, e.g. "\u4e00\u3001\u586b\u7a7a\u9898\uff08\u6bcf\u7a7a1\u5206\uff0c\u5171\u8ba110\u5206\uff09" (Fill in the blanks, 1 pt each, 10 pts total)
 \newcommand{\examsection}[1]{%
   \vspace{0.5cm}
   \noindent{\heiti #1}

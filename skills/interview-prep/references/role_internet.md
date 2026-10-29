@@ -1,80 +1,80 @@
-# 互联网产品 / 运营 / PM 面试专题
+# Internet Product / Operations / PM Interview Special Topics
 
-## 产品经理（PM）
+## Product Manager (PM)
 
-### 高频题
-1. 介绍一款你最喜欢的产品 / APP，分析它的优势和不足
-2. 如果让你优化 ___（具体产品），你会怎么做
-3. 怎么衡量一个产品 / 功能的成功
-4. 一个新功能上线后留存提了 5%，怎么归因
-5. 你怎么定义产品的 north star metric
-6. 设计一个 ___ 功能（如：抖音的"不感兴趣"按钮）
-7. 给你一个用户反馈集合，怎么决定要做哪些
-8. PRD 写过吗？怎么写一个高质量的 PRD
-9. 你怎么和开发 / 设计 / 运营 协作
-10. 你做的最得意的一个数据驱动决策是什么
+### High-Frequency Questions
+1. Introduce your favorite product / app and analyze its strengths and weaknesses
+2. If you were asked to improve ___ (a specific product), what would you do?
+3. How do you measure the success of a product / feature?
+4. A new feature shipped and retention rose 5% — how do you attribute that?
+5. How do you define a product's north star metric?
+6. Design a ___ feature (e.g. Douyin's "not interested" button)
+7. Given a collection of user feedback, how do you decide what to build?
+8. Have you written PRDs? How do you write a high-quality PRD?
+9. How do you collaborate with engineering / design / operations?
+10. What's the data-driven decision you're proudest of?
 
-### PM 案例题答题套路（CIRCLES 框架）
+### PM Case Answering Pattern (CIRCLES framework)
 ```
-C - Comprehend the situation（澄清问题）
-I - Identify the customer（明确目标用户）
-R - Report the customer's needs（用户痛点）
-C - Cut, through prioritization（功能优先级）
-L - List solutions（具体方案 2~3 个）
-E - Evaluate trade-offs（取舍）
-S - Summarize recommendation（最终建议）
+C - Comprehend the situation (clarify the problem)
+I - Identify the customer (pin down the target user)
+R - Report the customer's needs (user pain points)
+C - Cut, through prioritization (feature priorities)
+L - List solutions (2-3 concrete options)
+E - Evaluate trade-offs (trade-offs)
+S - Summarize recommendation (final recommendation)
 ```
 
-### PM 面试官想看
-- 用户思维（不是站在自己角度）
-- 数据敏感度（你怎么用数据说服 / 验证）
-- 业务理解（不只是功能，还有 unit economics）
-- 跨职能沟通（你怎么处理与开发 / 设计的冲突）
-- ownership（你 own 一个功能从设计到上线到复盘的全流程）
+### What PM Interviewers Look For
+- User thinking (not projecting yourself onto the user)
+- Data sensitivity (how you use data to persuade / validate)
+- Business understanding (not just features but unit economics)
+- Cross-functional communication (how you handle conflict with engineering / design)
+- Ownership (you own a feature end-to-end: design → launch → retrospective)
 
-## 运营
+## Operations
 
-### 高频题
-1. DAU 跌了 X%，怎么排查
-2. 给你 100 万预算，做 ___ 活动，你怎么规划
-3. 怎么搭建一个用户分层运营体系
-4. 内容运营 / 用户运营 / 活动运营 你最想做哪个，为什么
-5. 你怎么衡量一个活动的 ROI
-6. 你做过的爆款活动 / 内容，复盘一下
-7. 私域 / 公域 你怎么打配合
-8. 怎么提升新用户次留 / 7 留 / 30 留
-9. 你怎么和产品 / 数据 / 设计 协作
-10. 一个失败的活动，你怎么复盘
+### High-Frequency Questions
+1. DAU dropped X% — how do you investigate?
+2. Given a 1M budget for a ___ campaign, how do you plan it?
+3. How do you build a user-segmentation operations system?
+4. Content ops / user ops / campaign ops — which do you want most, and why?
+5. How do you measure a campaign's ROI?
+6. Walk through a viral campaign / piece of content you ran — retrospective
+7. How do you coordinate private-domain and public-domain traffic?
+8. How do you improve new-user D1 / D7 / D30 retention?
+9. How do you collaborate with product / data / design?
+10. A campaign failed — how do you run the retrospective?
 
-### 运营常用框架
-- AARRR / RARRA：用户生命周期 5 个阶段
-- 活动复盘：目标 - 策略 - 执行 - 数据 - 反思
-- 内容运营三板斧：选题 - 制作 - 分发 - 数据反馈
+### Common Operations Frameworks
+- AARRR / RARRA: the 5 stages of the user lifecycle
+- Campaign retrospective: goal - strategy - execution - data - reflection
+- Content operations playbook: topic selection - production - distribution - data feedback
 
-### 运营面试官想看
-- 数据敏感度（每个动作配数字）
-- 用户洞察（不是"我觉得"，是"用户说"）
-- 资源整合（怎么撬动第三方 / 跨部门）
-- 闭环思维（活动结束 ≠ 工作结束，复盘 + 沉淀 SOP）
-- 创意 + 落地（既能想点子，又能落地到 SOP）
+### What Operations Interviewers Look For
+- Data sensitivity (every action paired with a number)
+- User insight ("users said", not "I think")
+- Resource leverage (how you mobilize third parties / other departments)
+- Closed-loop thinking (a campaign ending ≠ work ending: retrospective + distill into SOPs)
+- Creativity + execution (can both generate ideas and land them as SOPs)
 
-## 项目经理 / TPM
+## Project Manager / TPM
 
-### 高频题
-1. 你怎么管理一个 ___ 人 / ___ 月的项目
-2. 项目延期了，你怎么办
-3. 跨部门 / 跨时区 / 跨语种 协作的挑战和经验
-4. 你怎么管理项目风险
-5. 敏捷 vs 瀑布，你怎么选
-6. Scrum / Sprint planning / Retro 你怎么主持
-7. 怎么和 stakeholder 同步进度（汇报方式）
-8. 一个 stakeholder 不配合，你怎么 escalate
-9. 你管过的最大 / 最复杂的项目讲讲
-10. 项目失败 / 没达成目标，你怎么复盘
+### High-Frequency Questions
+1. How do you manage a ___-person / ___-month project?
+2. The project is running late — what do you do?
+3. Challenges and experience of cross-department / cross-timezone / cross-language collaboration
+4. How do you manage project risk?
+5. Agile vs. waterfall — how do you choose?
+6. How do you run Scrum / Sprint planning / Retros?
+7. How do you keep stakeholders synced (reporting format)?
+8. A stakeholder won't cooperate — how do you escalate?
+9. Tell me about the biggest / most complex project you've managed
+10. The project failed / missed its goal — how do you run the retrospective?
 
-### TPM 面试官想看
-- 结构化思维（项目拆解、依赖管理）
-- 沟通能力（向上 / 平行 / 向下）
-- 风险预判（不是事后救火，是事前预防）
-- 数据 / 工具熟练度（Jira / 飞书 / 自建 dashboard）
-- 推动力（drive 一群你管不到的人）
+### What TPM Interviewers Look For
+- Structured thinking (project decomposition, dependency management)
+- Communication (upward / lateral / downward)
+- Risk anticipation (prevention before the fact, not firefighting after)
+- Data / tool proficiency (Jira / Lark / self-built dashboards)
+- Drive (moving a group of people you don't manage)

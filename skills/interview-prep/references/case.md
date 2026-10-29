@@ -1,93 +1,93 @@
-# Case 面题库（Case Interview）
+# Case Interview Question Bank
 
-适用：咨询（MBB / Big4 战略）、战略 / 商分岗位、高级 PM 面试。
+Applies to: consulting (MBB / Big-4 strategy), strategy / business-analysis roles, senior PM interviews.
 
-## 经典 case 类型
+## Classic Case Types
 
-1. **Market Sizing（市场规模估算）**
-   - 中国一年卖多少杯咖啡？
-   - 上海有多少辆出租车？
-   - 抖音一天产生多少视频？
-2. **Profitability（盈利分析）**
-   - 客户利润下降，怎么诊断？
-3. **Market Entry（市场进入）**
-   - 某连锁品牌要进入印度，建议吗？
-4. **M&A（并购）**
-   - 某公司想收购竞争对手，做不做？
-5. **Growth Strategy（增长策略）**
-   - 某 SaaS 公司想 3 年 ARR 翻倍，怎么走？
-6. **Operations（运营优化）**
-   - 某物流公司成本太高，怎么优化？
+1. **Market Sizing**
+   - How many cups of coffee are sold in China per year?
+   - How many taxis are there in Shanghai?
+   - How many videos does Douyin (TikTok China) produce per day?
+2. **Profitability**
+   - A client's profits are declining — how do you diagnose it?
+3. **Market Entry**
+   - A chain brand wants to enter India — should they?
+4. **M&A**
+   - A company wants to acquire a competitor — should they do it?
+5. **Growth Strategy**
+   - A SaaS company wants to double ARR in 3 years — what's the path?
+6. **Operations**
+   - A logistics company's costs are too high — how do you optimize?
 
-## Market Sizing 框架
-
-```
-Top-down: 总人口 → 目标用户比例 → 频次 → 单价 → 总市场
-Bottom-up: 单店销量 → 城市门店数 → 城市数 → 总市场
-
-关键：
-1. 假设要明确（性别 / 年龄 / 城市分层 / 频次）
-2. 数字要可验算（路演时面试官可能让你重算）
-3. 给一个 sanity check（"这个数对比 X 行业大概是 Y 倍，看起来合理"）
-```
-
-## Profitability 框架
+## Market Sizing Framework
 
 ```
-利润 = 收入 - 成本
+Top-down: total population → share of target users → frequency → price per unit → total market
+Bottom-up: sales per store → stores per city → number of cities → total market
 
-收入端：
-- 价格 × 销量
-- 销量 = 客户数 × 客单价 × 频次
-- 客户数 = 市场规模 × 渗透率
-
-成本端：
-- 固定成本（人工 / 租金 / 设备）
-- 变动成本（原材料 / 物流 / 营销）
-
-诊断顺序：
-1. 量价拆分（量降还是价降？）
-2. 区域 / 产品 / 客群 拆分（哪一块下滑最多）
-3. 与行业对比（是行业问题还是公司问题）
-4. 给出 2~3 个改进方向
+Keys:
+1. State assumptions explicitly (gender / age / city tiers / frequency)
+2. Numbers must be re-computable (the interviewer may ask you to recalculate on the spot)
+3. Offer a sanity check ("this figure is roughly Y times the X industry, which seems reasonable")
 ```
 
-## Market Entry 框架（4C / 5C）
+## Profitability Framework
 
 ```
-Customer：目标客户、需求、规模、增长
-Competition：现有玩家、市场份额、竞争激烈度、进入壁垒
-Company：自身能力（产品 / 渠道 / 品牌 / 资金）是否匹配
-Channel：渠道选择（直营 / 加盟 / 经销 / 线上）
-Cost-benefit：投入产出测算 + 时间表
+Profit = Revenue - Costs
 
-关键：必须给"做 / 不做"的明确答案，不要"看情况"
+Revenue side:
+- Price × volume
+- Volume = customer count × average order value × frequency
+- Customer count = market size × penetration rate
+
+Cost side:
+- Fixed costs (labor / rent / equipment)
+- Variable costs (materials / logistics / marketing)
+
+Diagnostic order:
+1. Split price vs. volume (is volume down or price down?)
+2. Split by region / product / customer segment (which slice declined most)
+3. Benchmark against the industry (industry problem or company problem?)
+4. Offer 2-3 improvement directions
 ```
 
-## Case 面回答原则
+## Market Entry Framework (4C / 5C)
 
-1. **先 take a moment**：拿到题不要急着答，花 1~2 分钟列框架（面试官期待这个）
-2. **MECE 框架**：分类要 Mutually Exclusive, Collectively Exhaustive
-3. **Hypothesis-driven**：基于一个假设展开分析，而不是穷举
-4. **Number first**：所有结论都要有数字支撑
-5. **沟通节奏**：每展开一个分支前，先告诉面试官"我打算先看 X 再看 Y"
-6. **主动总结**：每个分支结束做小结，最后给 final recommendation
+```
+Customer: target customers, needs, size, growth
+Competition: incumbent players, market share, intensity of competition, entry barriers
+Company: does our own capability (product / channel / brand / capital) match?
+Channel: channel choice (direct / franchise / distribution / online)
+Cost-benefit: investment-return estimate + timeline
 
-## 常见误区
+Key: you must give a clear "do it / don't do it" answer — never "it depends"
+```
 
-- 不澄清需求就开干 → 面试官期待你"先 clarify"
-- 框架太机械（生硬套 4P / SWOT，看不到思考）
-- 数字估算时单位混乱（百万 vs 亿）→ 用清楚单位
-- 不主动 sanity check
-- 跑得太快，面试官没法跟上你的逻辑
-- 给建议时不写具体动作（"加强营销"是废话，"在 X 渠道投放 Y 类型内容，预算 Z"才是建议）
+## Case Interview Answering Principles
 
-## 高级 PM Case 高频题（不是咨询，是 PM 战略题）
+1. **Take a moment first**: don't rush to answer; spend 1-2 minutes laying out a framework (the interviewer expects this)
+2. **MECE framework**: categories must be Mutually Exclusive, Collectively Exhaustive
+3. **Hypothesis-driven**: structure the analysis around a hypothesis instead of brute-force enumeration
+4. **Number first**: every conclusion needs numeric support
+5. **Communication rhythm**: before expanding each branch, tell the interviewer "I'll look at X first, then Y"
+6. **Summarize proactively**: wrap up each branch, then give a final recommendation
 
-1. 你怎么衡量微信视频号成功
-2. 美团外卖准备进入印尼，你的 product strategy 是什么
-3. ChatGPT 推出后，你作为 Notion PM 会做什么
-4. 给一个产品设计 north star metric
-5. 抖音直播 GMV 卡住了，你怎么 diagnose
+## Common Mistakes
 
-PM Case 关键：必须有用户思维 + 业务思维 + 数据思维 同时在线，不要只讲框架，要讲到具体功能 / 实验设计。
+- Starting work without clarifying the ask → the interviewer expects you to "clarify first"
+- Framework too mechanical (forced 4P / SWOT with no visible thinking)
+- Confusing units during estimation (millions vs. billions) → state units clearly
+- Not offering a sanity check proactively
+- Moving too fast for the interviewer to follow your logic
+- Recommendations without concrete actions ("improve marketing" is filler; "launch Y-type content on channel X with budget Z" is a recommendation)
+
+## Senior PM Case High-Frequency Questions (not consulting — these are PM strategy questions)
+
+1. How would you measure the success of WeChat Channels (WeChat's short-video feed)?
+2. Meituan (food delivery) is preparing to enter Indonesia — what's your product strategy?
+3. After ChatGPT launched, what would you do as Notion's PM?
+4. Propose a north star metric for a product design
+5. Douyin live-commerce GMV has plateaued — how do you diagnose it?
+
+Key for PM cases: user thinking + business thinking + data thinking must all be online at once. Don't just recite frameworks — get down to specific features / experiment design.

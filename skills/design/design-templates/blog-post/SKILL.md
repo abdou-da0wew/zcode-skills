@@ -1,24 +1,24 @@
 ---
 name: blog-post
-description: Long-form Chinese article / blog-post template — two voices: a wildstay-style lifestyle launch piece with editorial grid + oversized display type, and a WeChat-公众号-style serif beauty/longform with measured prose and quiet hairlines.
+description: Long-form article / blog-post template — two voices: a wildstay-style lifestyle launch piece with editorial grid + oversized display type, and a WeChat-official-account-style serif beauty/longform with measured prose and quiet hairlines.
 visibility: public
 mode: template
 carrier: long-form-article
 scenario: editorial-content
-pattern_source: qiye-wildstay.html, 肌肤专题｜关于屏障的一次重读.html
+pattern_source: qiye-wildstay.html, skin-barrier-rereading.html
 source_priority: skill-first
 triggers:
-  - "做个长文页"
-  - "公众号长文"
-  - "野宿 lifestyle 大标题页"
-  - "美妆专题长文"
-  - "中文博客文"
-  - "editorial 长文"
+  - "make a long-form article page"
+  - "official-account long-form post"
+  - "wildstay lifestyle big-title page"
+  - "beauty feature long-read"
+  - "editorial blog post"
+  - "editorial long read"
 ---
 
 # Blog Post Template
 
-Use this template for **single-page long-form Chinese articles** — brand stories, lifestyle features, beauty / wellness deep-reads, cultural essays, 公众号-style long posts rendered as standalone web pages.
+Use this template for **single-page long-form articles** — brand stories, lifestyle features, beauty / wellness deep-reads, cultural essays, WeChat-official-account-style long posts rendered as standalone web pages.
 
 This template ships two variants. Pick before building.
 
@@ -27,20 +27,20 @@ This template ships two variants. Pick before building.
 ### `qiye-wildstay.html` — Lifestyle / brand-launch editorial
 
 - Voice: aspirational, energetic, image-led, asymmetric.
-- Use for: 户外 / 旅行 / 营地 / 生活方式新品发布, brand-launch features, 品牌故事 with strong photography.
+- Use for: outdoor / travel / camping / lifestyle product launches, brand-launch features, brand stories with strong photography.
 - Distinctive moves: oversized display numerals (date as poster), Helvetica + PingFang stack, grid-scattered title characters, rotated accent bars, pill CTAs.
 
-### `肌肤专题｜关于屏障的一次重读.html` — Serif long-read
+### `skin-barrier-rereading.html` — Serif long-read
 
 - Voice: introspective, scholarly, text-first.
-- Use for: 美妆 / 护肤 / 健康 / 科普 / 文化深度文章, 公众号-style serialized columns.
+- Use for: beauty / skincare / health / science / culture deep-dives, WeChat-official-account-style serialized columns.
 - Distinctive moves: Songti SC display title + Cormorant Garamond italic English subtitle, blue-grey accent rules, justified body, restrained metadata header.
 
 ## Use When
 
 - The artifact is a **scrolling web article**, not a fixed-image card.
 - Content is paragraph-led with images, pull-quotes, possibly a few module breaks.
-- The user wants 公众号 / 杂志专题 / 品牌长读 feel — not a SaaS landing, not a social card.
+- The user wants an official-account / magazine-feature / brand-long-read feel — not a SaaS landing, not a social card.
 
 ## Avoid When
 
@@ -60,7 +60,7 @@ Do not mix the two voices in one piece. They embody different reading contracts.
 Pick the variant from voice, not topic:
 
 - Energy + photography forward → **wildstay**
-- Quiet + reasoned + paragraphs → **肌肤专题**
+- Quiet + reasoned + paragraphs → **skin-barrier-rereading**
 
 Then decide the spine:
 
@@ -75,11 +75,11 @@ Then decide the spine:
 
 Prefer:
 
-- generous line-height for CJK body (≥ 1.75)
+- generous line-height for CJK body text (≥ 1.75) when the target language is Chinese
 - one display font + one body font, not three
 - hairline rules over decorative dividers
 - justified or natural ragged-right body — never centered
-- captions and metadata in small caps / mono / Latin to break the Chinese rhythm
+- captions and metadata in small caps / mono / Latin to break the body-text rhythm
 
 Avoid:
 

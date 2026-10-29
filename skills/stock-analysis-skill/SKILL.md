@@ -5,62 +5,70 @@ description: "Comprehensive stock market analysis skill covering A-share (China)
 
 # Stock Analysis Skill
 
-## 依赖平台 Skills
+## LLM Configuration
 
-- `finance skill` — 所有市场数据（A股/港股/美股统一）
-- `pdf skill` — PDF 研报生成
-- `docx skill` — Word 文档生成
-- `vlm skill`（内置）— K线图形态识别
+Works with any OpenAI-compatible LLM server (open-source or free): Ollama, vLLM, LM Studio, OpenRouter, and others. Designed for the DiveeOI agent (OpenCode-based). Configure via environment variables:
+
+- `LLM_BASE_URL` — OpenAI-compatible endpoint (default: `http://localhost:11434/v1`)
+- `LLM_API_KEY` — API key, if your server requires one
+- `LLM_MODEL` — model name (default: `qwen2.5`; try `llama3.1`, `deepseek-r1`, etc.)
+
+## Platform Skills Required
+
+- `finance skill` — all market data (A-shares / HK stocks / US stocks unified)
+- `pdf skill` — PDF research report generation
+- `docx skill` — Word document generation
+- `vlm skill` (built-in) — K-line chart pattern recognition
 
 ---
 
 ## Commands & Triggers
 
-| 命令 | 触发词示例 |
+| Command | Example trigger phrases |
 |------|-----------|
-| 个股分析 | 分析600519 / AAPL值不值得买 / 帮我看看腾讯 |
-| 带持仓分析 | 我持仓成本1450分析茅台 / AAPL我170买的现在怎样 |
-| 股息分析 | JNJ股息怎么样 / 帮我分析这几只股的股息 KO PG JNJ |
-| 传闻扫描 | 今日有什么并购传闻 / 扫描一下市场早期信号 |
-| 添加自选股 | 关注AAPL / 把600519加入自选，目标价1600止损1350 |
-| 查看自选股 | 我的自选股列表 / 看一下我关注的股票 |
-| 检查提醒 | 检查自选股提醒 / 有没有触发止损 |
-| 删除自选股 | 从自选股删除TSLA |
-| K线图分析 | （上传图片）帮我分析这个K线图 |
-| 大盘复盘 | 附带大盘复盘分析600519 |
+| Single-stock analysis | Analyze 600519 / Is AAPL worth buying / Take a look at Tencent for me |
+| Position-aware analysis | My cost basis is 1450, analyze Moutai / I bought AAPL at 170, how is it now |
+| Dividend analysis | How is JNJ's dividend / Analyze the dividends of these stocks: KO PG JNJ |
+| Rumor scan | Any M&A rumors today / Scan for early market signals |
+| Add to watchlist | Watch AAPL / Add 600519 to my watchlist, target 1600, stop-loss 1350 |
+| View watchlist | My watchlist / Show me the stocks I follow |
+| Check alerts | Check watchlist alerts / Any stop-losses triggered |
+| Remove from watchlist | Remove TSLA from my watchlist |
+| K-line chart analysis | (upload an image) Analyze this K-line chart for me |
+| Market review | With a market overview, analyze 600519 |
 
 ---
 
 ## Input Schemas
 
-### 个股分析
+### Single-stock analysis
 ```typescript
 {
   stocks: (string | { code: string; position?: { status: "empty"|"holding"; cost?: number; shares?: number } })[],
-  outputFormat?: "markdown" | "pdf" | "word",  // 默认 markdown
-  mode?: "full" | "quote",                      // 默认 full
-  includeMarketReview?: boolean,                // 默认 false
-  includeGlobalMacro?: boolean,                 // 默认 true
-  includeDividend?: boolean,                    // 美股附加股息分析，默认 false
+  outputFormat?: "markdown" | "pdf" | "word",  // default markdown
+  mode?: "full" | "quote",                      // default full
+  includeMarketReview?: boolean,                // default false
+  includeGlobalMacro?: boolean,                 // default true
+  includeDividend?: boolean,                    // extra dividend analysis for US stocks, default false
 }
 ```
 
-### 股息分析
+### Dividend analysis
 ```typescript
 runDividend(tickers: string | string[])
 ```
 
-### 传闻扫描
+### Rumor scan
 ```typescript
-runRumorScan()  // 无需参数，自动扫描今日信号
+runRumorScan()  // no parameters; automatically scans today's signals
 ```
 
-### 自选股管理
+### Watchlist management
 ```typescript
 runWatchlistAdd(ticker, { targetPrice?, stopPrice?, alertOnSignal?, notes? })
 runWatchlistRemove(ticker)
 runWatchlistList()
-runWatchlistCheck()  // 检查是否触发价格/信号提醒
+runWatchlistCheck()  // checks whether price/signal alerts have triggered
 ```
 
 ---
@@ -68,63 +76,63 @@ runWatchlistCheck()  // 检查是否触发价格/信号提醒
 ## Report Structure
 
 ```
-# 股票智能分析报告
+# Stock Intelligence Analysis Report
 
-## 🌍 全球宏观速览（默认开启）
-## 🎯 大盘复盘（需开启）
-## 📊 个股决策仪表盘（每只）
-   ### 📰 重要信息速览（舆情/业绩预期/🚨风险/✨利好/最新动态）
-   ### 📌 核心结论（结论/一句话/空仓者建议/持仓者建议+盈亏）
-   ### 📈 当日行情
-   ### 📊 数据透视（技术面/基本面/资金面）
-   ### 🎯 作战计划（狙击点位表/仓位/风控）
-   ### ✅ 检查清单（综合结论）
-   ### 💰 股息分析（美股，需开启 includeDividend）
+## 🌍 Global Macro Snapshot (on by default)
+## 🎯 Market Overview (opt-in)
+## 📊 Per-Stock Decision Dashboard (one per stock)
+   ### 📰 Key Information at a Glance (sentiment / earnings expectations / 🚨 risks / ✨ catalysts / latest developments)
+   ### 📌 Core Conclusion (verdict / one-liner / empty-position advice / holding advice + P/L)
+   ### 📈 Today's Session
+   ### 📊 Data Deep-Dive (technicals / fundamentals / capital flows)
+   ### 🎯 Battle Plan (entry level table / position sizing / risk control)
+   ### ✅ Checklist (overall conclusion)
+   ### 💰 Dividend Analysis (US stocks; requires includeDividend)
 ```
 
 ---
 
 ## Dividend Analysis Metrics
 
-| 指标 | 说明 |
+| Metric | Description |
 |------|------|
-| 安全评分 | 0-100，综合派息率/增长/连续年数 |
-| 收入评级 | excellent/good/moderate/poor |
-| 派息率状态 | safe(<40%)/moderate/high/unsustainable |
-| 5年CAGR | 股息复合增长率 |
-| 连续增长年数 | 25年以上为股息贵族 |
+| Safety score | 0-100, combining payout ratio / growth / consecutive years |
+| Income rating | excellent/good/moderate/poor |
+| Payout ratio status | safe(<40%)/moderate/high/unsustainable |
+| 5-year CAGR | compound dividend growth rate |
+| Consecutive growth years | 25+ years qualifies as a dividend aristocrat |
 
 ---
 
 ## Rumor Scanner Signal Types
 
-| 类型 | 冲击分 | 说明 |
+| Type | Impact score | Description |
 |------|--------|------|
-| 并购传闻 (ma) | +5 | M&A/收购/要约 |
-| 内部人动态 (insider) | +4 | CEO/董事买卖 |
-| 分析师调整 (analyst) | +3 | 评级上调/下调/目标价变动 |
-| 监管动态 (regulatory) | +3 | SEC调查/合规风险 |
-| 业绩预期 (earnings) | +2 | 盈利预警/上调 |
+| M&A rumor (ma) | +5 | M&A / acquisitions / tender offers |
+| Insider move (insider) | +4 | CEO / director buying or selling |
+| Analyst change (analyst) | +3 | upgrades / downgrades / target price changes |
+| Regulatory (regulatory) | +3 | SEC investigations / compliance risk |
+| Earnings expectation (earnings) | +2 | profit warnings / guidance raises |
 
 ---
 
 ## Watchlist Alert Types
 
-| 提醒类型 | 触发条件 |
+| Alert type | Trigger condition |
 |---------|---------|
-| 🎯 目标价 | 当前价 ≥ targetPrice |
-| 🛑 止损价 | 当前价 ≤ stopPrice |
-| 📊 信号变化 | 本次结论 ≠ 上次结论 |
+| 🎯 Target price | current price ≥ targetPrice |
+| 🛑 Stop price | current price ≤ stopPrice |
+| 📊 Signal change | current verdict ≠ previous verdict |
 
 ---
 
 ## Behavior Rules
 
-- 乖离率 > 5% → 结论不得为买入/强烈买入
-- 数据缺失 → 标"暂缺"，严禁捏造
-- 有持仓成本 → 必须给出盈亏分析
-- 未提供持仓 → 同时给出空仓/持仓两套建议
-- 每次分析后自动静默更新自选股信号
+- Deviation rate > 5% → the verdict must not be Buy/Strong Buy
+- Missing data → mark "N/A"; fabrication is strictly prohibited
+- Position cost provided → must include a P/L analysis
+- No position provided → give two sets of advice (empty position and holding)
+- After each analysis, silently update watchlist signals
 
 ---
 
@@ -136,21 +144,21 @@ stock-analysis-skill/
 ├── package.json
 ├── tsconfig.json
 └── src/
-    ├── index.ts          # 主入口（所有命令路由）
-    ├── types.ts          # 类型定义
-    ├── dataFetcher.ts    # 数据层（finance skill）
-    ├── analyzer.ts       # 个股分析（LLM/VLM）
-    ├── dividend.ts       # 股息分析
-    ├── rumorScanner.ts   # 传闻扫描
-    └── watchlist.ts      # 自选股管理（storage 持久化）
+    ├── index.ts          # main entry (all command routing)
+    ├── types.ts          # type definitions
+    ├── dataFetcher.ts    # data layer (finance skill) + OpenAI-compatible LLM client
+    ├── analyzer.ts       # single-stock analysis (LLM/VLM)
+    ├── dividend.ts       # dividend analysis
+    ├── rumorScanner.ts   # rumor scan
+    └── watchlist.ts      # watchlist management (storage persistence)
 ```
 
 ---
 
 ## Limitations
 
-- 传闻扫描依赖 finance skill 新闻数据质量
-- 自选股数据持久化依赖平台 storage API
-- 港股基本面数据较少
-- 不支持期货、ETF、可转债
-- 仅供参考，不构成投资建议
+- Rumor scanning depends on the finance skill's news data quality
+- Watchlist persistence depends on the platform storage API
+- Fundamental data for HK stocks is sparser
+- Futures, ETFs, and convertible bonds are not supported
+- For reference only; not investment advice

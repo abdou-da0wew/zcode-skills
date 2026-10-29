@@ -1,79 +1,78 @@
-# JD 解析信号词参考
+# JD Parsing Signal Words Reference
 
-## must-have 强信号词
+## Must-have strong signal words
 
-只要 JD 句子里出现这些词，后面的技能 / 经验大概率是硬门槛：
+When these words appear in a JD sentence, the skill / experience that follows is most likely a hard requirement:
 
-- 必须 / 必备 / 要求 / 应当
-- 至少 X 年 / X+ years / 不少于
-- "需要" / "需具备"
-- "必要条件" / "硬性要求"
-- 工科背景 / 985 / 211 / 硕士及以上 / 博士
+- Must / Required / Should / Essential
+- At least X years / X+ years / No less than
+- "Needs to have" / "Requires"
+- "Prerequisite" / "Hard requirement"
+- Engineering background / Top-tier university / Master's degree or above / PhD
 
-英文 JD：
+English JDs:
 - Required / Must have / Mandatory / Essential
 - Minimum X years
 - Strong proficiency in / Expert in
 - Demonstrated experience with
 
-## nice-to-have 弱信号词
+## Nice-to-have weak signal words
 
-- 加分 / 优先 / 优先考虑
-- 熟悉 ___ 者优先
-- 有 ___ 经验者优先
-- "了解 ___ 即可"
-- 加分项
+- Plus / Preferred / Preferred candidates
+- Candidates familiar with ___ preferred
+- Experience with ___ is a plus
+- "Basic understanding of ___ is sufficient"
+- Bonus points
 
-英文：
+English:
 - Preferred / Nice to have / Plus / Bonus / Desirable
 - Familiar with / Exposure to
 - A plus / Would be a plus
 
-## 职责动词（写在 bullet 里能呼应 JD）
+## Responsibility verbs (echoing them in resume bullets aligns with the JD)
 
-中文：负责、主导、推动、设计、搭建、优化、规划、迭代、孵化、复盘、运营、管理、协调、执行
-英文：Lead / Drive / Build / Design / Architect / Develop / Implement / Optimize / Manage / Coordinate / Execute / Own
+English: Lead / Drive / Build / Design / Architect / Develop / Implement / Optimize / Manage / Coordinate / Execute / Own
 
-## 特殊要求
+## Special requirements
 
-- **学历**：本科 / 硕士 / 博士及以上；学校 tier
-- **工作年限**：X-Y 年（写明 range，不写满则有弹性）
-- **语言**：英语口语流利 / CET-6 / 雅思 X / 母语
-- **证书**：CFA / CPA / PMP / AWS Solutions Architect 等
-- **出差 / 派驻 / 加班**："接受出差"、"奇偶周末调休"、"项目制 996"
-- **工作地点**：城市 + 是否 remote / hybrid
+- **Education**: Bachelor's / Master's / PhD or above; school tier
+- **Years of experience**: X-Y years (state the range; not stating a max leaves flexibility)
+- **Languages**: fluent spoken English / CET-6 / IELTS X / native speaker
+- **Certifications**: CFA / CPA / PMP / AWS Solutions Architect, etc.
+- **Travel / relocation / overtime**: "willing to travel", "weekend shifts on rotation", "project-based 996 schedule"
+- **Location**: city + remote / hybrid or not
 
-## 反信号（看到这些要警觉）
+## Anti-signals (be alert when you see these)
 
-- "其他领导交办的任务" → 工作边界模糊
-- "良好的抗压能力" → 加班多
-- "拥抱变化 / 快速迭代" → 业务方向不稳定
-- "扁平化沟通 / 没有层级" → 实际可能更乱
-- "5 险一金 + 节日福利" 写在 JD 显眼位置 → 福利可能就这些
+- "Other tasks assigned by leadership" → fuzzy job boundaries
+- "Strong ability to work under pressure" → heavy overtime
+- "Embrace change / rapid iteration" → unstable business direction
+- "Flat communication / no hierarchy" → may actually be more chaotic
+- "Full benefits + holiday gifts" featured prominently in the JD → benefits may be all there is
 
-## 输出格式（Step 1 给用户看的）
+## Output format (what Step 1 shows the user)
 
 ```json
 {
-  "company": "XX 公司",
-  "position": "XX 岗位",
+  "company": "Company X",
+  "position": "Role X",
   "must_have": [
-    {"item": "5 年以上 C 端产品经验", "evidence": "JD 第 X 行"},
-    {"item": "熟练 SQL", "evidence": "JD 第 Y 行"}
+    {"item": "5+ years of consumer product experience", "evidence": "JD line X"},
+    {"item": "Proficient in SQL", "evidence": "JD line Y"}
   ],
   "nice_to_have": [
-    {"item": "海外业务经验", "evidence": "JD 第 Z 行"}
+    {"item": "Overseas business experience", "evidence": "JD line Z"}
   ],
-  "soft_skills": ["跨部门推动", "数据驱动决策"],
+  "soft_skills": ["cross-team drive", "data-driven decisions"],
   "responsibilities": [
-    "主导 ___ 业务线产品规划",
-    "通过数据分析驱动迭代"
+    "Lead product planning for the ___ business line",
+    "Drive iteration through data analysis"
   ],
   "special_requirements": {
-    "education": "本科及以上",
+    "education": "Bachelor's degree or above",
     "years": "5+",
-    "language": "英语口语流利",
-    "location": "上海，可接受短期出差"
+    "language": "Fluent spoken English",
+    "location": "Shanghai; short-term travel acceptable"
   }
 }
 ```

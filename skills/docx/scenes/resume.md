@@ -45,7 +45,7 @@ Name & Contact → Research Direction / Target → Education → Research Experi
 1. If user provides a target position or JD → **must reorganize and rewrite content around position requirements**
 2. If user provides a raw draft → prioritize restructuring, phrasing refinement, and priority reordering; do not rewrite into an unfamiliar career
 3. **Never fabricate** companies, positions, degrees, projects, certifications, awards, papers, patents, data results, or achievements
-4. If critical data is missing → use conservative expressions or placeholder `【Please fill in: ______】`; never fabricate precise numbers
+4. If critical data is missing → use conservative expressions or placeholder `[Please fill in: ______]`; never fabricate precise numbers
 5. A single resume should generally serve only one primary career direction
 
 ---
@@ -166,7 +166,7 @@ When industry is unspecified, use default warm neutral palette. This aligns with
 - **NO cover page / NO TOC**
 - **Target: 1 page** (2 pages max for senior roles)
 - **Compact spacing**: `line: 276` (1.15x)
-- All templates use **bilingual section headings** (e.g., "Work Experience 工作经历")
+- All templates use **bilingual section headings** (e.g., "Work Experience" + its Chinese equivalent)
 
 ---
 

@@ -1,128 +1,128 @@
-# AI 新闻源推荐列表
+# Recommended AI news sources
 
-## Newsletter / 周报（信息密度最高 🔑）
+## Newsletters / weekly roundups (highest information density 🔑)
 
-| 来源 | 网址 | 特点 |
+| Source | URL | Notes |
 |------|------|------|
-| Last Week in AI | lastweekin.ai / medium.com/last-week-in-ai | 每周最全面的 AI 新闻汇总 |
-| The Batch (Andrew Ng) | deeplearning.ai/the-batch | 权威周报 |
-| Import AI (Jack Clark) | importai.net | Anthropic 联创的 AI 周报 |
-| Platformer (Casey Newton) | platformer.news | 科技深度分析，覆盖 AI |
-| The Neuron | theneurondaily.com | 每日 AI 简报 |
-| Ben's Bites | bensbites.com | AI 产品/工具为主 |
-| AI Tidbits | aitidbits.substack.com | AI 动态精选 |
-| TLDR AI | tldr.tech/ai | 每日 AI 简报 |
-| Interconnects | interconnects.ai | 深度技术分析 |
+| Last Week in AI | lastweekin.ai / medium.com/last-week-in-ai | Most comprehensive weekly AI news digest |
+| The Batch (Andrew Ng) | deeplearning.ai/the-batch | Authoritative weekly |
+| Import AI (Jack Clark) | importai.net | AI weekly by an Anthropic co-founder |
+| Platformer (Casey Newton) | platformer.news | In-depth tech analysis, covers AI |
+| The Neuron | theneurondaily.com | Daily AI briefing |
+| Ben's Bites | bensbites.com | AI products/tools focused |
+| AI Tidbits | aitidbits.substack.com | Curated AI updates |
+| TLDR AI | tldr.tech/ai | Daily AI briefing |
+| Interconnects | interconnects.ai | Deep technical analysis |
 
-## 关键 Substack / 独立博客
+## Key Substacks / independent blogs
 
-| 来源 | 网址 | 特点 |
+| Source | URL | Notes |
 |------|------|------|
-| Gary Marcus | garymarcus.substack.com | AI 批评性分析，常首发安全/争议话题 |
-| Simon Willison | simonwillison.net | LLM 安全、工具生态，社区现象第一手报道 |
-| Ethan Mollick | oneusefulthing.substack.com | Wharton 教授，AI 应用洞察 |
-| Lenny's Newsletter | lennysnewsletter.com | AI 产品/增长 |
-| Understanding AI | understandingai.org | 趋势分析与预测 |
-| Nathan Lebenz (Cognitive Revolution) | cognitiverevolution.substack.com | AI 深度访谈 |
+| Gary Marcus | garymarcus.substack.com | Critical AI analysis; often first to cover safety/controversy topics |
+| Simon Willison | simonwillison.net | LLM safety, tooling ecosystem; first-hand coverage of community phenomena |
+| Ethan Mollick | oneusefulthing.substack.com | Wharton professor; applied AI insights |
+| Lenny's Newsletter | lennysnewsletter.com | AI products/growth |
+| Understanding AI | understandingai.org | Trend analysis and forecasting |
+| Nathan Lebenz (Cognitive Revolution) | cognitiverevolution.substack.com | In-depth AI interviews |
 
-## 国际主流媒体
+## Major international media
 
-| 来源 | 网址 | 侧重 |
+| Source | URL | Focus |
 |------|------|------|
-| TechCrunch AI | techcrunch.com/category/artificial-intelligence | 产品、融资 |
-| The Verge AI | theverge.com/ai-artificial-intelligence | 产品、行业 |
-| Ars Technica | arstechnica.com/ai | 深度分析 |
-| VentureBeat AI | venturebeat.com/ai | 企业 AI |
-| MIT Tech Review | technologyreview.com/artificial-intelligence | 研究、趋势 |
-| Wired AI | wired.com/tag/artificial-intelligence | 行业影响 |
-| CNBC Tech | cnbc.com/technology | 商业+科技交叉 |
-| Scientific American | scientificamerican.com | 科学视角 AI |
-| The Information | theinformation.com | 深度报道（付费） |
+| TechCrunch AI | techcrunch.com/category/artificial-intelligence | Products, funding |
+| The Verge AI | theverge.com/ai-artificial-intelligence | Products, industry |
+| Ars Technica | arstechnica.com/ai | In-depth analysis |
+| VentureBeat AI | venturebeat.com/ai | Enterprise AI |
+| MIT Tech Review | technologyreview.com/artificial-intelligence | Research, trends |
+| Wired AI | wired.com/tag/artificial-intelligence | Industry impact |
+| CNBC Tech | cnbc.com/technology | Business + tech crossover |
+| Scientific American | scientificamerican.com | AI from a science angle |
+| The Information | theinformation.com | In-depth reporting (paywalled) |
 
-## 国内媒体
+## Chinese-language media
 
-| 来源 | 网址 | 侧重 |
+| Source | URL | Focus |
 |------|------|------|
-| 机器之心 | jiqizhixin.com | 技术、论文 |
-| 量子位 | qbitai.com | 产品、行业 |
-| 36氪 AI | 36kr.com/information/AI | 融资、产品 |
-| InfoQ AI | infoq.cn/topic/AI | 技术实践 |
-| 新智元 | xinzhiyuan.com | 行业动态 |
-| AI 科技评论 | leiphone.com/category/ai | 技术、产品 |
+| Synced / Jiqizhixin | jiqizhixin.com | Technology, papers |
+| QbitAI | qbitai.com | Products, industry |
+| 36Kr AI | 36kr.com/information/AI | Funding, products |
+| InfoQ AI | infoq.cn/topic/AI | Engineering practice |
+| Xinzhiyuan | xinzhiyuan.com | Industry news |
+| Leiphone AI Tech Review | leiphone.com/category/ai | Technology, products |
 
-## 社区与论坛（捕捉病毒传播 🔑）
+## Communities and forums (for catching virality 🔑)
 
-| 来源 | 网址 | 特点 |
+| Source | URL | Notes |
 |------|------|------|
-| Hacker News | news.ycombinator.com | 技术讨论热度，开源项目首发 |
-| Reddit r/MachineLearning | reddit.com/r/MachineLearning | 学术前沿 |
-| Reddit r/artificial | reddit.com/r/artificial | 综合讨论 |
-| Reddit r/LocalLLaMA | reddit.com/r/LocalLLaMA | 本地模型、开源工具热度 |
-| Reddit r/singularity | reddit.com/r/singularity | AI 社区热议 |
-| Twitter/X | twitter.com | 实时动态，病毒传播首发地 |
-| 即刻 AI 圈子 | okjike.com | 国内社区讨论 |
-| V2EX | v2ex.com | 开发者视角 |
-| 知乎 | zhihu.com | 深度技术讨论 |
+| Hacker News | news.ycombinator.com | Tech discussion buzz; open-source project debuts |
+| Reddit r/MachineLearning | reddit.com/r/MachineLearning | Academic frontier |
+| Reddit r/artificial | reddit.com/r/artificial | General discussion |
+| Reddit r/LocalLLaMA | reddit.com/r/LocalLLaMA | Local models, open-source tool buzz |
+| Reddit r/singularity | reddit.com/r/singularity | AI community discussions |
+| Twitter/X | twitter.com | Real-time updates; where things go viral first |
+| Jike AI circles | okjike.com | Chinese-language community discussions |
+| V2EX | v2ex.com | Developer perspective |
+| Zhihu | zhihu.com | In-depth technical discussions |
 
-## 安全与批评视角
+## Safety and critical perspectives
 
-| 来源 | 网址 | 特点 |
+| Source | URL | Notes |
 |------|------|------|
-| Palo Alto Networks Blog | paloaltonetworks.com/blog | AI 安全预警 |
-| 1Password Blog | 1password.com/blog | Agent 安全分析 |
-| Trail of Bits | blog.trailofbits.com | AI 安全研究 |
+| Palo Alto Networks Blog | paloaltonetworks.com/blog | AI security advisories |
+| 1Password Blog | 1password.com/blog | Agent security analysis |
+| Trail of Bits | blog.trailofbits.com | AI security research |
 
-## 学术与研究
+## Academic and research
 
-| 来源 | 网址 | 特点 |
+| Source | URL | Notes |
 |------|------|------|
-| arXiv CS.AI | arxiv.org/list/cs.AI/recent | 最新论文 |
-| arXiv CS.LG | arxiv.org/list/cs.LG/recent | 机器学习论文 |
-| Papers With Code | paperswithcode.com | 论文+代码 |
-| Google AI Blog | ai.googleblog.com | 谷歌研究 |
-| OpenAI Blog | openai.com/blog | OpenAI 动态 |
-| Anthropic News | anthropic.com/news | Anthropic 动态 |
-| DeepMind Blog | deepmind.com/blog | DeepMind 研究 |
-| Meta AI | ai.meta.com/blog | Meta 研究 |
-| Hugging Face Blog | huggingface.co/blog | 开源生态 |
+| arXiv CS.AI | arxiv.org/list/cs.AI/recent | Latest papers |
+| arXiv CS.LG | arxiv.org/list/cs.LG/recent | Machine learning papers |
+| Papers With Code | paperswithcode.com | Papers + code |
+| Google AI Blog | ai.googleblog.com | Google research |
+| OpenAI Blog | openai.com/blog | OpenAI updates |
+| Anthropic News | anthropic.com/news | Anthropic updates |
+| DeepMind Blog | deepmind.com/blog | DeepMind research |
+| Meta AI | ai.meta.com/blog | Meta research |
+| Hugging Face Blog | huggingface.co/blog | Open-source ecosystem |
 
-## 开源项目追踪
+## Open-source project tracking
 
-| 来源 | 网址 | 特点 |
+| Source | URL | Notes |
 |------|------|------|
-| GitHub Trending | github.com/trending | 热门项目，必查 |
-| Product Hunt AI | producthunt.com/topics/artificial-intelligence | 新产品发布 |
-| Awesome LLM | github.com/Hannibal046/Awesome-LLM | LLM 资源汇总 |
-| Hugging Face Models | huggingface.co/models | 新模型发布 |
+| GitHub Trending | github.com/trending | Hot projects; always check |
+| Product Hunt AI | producthunt.com/topics/artificial-intelligence | New product launches |
+| Awesome LLM | github.com/Hannibal046/Awesome-LLM | LLM resource collection |
+| Hugging Face Models | huggingface.co/models | New model releases |
 
-## 搜索关键词矩阵
+## Search keyword matrix
 
-每个维度对应的推荐搜索词：
+Recommended search terms per dimension:
 
-**Newsletter/周报**：
-- `"last week in AI" [月份 年份]`
-- `"AI weekly roundup" [月份 年份]`
-- `site:substack.com AI news [月份]`
+**Newsletter/weekly roundups**:
+- `"last week in AI" [month year]`
+- `"AI weekly roundup" [month year]`
+- `site:substack.com AI news [month]`
 
-**社区病毒传播**：
+**Community virality**:
 - `"viral AI tool" OR "viral AI agent"`
 - `"AI trending" site:reddit.com`
 - `"GitHub trending AI"`
 - `AI "everyone is talking about"`
 
-**产品发布**：
-- `"AI model release" OR "LLM launch" [月份]`
+**Product launches**:
+- `"AI model release" OR "LLM launch" [month]`
 - `OpenAI OR Anthropic OR Google announcement`
-- `"大模型发布" OR "AI 新产品"`
+- Chinese-language sources: localized terms for "large model release" or "new AI product" on jiqizhixin.com / qbitai.com
 
-**研究突破**：
-- `"AI breakthrough" OR "state of the art" [月份]`
+**Research breakthroughs**:
+- `"AI breakthrough" OR "state of the art" [month]`
 - `"AI paper" OR "machine learning research"`
 
-**融资商业**：
-- `"AI startup funding" [月份 年份]`
+**Funding and business**:
+- `"AI startup funding" [month year]`
 - `"AI acquisition" OR "AI IPO"`
 
-**监管政策**：
-- `"AI regulation" OR "AI policy" [月份 年份]`
-- `"AI law" OR "AI 监管"`
+**Regulation and policy**:
+- `"AI regulation" OR "AI policy" [month year]`
+- `"AI law" OR "AI governance"` (plus Chinese-language sources)

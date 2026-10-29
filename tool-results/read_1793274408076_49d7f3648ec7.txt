@@ -1,0 +1,1190 @@
+     1→<!DOCTYPE html>
+     2→<html lang="zh-CN">
+     3→<head>
+     4→  <meta charset="UTF-8" />
+     5→  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     6→  <title>{{ title }}</title>
+     7→  <link rel="preconnect" href="https://fonts.googleapis.com" />
+     8→  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+     9→  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;500;600;700;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    10→  <style>
+    11→    * { box-sizing: border-box; margin: 0; padding: 0; }
+    12→
+    13→    :root {
+    14→      --bg: #ffffff;
+    15→      --bg-soft: #f5f5f5;
+    16→      --card: #ffffff;
+    17→      --text: #0a0a0a;
+    18→      --text-mute: #6b6b6f;
+    19→      --text-faint: #a8a8ac;
+    20→      --border: rgba(15, 15, 18, 0.06);
+    21→      --border-strong: rgba(15, 15, 18, 0.12);
+    22→
+    23→      --accent: #0a0a0a;
+    24→
+    25→      --color-chong: #e06b66;
+    26→      --bg-chong: #f7efee;
+    27→      --color-wen: #5b9bc4;
+    28→      --bg-wen: #eef3f7;
+    29→      --color-bao: #9cb85e;
+    30→      --bg-bao: #f1f4ea;
+    31→
+    32→      --r-lg: 28px;
+    33→      --r-md: 20px;
+    34→      --r-sm: 14px;
+    35→      --r-xs: 10px;
+    36→
+    37→      --glass-bg: rgba(255, 255, 255, 0.72);
+    38→      --glass-bg-strong: rgba(255, 255, 255, 0.88);
+    39→      --glass-border: rgba(15, 15, 18, 0.06);
+    40→      --glass-hi: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    41→      --glass-shadow: 0 1px 2px rgba(15, 15, 18, 0.03), 0 8px 24px -14px rgba(15, 15, 18, 0.08);
+    42→      --card-shadow: 0 1px 2px rgba(15, 15, 18, 0.03), 0 12px 32px -20px rgba(15, 15, 18, 0.08);
+    43→      --card-shadow-hover: 0 24px 60px -28px rgba(15, 15, 18, 0.18);
+    44→
+    45→      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'MiSans',
+    46→                   'HarmonyOS Sans SC', 'Source Han Sans SC', 'Noto Sans CJK SC',
+    47→                   'Microsoft YaHei UI', sans-serif;
+    48→      --font-serif: 'Inter', 'Helvetica Neue', 'Songti SC', 'Source Han Serif SC',
+    49→                    'Noto Serif SC', 'Noto Serif CJK SC', 'STSong', serif;
+    50→    }
+    51→
+    52→    body {
+    53→      font-family: var(--font-sans);
+    54→      font-feature-settings: 'cv11', 'ss01', 'ss03', 'tnum';
+    55→      -webkit-font-smoothing: antialiased;
+    56→      -moz-osx-font-smoothing: grayscale;
+    57→      background: var(--bg);
+    58→      color: var(--text);
+    59→      line-height: 1.75;
+    60→      font-size: 15px;
+    61→      letter-spacing: 0.01em;
+    62→      text-rendering: optimizeLegibility;
+    63→      min-height: 100vh;
+    64→    }
+    65→
+    66→    .num, .stat-box .count, .prob-val, .pill .v, .profile-item .value,
+    67→    .majors-table td, .stat-box .count {
+    68→      font-variant-numeric: tabular-nums;
+    69→    }
+    70→
+    71→    .container {
+    72→      max-width: 1080px;
+    73→      margin: 0 auto;
+    74→      padding: 32px 28px 120px;
+    75→    }
+    76→
+    77→    /* ===================== HERO ===================== */
+    78→    .hero-section { margin-bottom: 36px; }
+    79→
+    80→    .brand-bar {
+    81→      margin-bottom: 24px;
+    82→    }
+    83→    .brand-bar a {
+    84→      display: inline-flex;
+    85→      align-items: center;
+    86→      text-decoration: none;
+    87→      transition: opacity 0.2s;
+    88→    }
+    89→    .brand-bar a:hover { opacity: 0.7; }
+    90→    .brand-logo {
+    91→      height: 32px;
+    92→      width: auto;
+    93→      display: block;
+    94→    }
+    95→
+    96→    .hero-header {
+    97→      display: flex;
+    98→      justify-content: space-between;
+    99→      align-items: flex-end;
+   100→      gap: 24px;
+   101→      margin-bottom: 28px;
+   102→    }
+   103→    .hero-header h1 {
+   104→      font-family: var(--font-serif);
+   105→      font-size: 40px;
+   106→      font-weight: 600;
+   107→      letter-spacing: 0.02em;
+   108→      line-height: 1.2;
+   109→      color: var(--text);
+   110→    }
+   111→    .hero-header .meta-time {
+   112→      color: var(--text-mute);
+   113→      font-size: 13px;
+   114→      font-weight: 500;
+   115→      letter-spacing: 0.02em;
+   116→      flex-shrink: 0;
+   117→      padding-bottom: 4px;
+   118→    }
+   119→
+   120→    .profile-grid {
+   121→      display: grid;
+   122→      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+   123→      gap: 0;
+   124→      background: var(--card);
+   125→      padding: 14px 32px;
+   126→      border: 1px solid var(--border);
+   127→      border-radius: var(--r-lg);
+   128→      margin-top: 50px;
+   129→      margin-bottom: 30px;
+   130→      box-shadow: var(--card-shadow);
+   131→    }
+   132→    .profile-item {
+   133→      display: flex;
+   134→      flex-direction: column;
+   135→      gap: 2px;
+   136→      padding: 2px 18px;
+   137→      position: relative;
+   138→    }
+   139→    .profile-item:first-child { padding-left: 0; }
+   140→    .profile-item:not(:last-child)::after {
+   141→      content: '';
+   142→      position: absolute;
+   143→      right: 0;
+   144→      top: 10px;
+   145→      bottom: 10px;
+   146→      width: 1px;
+   147→      background: var(--border);
+   148→    }
+   149→    .profile-item .label {
+   150→      font-size: 11px;
+   151→      color: var(--text-faint);
+   152→      font-weight: 500;
+   153→      letter-spacing: 0.06em;
+   154→    }
+   155→    .profile-item .value {
+   156→      font-size: 15px;
+   157→      color: var(--text);
+   158→      font-weight: 600;
+   159→      letter-spacing: 0.01em;
+   160→    }
+   161→
+   162→    /* ===================== STATS NAV ===================== */
+   163→    .stats-container {
+   164→      display: flex;
+   165→      flex-wrap: wrap;
+   166→      gap: 12px;
+   167→      margin-bottom: 48px;
+   168→      position: relative;
+   169→      scroll-margin-top: 90px;
+   170→    }
+   171→    .stat-box {
+   172→      flex: 1;
+   173→      min-width: 120px;
+   174→      padding: 22px 24px;
+   175→      background: var(--card-dark, #0a0a0a);
+   176→      border: 1px solid rgba(255, 255, 255, 0.08);
+   177→      border-radius: var(--r-md);
+   178→      display: flex;
+   179→      flex-direction: column;
+   180→      gap: 10px;
+   181→      box-shadow: var(--card-shadow);
+   182→      text-decoration: none;
+   183→      color: #f5f5f5;
+   184→      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+   185→                  box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+   186→                  border-color 0.2s;
+   187→    }
+   188→    .stat-box.stat-link {
+   189→      cursor: pointer;
+   190→      user-select: none;
+   191→    }
+   192→    .stat-box.stat-link:hover {
+   193→      transform: translateY(-2px);
+   194→      box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.4);
+   195→      border-color: rgba(255, 255, 255, 0.18);
+   196→    }
+   197→    .stat-box.stat-link:active {
+   198→      transform: translateY(0);
+   199→    }
+   200→    .stat-box:focus-visible {
+   201→      outline: 2px solid rgba(255, 255, 255, 0.3);
+   202→      outline-offset: 2px;
+   203→    }
+   204→    .stat-box .count {
+   205→      font-family: 'Space Grotesk', 'Inter', sans-serif;
+   206→      font-size: 32px;
+   207→      font-weight: 700;
+   208→      letter-spacing: -0.03em;
+   209→      line-height: 1;
+   210→    }
+   211→    .stat-box .label {
+   212→      font-size: 13px;
+   213→      color: rgba(255, 255, 255, 0.55);
+   214→      font-weight: 500;
+   215→    }
+   216→
+   217→    /* ---- stat-box visualization elements ---- */
+   218→    .stat-top {
+   219→      display: flex;
+   220→      align-items: flex-start;
+   221→      justify-content: space-between;
+   222→      gap: 8px;
+   223→    }
+   224→    .stat-num-group {
+   225→      display: flex;
+   226→      flex-direction: column;
+   227→      gap: 6px;
+   228→    }
+   229→    .stat-ring {
+   230→      width: 44px;
+   231→      height: 44px;
+   232→      flex-shrink: 0;
+   233→    }
+   234→    .stat-ring .track {
+   235→      stroke: rgba(255, 255, 255, 0.1);
+   236→      fill: none;
+   237→    }
+   238→    .stat-ring .ring-fill {
+   239→      fill: none;
+   240→      stroke-linecap: round;
+   241→      stroke-dasharray: 100;
+   242→      stroke-dashoffset: 100;
+   243→      transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+   244→    }
+   245→    .stat-ring.animate .ring-fill {
+   246→      stroke-dashoffset: var(--target-offset, 0);
+   247→    }
+   248→    .stat-dist {
+   249→      display: flex;
+   250→      height: 5px;
+   251→      border-radius: 99px;
+   252→      overflow: hidden;
+   253→      gap: 2px;
+   254→    }
+   255→    .stat-dist .seg {
+   256→      border-radius: 99px;
+   257→      min-width: 3px;
+   258→      transition: opacity 0.2s;
+   259→    }
+   260→    .stat-box:hover .stat-dist .seg {
+   261→      opacity: 0.85;
+   262→    }
+   263→
+   264→    /* ===================== PAGE MODULE TITLE ===================== */
+   265→    .page-module-title {
+   266→      font-family: var(--font-serif);
+   267→      font-size: 26px;
+   268→      font-weight: 600;
+   269→      color: var(--text);
+   270→      margin: 56px 0 28px 0;
+   271→      letter-spacing: 0.03em;
+   272→      line-height: 1.3;
+   273→    }
+   274→    .page-module-title:first-of-type { margin-top: 0; }
+   275→
+   276→    /* ===================== ANALYSIS ===================== */
+   277→    .analysis-section {
+   278→      margin-bottom: 48px;
+   279→      scroll-margin-top: 90px;
+   280→    }
+   281→    .analysis-card {
+   282→      background: var(--card);
+   283→      border: 1px solid var(--border);
+   284→      border-radius: var(--r-lg);
+   285→      padding: 36px 40px;
+   286→      box-shadow: var(--card-shadow);
+   287→    }
+   288→    .analysis-card h3 {
+   289→      font-family: var(--font-serif);
+   290→      font-size: 18px;
+   291→      font-weight: 600;
+   292→      margin-top: 32px;
+   293→      margin-bottom: 14px;
+   294→      color: var(--text);
+   295→      letter-spacing: 0.02em;
+   296→      line-height: 1.4;
+   297→    }
+   298→    .analysis-card h3:first-of-type { margin-top: 0; }
+   299→    .analysis-card p {
+   300→      font-size: 15px;
+   301→      color: var(--text-secondary, #3d3b38);
+   302→      margin-bottom: 16px;
+   303→      line-height: 1.85;
+   304→      letter-spacing: 0.01em;
+   305→    }
+   306→    .analysis-card p strong { color: var(--text); font-weight: 600; }
+   307→    .analysis-card ul {
+   308→      margin-left: 0;
+   309→      margin-bottom: 18px;
+   310→      color: var(--text-secondary, #3d3b38);
+   311→      list-style: none;
+   312→    }
+   313→    .analysis-card li {
+   314→      margin-bottom: 14px;
+   315→      line-height: 1.8;
+   316→      padding-left: 0;
+   317→      position: relative;
+   318→      letter-spacing: 0.01em;
+   319→    }
+   320→    .analysis-card li::before {
+   321→      content: '';
+   322→    }
+   323→    .analysis-card li strong { color: var(--text); font-weight: 600; }
+   324→    .analysis-card em {
+   325→      font-style: normal;
+   326→      background: var(--bg-soft);
+   327→      padding: 3px 10px;
+   328→      border-radius: 999px;
+   329→      font-size: 12px;
+   330→      font-weight: 500;
+   331→      color: var(--text);
+   332→      letter-spacing: 0.04em;
+   333→    }
+   334→
+   335→    /* ===================== CATEGORY ===================== */
+   336→    .category-section {
+   337→      margin-bottom: 48px;
+   338→      scroll-margin-top: 90px;
+   339→    }
+   340→    .category-section:last-of-type { margin-bottom: 0; }
+   341→    .section-title {
+   342→      font-family: var(--font-serif);
+   343→      font-size: 20px;
+   344→      font-weight: 600;
+   345→      margin-bottom: 20px;
+   346→      display: flex;
+   347→      align-items: center;
+   348→      gap: 12px;
+   349→      letter-spacing: 0.03em;
+   350→      line-height: 1.35;
+   351→    }
+   352→    .section-title::before {
+   353→      content: '';
+   354→      display: block;
+   355→      width: 10px;
+   356→      height: 10px;
+   357→      border-radius: 50%;
+   358→    }
+   359→    .title-chong::before { background: var(--color-chong); }
+   360→    .title-wen::before { background: var(--color-wen); }
+   361→    .title-bao::before { background: var(--color-bao); }
+   362→
+   363→    /* ===================== SCHOOL CARD ===================== */
+   364→    .school-card {
+   365→      background: var(--card);
+   366→      border: 1px solid var(--border);
+   367→      border-radius: var(--r-lg);
+   368→      margin-bottom: 14px;
+   369→      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+   370→                  box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+   371→                  border-color 0.2s;
+   372→      overflow: hidden;
+   373→      box-shadow: var(--card-shadow);
+   374→    }
+   375→    .school-card:hover {
+   376→      transform: translateY(-2px);
+   377→      box-shadow: var(--card-shadow-hover);
+   378→      border-color: var(--border-strong);
+   379→    }
+   380→    .card-primary {
+   381→      padding: 28px 32px;
+   382→      display: flex;
+   383→      justify-content: space-between;
+   384→      align-items: flex-start;
+   385→      gap: 24px;
+   386→    }
+   387→    .school-info { flex: 1; min-width: 0; }
+   388→    .school-info h3 {
+   389→      font-family: var(--font-sans);
+   390→      font-size: 19px;
+   391→      font-weight: 600;
+   392→      margin-bottom: 8px;
+   393→      display: flex;
+   394→      align-items: center;
+   395→      flex-wrap: wrap;
+   396→      gap: 8px;
+   397→      letter-spacing: 0.01em;
+   398→      line-height: 1.35;
+   399→    }
+   400→    .school-info h3 .rec-school-btn {
+   401→      display: inline-flex;
+   402→      width: fit-content;
+   403→      margin-top: 0;
+   404→      margin-left: 0;
+   405→    }
+   406→    .tags-container {
+   407→      display: flex;
+   408→      flex-wrap: wrap;
+   409→      gap: 6px;
+   410→      margin-top: 14px;
+   411→    }
+   412→    .tag {
+   413→      padding: 4px 11px;
+   414→      font-size: 12px;
+   415→      font-weight: 500;
+   416→      background: var(--bg-soft);
+   417→      color: var(--text-mute);
+   418→      border-radius: 999px;
+   419→      letter-spacing: 0.04em;
+   420→    }
+   421→
+   422→    .rec-school-btn {
+   423→      display: inline-flex;
+   424→      align-items: center;
+   425→      gap: 4px;
+   426→      padding: 3px 10px;
+   427→      font-size: 12px;
+   428→      font-weight: 600;
+   429→      background: linear-gradient(180deg, #f7efee, #f0e4e2);
+   430→      color: #e06b66;
+   431→      border: 1px solid #ddc4c2;
+   432→      border-radius: 999px;
+   433→      cursor: pointer;
+   434→      transition: all 0.2s ease;
+   435→      vertical-align: middle;
+   436→      letter-spacing: 0.04em;
+   437→    }
+   438→    .rec-school-btn:hover {
+   439→      background: #f0e4e2;
+   440→      transform: translateY(-1px);
+   441→      box-shadow: 0 4px 12px -2px rgba(224, 107, 102, 0.18);
+   442→    }
+   443→
+   444→    .rec-major {
+   445→      display: inline-flex;
+   446→      align-items: center;
+   447→      gap: 4px;
+   448→      margin-left: 6px;
+   449→      padding: 3px 10px;
+   450→      font-size: 12px;
+   451→      background: linear-gradient(180deg, #f1f4ea, #e6ebd8);
+   452→      color: #9cb85e;
+   453→      border: 1px solid #cdd3b4;
+   454→      border-radius: 999px;
+   455→      cursor: pointer;
+   456→      font-weight: 600;
+   457→      vertical-align: middle;
+   458→      transition: all 0.2s ease;
+   459→    }
+   460→    .rec-major:hover {
+   461→      background: #e6ebd8;
+   462→      transform: translateY(-1px);
+   463→      box-shadow: 0 4px 12px -2px rgba(156, 184, 94, 0.18);
+   464→    }
+   465→
+   466→    /* ===================== PROB ===================== */
+   467→    .prob-container {
+   468→      text-align: right;
+   469→      min-width: 100px;
+   470→      flex-shrink: 0;
+   471→    }
+   472→    .prob-container .prob-val {
+   473→      font-family: 'Space Grotesk', 'Inter', sans-serif;
+   474→      font-size: 26px;
+   475→      font-weight: 700;
+   476→      letter-spacing: -0.03em;
+   477→      line-height: 1.1;
+   478→    }
+   479→    .prob-val.chong { color: var(--color-chong); }
+   480→    .prob-val.wen { color: var(--color-wen); }
+   481→    .prob-val.bao { color: var(--color-bao); }
+   482→    .prob-val.range { font-size: 36px; }
+   483→    .prob-val .pct { font-size: 0.55em; font-weight: 600; margin-left: 1px; }
+   484→    .prob-container .prob-label {
+   485→      font-size: 14px;
+   486→      color: var(--text-faint);
+   487→      font-weight: 500;
+   488→      letter-spacing: 0.06em;
+   489→      margin-top: 4px;
+   490→    }
+   491→
+   492→    /* ===================== DETAILS ===================== */
+   493→    details {
+   494→      border-top: 1px solid var(--border);
+   495→    }
+   496→    summary {
+   497→      list-style: none;
+   498→      padding: 16px 32px;
+   499→      background: var(--bg-soft);
+   500→      font-size: 13px;
+   501→      font-weight: 500;
+   502→      color: var(--text-mute);
+   503→      cursor: pointer;
+   504→      display: flex;
+   505→      align-items: center;
+   506→      transition: background 0.2s, color 0.2s;
+   507→      letter-spacing: 0.03em;
+   508→    }
+   509→    summary::-webkit-details-marker { display: none; }
+   510→    summary:hover {
+   511→      background: #ededeb;
+   512→      color: var(--text);
+   513→    }
+   514→    summary::before {
+   515→      content: '+';
+   516→      display: inline-block;
+   517→      width: 20px;
+   518→      font-size: 18px;
+   519→      font-weight: 400;
+   520→      line-height: 1;
+   521→      color: var(--text-faint);
+   522→    }
+   523→    details[open] summary::before { content: '−'; }
+   524→    details[open] summary {
+   525→      border-bottom: 1px solid var(--border);
+   526→      background: #ededeb;
+   527→      color: var(--text);
+   528→    }
+   529→    .card-secondary { padding: 24px 32px 28px; }
+   530→
+   531→    .majors-table {
+   532→      width: 100%;
+   533→      border-collapse: collapse;
+   534→      font-size: 14px;
+   535→    }
+   536→    .majors-table th {
+   537→      text-align: left;
+   538→      padding: 10px 14px;
+   539→      color: var(--text-faint);
+   540→      font-weight: 500;
+   541→      font-size: 12px;
+   542→      letter-spacing: 0.06em;
+   543→      border-bottom: 1px solid var(--border);
+   544→    }
+   545→    .majors-table td {
+   546→      padding: 14px;
+   547→      border-bottom: 1px solid var(--border);
+   548→      vertical-align: top;
+   549→      color: var(--text);
+   550→      letter-spacing: 0.01em;
+   551→      line-height: 1.6;
+   552→    }
+   553→    .majors-table tr:last-child td { border-bottom: none; }
+   554→    .majors-table tr:hover td { background: var(--bg-soft); }
+   555→    .major-name {
+   556→      font-weight: 600;
+   557→      margin-bottom: 4px;
+   558→      display: flex;
+   559→      align-items: center;
+   560→      flex-wrap: wrap;
+   561→      gap: 4px;
+   562→      letter-spacing: 0.01em;
+   563→    }
+   564→    .major-meta {
+   565→      font-size: 12px;
+   566→      color: var(--text-faint);
+   567→      font-weight: 400;
+   568→      letter-spacing: 0.02em;
+   569→    }
+   570→    .major-history {
+   571→      font-size: 14px;
+   572→      color: var(--text);
+   573→      margin-top: 0;
+   574→      line-height: 1.6;
+   575→      font-variant-numeric: tabular-nums;
+   576→      letter-spacing: 0.01em;
+   577→    }
+   578→    .major-history span {
+   579→      display: block;
+   580→    }
+   581→
+   582→    /* ===================== FOOTER ===================== */
+   583→    .footer-note {
+   584→      margin-top: 64px;
+   585→      padding-top: 28px;
+   586→      border-top: 1px solid var(--border);
+   587→      text-align: center;
+   588→      font-size: 13px;
+   589→      color: var(--text-faint);
+   590→      line-height: 1.8;
+   591→      letter-spacing: 0.02em;
+   592→    }
+   593→
+   594→    /* ===================== STICKY PROGRESS (bottom dock) ===================== */
+   595→    .sticky-progress {
+   596→      position: fixed;
+   597→      left: 50%;
+   598→      bottom: 24px;
+   599→      transform: translateX(-50%);
+   600→      width: max-content;
+   601→      max-width: calc(100vw - 32px);
+   602→      padding: 6px;
+   603→      background: rgba(12, 12, 14, 0.92);
+   604→      backdrop-filter: blur(24px) saturate(140%);
+   605→      -webkit-backdrop-filter: blur(24px) saturate(140%);
+   606→      border-radius: 999px;
+   607→      box-shadow:
+   608→        0 18px 40px -12px rgba(0, 0, 0, 0.35),
+   609→        inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+   610→      display: flex;
+   611→      align-items: center;
+   612→      gap: 2px;
+   613→      z-index: 50;
+   614→    }
+   615→    .sticky-progress .pill {
+   616→      display: inline-flex;
+   617→      align-items: baseline;
+   618→      gap: 6px;
+   619→      padding: 10px 16px;
+   620→      border-radius: 999px;
+   621→      border: 0;
+   622→      background: transparent;
+   623→      cursor: pointer;
+   624→      font-size: 13px;
+   625→      font-weight: 500;
+   626→      color: rgba(255, 255, 255, 0.55);
+   627→      transition: color 0.2s ease, background 0.25s ease;
+   628→      white-space: nowrap;
+   629→      user-select: none;
+   630→      font-family: inherit;
+   631→    }
+   632→    .sticky-progress .pill:hover {
+   633→      color: #ffffff;
+   634→    }
+   635→    .sticky-progress .pill.active {
+   636→      background: #ffffff;
+   637→      color: #0a0a0a;
+   638→    }
+   639→    .sticky-progress .pill .k {
+   640→      font-weight: 600;
+   641→      letter-spacing: 0;
+   642→    }
+   643→    .sticky-progress .pill .icon-top {
+   644→      display: block;
+   645→    }
+   646→    .sticky-progress .pill .v {
+   647→      font-weight: 700;
+   648→      letter-spacing: -0.02em;
+   649→      font-variant-numeric: tabular-nums;
+   650→    }
+   651→    .sticky-progress .pill.advice .v { color: rgba(255, 255, 255, 0.7); }
+   652→    .sticky-progress .pill.chong .v { color: var(--color-chong); }
+   653→    .sticky-progress .pill.wen .v { color: var(--color-wen); }
+   654→    .sticky-progress .pill.bao .v { color: var(--color-bao); }
+   655→    .sticky-progress .pill.active .v { color: #0a0a0a; }
+   656→    .sticky-progress .pill.active.advice .v,
+   657→    .sticky-progress .pill.active.chong .v,
+   658→    .sticky-progress .pill.active.wen .v,
+   659→    .sticky-progress .pill.active.bao .v { color: #0a0a0a; }
+   660→
+   661→    /* ===================== MODAL ===================== */
+   662→    dialog.rec-modal {
+   663→      border: none;
+   664→      border-radius: var(--r-lg);
+   665→      padding: 0;
+   666→      max-width: 540px;
+   667→      width: 92%;
+   668→      box-shadow: 0 24px 60px -20px rgba(15, 15, 18, 0.25);
+   669→      position: fixed;
+   670→      top: 50%;
+   671→      left: 50%;
+   672→      transform: translate(-50%, -50%);
+   673→      background: var(--card);
+   674→      color: var(--text);
+   675→      opacity: 0;
+   676→      transition: opacity 0.3s ease;
+   677→    }
+   678→    dialog.rec-modal[open] { opacity: 1; }
+   679→    dialog.rec-modal::backdrop {
+   680→      background: rgba(10, 10, 10, 0.45);
+   681→      backdrop-filter: blur(6px);
+   682→      -webkit-backdrop-filter: blur(6px);
+   683→    }
+   684→    .modal-header {
+   685→      display: flex;
+   686→      justify-content: space-between;
+   687→      align-items: center;
+   688→      padding: 22px 28px;
+   689→      border-bottom: 1px solid var(--border);
+   690→    }
+   691→    .modal-title {
+   692→      font-family: var(--font-sans);
+   693→      font-size: 17px;
+   694→      font-weight: 600;
+   695→      color: var(--text);
+   696→      letter-spacing: 0;
+   697→    }
+   698→    .modal-close {
+   699→      cursor: pointer;
+   700→      background: var(--bg-soft);
+   701→      border: none;
+   702→      width: 32px;
+   703→      height: 32px;
+   704→      border-radius: 50%;
+   705→      font-size: 18px;
+   706→      line-height: 1;
+   707→      color: var(--text-mute);
+   708→      transition: background 0.2s, color 0.2s;
+   709→      display: grid;
+   710→      place-items: center;
+   711→    }
+   712→    .modal-close:hover {
+   713→      background: #e8e8e6;
+   714→      color: var(--text);
+   715→    }
+   716→    .modal-body {
+   717→      padding: 28px;
+   718→      font-size: 15px;
+   719→      line-height: 1.8;
+   720→      color: var(--text-secondary, #3d3b38);
+   721→      letter-spacing: 0.01em;
+   722→    }
+   723→    .modal-body h4 {
+   724→      color: var(--text);
+   725→      margin-bottom: 14px;
+   726→      font-size: 15px;
+   727→      font-weight: 600;
+   728→      letter-spacing: 0.01em;
+   729→    }
+   730→    .modal-body ul {
+   731→      margin-left: 22px;
+   732→      margin-bottom: 16px;
+   733→      list-style: none;
+   734→    }
+   735→    .modal-body li {
+   736→      margin-bottom: 10px;
+   737→      margin-left: 10px;
+   738→      position: relative;
+   739→      padding-left: 4px;
+   740→      line-height: 1.75;
+   741→    }
+   742→    .modal-body li::before {
+   743→      content: '';
+   744→    }
+   745→    .modal-body li strong { color: var(--text); font-weight: 600; margin-left: 1px; }
+   746→
+   747→    /* ===================== RESPONSIVE ===================== */
+   748→    @media (max-width: 600px) {
+   749→      .container { padding: 24px 18px 100px; }
+   750→      .hero-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+   751→      .hero-header h1 { font-size: 30px; }
+   752→      .profile-grid {
+   753→        grid-template-columns: repeat(2, 1fr);
+   754→        gap: 16px 0;
+   755→        padding: 18px 20px;
+   756→      }
+   757→      .profile-item { padding: 0 14px; }
+   758→      .profile-item:nth-child(odd) { padding-left: 0; }
+   759→      .profile-item:nth-child(even) { padding-right: 0; }
+   760→      .profile-item:not(:last-child)::after { display: none; }
+   761→      .profile-item:nth-child(odd)::after {
+   762→        display: block;
+   763→        right: 0;
+   764→      }
+   765→      .card-primary { flex-direction: column; padding: 22px 22px; }
+   766→      .prob-container { text-align: left; }
+   767→      .stats-container { flex-wrap: wrap; }
+   768→      .stat-box { min-width: 45%; }
+   769→      .majors-table { display: block; overflow-x: auto; }
+   770→      .sticky-progress {
+   771→        bottom: 14px;
+   772→        border-radius: 999px;
+   773→        justify-content: space-between;
+   774→        gap: 2px;
+   775→        padding: 5px;
+   776→      }
+   777→      .sticky-progress .pill {
+   778→        flex: 1;
+   779→        justify-content: center;
+   780→        padding: 8px 6px;
+   781→      }
+   782→      .analysis-card { padding: 24px 22px; }
+   783→      .card-secondary { padding: 20px 18px; }
+   784→      .page-module-title { font-size: 22px; }
+   785→    }
+   786→
+   787→    @media (prefers-reduced-motion: reduce) {
+   788→      *, *::before, *::after {
+   789→        animation-duration: 0.01ms !important;
+   790→        transition-duration: 0.01ms !important;
+   791→      }
+   792→    }
+   793→  </style>
+   794→</head>
+   795→
+   796→<body>
+   797→  <div class="container">
+   798→    <header class="hero-section">
+   799→      <div class="brand-bar">
+   800→        <a href="https://agentmore.chatglm.cn/" target="_blank" rel="noopener">
+   801→          <img src="https://sfile.chatglm.cn/workspace/image/ee/eefb29159a.png" alt="清言 · AgentMore" class="brand-logo" />
+   802→        </a>
+   803→      </div>
+   804→      <div class="hero-header">
+   805→        <h1><a href="https://agentmore.chatglm.cn/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">{{ title }}</a></h1>
+   806→        <div class="meta-time">{{ generated_at }} · 智能算法生成</div>
+   807→      </div>
+   808→
+   809→      <div class="profile-grid">
+   810→        <div class="profile-item"><span class="label">省份</span><span class="value">{{ profile.province or '—' }}</span></div>
+   811→        <div class="profile-item"><span class="label">选科</span><span class="value">{{ subjects_display }}</span></div>
+   812→        <div class="profile-item"><span class="label">成绩</span><span class="value">{{ score_display }}</span></div>
+   813→        <div class="profile-item"><span class="label">批次</span><span class="value">{{ profile.batch or '—' }}</span></div>
+   814→        <div class="profile-item"><span class="label">志愿类型</span><span class="value">{{ volunteer_type_label }}</span></div>
+   815→        <div class="profile-item"><span class="label">调剂</span><span class="value">{{ is_adjust_label }}</span></div>
+   816→      </div>
+   817→
+   818→      <div class="stats-container stats-nav" id="statsNav">
+   819→        <a class="stat-box stat-link" href="#top" aria-label="回到顶部概览">
+   820→          <div class="stat-top">
+   821→            <div class="stat-num-group">
+   822→              <span class="count" style="color:#ffffff">{{ stats.total }}</span>
+   823→              <span class="label">推荐志愿</span>
+   824→            </div>
+   825→          </div>
+   826→          <div class="stat-dist" title="冲 {{ stats.chong }} · 稳 {{ stats.wen }} · 保 {{ stats.bao }}">
+   827→            <span class="seg" style="background:var(--color-chong); flex:{{ stats.chong or 1 }}"></span>
+   828→            <span class="seg" style="background:var(--color-wen); flex:{{ stats.wen or 1 }}"></span>
+   829→            <span class="seg" style="background:var(--color-bao); flex:{{ stats.bao or 1 }}"></span>
+   830→          </div>
+   831→        </a>
+   832→
+   833→        <a class="stat-box stat-link" href="#section-chong" aria-label="跳到冲档志愿">
+   834→          <div class="stat-top">
+   835→            <div class="stat-num-group">
+   836→              <span class="count" style="color:var(--color-chong)">{{ stats.chong }}</span>
+   837→              <span class="label">冲档</span>
+   838→            </div>
+   839→            <svg class="stat-ring" viewBox="0 0 36 36">
+   840→              <circle class="track" cx="18" cy="18" r="15.9" stroke-width="3"/>
+   841→              <circle class="ring-fill" cx="18" cy="18" r="15.9" stroke="var(--color-chong)" stroke-width="3"
+   842→                stroke-dasharray="100" stroke-dashoffset="100" data-pct="{{ stat_pcts.chong }}" transform="rotate(-90 18 18)"/>
+   843→            </svg>
+   844→          </div>
+   845→        </a>
+   846→        <a class="stat-box stat-link" href="#section-wen" aria-label="跳到稳档志愿">
+   847→          <div class="stat-top">
+   848→            <div class="stat-num-group">
+   849→              <span class="count" style="color:var(--color-wen)">{{ stats.wen }}</span>
+   850→              <span class="label">稳档</span>
+   851→            </div>
+   852→            <svg class="stat-ring" viewBox="0 0 36 36">
+   853→              <circle class="track" cx="18" cy="18" r="15.9" stroke-width="3"/>
+   854→              <circle class="ring-fill" cx="18" cy="18" r="15.9" stroke="var(--color-wen)" stroke-width="3"
+   855→                stroke-dasharray="100" stroke-dashoffset="100" data-pct="{{ stat_pcts.wen }}" transform="rotate(-90 18 18)"/>
+   856→            </svg>
+   857→          </div>
+   858→        </a>
+   859→        <a class="stat-box stat-link" href="#section-bao" aria-label="跳到保档志愿">
+   860→          <div class="stat-top">
+   861→            <div class="stat-num-group">
+   862→              <span class="count" style="color:var(--color-bao)">{{ stats.bao }}</span>
+   863→              <span class="label">保档</span>
+   864→            </div>
+   865→            <svg class="stat-ring" viewBox="0 0 36 36">
+   866→              <circle class="track" cx="18" cy="18" r="15.9" stroke-width="3"/>
+   867→              <circle class="ring-fill" cx="18" cy="18" r="15.9" stroke="var(--color-bao)" stroke-width="3"
+   868→                stroke-dasharray="100" stroke-dashoffset="100" data-pct="{{ stat_pcts.bao }}" transform="rotate(-90 18 18)"/>
+   869→            </svg>
+   870→          </div>
+   871→        </a>
+   872→      </div>
+   873→    </header>
+   874→
+   875→    <nav class="sticky-progress" id="stickyProgress" aria-label="快速定位导航">
+   876→      <button class="pill" data-target="#top" type="button" aria-label="回到顶部">
+   877→        <svg class="icon-top" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+   878→      </button>
+   879→      {% if has_analysis %}
+   880→      <button class="pill advice" data-target="#section-analysis" type="button" aria-label="跳到综合建议">
+   881→        <span class="k">综合建议</span>
+   882→      </button>
+   883→      {% endif %}
+   884→      <button class="pill chong" data-target="#section-chong" type="button" aria-label="跳到冲档志愿">
+   885→        <span class="k">冲</span><span class="v">{{ stats.chong }}</span>
+   886→      </button>
+   887→      <button class="pill wen" data-target="#section-wen" type="button" aria-label="跳到稳档志愿">
+   888→        <span class="k">稳</span><span class="v">{{ stats.wen }}</span>
+   889→      </button>
+   890→      <button class="pill bao" data-target="#section-bao" type="button" aria-label="跳到保档志愿">
+   891→        <span class="k">保</span><span class="v">{{ stats.bao }}</span>
+   892→      </button>
+   893→    </nav>
+   894→
+   895→    <main>
+   896→      {% if has_analysis %}
+   897→      <h2 class="page-module-title">一、 综合测评与建议</h2>
+   898→      <section class="analysis-section" id="section-analysis" data-tier="建议">
+   899→        <div class="analysis-card">
+   900→          <p>{{ analysis.intro | safe }}</p>
+   901→          <h3>1. 核心定位与策略</h3>
+   902→          <p>{{ analysis.strategy | safe }}</p>
+   903→          <h3>2. 推荐专业方向解析</h3>
+   904→          <ul>
+   905→            {% for d in analysis.major_directions %}
+   906→            <li><strong>{{ d.icon }} {{ d.title }}</strong><br>{{ d.description | safe }}</li>
+   907→            {% endfor %}
+   908→          </ul>
+   909→          <h3>3. 院校梯度布局建议</h3>
+   910→          <p>{{ analysis.school_strategy | safe }}</p>
+   911→        </div>
+   912→      </section>
+   913→      {% endif %}
+   914→
+   915→      <h2 class="page-module-title">{% if has_analysis %}二、 {% endif %}具体志愿推荐列表</h2>
+   916→
+   917→      {% for section in sections %}
+   918→      <section
+   919→        class="category-section"
+   920→        id="{% if section.label == '冲' %}section-chong{% elif section.label == '稳' %}section-wen{% elif section.label == '保' %}section-bao{% else %}section-{{ section.label }}{% endif %}"
+   921→        data-tier="{{ section.label }}"
+   922→      >
+   923→        <h2 class="section-title {{ section.title_class }}">{{ section.label }}档志愿 ({{ section.count }}所)</h2>
+   924→
+   925→        {% for uni in section.universities %}
+   926→        <article class="school-card">
+   927→          <div class="card-primary">
+   928→            <div class="school-info">
+   929→              <h3>
+   930→                {{ uni.index }}. {{ uni.university_name }}
+   931→                {% if uni.group_subtitle %}<span class="group-id" style="font-weight:400;font-size:14px;color:var(--text-mute)">{{ uni.group_subtitle }}</span>{% endif %}
+   932→                {% if uni.rec_id %}
+   933→                <span class="rec-school-btn" data-rec-id="{{ uni.rec_id }}">👍🏻 推荐学校</span>
+   934→                {% endif %}
+   935→              </h3>
+   936→              {% if uni.tag_list %}
+   937→              <div class="tags-container">
+   938→                {% for tag in uni.tag_list %}<span class="tag">{{ tag }}</span>{% endfor %}
+   939→              </div>
+   940→              {% endif %}
+   941→            </div>
+   942→            {% if uni.prob_display %}
+   943→            <div class="prob-container">
+   944→              <div class="prob-val range {{ uni.type_css }}">{{ uni.prob_display | replace('%', '<span class="pct">%</span>') | safe }}</div>
+   945→              <div class="prob-label">{% if uni.prob_min != uni.prob_max %}预测录取率区间{% else %}预测录取率{% endif %}</div>
+   946→            </div>
+   947→            {% endif %}
+   948→          </div>
+   949→
+   950→          {% if uni.has_details %}
+   951→          <details>
+   952→            <summary>
+   953→              {% if uni.has_major_group %}
+   954→                {% if uni.group_count > 1 %}展开查看 {{ uni.group_count }} 个专业组的历年投档与专业详情{% else %}展开查看历年投档与专业详情{% endif %}
+   955→              {% else %}
+   956→                展开查看专业详情（{{ uni.flat_major_count }} 个专业）
+   957→              {% endif %}
+   958→            </summary>
+   959→            <div class="card-secondary">
+   960→              {% if not uni.has_major_group %}
+   961→              <table class="majors-table">
+   962→                <thead>
+   963→                  <tr>
+   964→                    <th>专业名称</th><th>选科要求</th><th>学制/学费</th><th>计划</th>
+   965→                    <th>历年投档（分/位次）</th><th>专业录取率</th>
+   966→                  </tr>
+   967→                </thead>
+   968→                <tbody>
+   969→                  {% for m in uni.flat_majors %}
+   970→                  <tr>
+   971→                    <td>
+   972→                      <div class="major-name">
+   973→                        {{ m.major_name }}
+   974→                        {% if m.rec_id %}<span class="rec-major" data-rec-id="{{ m.rec_id }}">🔥 推荐专业</span>{% endif %}
+   975→                      </div>
+   976→                      {% if m.major_code or m.major_class %}
+   977→                      <div class="major-meta">{% if m.major_code %}代码: {{ m.major_code }}{% endif %}{% if m.major_code and m.major_class %} | {% endif %}{% if m.major_class %}{{ m.major_class }}{% endif %}</div>
+   978→                      {% endif %}
+   979→                    </td>
+   980→                    <td>{{ m.claim or '不限' }}</td>
+   981→                    <td>{{ m.study_year or '—' }}年 / {{ m.study_cost_display }}</td>
+   982→                    <td>{{ m.plan_num or '—' }}</td>
+   983→                    <td>
+   984→                      {% if m.entry_score_history %}
+   985→                      <div class="major-history">
+   986→                        {% for h in m.entry_score_history[:2] %}<span>{{ h.year }}：{{ h.score }}/{{ h.rank }}</span>{% endfor %}
+   987→                      </div>
+   988→                      {% else %}—{% endif %}
+   989→                    </td>
+   990→                    <td>{% if m.enroll_probability is not none %}<strong>{{ m.enroll_probability }}%</strong>{% else %}—{% endif %}</td>
+   991→                  </tr>
+   992→                  {% endfor %}
+   993→                </tbody>
+   994→              </table>
+   995→              {% else %}
+   996→              {% for group in uni.groups %}
+   997→              {% if group.has_content %}
+   998→              <div class="major-group-block" style="margin-bottom:28px;padding-bottom:28px;border-bottom:1px dashed var(--border);">
+   999→                <div style="display:flex;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+  1000→                  <h4 style="font-size:15px;font-weight:600;">专业组 {{ group.major_group or '—' }}</h4>
+  1001→                  {% if group.enroll_probability is not none %}<span style="font-size:14px;color:var(--text-mute);">专业组录取率 <strong>{{ group.enroll_probability }}%</strong></span>{% endif %}
+  1002→                </div>
+  1003→                {% if group.score_history %}
+  1004→                <div style="display:flex;flex-wrap:wrap;gap:24px;margin-bottom:16px;font-size:13px;">
+  1005→                  {% for h in group.score_history %}
+  1006→                  <div><div style="color:var(--text-mute);">{{ h.year }}年投档</div><div style="font-weight:500;">{{ h.score }}分 / 位次{{ h.rank }} / 计划{{ h.plan_num }}</div></div>
+  1007→                  {% endfor %}
+  1008→                </div>
+  1009→                {% endif %}
+  1010→                {% if group.majors %}
+  1011→                <table class="majors-table">
+  1012→                  <thead>
+  1013→                    <tr><th>专业名称</th><th>选科要求</th><th>学制/学费</th><th>计划</th><th>专业录取率</th></tr>
+  1014→                  </thead>
+  1015→                  <tbody>
+  1016→                    {% for m in group.majors %}
+  1017→                    <tr>
+  1018→                      <td>
+  1019→                        <div class="major-name">
+  1020→                          {{ m.major_name }}
+  1021→                          {% if m.rec_id %}<span class="rec-major" data-rec-id="{{ m.rec_id }}">🔥 推荐专业</span>{% endif %}
+  1022→                        </div>
+  1023→                        {% if m.major_code or m.major_class %}<div class="major-meta">{% if m.major_code %}代码: {{ m.major_code }}{% endif %}{% if m.major_code and m.major_class %} | {% endif %}{% if m.major_class %}{{ m.major_class }}{% endif %}</div>{% endif %}
+  1024→                      </td>
+  1025→                      <td>{{ m.claim or '不限' }}</td>
+  1026→                      <td>{{ m.study_year or '—' }}年 / {{ m.study_cost_display }}</td>
+  1027→                      <td>{{ m.plan_num or '—' }}</td>
+  1028→                      <td>{% if m.enroll_probability is not none %}<strong>{{ m.enroll_probability }}%</strong>{% else %}—{% endif %}</td>
+  1029→                    </tr>
+  1030→                    {% endfor %}
+  1031→                  </tbody>
+  1032→                </table>
+  1033→                {% endif %}
+  1034→              </div>
+  1035→              {% endif %}
+  1036→              {% endfor %}
+  1037→              {% endif %}
+  1038→            </div>
+  1039→          </details>
+  1040→          {% endif %}
+  1041→        </article>
+  1042→        {% endfor %}
+  1043→      </section>
+  1044→      {% else %}
+  1045→      <p style="text-align:center;color:var(--text-mute);padding:48px;">暂无推荐院校数据</p>
+  1046→      {% endfor %}
+  1047→    </main>
+  1048→
+  1049→    <footer class="footer-note">
+  1050→      <p>录取概率说明：冲档通常 ≤30%；稳档约 50%–70%；保档 ≥80%。历年分数缺失时请优先参考录取概率与同位分。</p>
+  1051→      <p style="margin-top: 6px;">本报告基于智能算法生成仅供参考，最终填报请务必核对省教育考试院官方目录。</p>
+  1052→    </footer>
+  1053→  </div>
+  1054→
+  1055→  <dialog id="recModal" class="rec-modal" aria-labelledby="recModalTitle">
+  1056→    <div class="modal-header">
+  1057→      <div class="modal-title" id="recModalTitle">推荐详情</div>
+  1058→      <button class="modal-close" onclick="closeRecModal()" aria-label="关闭">&times;</button>
+  1059→    </div>
+  1060→    <div class="modal-body" id="recModalBody"></div>
+  1061→  </dialog>
+  1062→
+  1063→  <script>
+  1064→    window.REC_MODALS = {{ rec_modals_json | safe }};
+  1065→
+  1066→    function openRecModalById(recId) {
+  1067→      var data = window.REC_MODALS && window.REC_MODALS[recId];
+  1068→      if (!data) return;
+  1069→      var modal = document.getElementById('recModal');
+  1070→      document.getElementById('recModalTitle').innerText = data.title || '推荐详情';
+  1071→      document.getElementById('recModalBody').innerHTML = data.body || '';
+  1072→      modal.showModal();
+  1073→    }
+  1074→
+  1075→    function closeRecModal() {
+  1076→      document.getElementById('recModal').close();
+  1077→    }
+  1078→
+  1079→    document.getElementById('recModal').addEventListener('click', function(e) {
+  1080→      if (e.target === this) this.close();
+  1081→    });
+  1082→
+  1083→    document.addEventListener('click', function(e) {
+  1084→      var el = e.target.closest && e.target.closest('[data-rec-id]');
+  1085→      if (!el) return;
+  1086→      e.preventDefault();
+  1087→      openRecModalById(el.getAttribute('data-rec-id'));
+  1088→    });
+  1089→
+  1090→    (function () {
+  1091→      var sticky = document.getElementById('stickyProgress');
+  1092→      var statsNav = document.getElementById('statsNav');
+  1093→      if (!sticky || !statsNav) return;
+  1094→
+  1095→      function smoothScrollTo(selector) {
+  1096→        var el = document.querySelector(selector);
+  1097→        if (!el) return;
+  1098→        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  1099→      }
+  1100→
+  1101→      sticky.addEventListener('click', function (e) {
+  1102→        var btn = e.target.closest && e.target.closest('button[data-target]');
+  1103→        if (!btn) return;
+  1104→        e.preventDefault();
+  1105→        smoothScrollTo(btn.getAttribute('data-target'));
+  1106→      });
+  1107→
+  1108→      var navObserver = new IntersectionObserver(function (entries) {
+  1109→        entries.forEach(function (entry) {
+  1110→          if (entry.target !== statsNav) return;
+  1111→        });
+  1112→      }, { threshold: 0 });
+  1113→      navObserver.observe(statsNav);
+  1114→
+  1115→      // Animate stat rings on load
+  1116→      document.querySelectorAll('.stat-ring').forEach(function (svg) {
+  1117→        var fill = svg.querySelector('.ring-fill');
+  1118→        if (!fill) return;
+  1119→        var pct = parseFloat(fill.getAttribute('data-pct')) || 0;
+  1120→        var offset = 100 - Math.min(100, Math.max(0, pct));
+  1121→        svg.style.setProperty('--target-offset', offset);
+  1122→        requestAnimationFrame(function () {
+  1123→          setTimeout(function () { svg.classList.add('animate'); }, 100);
+  1124→        });
+  1125→      });
+  1126→
+  1127→      var tierSections = Array.prototype.slice.call(document.querySelectorAll('section[data-tier]'));
+  1128→      var tierToTarget = { {% if has_analysis %}'建议': '#section-analysis', {% endif %}'冲': '#section-chong', '稳': '#section-wen', '保': '#section-bao' };
+  1129→      var pills = Array.prototype.slice.call(sticky.querySelectorAll('button.pill'));
+  1130→
+  1131→      function setActive(target) {
+  1132→        pills.forEach(function (p) {
+  1133→          var t = p.getAttribute('data-target');
+  1134→          if (t === '#top') {
+  1135→            p.classList.remove('active');
+  1136→            return;
+  1137→          }
+  1138→          if (target && t === target) p.classList.add('active');
+  1139→          else p.classList.remove('active');
+  1140→        });
+  1141→      }
+  1142→
+  1143→      setActive(null);
+  1144→
+  1145→      var lastActive = null;
+  1146→      var ticking = false;
+  1147→      function getCurrentTierTarget() {
+  1148→        if (!tierSections.length) return null;
+  1149→        var y = window.scrollY || document.documentElement.scrollTop || 0;
+  1150→        var probe = y + 120;
+  1151→        var current = null;
+  1152→        for (var i = 0; i < tierSections.length; i++) {
+  1153→          var sec = tierSections[i];
+  1154→          var top = sec.getBoundingClientRect().top + y;
+  1155→          if (top <= probe) current = sec;
+  1156→          else break;
+  1157→        }
+  1158→        if (!current) return null;
+  1159→        var tier = current.getAttribute('data-tier');
+  1160→        return tierToTarget[tier] || null;
+  1161→      }
+  1162→      function onScroll() {
+  1163→        if (ticking) return;
+  1164→        ticking = true;
+  1165→        window.requestAnimationFrame(function () {
+  1166→          ticking = false;
+  1167→          var target = getCurrentTierTarget();
+  1168→          if (target !== lastActive) {
+  1169→            lastActive = target;
+  1170→            setActive(target);
+  1171→          }
+  1172→        });
+  1173→      }
+  1174→      window.addEventListener('scroll', onScroll, { passive: true });
+  1175→      window.addEventListener('resize', onScroll);
+  1176→      onScroll();
+  1177→
+  1178→      if (!document.getElementById('top')) {
+  1179→        var topAnchor = document.createElement('div');
+  1180→        topAnchor.id = 'top';
+  1181→        topAnchor.style.position = 'absolute';
+  1182→        topAnchor.style.top = '0';
+  1183→        topAnchor.style.left = '0';
+  1184→        document.body.prepend(topAnchor);
+  1185→      }
+  1186→    })();
+  1187→  </script>
+  1188→</body>
+  1189→</html>
+  1190→

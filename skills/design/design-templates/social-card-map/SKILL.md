@@ -1,6 +1,6 @@
 ---
 name: social-card-map
-description: 地图 / 行程 / 路线主导的社交卡 — 路线 + 3 个停靠点 / 邻里地图 + 推荐标签 / 一日行程 + 简化路径 / 地点卡 + 迷你地图 + 旅行笔记 / 两区两路线对比。地理必须激进简化，只标必要地点，给清晰路径层级，配 city/date/duration/walking-driving 上下文。触发："做个旅行路线卡 / 行程图卡 / 邻里地图卡 / 周末散步路线 / 城市指南"。NOT 真实地图数据虚构，NOT 地图当背景装饰。
+description: Map / itinerary / route-led social cards — route + 3 stops / neighborhood map + recommendation labels / one-day itinerary + simplified path / place card + mini map + travel notes / two-district two-route comparison. Geography must be aggressively simplified: label only necessary places, give a clear path hierarchy, and pair with city/date/duration/walking-driving context. Triggers: "make a travel route card / itinerary map card / neighborhood map card / weekend walk route / city guide". NOT fabricating real map data, NOT map-as-background decoration.
 visibility: public
 mode: template
 carrier: fixed-image
@@ -8,12 +8,12 @@ scenario: social-content
 pattern_source: pattern.html
 source_priority: skill-first
 triggers:
-  - "做个旅行路线卡"
-  - "行程图卡"
-  - "邻里地图卡"
-  - "周末散步路线"
-  - "城市指南卡"
-  - "地图打卡卡"
+  - "make a travel route card"
+  - "itinerary map card"
+  - "neighborhood map card"
+  - "weekend walk route"
+  - "city guide card"
+  - "map check-in card"
 related_patterns: social-card-editorial
 ---
 

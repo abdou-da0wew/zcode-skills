@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>春日松弛感生活提案 · 小红书封面</title>
+<title>Soft Spring Life Proposal · Rednote Cover</title>
 <style>
   :root {
-    --mint: #cfe1cd;          /* 顶部薄荷 */
-    --mint-soft: #e3edd9;     /* 中部柔薄荷 */
-    --cream: #f1ebd9;         /* 底部奶油 */
-    --grass: #8ab28a;         /* 草绿 */
-    --ink: #2d4a3e;           /* 深墨绿 */
-    --ink-soft: #557565;      /* 灰墨绿 */
+    --mint: #cfe1cd;          /* top mint */
+    --mint-soft: #e3edd9;     /* mid soft mint */
+    --cream: #f1ebd9;         /* bottom cream */
+    --grass: #8ab28a;         /* grass green */
+    --ink: #2d4a3e;           /* deep ink green */
+    --ink-soft: #557565;      /* grey ink green */
     --line: #b8cdb5;
   }
 
@@ -30,7 +30,7 @@
     padding: 40px 0;
   }
 
-  /* ===== 画布 1242×1660 ===== */
+  /* ===== Canvas 1242×1660 ===== */
   .cover {
     width: 1242px;
     height: 1660px;
@@ -40,7 +40,7 @@
     box-shadow: 0 30px 80px rgba(0,0,0,.4);
   }
 
-  /* 顶部薄荷绿渐变天空 */
+  /* Top mint-green gradient sky */
   .sky {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -52,7 +52,7 @@
     z-index: 0;
   }
 
-  /* 顶部条:左上日期 + 右上品牌 */
+  /* Top bar: date top-left + brand top-right */
   .top-bar {
     position: absolute;
     top: 60px;
@@ -91,7 +91,7 @@
     color: var(--ink-soft);
   }
 
-  /* 英文大标题 */
+  /* English display title */
   .eng-title {
     position: absolute;
     top: 130px;
@@ -110,7 +110,7 @@
   }
   .eng-title .l2 { display: block; margin-top: 6px; }
 
-  /* 中文大标题 */
+  /* CJK display title */
   .cn-title {
     position: absolute;
     top: 340px;
@@ -125,7 +125,7 @@
     color: var(--ink);
   }
 
-  /* ===== 中部:云朵 + 主图 ===== */
+  /* ===== Middle scene: clouds + hero photo ===== */
   .scene {
     position: absolute;
     top: 590px;
@@ -135,7 +135,7 @@
     overflow: hidden;
   }
 
-  /* SVG 云朵层(在主图之上,做"插画式"遮罩) */
+  /* SVG cloud layer (above the hero photo, as an illustration-style mask) */
   .clouds {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -145,14 +145,14 @@
   }
   .clouds svg { display: block; width: 100%; height: 100%; }
 
-  /* 主图:Pexels 春日草甸,带柔光滤镜 */
+  /* Hero photo: Pexels spring meadow, with a soft-light filter */
   .hero-img {
     position: absolute;
     bottom: 0; left: 0; right: 0;
     height: 520px;
     overflow: hidden;
     z-index: 2;
-    /* 顶部柔化:用 mask 让上沿和云朵区融合 */
+    /* Top softening: a mask blends the upper edge into the cloud zone */
     -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,.7) 18%, #000 35%, #000 100%);
             mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,.7) 18%, #000 35%, #000 100%);
   }
@@ -165,7 +165,7 @@
     display: block;
   }
 
-  /* 主图上的薄荷绿色彩叠加,让照片更接近插画调 */
+  /* Mint-green tint over the hero photo, pushing it toward an illustrated look */
   .hero-tint {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -178,7 +178,7 @@
     pointer-events: none;
   }
 
-  /* 草地装饰:底部一条小草丛剪影 */
+  /* Grass decoration: a tuft-of-grass silhouette strip along the bottom */
   .grass-deco {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -188,7 +188,7 @@
   }
   .grass-deco svg { display: block; width: 100%; height: 100%; }
 
-  /* Pexels 标注 */
+  /* Pexels credit */
   .photo-credit {
     position: absolute;
     right: 24px;
@@ -201,7 +201,7 @@
     text-shadow: 0 1px 3px rgba(0,0,0,.5);
   }
 
-  /* ===== 底部:提案块 ===== */
+  /* ===== Bottom: proposal block ===== */
   .proposals {
     position: absolute;
     top: 1255px;
@@ -239,7 +239,7 @@
     overflow: hidden;
   }
 
-  /* ===== 最底栏:日期 / 地点 / 品牌 ===== */
+  /* ===== Footer bar: date / location / brand ===== */
   .footer {
     position: absolute;
     bottom: 50px;
@@ -306,33 +306,33 @@
 
 <div class="cover">
 
-  <!-- 天空背景 -->
+  <!-- Sky background -->
   <div class="sky"></div>
 
-  <!-- 顶部条 -->
+  <!-- Top bar -->
   <div class="top-bar">
     <div class="date-eng">Apr. 2026</div>
     <div class="brand-cn">
-      <span class="line">春和景明</span>
-      <div class="sub">春日生活提案</div>
+      <span class="line">SPRING IN FULL BLOOM</span>
+      <div class="sub">Spring life proposal</div>
     </div>
   </div>
 
-  <!-- 英文标题 -->
+  <!-- English title -->
   <div class="eng-title">
     <span>Soft</span> <span class="spaced">S p r i n g</span>
     <span class="l2">&amp; Slow Days</span>
   </div>
 
-  <!-- 中文标题 -->
-  <div class="cn-title">春日松弛感<br>生活提案</div>
+  <!-- CJK title -->
+  <div class="cn-title">Spring, unhurried —<br>a life proposal</div>
 
-  <!-- 中部场景 -->
+  <!-- Middle scene -->
   <div class="scene">
-    <!-- 云朵 -->
+    <!-- Clouds -->
     <div class="clouds">
       <svg viewBox="0 0 1242 360" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- 三朵云 -->
+        <!-- Three clouds -->
         <g fill="#f1ebd9">
           <path d="M -40,200
                    C 60,120 180,110 240,160
@@ -349,20 +349,20 @@
                    C 920,140 1020,160 1080,220
                    L 1080,260 L 100,260 Z" opacity="0.5"/>
         </g>
-        <!-- 远山轮廓线 -->
+        <!-- Distant mountain contour line -->
         <path d="M 0,340 L 200,280 L 380,310 L 560,260 L 780,300 L 980,270 L 1242,320"
               stroke="#8ab28a" stroke-width="1.5" fill="none" opacity="0.55"/>
       </svg>
     </div>
 
-    <!-- 主图 -->
+    <!-- Hero photo -->
     <div class="hero-img">
       <img src="https://images.pexels.com/photos/32893151/pexels-photo-32893151.jpeg?auto=compress&cs=tinysrgb&w=1600"
            alt="dreamy meadow with spring wildflowers from Pexels">
     </div>
     <div class="hero-tint"></div>
 
-    <!-- 草地装饰 -->
+    <!-- Grass decoration -->
     <div class="grass-deco">
       <svg viewBox="0 0 1242 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <g stroke="#557565" stroke-width="1.6" fill="none" opacity="0.55" stroke-linecap="round">
@@ -402,34 +402,34 @@
     <div class="photo-credit">PHOTO · PEXELS / FARHAAN PARIMOO</div>
   </div>
 
-  <!-- 提案列表 -->
+  <!-- Proposal list -->
   <div class="proposals">
     <div class="prop">
-      <h4><span class="num">01</span>城市公园野餐</h4>
-      <p>带一块格子布、半盒草莓,<br>坐到云挪了又挪。</p>
+      <h4><span class="num">01</span>City park picnic</h4>
+      <p>Bring a checkered blanket and half a box of strawberries,<br>sit until the clouds drift and drift again.</p>
     </div>
     <div class="prop">
-      <h4><span class="num">02</span>周末山野徒步</h4>
-      <p>8 公里以内的小路,不打卡,<br>把节奏交还给身体。</p>
+      <h4><span class="num">02</span>Weekend trail hike</h4>
+      <p>Trails under 8 km, no check-ins,<br>hand the pace back to your body.</p>
     </div>
     <div class="prop">
-      <h4><span class="num">03</span>阳台花园种植</h4>
-      <p>从一盆薄荷开始,把"等待"<br>重新放回每一天。</p>
+      <h4><span class="num">03</span>Balcony garden planting</h4>
+      <p>Start with one pot of mint, and put "waiting"<br>back into every day.</p>
     </div>
     <div class="prop">
-      <h4><span class="num">04</span>樱花树下夜读</h4>
-      <p>一本薄薄的随笔,<br>读到天色变蓝,读到困。</p>
+      <h4><span class="num">04</span>Night reading under cherry blossoms</h4>
+      <p>A thin book of essays,<br>read until the sky turns blue and your eyes grow heavy.</p>
     </div>
   </div>
 
-  <!-- 底栏 -->
+  <!-- Footer bar -->
   <div class="footer">
     <div class="footer-left">
       <div class="date">4.04 — 5.20</div>
-      <div class="loc"><b>WHERE</b>城市 · 山野 · 阳台 · 任何有春风的地方</div>
+      <div class="loc"><b>WHERE</b>City · Hills · Balcony · Anywhere the spring wind reaches</div>
     </div>
     <div class="footer-right">
-      <div class="brand">慢 <span class="sep">·</span> 生 <span class="sep">·</span> 活</div>
+      <div class="brand">SLOW <span class="sep">·</span> SOFT <span class="sep">·</span> LIVING</div>
       <div class="tag">SLOW LIVING JOURNAL &nbsp;/&nbsp; VOL.04</div>
     </div>
   </div>

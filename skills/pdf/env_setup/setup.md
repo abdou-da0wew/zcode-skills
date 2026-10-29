@@ -54,7 +54,7 @@ Run the platform-appropriate setup script:
 | Browser | Chromium (via Playwright) | Headless rendering |
 | Optional | tectonic | LaTeX/Academic PDF compilation |
 | Optional | LibreOffice | Office-to-PDF conversion |
-| Font | CJK fonts (from CDN) | Chinese text in PDFs |
+| Font | CJK fonts (open-source, see Step 3) | Chinese text in PDFs |
 
 ### Manual Install by Platform
 
@@ -103,16 +103,17 @@ Alternative Windows package managers:
 
 ## Step 3: Font Installation
 
-Fonts are downloaded individually from CDN on first setup.
+Fonts are downloaded individually on first setup from an open, self-hostable font mirror.
 
-- **CDN base**: `https://z-cdn.chatglm.cn/office-skill/fonts/`
+- **Font mirror base**: `PDF_FONT_MIRROR_URL` environment variable (any static HTTP server hosting the font tree works; point it at a mirror you host yourself or build one from the official upstream releases listed below)
 - **Font list**: `env_setup/font_list.txt` (78 fonts, one relative path per line)
 - **Marker file**: `.office-skill-fonts-installed` in the user font directory prevents re-download
 - Special characters in filenames (e.g., `[`, `]`) are URL-encoded automatically by the setup script
+- All fonts are open-source (SIL OFL / GPL+FE / Apache) and fetched from their official upstream projects: Noto CJK (github.com/notofonts), LXGW WenKai (github.com/lxgw), DejaVu, GNU FreeFont, Liberation Fonts, Google Fonts
 
 The setup scripts read `font_list.txt`, check which fonts are already installed, and download only the missing ones. Each font is saved flat (filename only) to the user font directory.
 
-### CDN Directory Structure (78 fonts)
+### Font Mirror Directory Structure (78 fonts)
 
 | Directory | Count | Description |
 |-----------|-------|-------------|
@@ -139,11 +140,12 @@ The setup scripts read `font_list.txt`, check which fonts are already installed,
 
 ### Manual Font Installation
 
-If CDN is unreachable, download fonts manually. Example:
+If the default mirror is unreachable, download fonts manually from any mirror or the official upstream releases. Example:
 
 ```bash
+FONT_MIRROR="${PDF_FONT_MIRROR_URL:-https://your-mirror.example.com/fonts}"
 # Download a single font (use static-weight files, NOT variable fonts)
-curl -fSLO "https://z-cdn.chatglm.cn/office-skill/fonts/chinese/NotoSansSC-Regular.ttf"
+curl -fSLO "$FONT_MIRROR/chinese/NotoSansSC-Regular.ttf"
 # Copy to user font dir
 cp "NotoSansSC-Regular.ttf" ~/Library/Fonts/   # macOS
 ```
@@ -151,9 +153,10 @@ cp "NotoSansSC-Regular.ttf" ~/Library/Fonts/   # macOS
 Or download all fonts listed in `font_list.txt`:
 
 ```bash
+FONT_MIRROR="${PDF_FONT_MIRROR_URL:-https://your-mirror.example.com/fonts}"
 while read f; do
     encoded=$(echo "$f" | sed 's/\[/%5B/g; s/\]/%5D/g')
-    curl -fSLO "https://z-cdn.chatglm.cn/office-skill/fonts/$encoded"
+    curl -fSLO "$FONT_MIRROR/$encoded"
 done < env_setup/font_list.txt
 ```
 

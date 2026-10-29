@@ -1,12 +1,14 @@
 ---
 name: Video Generation
-description: Implement AI-powered video generation capabilities using the z-ai-web-dev-sdk. Use this skill when the user needs to generate videos from text prompts or images, create video content programmatically, or build applications that produce video outputs. Supports asynchronous task management with status polling and result retrieval.
+description: Implement AI-powered video generation capabilities using any OpenAI-compatible server with an async video task API. Use this skill when the user needs to generate videos from text prompts or images, create video content programmatically, or build applications that produce video outputs. Supports asynchronous task management with status polling and result retrieval. Works with any OpenAI-compatible LLM server (open-source or free), designed for the DiveeOI agent (OpenCode-based).
 license: MIT
 ---
 
 # Video Generation Skill
 
-This skill guides the implementation of video generation functionality using the z-ai-web-dev-sdk package, enabling AI models to create videos from text descriptions or images through asynchronous task processing.
+This skill guides the implementation of video generation functionality using plain OpenAI-compatible HTTP calls (no SDK, no extra dependencies), enabling AI models to create videos from text descriptions or images through asynchronous task processing.
+
+It works with any OpenAI-compatible server that exposes an async video generation route (open-source or free) — gateways fronting open-source video models (Wan 2.x, CogVideoX, HunyuanVideo) and hosted OpenAI-compatible APIs. Designed for the DiveeOI agent (OpenCode-based).
 
 ## Skills Path
 
@@ -20,160 +22,185 @@ This skill is located at the above path in your project.
 
 Video Generation allows you to build applications that can create video content from text prompts or images, with customizable parameters like resolution, frame rate, duration, and quality settings. The API uses an asynchronous task model where you create a task and poll for results.
 
-**IMPORTANT**: z-ai-web-dev-sdk MUST be used in backend code only. Never use it in client-side code.
+**IMPORTANT**: Keep your API key in backend code or environment variables only. Never hardcode credentials in client-side code.
 
 ## Prerequisites
 
-The z-ai-web-dev-sdk package is already installed. Import it as shown in the examples below.
+- Node.js 18+ (for the global `fetch` API) or any HTTP client
+- An OpenAI-compatible server exposing the async video task routes (see below)
+- No npm packages required — examples use built-in APIs only
+
+## Configuration (Environment Variables)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LLM_BASE_URL` | `http://localhost:11434/v1` | OpenAI-compatible base URL |
+| `LLM_API_KEY` | (empty) | API key sent as `Authorization: Bearer <key>`; leave empty for local servers |
+| `VIDEO_MODEL` | `wan2.1` | Video model name (server-dependent, e.g. `wan2.1`, `cogvideox`, `hunyuanvideo`) |
+
+### API Convention
+
+This skill uses the most common OpenAI-compatible async video convention (documented, env-configurable):
+
+- **Create task**: `POST {LLM_BASE_URL}/videos/generations`
+- **Poll status**: `GET {LLM_BASE_URL}/videos/generations/{task_id}`
+
+Task status values: `PROCESSING`, `SUCCESS`, `FAIL`.
+
+### Shared Client Helpers
+
+All examples below use these helpers (plain `fetch`, zero dependencies):
+
+```javascript
+const BASE_URL = process.env.LLM_BASE_URL ?? "http://localhost:11434/v1";
+const API_KEY = process.env.LLM_API_KEY ?? "";
+const VIDEO_MODEL = process.env.VIDEO_MODEL ?? "wan2.1";
+
+function authHeaders() {
+  return {
+    "Content-Type": "application/json",
+    ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+  };
+}
+
+async function createVideoTask(body) {
+  const res = await fetch(`${BASE_URL}/videos/generations`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ model: VIDEO_MODEL, ...body }),
+  });
+  if (!res.ok) throw new Error(`Video task creation failed (${res.status}): ${await res.text()}`);
+  return res.json();
+}
+
+async function queryVideoTask(taskId) {
+  const res = await fetch(`${BASE_URL}/videos/generations/${taskId}`, {
+    method: "GET",
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error(`Video task query failed (${res.status}): ${await res.text()}`);
+  return res.json();
+}
+```
 
 ## CLI Usage (For Simple Tasks)
 
-For simple video generation tasks, you can use the z-ai CLI instead of writing code. The CLI handles task creation and polling automatically, making it ideal for quick tests and simple automation.
+For simple video generation tasks, you can use `curl` instead of writing code. The CLI handles task creation and polling via shell loops, making it ideal for quick tests and simple automation.
 
 ### Basic Text-to-Video
 
 ```bash
-# Generate video with automatic polling
-z-ai video --prompt "A cat playing with a ball" --poll
+# Generate video: create the task
+TASK=$(curl -s "$LLM_BASE_URL/videos/generations" \
+  -H "Content-Type: application/json" \
+  ${LLM_API_KEY:+-H "Authorization: Bearer $LLM_API_KEY"} \
+  -d '{"model": "wan2.1", "prompt": "A cat playing with a ball", "quality": "speed", "size": "1920x1080", "fps": 30, "duration": 5}')
 
-# Using short options
-z-ai video -p "Beautiful landscape with mountains" --poll
+echo "$TASK" | jq -r '.id'
 ```
 
 ### Custom Quality and Settings
 
 ```bash
 # Quality mode (speed or quality)
-z-ai video -p "Ocean waves at sunset" --quality quality --poll
+curl -s "$LLM_BASE_URL/videos/generations" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "wan2.1", "prompt": "Ocean waves at sunset", "quality": "quality"}'
 
 # Custom resolution and FPS
-z-ai video \
-  -p "City timelapse" \
-  --size "1920x1080" \
-  --fps 60 \
-  --poll
+curl -s "$LLM_BASE_URL/videos/generations" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "wan2.1", "prompt": "City timelapse", "size": "1920x1080", "fps": 60}'
 
 # Custom duration (5 or 10 seconds)
-z-ai video -p "Fireworks display" --duration 10 --poll
+curl -s "$LLM_BASE_URL/videos/generations" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "wan2.1", "prompt": "Fireworks display", "duration": 10}'
 ```
 
 ### Image-to-Video
 
-**IMPORTANT**: For `image_url` parameter, it is **strongly recommended to use base64-encoded image data** instead of URLs. This approach is more reliable and avoids potential network issues or access restrictions.
+**IMPORTANT**: For the `image_url` field, it is **strongly recommended to use base64-encoded image data** instead of URLs. This approach is more reliable and avoids potential network issues or access restrictions.
 
 **Note**: Match the MIME type in the data URI to your actual image format (image/jpeg, image/png, image/webp, etc.) to avoid decoding issues.
 
 ```bash
 # Generate video from single image using base64 (RECOMMENDED)
-# Convert your image to base64 with correct MIME type
-
-# For PNG images
-IMAGE_BASE64=$(base64 -i image.png)
-z-ai video \
-  --image-url "data:image/png;base64,${IMAGE_BASE64}" \
-  --prompt "Make the scene come alive" \
-  --poll
-
-# For JPEG images
-IMAGE_BASE64=$(base64 -i photo.jpg)
-z-ai video \
-  --image-url "data:image/jpeg;base64,${IMAGE_BASE64}" \
-  --prompt "Make the scene come alive" \
-  --poll
-
-# For WebP images
-IMAGE_BASE64=$(base64 -i image.webp)
-z-ai video \
-  --image-url "data:image/webp;base64,${IMAGE_BASE64}" \
-  --prompt "Make the scene come alive" \
-  --poll
+IMAGE_BASE64=$(base64 -w0 image.png)
+curl -s "$LLM_BASE_URL/videos/generations" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "wan2.1", "image_url": "data:image/png;base64,'"$IMAGE_BASE64"'", "prompt": "Make the scene come alive"}'
 
 # Using URL (less recommended, may have reliability issues)
-z-ai video \
-  -i "https://example.com/photo.jpg" \
-  -p "Add motion to this scene" \
-  --poll
+curl -s "$LLM_BASE_URL/videos/generations" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "wan2.1", "image_url": "https://example.com/photo.jpg", "prompt": "Add motion to this scene"}'
 ```
 
 ### First-Last Frame Mode
 
-**IMPORTANT**: For best reliability, use base64-encoded images instead of URLs. Ensure the MIME type matches your actual image format.
+**IMPORTANT**: For best reliability, use base64-encoded images instead of URLs. Ensure the MIME type matches your actual image format. For two keyframes, pass both data URLs in an array.
 
 ```bash
 # Generate video between two frames using base64 (RECOMMENDED)
-# Make sure to use the correct MIME type for each image
-
-# Example with PNG images
-START_BASE64=$(base64 -i start.png)
-END_BASE64=$(base64 -i end.png)
-z-ai video \
-  --image-url "data:image/png;base64,${START_BASE64},data:image/png;base64,${END_BASE64}" \
-  --prompt "Smooth transition between frames" \
-  --poll
-
-# Example with JPEG images
-START_BASE64=$(base64 -i start.jpg)
-END_BASE64=$(base64 -i end.jpg)
-z-ai video \
-  --image-url "data:image/jpeg;base64,${START_BASE64},data:image/jpeg;base64,${END_BASE64}" \
-  --prompt "Smooth transition between frames" \
-  --poll
+START_BASE64=$(base64 -w0 start.png)
+END_BASE64=$(base64 -w0 end.png)
+curl -s "$LLM_BASE_URL/videos/generations" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "wan2.1", "image_url": ["data:image/png;base64,'"$START_BASE64"'", "data:image/png;base64,'"$END_BASE64"'"], "prompt": "Smooth transition between frames"}'
 
 # Using URLs (less recommended)
-z-ai video \
-  --image-url "https://example.com/start.png,https://example.com/end.png" \
-  --prompt "Smooth transition between frames" \
-  --poll
+curl -s "$LLM_BASE_URL/videos/generations" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "wan2.1", "image_url": ["https://example.com/start.png", "https://example.com/end.png"], "prompt": "Smooth transition between frames"}'
 ```
 
 ### With Audio Generation
 
 ```bash
-# Generate video with AI-generated audio effects
-z-ai video \
-  -p "Thunder storm approaching" \
-  --with-audio \
-  --poll
+# Generate video with AI-generated audio effects (server-dependent)
+curl -s "$LLM_BASE_URL/videos/generations" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "wan2.1", "prompt": "Thunder storm approaching", "with_audio": true}'
 ```
 
 ### Save Output
 
 ```bash
 # Save task result to JSON file
-z-ai video \
-  -p "Sunrise over mountains" \
-  --poll \
+curl -s "$LLM_BASE_URL/videos/generations" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "wan2.1", "prompt": "Sunrise over mountains"}' \
   -o video_result.json
 ```
 
 ### Custom Polling Parameters
 
 ```bash
-# Customize polling behavior
-z-ai video \
-  -p "Dancing robot" \
-  --poll \
-  --poll-interval 10 \
-  --max-polls 30
-
-# Create task without polling (get task ID)
-z-ai video -p "Abstract art animation" -o task.json
+# Poll a task from the shell (adjust interval/count as needed)
+TASK_ID="your-task-id-here"
+for i in $(seq 1 60); do
+  RESULT=$(curl -s "$LLM_BASE_URL/videos/generations/$TASK_ID" \
+    ${LLM_API_KEY:+-H "Authorization: Bearer $LLM_API_KEY"})
+  STATUS=$(echo "$RESULT" | jq -r '.task_status')
+  echo "Poll $i/60: $STATUS"
+  [ "$STATUS" != "PROCESSING" ] && break
+  sleep 5
+done
+echo "$RESULT" | jq .
 ```
 
 ### CLI Parameters
 
-- `--prompt, -p <text>`: Optional - Text description of the video
-- `--image-url, -i <data>`: Optional - **Preferably base64-encoded image data** (e.g., "data:image/png;base64,iVBORw..."). URLs are also supported but less recommended. For two images, use comma-separated values.
-- `--quality, -q <mode>`: Optional - Output mode: `speed` or `quality` (default: speed)
-- `--with-audio`: Optional - Generate AI audio effects (default: false)
-- `--size, -s <resolution>`: Optional - Video resolution (e.g., "1920x1080")
-- `--fps <rate>`: Optional - Frame rate: 30 or 60 (default: 30)
-- `--duration, -d <seconds>`: Optional - Duration: 5 or 10 seconds (default: 5)
-- `--model, -m <model>`: Optional - Model name to use
-- `--poll`: Optional - Auto-poll until task completes
-- `--poll-interval <seconds>`: Optional - Polling interval (default: 5)
-- `--max-polls <count>`: Optional - Maximum poll attempts (default: 60)
-- `--output, -o <path>`: Optional - Output file path (JSON format)
+- Request body fields (POST `/videos/generations`):
+  - `model`: Optional - Model name (default: `VIDEO_MODEL`)
+  - `prompt`: Optional - Text description of the video
+  - `image_url`: Optional - **Preferably base64-encoded image data** (e.g., "data:image/png;base64,iVBORw..."). URLs are also supported but less recommended. For two images, use an array of two strings.
+  - `quality`: Optional - Output mode: `speed` or `quality` (default: speed)
+  - `with_audio`: Optional - Generate AI audio effects (default: false)
+  - `size`: Optional - Video resolution (e.g., "1920x1080")
+  - `fps`: Optional - Frame rate: 30 or 60 (default: 30)
+  - `duration`: Optional - Duration: 5 or 10 seconds (default: 5)
 
 ### Supported Resolutions
 
@@ -188,22 +215,23 @@ z-ai video -p "Abstract art animation" -o task.json
 
 ### Checking Task Status Later
 
-If you create a task without `--poll`, you can check its status later:
+If you create a task without polling, you can check its status later:
 
 ```bash
-# Get the task ID from the initial response
-z-ai async-result --id "task-id-here" --poll
+# Get the task ID from the initial response, then poll
+curl -s "$LLM_BASE_URL/videos/generations/task-id-here" \
+  ${LLM_API_KEY:+-H "Authorization: Bearer $LLM_API_KEY"} | jq .
 ```
 
-### When to Use CLI vs SDK
+### When to Use CLI vs Code
 
-**Use CLI for:**
+**Use curl for:**
 - Quick video generation tests
 - Simple one-off video creation
 - Command-line automation scripts
 - Testing different prompts and settings
 
-**Use SDK for:**
+**Use code for:**
 - Batch video generation with custom logic
 - Integration with web applications
 - Custom task queue management
@@ -213,22 +241,18 @@ z-ai async-result --id "task-id-here" --poll
 
 Video generation follows a two-step asynchronous pattern:
 
-1. **Create Task**: Submit video generation request and receive a task ID
-2. **Poll Results**: Query the task status until completion and retrieve the video URL
+1. **Create Task**: `POST /videos/generations` — submit the request and receive a task ID
+2. **Poll Results**: `GET /videos/generations/{task_id}` — query the task status until completion and retrieve the video URL
 
 ## Basic Video Generation Implementation
 
 ### Simple Text-to-Video Generation
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-
 async function generateVideo(prompt) {
   try {
-    const zai = await ZAI.create();
-
     // Create video generation task
-    const task = await zai.video.generations.create({
+    const task = await createVideoTask({
       prompt: prompt,
       quality: 'speed', // 'speed' or 'quality'
       with_audio: false,
@@ -241,7 +265,7 @@ async function generateVideo(prompt) {
     console.log('Task Status:', task.task_status);
 
     // Poll for results
-    let result = await zai.async.result.query(task.id);
+    let result = await queryVideoTask(task.id);
     let pollCount = 0;
     const maxPolls = 60;
     const pollInterval = 5000; // 5 seconds
@@ -250,7 +274,7 @@ async function generateVideo(prompt) {
       pollCount++;
       console.log(`Polling ${pollCount}/${maxPolls}: Status is ${result.task_status}`);
       await new Promise(resolve => setTimeout(resolve, pollInterval));
-      result = await zai.async.result.query(task.id);
+      result = await queryVideoTask(task.id);
     }
 
     if (result.task_status === 'SUCCESS') {
@@ -278,12 +302,11 @@ console.log('Generated video:', videoUrl);
 
 ### Image-to-Video Generation
 
-**IMPORTANT**: The `image_url` parameter accepts both base64-encoded image data and URLs, but **base64 encoding is strongly recommended** for better reliability and to avoid network-related issues.
+**IMPORTANT**: The `image_url` field accepts both base64-encoded image data and URLs, but **base64 encoding is strongly recommended** for better reliability and to avoid network-related issues.
 
 **Critical**: Always match the MIME type in your base64 data URI to the actual image format to prevent decoding errors.
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 
@@ -302,15 +325,13 @@ function getMimeType(filePath) {
 }
 
 async function generateVideoFromImage(imagePath, prompt) {
-  const zai = await ZAI.create();
-
   // Method 1: Using base64-encoded image (RECOMMENDED)
   // Automatically detect MIME type from file extension
   const imageBuffer = fs.readFileSync(imagePath);
   const mimeType = getMimeType(imagePath);
   const base64Image = `data:${mimeType};base64,${imageBuffer.toString('base64')}`;
 
-  const task = await zai.video.generations.create({
+  const task = await createVideoTask({
     image_url: base64Image,  // Base64 data string with correct MIME type
     prompt: prompt,
     quality: 'quality',
@@ -323,9 +344,7 @@ async function generateVideoFromImage(imagePath, prompt) {
 
 // Method 2: Using URL (less recommended)
 async function generateVideoFromImageUrl(imageUrl, prompt) {
-  const zai = await ZAI.create();
-
-  const task = await zai.video.generations.create({
+  const task = await createVideoTask({
     image_url: imageUrl,  // URL string
     prompt: prompt,
     quality: 'quality',
@@ -358,7 +377,6 @@ const task3 = await generateVideoFromImage(
 **IMPORTANT**: For keyframe mode, base64-encoded images are **highly recommended** over URLs to ensure consistent and reliable video generation. Always use the correct MIME type for each image.
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 
@@ -377,20 +395,18 @@ function getMimeType(filePath) {
 }
 
 async function generateVideoWithKeyframes(startImagePath, endImagePath, prompt) {
-  const zai = await ZAI.create();
-
   // Method 1: Using base64-encoded images (RECOMMENDED)
   // Automatically detect MIME type for each image
   const startBuffer = fs.readFileSync(startImagePath);
   const endBuffer = fs.readFileSync(endImagePath);
-  
+
   const startMimeType = getMimeType(startImagePath);
   const endMimeType = getMimeType(endImagePath);
-  
+
   const startBase64 = `data:${startMimeType};base64,${startBuffer.toString('base64')}`;
   const endBase64 = `data:${endMimeType};base64,${endBuffer.toString('base64')}`;
 
-  const task = await zai.video.generations.create({
+  const task = await createVideoTask({
     image_url: [startBase64, endBase64],  // Array of base64 strings with correct MIME types
     prompt: prompt,
     quality: 'quality',
@@ -404,9 +420,7 @@ async function generateVideoWithKeyframes(startImagePath, endImagePath, prompt) 
 
 // Method 2: Using URLs (less recommended)
 async function generateVideoWithKeyframesUrl(startImageUrl, endImageUrl, prompt) {
-  const zai = await ZAI.create();
-
-  const task = await zai.video.generations.create({
+  const task = await createVideoTask({
     image_url: [startImageUrl, endImageUrl],  // Array of URL strings
     prompt: prompt,
     quality: 'quality',
@@ -437,12 +451,9 @@ const task2 = await generateVideoWithKeyframes(
 ### Query Task Status
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-
 async function checkTaskStatus(taskId) {
   try {
-    const zai = await ZAI.create();
-    const result = await zai.async.result.query(taskId);
+    const result = await queryVideoTask(taskId);
 
     console.log('Task Status:', result.task_status);
 
@@ -476,18 +487,14 @@ const status = await checkTaskStatus('your-task-id-here');
 ### Polling with Exponential Backoff
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-
 async function pollWithBackoff(taskId) {
-  const zai = await ZAI.create();
-  
   let pollInterval = 5000; // Start with 5 seconds
   const maxInterval = 30000; // Max 30 seconds
   const maxPolls = 40;
   let pollCount = 0;
 
   while (pollCount < maxPolls) {
-    const result = await zai.async.result.query(taskId);
+    const result = await queryVideoTask(taskId);
     pollCount++;
 
     if (result.task_status === 'SUCCESS') {
@@ -517,20 +524,14 @@ async function pollWithBackoff(taskId) {
 ### Video Generation Queue Manager
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-
 class VideoGenerationQueue {
   constructor() {
     this.tasks = new Map();
   }
 
-  async initialize() {
-    this.zai = await ZAI.create();
-  }
-
   async createVideo(params) {
-    const task = await this.zai.video.generations.create(params);
-    
+    const task = await createVideoTask(params);
+
     this.tasks.set(task.id, {
       taskId: task.id,
       status: task.task_status,
@@ -542,13 +543,13 @@ class VideoGenerationQueue {
   }
 
   async checkTask(taskId) {
-    const result = await this.zai.async.result.query(taskId);
-    
+    const result = await queryVideoTask(taskId);
+
     const taskInfo = this.tasks.get(taskId);
     if (taskInfo) {
       taskInfo.status = result.task_status;
       taskInfo.lastChecked = new Date();
-      
+
       if (result.task_status === 'SUCCESS') {
         taskInfo.videoUrl = result.video_result?.[0]?.url ||
                           result.video_url ||
@@ -563,12 +564,12 @@ class VideoGenerationQueue {
   async pollTask(taskId, options = {}) {
     const maxPolls = options.maxPolls || 60;
     const pollInterval = options.pollInterval || 5000;
-    
+
     let pollCount = 0;
 
     while (pollCount < maxPolls) {
       const result = await this.checkTask(taskId);
-      
+
       if (result.task_status === 'SUCCESS' || result.task_status === 'FAIL') {
         return result;
       }
@@ -591,7 +592,6 @@ class VideoGenerationQueue {
 
 // Usage
 const queue = new VideoGenerationQueue();
-await queue.initialize();
 
 const taskId = await queue.createVideo({
   prompt: 'A sunset over the ocean',
@@ -606,15 +606,12 @@ console.log('Video ready:', result.video_result?.[0]?.url);
 ### Batch Video Generation
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-
 async function generateMultipleVideos(prompts) {
-  const zai = await ZAI.create();
   const tasks = [];
 
   // Create all tasks
   for (const prompt of prompts) {
-    const task = await zai.video.generations.create({
+    const task = await createVideoTask({
       prompt: prompt,
       quality: 'speed',
       duration: 5
@@ -627,7 +624,7 @@ async function generateMultipleVideos(prompts) {
   // Poll all tasks
   const results = [];
   for (const task of tasks) {
-    const result = await pollTaskUntilComplete(zai, task.taskId);
+    const result = await pollTaskUntilComplete(task.taskId);
     results.push({
       prompt: task.prompt,
       taskId: task.taskId,
@@ -638,13 +635,13 @@ async function generateMultipleVideos(prompts) {
   return results;
 }
 
-async function pollTaskUntilComplete(zai, taskId) {
+async function pollTaskUntilComplete(taskId) {
   let pollCount = 0;
   const maxPolls = 60;
 
   while (pollCount < maxPolls) {
-    const result = await zai.async.result.query(taskId);
-    
+    const result = await queryVideoTask(taskId);
+
     if (result.task_status === 'SUCCESS') {
       return {
         success: true,
@@ -685,6 +682,7 @@ videos.forEach(video => {
 
 | Parameter | Type | Required | Description | Default |
 |-----------|------|----------|-------------|---------|
+| `model` | string | Optional | Video model name | `VIDEO_MODEL` |
 | `prompt` | string | Optional* | Text description of the video | - |
 | `image_url` | string \| string[] | Optional* | Image URL(s) for generation | - |
 | `quality` | string | Optional | Output mode: `'speed'` or `'quality'` | `'speed'` |
@@ -692,7 +690,6 @@ videos.forEach(video => {
 | `size` | string | Optional | Video resolution (e.g., `'1920x1080'`) | - |
 | `fps` | number | Optional | Frame rate: `30` or `60` | `30` |
 | `duration` | number | Optional | Duration in seconds: `5` or `10` | `5` |
-| `model` | string | Optional | Model name | - |
 
 *Note: At least one of `prompt` or `image_url` must be provided.
 
@@ -758,10 +755,10 @@ image_url: [
 
 ```javascript
 // Recommended polling implementation
-async function smartPoll(zai, taskId) {
+async function smartPoll(taskId) {
   // Check immediately (some tasks complete fast)
-  let result = await zai.async.result.query(taskId);
-  
+  let result = await queryVideoTask(taskId);
+
   if (result.task_status !== 'PROCESSING') {
     return result;
   }
@@ -769,16 +766,16 @@ async function smartPoll(zai, taskId) {
   // Start polling with reasonable intervals
   let interval = 5000; // 5 seconds
   let maxPolls = 60; // 5 minutes total
-  
+
   for (let i = 0; i < maxPolls; i++) {
     await new Promise(resolve => setTimeout(resolve, interval));
-    result = await zai.async.result.query(taskId);
-    
+    result = await queryVideoTask(taskId);
+
     if (result.task_status !== 'PROCESSING') {
       return result;
     }
   }
-  
+
   throw new Error('Task timeout');
 }
 ```
@@ -788,26 +785,24 @@ async function smartPoll(zai, taskId) {
 ```javascript
 async function safeVideoGeneration(params) {
   try {
-    const zai = await ZAI.create();
-    
     // Validate parameters
     if (!params.prompt && !params.image_url) {
       throw new Error('Either prompt or image_url is required');
     }
-    
-    const task = await zai.video.generations.create(params);
-    const result = await smartPoll(zai, task.id);
-    
+
+    const task = await createVideoTask(params);
+    const result = await smartPoll(task.id);
+
     if (result.task_status === 'SUCCESS') {
       const videoUrl = result.video_result?.[0]?.url ||
                       result.video_url ||
                       result.url ||
                       result.video;
-      
+
       if (!videoUrl) {
         throw new Error('Video URL not found in response');
       }
-      
+
       return {
         success: true,
         url: videoUrl,
@@ -832,7 +827,7 @@ async function safeVideoGeneration(params) {
 
 ### 3. Resource Management
 
-- Cache the ZAI instance for multiple video generations
+- Reuse HTTP connections for multiple video generations
 - Implement task ID storage for long-running operations
 - Clean up completed tasks from your tracking system
 - Implement timeout mechanisms to prevent infinite polling
@@ -841,7 +836,7 @@ async function safeVideoGeneration(params) {
 
 ```javascript
 // Fast generation for previews or high volume
-const quickVideo = await zai.video.generations.create({
+const quickVideo = await createVideoTask({
   prompt: 'A cat playing',
   quality: 'speed',
   duration: 5,
@@ -849,7 +844,7 @@ const quickVideo = await zai.video.generations.create({
 });
 
 // High quality for final production
-const qualityVideo = await zai.video.generations.create({
+const qualityVideo = await createVideoTask({
   prompt: 'A cat playing',
   quality: 'quality',
   duration: 10,
@@ -863,7 +858,7 @@ const qualityVideo = await zai.video.generations.create({
 - Validate all user inputs before creating tasks
 - Implement rate limiting for video generation endpoints
 - Store and validate task IDs securely
-- Never expose SDK credentials in client-side code
+- Never expose API keys in client-side code
 - Set reasonable timeouts for polling operations
 
 ## Common Use Cases
@@ -882,16 +877,9 @@ const qualityVideo = await zai.video.generations.create({
 
 ```javascript
 import express from 'express';
-import ZAI from 'z-ai-web-dev-sdk';
 
 const app = express();
 app.use(express.json());
-
-let zaiInstance;
-
-async function initZAI() {
-  zaiInstance = await ZAI.create();
-}
 
 // Create video generation task
 app.post('/api/video/create', async (req, res) => {
@@ -899,15 +887,15 @@ app.post('/api/video/create', async (req, res) => {
     const { prompt, image_url, quality, duration } = req.body;
 
     if (!prompt && !image_url) {
-      return res.status(400).json({ 
-        error: 'Either prompt or image_url is required' 
+      return res.status(400).json({
+        error: 'Either prompt or image_url is required'
       });
     }
 
     // Note: image_url should preferably be base64-encoded image data
     // Format: "data:image/jpeg;base64,..." or array of such strings
     // URLs are also supported but less recommended
-    const task = await zaiInstance.video.generations.create({
+    const task = await createVideoTask({
       prompt,
       image_url,  // Accepts base64 data or URL
       quality: quality || 'speed',
@@ -932,7 +920,7 @@ app.post('/api/video/create', async (req, res) => {
 app.get('/api/video/status/:taskId', async (req, res) => {
   try {
     const { taskId } = req.params;
-    const result = await zaiInstance.async.result.query(taskId);
+    const result = await queryVideoTask(taskId);
 
     const response = {
       taskId: taskId,
@@ -955,10 +943,8 @@ app.get('/api/video/status/:taskId', async (req, res) => {
   }
 });
 
-initZAI().then(() => {
-  app.listen(3000, () => {
-    console.log('Video generation API running on port 3000');
-  });
+app.listen(3000, () => {
+  console.log('Video generation API running on port 3000');
 });
 ```
 
@@ -966,14 +952,8 @@ initZAI().then(() => {
 
 ```javascript
 import WebSocket from 'ws';
-import ZAI from 'z-ai-web-dev-sdk';
 
 const wss = new WebSocket.Server({ port: 8080 });
-let zaiInstance;
-
-async function initZAI() {
-  zaiInstance = await ZAI.create();
-}
 
 wss.on('connection', (ws) => {
   ws.on('message', async (message) => {
@@ -982,8 +962,8 @@ wss.on('connection', (ws) => {
 
       if (data.action === 'generate') {
         // Create task
-        const task = await zaiInstance.video.generations.create(data.params);
-        
+        const task = await createVideoTask(data.params);
+
         ws.send(JSON.stringify({
           type: 'task_created',
           taskId: task.id
@@ -1006,8 +986,8 @@ async function pollAndNotify(ws, taskId) {
   const maxPolls = 60;
 
   while (pollCount < maxPolls) {
-    const result = await zaiInstance.async.result.query(taskId);
-    
+    const result = await queryVideoTask(taskId);
+
     ws.send(JSON.stringify({
       type: 'status_update',
       taskId: taskId,
@@ -1038,14 +1018,12 @@ async function pollAndNotify(ws, taskId) {
     await new Promise(resolve => setTimeout(resolve, 5000));
   }
 }
-
-initZAI();
 ```
 
 ## Troubleshooting
 
-**Issue**: "SDK must be used in backend"
-- **Solution**: Ensure z-ai-web-dev-sdk is only imported and used in server-side code
+**Issue**: "API key must be kept server-side"
+- **Solution**: Read `LLM_API_KEY` from environment variables and only use it in server-side code
 
 **Issue**: Task stays in PROCESSING status indefinitely
 - **Solution**: Implement proper timeout mechanisms and consider the video complexity and duration
@@ -1062,21 +1040,26 @@ initZAI();
 **Issue**: Polling timeout
 - **Solution**: Increase maxPolls value or pollInterval based on video duration and quality settings
 
+**Issue**: 404 on `/videos/generations`
+- **Solution**: Your server does not implement the async video task routes. Point `LLM_BASE_URL` at a gateway or video server that does
+
 ## Performance Tips
 
 1. **Use appropriate quality settings**: Choose 'speed' for quick results, 'quality' for final production
 2. **Start with shorter durations**: Test with 5-second videos before generating longer content
 3. **Implement intelligent polling**: Use exponential backoff to reduce API calls
-4. **Cache ZAI instance**: Reuse the same instance for multiple video generations
+4. **Reuse HTTP connections**: `fetch` with keep-alive reuses connections across polls
 5. **Parallel processing**: Create multiple tasks simultaneously and poll them independently
 6. **Monitor and log**: Track task completion times to optimize your polling strategy
 
 ## Remember
 
-- Always use z-ai-web-dev-sdk in backend code only
-- Video generation is asynchronous - always implement proper polling
+- Works with any OpenAI-compatible server exposing the async video task routes (gateways fronting Wan, CogVideoX, HunyuanVideo, ..., or hosted OpenAI-compatible APIs)
+- Designed for the DiveeOI agent (OpenCode-based)
+- Configuration via environment variables: `LLM_BASE_URL`, `LLM_API_KEY`, `VIDEO_MODEL`
+- Video generation is asynchronous - create via `POST /videos/generations`, poll via `GET /videos/generations/{task_id}`
 - Check multiple response fields for video URL to ensure compatibility
 - Implement timeouts to prevent infinite polling loops
 - Handle all three task statuses: PROCESSING, SUCCESS, and FAIL
 - Consider rate limits and implement appropriate delays between requests
-- The SDK is already installed - import as shown in examples
+- Keep your API key in server-side code only

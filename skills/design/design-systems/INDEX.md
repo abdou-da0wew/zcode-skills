@@ -37,9 +37,10 @@ Path: `SKILLS/design/design-systems/style-skills/`
 
 Available style skills:
 
-> **按风格气质选(用户说"清新/高级/科技/复古/温暖/极简"等模糊词而非点名系统时)**：
-> 读同目录 `index.json`，按每个条目的 `mood` / `formality` / `scheme` 标签匹配用户描述，
-> 选气质最接近的 style-skill。下面列表的一句话描述只是补充；`index.json` 的标签才是匹配主依据。
+> **Select by style temperament (when the user says vague words like "fresh / premium / techy / retro / warm / minimal" instead of naming a system)**:
+> Read the `index.json` in the same directory and match the user's description against each entry's
+> `mood` / `formality` / `scheme` tags, choosing the closest-temperament style skill. The one-line
+> descriptions in the list below are only supplementary; the `index.json` tags are the primary matching basis.
 
 - **agentic** — Path: `style-skills/agentic/`
 - **ant** — Path: `style-skills/ant/` — Ant Design / enterprise component-oriented UI; use when user explicitly asks for Ant Design or antd-like enterprise UI.

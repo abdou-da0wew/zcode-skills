@@ -1,9 +1,9 @@
 ---
 name: docx
 metadata:
-  author: Z.AI
+  author: DiveeOI
   version: "1.0"
-description: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. When GLM needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
+description: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. When the agent needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
 license: Proprietary. LICENSE.txt has complete terms
 ---
 
@@ -116,7 +116,7 @@ For Chinese font size table and common margins, see `references/common-rules.md`
 - [ ] PageBreak inside Paragraph
 - [ ] ShadingType uses CLEAR
 - [ ] Each numbered list uses unique `reference`
-- [ ] **⚠️ CRITICAL — Quotation marks in JS strings properly escaped.** Chinese curly quotes (`""` `''`) MUST use Unicode escapes (`\u201c` `\u201d` `\u2018` `\u2019`); straight quotes (`"` `'`) use `\"` `\'` or alternate delimiters. **This is the #1 most common code generation bug.** Chinese text frequently contains `""` for emphasis or proper nouns (e.g., "双11", "前低后高", "618") — every occurrence MUST be escaped. Failure to escape produces JS syntax errors that silently break document generation.
+- [ ] **⚠️ CRITICAL — Quotation marks in JS strings properly escaped.** Chinese curly quotes (`“”` `‘’`) MUST use Unicode escapes (`\u201c` `\u201d` `\u2018` `\u2019`); straight quotes (`"` `'`) use `\"` `\'` or alternate delimiters. **This is the #1 most common code generation bug.** Chinese text frequently contains curly quotes for emphasis or proper nouns (e.g., promotional event names like "Double 11", "618") — every occurrence MUST be escaped. Failure to escape produces JS syntax errors that silently break document generation.
 - [ ] ImageRun includes `type` parameter
 - [ ] Header/footer present (unless scene says otherwise)
 

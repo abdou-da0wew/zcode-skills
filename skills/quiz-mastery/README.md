@@ -1,93 +1,93 @@
 # Quiz Mastery Skill
 
-OpenClaw agent 的独立出题/复习/掌握度追踪引擎。
+A standalone question-generation / review / mastery-tracking engine for the DiveeOI agent (OpenCode-based).
 
 ## Features
 
-- **从学习资料出题**：把 PDF / Word / Markdown 等学习材料转成分级测验（L1/L2/L3）
-- **从题目文件导入练习**：解析已有题目文件，标准化后让用户答题
-- **答案评分**：自动评分 + 逐题反馈
-- **掌握度追踪**：跨三级难度记录用户进度
-- **薄弱知识点**：累计错误次数 ≥ 3 → 标为薄弱（**只增不减**，作为历史档案）
-- **遗忘曲线复习**：基于艾宾浩斯（1/2/4/7/15 天）安排复习
+- **Generate questions from study material**: turn PDF / Word / Markdown study material into leveled quizzes (L1/L2/L3)
+- **Import questions from a question file**: parse an existing question file, normalize it, and let the user practice
+- **Answer grading**: automatic grading + per-question feedback
+- **Mastery tracking**: records user progress across the three difficulty levels
+- **Weak knowledge points**: cumulative wrong count ≥ 3 → marked weak (**only grows, never shrinks**; kept as a historical archive)
+- **Forgetting-curve review**: schedules reviews based on the Ebbinghaus curve (1/2/4/7/15 days)
 
 ## Architecture
 
 ```
 quiz-mastery/
-├── SKILL.md                          # Skill metadata (LLM 读)
-├── README.md                         # 本文件（人读）
-├── skill.yaml                        # Skill 配置
+├── SKILL.md                          # Skill metadata (read by the LLM)
+├── README.md                         # this file (for humans)
+├── skill.yaml                        # Skill configuration
 ├── scripts/
-│   ├── generate_from_material.py     # 从学习资料提取知识点
-│   ├── import_quiz.py                # 从题目文件导入题目
-│   ├── run_quiz.py                   # 生成测验 prompt
-│   └── submit_answers.py             # 提交答案 + 评分
-├── src/quiz_mastery/                 # 核心引擎
+│   ├── generate_from_material.py     # Extract knowledge points from study material
+│   ├── import_quiz.py                # Import questions from a question file
+│   ├── run_quiz.py                   # Build the quiz-generation prompt
+│   └── submit_answers.py             # Submit answers + grading
+├── src/quiz_mastery/                 # Core engine
 └── data/
-    ├── knowledge_points/             # 文档知识点定义
-    ├── user_progress/                # 用户掌握度数据（含薄弱标记、艾宾浩斯阶段）
-    └── sessions/                     # 测验会话记录
+    ├── knowledge_points/             # Document knowledge point definitions
+    ├── user_progress/                # User mastery data (incl. weak flags, Ebbinghaus stages)
+    └── sessions/                     # Quiz session records
 ```
 
 ## Quick Start
 
-### 1. 从学习资料提取知识点
+### 1. Extract knowledge points from study material
 
 ```bash
 python3 scripts/generate_from_material.py <file_path> <document_id>
 ```
 
-输出知识点提取 prompt（JSON）。把 `prompts.system_prompt` 和 `prompts.user_prompt` 发给 LLM，得到知识点列表后调 `service.save_knowledge_points()` 保存。
+Outputs the knowledge-point extraction prompt (JSON). Send `prompts.system_prompt` and `prompts.user_prompt` to the LLM, then call `service.save_knowledge_points()` to save the resulting knowledge-point list.
 
-### 2. 从题目文件导入
+### 2. Import from a question file
 
 ```bash
 python3 scripts/import_quiz.py <file_path> <document_id> <user_id>
 ```
 
-输出题目解析 prompt（JSON）。把 prompt 发给 LLM 得到标准化题目，调 `service.import_questions()` 导入。
+Outputs the question-parsing prompt (JSON). Send the prompt to the LLM to get normalized questions, then call `service.import_questions()` to import them.
 
-### 3. 生成测验
+### 3. Generate a quiz
 
 ```bash
 python3 scripts/run_quiz.py <user_id> <document_id>
 ```
 
-按用户当前掌握度自动决定难度，输出出题 prompt（JSON）。
+Automatically decides difficulty from the user's current mastery and outputs the question-generation prompt (JSON).
 
-### 4. 提交答案
+### 4. Submit answers
 
 ```bash
 python3 scripts/submit_answers.py <user_id> <document_id> <session_id> '<answers_json>'
 ```
 
-返回：`score`、`total`、`accuracy`、逐题 `results`。
+Returns: `score`, `total`, `accuracy`, and per-question `results`.
 
-## 数据集成（与 OpenClaw agent 的关系）
+## Data Integration (relationship with the DiveeOI agent)
 
-本 skill **不写 `memory/`**，仅写 USER.md 第 3 节"薄弱知识点"。所有持久化由调用方 agent 统一负责，详见 SKILL.md。
+This skill **does not write to `memory/`**; it only writes to USER.md section 3, "Weak knowledge points". All other persistence is the responsibility of the calling agent — see SKILL.md for details.
 
-| 数据 | 谁写 | 写到哪 |
+| Data | Written by | Written where |
 |------|------|--------|
-| 知识点定义、答题战绩、艾宾浩斯阶段 | 本 skill | `data/` 目录 |
-| 薄弱知识点（错误次数 ≥ 3） | 本 skill | USER.md 第 3 节（来源=`quiz-mastery`） |
-| 学习项目状态、DAY 排期 | study-buddy（上游 agent） | USER.md 第 2 节 |
+| Knowledge point definitions, answer records, Ebbinghaus stages | this skill | `data/` directory |
+| Weak knowledge points (wrong count ≥ 3) | this skill | USER.md section 3 (source=`quiz-mastery`) |
+| Study project status, DAY schedule | study-buddy (upstream agent) | USER.md section 2 |
 
-## 难度系统
+## Difficulty System
 
-| 级别 | 含义 |
+| Level | Meaning |
 |------|------|
-| L1 | 识记（基础记忆和理解） |
-| L2 | 理解（深层理解、应用） |
-| L3 | 应用（综合运用、问题解决） |
+| L1 | Recall (basic memorization and understanding) |
+| L2 | Understand (deeper understanding, application) |
+| L3 | Apply (synthesis, problem solving) |
 
-- 首次出题强制 L1 起步
-- 答对升级（最高 L3），答错降级（最低 L1）
+- First quiz always starts at L1
+- Correct answers level up (max L3); wrong answers level down (min L1)
 
 ## Workflow
 
-1. **Generate / Import**：从学习资料或题目文件创建知识点 + 题目
-2. **Run**：生成测验
-3. **Submit**：用户答题 → 自动评分 → 更新掌握度 / 薄弱标记
-4. **Sync**：薄弱知识点写入 USER.md 第 3 节
+1. **Generate / Import**: create knowledge points + questions from study material or a question file
+2. **Run**: generate the quiz
+3. **Submit**: user answers → auto-grading → update mastery / weak flags
+4. **Sync**: weak knowledge points are written to USER.md section 3

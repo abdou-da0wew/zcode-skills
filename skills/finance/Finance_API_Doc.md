@@ -6,13 +6,13 @@ Finance API provides comprehensive financial data access interfaces, including r
 
 ### 🌐 Access via API Gateway
 
-**This API is accessed through the web-dev-ai-gateway unified proxy service.**
+**This API is accessed through a unified API gateway proxy service.**
 
 **Gateway Configuration:**
-- **Gateway Base URL:** `GATEWAY_URL` (e.g., `https://internal-api.z.ai`)
-- **API Path Prefix:** `API_PREFIX` (e.g., `/external/finance`)
-- **Authentication:** Automatic (gateway injects `x-rapidapi-host` and `x-rapidapi-key`)
-- **Required Header:** `X-Z-AI-From: Z`
+- **Gateway Base URL:** `GATEWAY_URL` environment variable (e.g., `https://your-gateway.example.com`)
+- **API Path Prefix:** `API_PREFIX` environment variable (e.g., `/external/finance`)
+- **Authentication:** handled by your gateway configuration (e.g., the gateway injects the upstream provider headers such as `x-rapidapi-host` and `x-rapidapi-key`)
+- **Additional headers:** include any extra headers your gateway requires (e.g. an API key or bearer token)
 
 **URL Structure:**
 ```
@@ -20,9 +20,9 @@ Finance API provides comprehensive financial data access interfaces, including r
 ```
 
 **Example:**
-- Full URL: `https://internal-api.z.ai/external/finance/v1/markets/search?search=Apple`
+- Full URL: `https://your-gateway.example.com/external/finance/v1/markets/search?search=Apple`
 - Breakdown:
-  - `https://internal-api.z.ai` - Gateway base URL (`GATEWAY_URL`)
+  - `https://your-gateway.example.com` - Gateway base URL (`GATEWAY_URL`)
   - `/external/finance` - API path prefix (`API_PREFIX`)
   - `/v1/markets/search` - API endpoint path
 
@@ -31,8 +31,7 @@ Finance API provides comprehensive financial data access interfaces, including r
 
 ```bash
 # Get real-time quote for Apple
-curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/quote?ticker=AAPL&type=STOCKS" \
-  -H "X-Z-AI-From: Z"
+curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/quote?ticker=AAPL&type=STOCKS"
 ```
 
 
@@ -49,8 +48,7 @@ curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/quote?ticker=AAPL&type=STOCKS"
 
 **curl example (via Gateway):**
 ```bash
-curl -X GET "{GATEWAY_URL}{API_PREFIX}/v2/markets/tickers?page=1&type=STOCKS" \
-  -H "X-Z-AI-From: Z"
+curl -X GET "{GATEWAY_URL}{API_PREFIX}/v2/markets/tickers?page=1&type=STOCKS"
 ```
 
 ---
@@ -62,8 +60,7 @@ curl -X GET "{GATEWAY_URL}{API_PREFIX}/v2/markets/tickers?page=1&type=STOCKS" \
 
 **curl example (via Gateway):**
 ```bash
-curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/search?search=Apple" \
-  -H "X-Z-AI-From: Z"
+curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/search?search=Apple"
 ```
 
 **Purpose:** Used to find specific stock or company ticker codes
@@ -81,8 +78,7 @@ curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/search?search=Apple" \
 
 **curl example (via Gateway):**
 ```bash
-curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/quote?ticker=AAPL&type=STOCKS" \
-  -H "X-Z-AI-From: Z"
+curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/quote?ticker=AAPL&type=STOCKS"
 ```
 
 ---
@@ -387,30 +383,26 @@ GET /v1/markets/stock/modules?ticker=AAPL&module=earnings
 ### 1. Batch Query Optimization
 ```bash
 # Get data for multiple stocks at once (snapshots endpoint) via Gateway
-curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/stock/quotes?ticker=AAPL,MSFT,GOOGL,AMZN,TSLA" \
-  -H "X-Z-AI-From: Z"
+curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/stock/quotes?ticker=AAPL,MSFT,GOOGL,AMZN,TSLA"
 ```
 
 ### 2. Time Range Query
 ```bash
 # Get historical data with specific interval via Gateway
-curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/stock/history?symbol=AAPL&interval=1d&diffandsplits=false" \
-  -H "X-Z-AI-From: Z"
+curl -X GET "{GATEWAY_URL}{API_PREFIX}/v1/markets/stock/history?symbol=AAPL&interval=1d&diffandsplits=false"
 ```
 
-### 3. Combined Query Example
 ### 3. Combined Query Example
 
 **Python example (via Gateway):**
 ```python
+import os
 import requests
 
-# Gateway automatically handles authentication
-headers = {
-    'X-Z-AI-From': 'Z'
-}
+# The gateway handles upstream authentication; add your own gateway auth here if required
+headers = {}
 
-gateway_url = '{GATEWAY_URL}{API_PREFIX}/v1'
+gateway_url = os.environ["GATEWAY_URL"] + os.environ["API_PREFIX"] + "/v1"
 symbol = 'AAPL'
 
 # Get real-time price
@@ -430,7 +422,7 @@ financials = requests.get(f'{gateway_url}/markets/stock/modules?ticker={symbol}&
 
 ### Gateway Usage
 
-1. **Authentication Header** - Always include `X-Z-AI-From: Z` header
+1. **Authentication** - Configure gateway credentials via environment variables (`GATEWAY_URL`, `API_PREFIX`, plus whatever auth headers your gateway requires); never hardcode secrets
 
 ### API Usage
 

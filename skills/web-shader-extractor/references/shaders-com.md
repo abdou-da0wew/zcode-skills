@@ -1,178 +1,178 @@
-# shaders.com 提取工作流
+# shaders.com Extraction Workflow
 
-shaders.com 是一个 shader 设计工具，使用 Nuxt.js + Three.js r183 TSL + Supabase。
+shaders.com is a shader design tool built on Nuxt.js + Three.js r183 TSL + Supabase.
 
-## 识别特征
+## Recognition Signatures
 
-- URL: `shaders.com/collection/{slug}/{presetId}` 或 `shaders.com/preset/{id}`
+- URL: `shaders.com/collection/{slug}/{presetId}` or `shaders.com/preset/{id}`
 - Canvas: `data-renderer="shaders"` + `data-engine="three.js r183"`
-- Nuxt.js (`_nuxt/` 路径)
-- Clerk 认证
-- Supabase 存储 (`data.shaders.com/storage/v1/`)
+- Nuxt.js (`_nuxt/` paths)
+- Clerk authentication
+- Supabase storage (`data.shaders.com/storage/v1/`)
 
-## 关键架构差异
+## Key Architectural Differences
 
-与 Unicorn Studio 完全不同：
-- **不使用 GLSL** — 使用 Three.js TSL (Three Shader Language) 节点系统
-- **87 种组件类型** — 每种有自己的 TSL `fragmentNode` 函数
-- **定义数据是 XOR + base64 编码的**
-- **组件可嵌套** — 树形结构（Glass 的 children 是其内部效果）
+Completely different from Unicorn Studio:
+- **No GLSL** — uses the Three.js TSL (Three Shading Language) node system
+- **87 component types** — each with its own TSL `fragmentNode` function
+- **Definition data is XOR + base64 encoded**
+- **Components can nest** — tree structure (Glass's children are its inner effects)
 
-## 数据获取
+## Data Fetching
 
-### API 端点
+### API endpoints
 
 ```bash
-# 集合变体（含编码定义）— 公开，无需认证
+# Collection variant (with encoded definitions) — public, no auth needed
 curl -s "https://shaders.com/api/collections/{slug}/{variantId}"
 
-# 预览 API（含编码定义 + 水印注入）
+# Preview API (encoded definitions + watermark injection)
 curl -s "https://shaders.com/api/preview/preset/{presetId}"
 
-# Nuxt payload（只含元数据，不含 shader 定义）
+# Nuxt payload (metadata only, no shader definitions)
 curl -s "https://shaders.com/collection/{slug}/{id}/_payload.json"
 ```
 
-### 定义解码
+### Definition decoding
 
-定义使用 XOR + base64 编码，有两套密钥：
+Definitions are XOR + base64 encoded, with two key sets:
 
-1. **网站 API**（`/api/collections/`）：
-   - 混淆密钥: `a5e7244ad0973f07e10285bfa75ddbe4`（来自 Nuxt runtime config）
-   - 组件/属性名用短代码（`C52`=Plasma, `p06`=angle, 等）
-   - 解码: `JSON.parse(XOR(base64decode(encoded), keyBytes))`
-   - 然后需要 code→name 映射表还原可读名称
+1. **Website API** (`/api/collections/`):
+   - Obfuscation key: `a5e7244ad0973f07e10285bfa75ddbe4` (from the Nuxt runtime config)
+   - Component/prop names use short codes (`C52`=Plasma, `p06`=angle, etc.)
+   - Decode: `JSON.parse(XOR(base64decode(encoded), keyBytes))`
+   - Then you need the code→name mapping table to restore readable names
 
-2. **预览 API**（`/api/preview/`）：
-   - 密钥: `shaders-preview-key`
-   - 使用人类可读属性名（无需映射）
-   - 注意：会注入水印 `ImageTexture` 组件
+2. **Preview API** (`/api/preview/`):
+   - Key: `shaders-preview-key`
+   - Uses human-readable prop names (no mapping needed)
+   - Note: it injects a watermark `ImageTexture` component
 
-### 代码映射表
+### Code mapping table
 
-87 种组件按字母排序编号 `C00-C86`，233 种属性按字母排序编号 `p00-p232`。
-映射表可从 JS bundle 中提取。
+The 87 components are numbered `C00-C86` alphabetically; the 233 props are numbered `p00-p232` alphabetically.
+The mapping table can be extracted from the JS bundle.
 
-## 已知陷阱
+## Known Pitfalls
 
-### Y 轴翻转（反复出现！）
+### Y-axis flip (recurring!)
 
-**SDF 纹理和 UV 坐标系统性 Y 翻转** — 已在多次提取中确认：
+**SDF textures and UV coordinates are systematically Y-flipped** — confirmed across multiple extractions:
 
-shaders.com 的 SDF 二进制（`.bin`）使用**图像坐标系**（Y=0 在顶部），
-而 WebGL 纹理坐标 Y=0 在底部。直接加载会导致形状上下翻转。
+shaders.com's SDF binaries (`.bin`) use an **image coordinate system** (Y=0 at the top),
+while WebGL texture coordinates put Y=0 at the bottom. Loading directly flips shapes upside down.
 
 ```glsl
-// 错误：直接用 shapeUV 采样
+// Wrong: sampling the SDF with shapeUV directly
 float sdf = texture(tSDF, shapeUV).r;
 
-// 正确：翻转 Y
+// Correct: flip Y
 vec2 sdfUV = vec2(shapeUV.x, 1.0 - shapeUV.y);
 float sdf = texture(tSDF, sdfUV).r;
 
-// 注意：梯度的 Y 分量也需要取反
+// Note: the gradient's Y component must be negated too
 float dSdy = -(texture(tSDF, sdfUV - vec2(0, eps)).r - sdf) / eps;
 ```
 
-同样，组件定义中的 `center.y` 使用 DOM 坐标（Y=0 在顶部），
-在 Glass shader 中需要翻转：`center.y = 1.0 - center.y`。
+Likewise, `center.y` in component definitions uses DOM coordinates (Y=0 at the top),
+and must be flipped in the Glass shader: `center.y = 1.0 - center.y`.
 
-### SDF 二进制格式
+### SDF binary format
 
-- 格式：512×512 Float32 单通道（1,048,576 bytes = 512² × 4）
-- 值域：有符号距离，负值=内部，正值=外部（如 [-0.065, 0.486]）
-- **不需要重映射**（不要做 `*2-1`），直接使用原始值
-- 需要 `OES_texture_float_linear` 扩展做线性过滤
-- WebGL2 加载：`gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32F, 512, 512, 0, gl.RED, gl.FLOAT, data)`
+- Format: 512×512 Float32 single channel (1,048,576 bytes = 512² × 4)
+- Value range: signed distance, negative = inside, positive = outside (e.g. [-0.065, 0.486])
+- **No remapping needed** (don't do `*2-1`); use the raw values
+- Requires the `OES_texture_float_linear` extension for linear filtering
+- WebGL2 upload: `gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32F, 512, 512, 0, gl.RED, gl.FLOAT, data)`
 
-## 组件类型速查
+## Component Type Quick Reference
 
-| 类别 | 组件 | 复杂度 |
+| Category | Components | Complexity |
 |------|------|--------|
-| 纹理 | Plasma, Godrays, SimplexNoise, LinearGradient, RadialGradient | 中 |
-| 形状 | Glass, Blob, Circle, Ring, Star, RoundedRect, Polygon | 高（Glass 最复杂） |
-| 畸变 | WaveDistortion, ChromaticAberration, Liquify, Twirl, Bulge | 低-中 |
-| 风格化 | FilmGrain, Halftone, Ascii, Dither, Glow, Bloom | 低-中 |
-| 后处理 | Blur, ProgressiveBlur, BrightnessContrast, HueShift | 低 |
+| Texture | Plasma, Godrays, SimplexNoise, LinearGradient, RadialGradient | Medium |
+| Shape | Glass, Blob, Circle, Ring, Star, RoundedRect, Polygon | High (Glass is the most complex) |
+| Distortion | WaveDistortion, ChromaticAberration, Liquify, Twirl, Bulge | Low-medium |
+| Stylization | FilmGrain, Halftone, Ascii, Dither, Glow, Bloom | Low-medium |
+| Post-processing | Blur, ProgressiveBlur, BrightnessContrast, HueShift | Low |
 
-## 渲染管线
+## Render Pipeline
 
 ```
-Three.js r183 TSL 渲染器
-├─ 优先尝试 WebGPU，降级到 WebGL
-├─ 正交相机 + 单个全屏四边形
-├─ 组件树从底到顶合成
-├─ 有 children 的组件用 RTT (render-to-texture) 捕获子内容
-├─ blend mode 用自定义混合函数
-└─ Glass 组件最复杂：SDF 评估 → 梯度法线 → 折射 → 色差 → 模糊 → 着色 → 高光 → 菲涅尔 → 合成
+Three.js r183 TSL renderer
+├─ Prefers WebGPU, falls back to WebGL
+├─ Orthographic camera + a single fullscreen quad
+├─ Component tree composites bottom-up
+├─ Components with children use RTT (render-to-texture) to capture child content
+├─ Blend modes use custom blend functions
+└─ The Glass component is the most complex: SDF evaluation → gradient normals → refraction → chromatic aberration → blur → shading → highlights → Fresnel → composite
 ```
 
-## 移植策略
+## Porting Strategy
 
-1. **TSL 不能直接复制** — 需要翻译为 GLSL
-2. **从 JS bundle 提取 TSL `fragmentNode`** → 反混淆 → 翻译为 GLSL
-3. **组件树 → multi-pass FBO 管线**
-4. **SDF 纹理需要 Y-flip**（见上方陷阱）
-5. **Glass 组件参数多**（20+），需要精确匹配每个值
+1. **TSL cannot be copied directly** — it must be translated to GLSL
+2. **Extract the TSL `fragmentNode` from the JS bundle** → de-obfuscate → translate to GLSL
+3. **Component tree → multi-pass FBO pipeline**
+4. **SDF textures need a Y-flip** (see pitfalls above)
+5. **Glass has many parameters** (20+); every value must be matched exactly
 
-## 颜色空间处理（关键）
+## Color Space Handling (critical)
 
-shaders.com 的 Three.js 渲染器全程在 **linear 空间** 工作：
-- 组件定义中的 hex 颜色（如 `#2c2c42`）是 **sRGB** 值
-- TSL 的 `color()` 函数自动将 sRGB→linear
-- 所有中间 FBO 均存储 linear 值
-- 最终由渲染器做 linear→sRGB 输出编码
+shaders.com's Three.js renderer works in **linear space** throughout:
+- hex colors in component definitions (e.g. `#2c2c42`) are **sRGB** values
+- TSL's `color()` function converts sRGB→linear automatically
+- All intermediate FBOs store linear values
+- The renderer performs the final linear→sRGB output encoding
 
-移植时：
+When porting:
 ```glsl
-// 1. 颜色定义时：sRGB hex → linear
+// 1. When defining colors: sRGB hex → linear
 vec3 colorA = pow(vec3(0.173, 0.173, 0.259), vec3(2.2));  // #2c2c42
 
-// 2. 中间 pass：全部在 linear 空间计算，不做 gamma
-// 3. 最终输出 pass（仅一次）：linear → sRGB
+// 2. Intermediate passes: compute entirely in linear space; no gamma
+// 3. Final output pass (only once): linear → sRGB
 fragColor = vec4(pow(color.rgb, vec3(1.0/2.2)), color.a);
 ```
 
-**常见错误**：在中间 pass 做 gamma 校正，导致后续 pass 在错误空间累加高光/菲涅尔。
+**Common mistake**: applying gamma correction in intermediate passes, causing later passes to accumulate highlights/Fresnel in the wrong space.
 
-## 参数精确对齐原则
+## Exact Parameter Alignment Principle
 
-**绝对禁止手动调参**。所有参数必须严格匹配 TSL 翻译中的公式和乘数：
+**Manual parameter tweaking is absolutely forbidden.** Every parameter must strictly match the formulas and multipliers of the TSL translation:
 
 ```
-TSL 原始乘数                → GLSL 必须使用的值
-aberration * 0.06           → 不能改为 0.12
-fresnelSoftness * 0.06      → 不能改为 0.12
-fresnel (0.17)              → 不能改为 0.4
-SDF gradient eps = 0.01     → 不能改为 0.005
+TSL original multiplier             → value GLSL must use
+aberration * 0.06           → do not change to 0.12
+fresnelSoftness * 0.06      → do not change to 0.12
+fresnel (0.17)              → do not change to 0.4
+SDF gradient eps = 0.01     → do not change to 0.005
 ```
 
-如果视觉效果不匹配，应检查：
-1. 颜色空间是否正确（sRGB/linear 混乱是最常见原因）
-2. 噪声函数实现差异（Perlin 实现 vs `mx_noise_float`）
-3. 时间基准是否正确
-4. FBO 管线顺序是否与组件树匹配
+If the visuals don't match, check:
+1. Whether the color space is correct (sRGB/linear confusion is the most common cause)
+2. Differences in noise function implementations (Perlin implementations vs `mx_noise_float`)
+3. Whether the time base is correct
+4. Whether the FBO pipeline order matches the component tree
 
-**不要**通过修改乘数来"补偿"视觉差异 — 这会在其他参数配置下崩溃。
+**Do not** "compensate" for visual differences by changing multipliers — it will break under other parameter configurations.
 
-## TSL 时间约定
+## TSL Time Conventions
 
-`timerLocal(speed)` = 每秒递增 `speed` 单位。移植时：`uTime = seconds * speed`。
+`timerLocal(speed)` = increments by `speed` units per second. When porting: `uTime = seconds * speed`.
 
-然后 shader 内部再乘自己的系数：
+The shader then applies its own internal multipliers:
 
-| 组件 | speed 参数 | shader 内部乘数 | 实际速率/秒 |
+| Component | speed parameter | shader-internal multiplier | actual rate per second |
 |------|-----------|----------------|------------|
 | Plasma | 2 | × 0.125 | 0.25 |
 | Godrays | 0.7 | × 0.2 | 0.14 |
 | WaveDistortion | 0.8 | × 0.5 | 0.4 |
-| FilmGrain | — | 无时间（静态） | 0 |
+| FilmGrain | — | no time (static) | 0 |
 
-## TSL→GLSL 标识符映射（SPCVwBqR.js）
+## TSL→GLSL Identifier Mapping (SPCVwBqR.js)
 
-常用映射（随构建版本变化，需动态提取）：
+Common mappings (they change between builds; extract them dynamically):
 
-| 本地名 | TSL 函数 | GLSL |
+| Local name | TSL function | GLSL |
 |--------|---------|------|
 | C / z | vec4() | vec4 |
 | x / D | vec2() | vec2 |

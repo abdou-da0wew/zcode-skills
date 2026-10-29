@@ -1,7 +1,7 @@
 ---
 name: ppt
 metadata:
-  author: Z.AI
+  author: DiveeOI
   version: "1.0"
 description: "Presentation creation, editing, and analysis for .pptx files: (1) Creating new presentations, (2) Modifying or editing content, (3) Working with layouts, (4) Adding comments or speaker notes. Academic/paper-based presentations use the embedded Beamer module at end of this file (PDF output only)."
 license: Proprietary. LICENSE.txt has complete terms
@@ -59,7 +59,7 @@ python ooxml/scripts/unpack.py <office_file> <output_dir>
 ---
 ## Creating a new PowerPoint presentation **without a template**(most case,creating ppt/pptx from scrach)
 
-When user upload pptx and ask for to use it as template ,do not follow this section routine! follow ## Editing an existing PowerPoint presentation（pptx）instead
+When user upload pptx and ask for to use it as template ,do not follow this section routine! follow ## Editing an existing PowerPoint presentation (pptx) instead
 You are an elite HTML-PPT design agent. You produce beautiful, content-rich, 1280x720 slide decks rendered as standalone HTML pages and committed to disk via the `Write` tool. Use the `Agent` tool to fan out the rendering of body slides to a **ppt sub-agent** (`subagent_type: ppt-expert`, falling back to `general-purpose` if unavailable) so multiple sections render in parallel.
 
 You operate in four strict stages. Do NOT skip or reorder stages.
@@ -102,25 +102,25 @@ Items marked **★** are strictly mandatory (palette, typography, per-page detai
 the rest should be asked unless the user's original request explicitly rules
 them out (e.g. "internal deck, no notes" → skip notes question).
 
-  1. **主题与目的 (Topic & purpose)** — the deck's core theme and the main
+  1. **Topic & purpose** — the deck's core theme and the main
      aspects it should showcase. Ask this FIRST — every downstream choice
      (length, layouts, data) hinges on it, so do not let it be implicit.
-  2. **目标受众 (Audience & tone)** — who is this for, what register.
-  3. **篇幅 (Deck length)** — tight range. like 1–8 / 8–12 / 12以上 slides，you must give user short slides choice.
-  4. **风格与基调 (Style & tone)** — the deck's overall voice as ONE preset:
-     商务 (business) / 简约 (minimal) / 正式汇报 (formal report). This is the
+  2. **Audience & tone** — who is this for, what register.
+  3. **Deck length** — tight range. like 1–8 / 8–12 / 12+ slides; you must give the user a short-slides option.
+  4. **Style & tone** — the deck's overall voice as ONE preset:
+     business / minimal / formal report. This is the
      high-level register; the palette and typography questions below refine
      it into concrete colors and fonts.
   5. **Visual reference** — a recognizable style anchor (one or two named
      reference decks / websites the user wants this to feel like).
-  6. **★ Palette (调色盘)** — ONE question that collects **all three** of
+  6. **★ Palette** — ONE question that collects **all three** of
      `background` / `primary` / `accent` together (as a unified palette
      choice). Do NOT split into three separate questions. The options the
      user picks from must be generated at runtime — do not hard-code
      specific colors or hex codes here in the skill.
-  7. **Speaker notes (备注讲稿)** — none / short bullet hints / verbatim full script.
-  8. **已有素材 / 数据来源 (Existing materials / data sourcing)** — 用户是否
-     已提供素材或数据;是否需要在最终页面标注数据来源 (是 / 否)。
+  7. **Speaker notes** — none / short bullet hints / verbatim full script.
+  8. **Existing materials / data sourcing** — whether the user has already
+     provided materials or data; whether the final pages need to credit data sources (yes / no).
   9. **Must include data**
   10. **Need image search**
 Important constraints when constructing the actual `AskUserQuestion` calls:
@@ -162,21 +162,21 @@ STAGE 2 — RESEARCH (parallel web search + page visits + parallel image search)
 Gather facts and visual assets.
 
 Text research:
-  • Use `web_search` function for up-to-date facts(if the user do not provided). Batch 2-3 queries across parallel calls in one turn.
+  • Use the agent's `web_search` function for up-to-date facts(if the user do not provided). Batch 2-3 queries across parallel calls in one turn.
       ```bash
-    # Simple search query
-    z-ai function --name "web_search" --args '{"query": "artificial intelligence","num": 3}'
+    # Simple search query (via the agent's function-calling CLI; adapt to your tool surface)
+    agent function --name "web_search" --args '{"query": "artificial intelligence","num": 3}'
 
     # Using short options
-    z-ai function -n web_search -a '{"query": "cryptocurrency news", "num": 3, "recency_days": 7}'
+    agent function -n web_search -a '{"query": "cryptocurrency news", "num": 3, "recency_days": 7}'
     ```
 
 
 Image assets (THIS IS IMPORTANT):
-  • For EVERY slide that needs a photo or illustration, run the `z-ai image-search` CLI (provided by `z-ai-web-dev-sdk`). Prerequisite: `npm install -g z-ai-web-dev-sdk` (or `bun add -g z-ai-web-dev-sdk`), which installs the `z-ai` binary.
+  • For EVERY slide that needs a photo or illustration, run an image search with the agent's available image-search tool/CLI (e.g. the `image-search` skill bundled in this collection, which exposes a standalone `image-search` binary).
   • Basic invocation:
-        z-ai image-search --query "<natural-language sentence>" --count 3
-    The CLI prints the JSON response (pretty-formatted) to stdout(--count control the image number return,use 5 by default). The query MUST be a natural-language sentence (NOT keywords). The response contains `results[].original_url` (OSS-hosted, embeddable) and `results[].caption`.
+        image-search --query "<natural-language sentence>" --count 3
+    The CLI prints the JSON response (pretty-formatted) to stdout(--count controls the number of images returned; use 5 by default). The query MUST be a natural-language sentence (NOT keywords). The response contains `results[].original_url` (embeddable) and `results[].caption`.
   • **Output handling — print-to-stdout only.** pick the best `original_url`, and **bake that URL directly into the slide's `task_brief`** in `slides_brief.json` (see Stage 3). The sub-agent that renders the slide has no access to the search results, so the URL MUST be inlined into `task_brief` — that is the only carrier.
   • Very important!!! if you want to use local image, YOU MUST use RELATIVE path rather than absolute path
   • You MAY emit several `Bash` calls in the SAME assistant turn — they will run concurrently. Prefer batching 3–4 image searches per turn to save wall time.
@@ -217,8 +217,8 @@ Final on-disk layout after Stage 3:
           Critical example: Do not name heading classes .h-1 / .h-2 / .h-3. In Tailwind these are height utilities (.h-1 = 4px, .h-2 = 8px, .h-3 = 12px). Applied to
           a heading, the box collapses to a few pixels while the text still renders at full size — the heading visibly overlaps the element below it.
      • Because `global.css` and the slide HTMLs are siblings inside `<work_dir>/slides/`, slides may link it as `<link rel="stylesheet" href="global.css">` (relative). 
-     • keep these in mind！！！ Global CSS scope — typography tokens only, no typography classes.Define typography design tokens (--font-heading, --font-body, --font-cn, --font-num, --fs-display, --fs-h1, --fs-h2, --fs-h3, --fs-body, --fs-small, --fs-micro) on :root in
-      global.css Do not ship pre-baked typography classes like .h-display / .h-1 / .h-2 / .h-3 / .cn-sub that bundle font-family, font-size, line-height,font-weight, and letter-spacing together. (This rule applies only to font family / size — palette, spacing, layout primitives, and other non-typography utilities can stilllive in global.css as before.) keep these in mind！！！
+     • keep these in mind!!! Global CSS scope — typography tokens only, no typography classes.Define typography design tokens (--font-heading, --font-body, --font-cn, --font-num, --fs-display, --fs-h1, --fs-h2, --fs-h3, --fs-body, --fs-small, --fs-micro) on :root in
+      global.css Do not ship pre-baked typography classes like .h-display / .h-1 / .h-2 / .h-3 / .cn-sub that bundle font-family, font-size, line-height,font-weight, and letter-spacing together. (This rule applies only to font family / size — palette, spacing, layout primitives, and other non-typography utilities can stilllive in global.css as before.) keep these in mind!!!
 
 2. `<work_dir>/slides/slides_brief.json` — the dispatch manifest. Schema:
      ```json
@@ -253,7 +253,7 @@ Final on-disk layout after Stage 3:
    • `task_brief` is the SOLE input the sub-agent will see for that slide — it MUST be self-contained for the renderer. 
        – Keep it concise and to the point: carry exactly what the renderer needs, no filler, no restating the design block, no meta reminders.
        – Restate the slide's exact text content: headline, body copy, data points, stats, quotes, key phrases. Copy verbatim — do not paraphrase loosely.
-       – Resolve every "Hero photo of …" / "icon of …" reference into the FULL image URL (https://…) from your `z-ai image-search` results. The sub-agent has NO access to search results — if a URL isn't in the brief (either inlined here or read back from a saved `images/<slot>.json` manifest), the slide can't display the image.
+       – Resolve every "Hero photo of …" / "icon of …" reference into the FULL image URL (https://…) from your image-search results. The sub-agent has NO access to search results — if a URL isn't in the brief (either inlined here or read back from a saved `images/<slot>.json` manifest), the slide can't display the image.
        – If the user asked for speaker notes in Stage 1, append a `Speaker notes:` block at the END of the brief. write the notes request. do NOT write notes verbatim here. The top-level `speaker_notes` field (`none` / `short` / `full`) tells the sub-agent whether and how deeply to generate notes from the rendered slide. The sub-agent will inject them into the slide HTML as `<aside data-notes>…</aside>` (visually hidden). If the user did NOT request notes, omit this block — do not invent notes.
        – Add any layout-specific payload the sub-agent needs (chart data values, ordered timeline events, comparison columns, exact quote attribution, etc.). The committed `design` block (palette, typography, reference) is already in `slides_brief.json`, so do NOT repeat it inside each `task_brief`.
        – Do NOT carry meta / quality-bar reminders inside the brief: word-count targets, "diversify layouts", "no photos", "verify contrast", etc. Those live ONCE in the sub-agent's self-audit checklist (Stage 4) — repeating them per slide is noise. If the slide is image-free, simply do not include any image URL; the sub-agent will not invent one.
@@ -306,7 +306,7 @@ every slide, cover / TOC / body / closing, is committed by a `ppt` sub-agent tha
 
 
 ═══════════════════════════════════════════════════════════════════════
-Only when user requested a pptx file，if user not request，directly give a summary and end the task — how to EXPORT TO PPTX:
+Only when the user requested a pptx file; if the user did not request one, directly give a summary and end the task — how to EXPORT TO PPTX:
 ═══════════════════════════════════════════════════════════════════════
 Convert `<work_dir>/slides/` into ONE `.pptx` via `batch_html2pptx.js`.
 
@@ -315,7 +315,7 @@ ensure filenames sort alphabetically into the same order as
 `slides_brief.json.slides[]`. If editing rounds left them out of order,
 rename to `slide_{NN:02d}.html` matching list index AND update each
 entry's `output_path`. This is the ONLY step that renames files.
-You can directly run the files，do not try to modify it
+You can directly run the files; do not try to modify them
 Invoke:
 ```
 cd /home/z/my-project && NODE_PATH=/usr/local/lib/node_modules nohup node /home/z/my-project/skills/ppt/batch_html2pptx.js /home/z/my-project/download/slides /home/z/my-project/download/xx.pptx
@@ -334,7 +334,7 @@ After export: `ls -lh <path>` to confirm, then report the `.pptx` path
 ═══════════════════════════════════════════════════════════════════════
 MULTI-ROUND HTML EDITING — keep `slides_brief.json` in sync
 ═══════════════════════════════════════════════════════════════════════
-When you only need to editing severals pages，directly read and editing them,when you need to change the entire design,try to edit global.css first
+When you only need to edit a few pages, directly read and edit them; when you need to change the entire design, try to edit global.css first
 Very inportant!: Keep only one version of html slides directly in "slides/" directory,do not keep mutiple versions of html. and there is only one version of slides.
 Very inportant!: when deleting or adding pages,first editing slides_brief.json first
 `slides_brief.json` is the single source of truth for the deck's
@@ -364,7 +364,7 @@ SLIDE QUALITY BAR (applies to every page)
   • Every text color on every background must pass WCAG AA (4.5:1 contrast).
   • Use TailwindCSS via CDN (`<script src="https://cdn.tailwindcss.com"></script>`) and link the deck-wide `global.css`. Use Google Fonts for typography.
   • Diversify layouts across slides — vary between cover, section header, split text+image, bento grid, stats, timeline, comparison, quote, closing, etc. Never repeat the same layout back-to-back.
-  • Never fabricate image URLs. Only use URLs that came back from the `z-ai image-search` CLI.
+  • Never fabricate image URLs. Only use URLs that came back from the image-search CLI.
   • Include icons (Material Icons via `<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">` and `<i class="material-icons">name</i>`). No `<script>` icon loaders.
   • Numbers, dates, and technical terms render in the proper numeric font per typography guide.
   • No graphical timelines, no SVG/connector flowcharts, no code-drawn maps, no base64 images, no Reveal.js.
@@ -377,7 +377,7 @@ GENERAL RULES
   • Parallelism is free — `WebSearch`, `WebFetch`, `Bash` (image-search), and the fan-out of `Agent` sub-agents all run concurrently when emitted in the same turn; use it.
   • Always respond in the user's language.
 
-## Editing an existing PowerPoint presentation（pptx）
+## Editing an existing PowerPoint presentation (pptx)
 
 Pick the approach by what you're editing:
 

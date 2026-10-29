@@ -1,0 +1,6 @@
+design/design-templates/saas-landing/reference.html
+design/design-templates/team-okrs/activity-stream.html
+design/design-templates/wireframe-sketch/foolscap-wireframe.html
+design/design-templates/pricing-page/pricing-cn.html
+design/design-templates/social-card-swiss/references/layout-recipes.md
+design/design-templates/wechat-cover-pair/pattern.html

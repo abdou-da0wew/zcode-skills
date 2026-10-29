@@ -1,44 +1,44 @@
-# 简历信息收集问题清单
+# Resume Intake Question List
 
-分 3 轮问，不要一次性塞给用户。
+Ask in 3 rounds; don't dump everything on the user at once.
 
-## 第 1 轮：基本信息（必问）
+## Round 1: Basic Info (required)
 
-1. 你的姓名 + 联系方式（手机、邮箱，可选 GitHub / 作品集）
-2. 学历（学校 + 专业 + 学历层次 + 毕业年份；多段教育依次列）
-3. 你目前 / 最近一份工作的：公司、岗位、起止时间
+1. Your name + contact info (phone, email, optionally GitHub / portfolio)
+2. Education (school + major + degree level + graduation year; list multiple degrees in order)
+3. For your current / most recent job: company, role, start and end dates
 
-## 第 2 轮：经历主体（必问）
+## Round 2: Experience Body (required)
 
-针对每段工作 / 实习 / 项目，按这个套路问：
+For each job / internship / project, ask along these lines:
 
-- 这段经历你**主要负责什么**？
-- 有哪些**具体的事情**是你独立或主导做的？（关键词：你"做了什么"，不是"参与了什么"）
-- **结果如何**？有没有可以量化的数字（用户量、转化率、收入、效率提升、排名等）
-- 这段经历你最得意的**一件事**是什么？
+- What were you **primarily responsible for** in this experience?
+- Which **specific things** did you do independently or lead? (keyword: what you "did", not what you "participated in")
+- **What was the result**? Any quantifiable numbers (user count, conversion rate, revenue, efficiency gains, rankings, etc.)
+- What is the **one thing** you're proudest of in this experience?
 
-如果用户记不清数字，可以这样追问：
-- "大致量级也可以，比如 10 万 / 百万 / 千万"
-- "百分比记不清的话，给一个 range，比如『大约 20-30%』"
-- "如果完全没办法估，我会标成『[需补具体数字]』，你后面填"
+If the user can't recall numbers, follow up like this:
+- "An order of magnitude is fine — e.g. tens of thousands / hundreds of thousands / millions"
+- "If you can't remember the percentage, give a range, like 'roughly 20-30%'"
+- "If it's truly impossible to estimate, I'll mark it '[TODO: exact number]' and you can fill it in later"
 
-## 第 3 轮：补充信息（可选）
+## Round 3: Supplementary Info (optional)
 
-- 技能 / 工具：编程语言、框架、设计 / 数据 / 办公工具
-- 语言能力：英语 / 其他语种 + 等级
-- 证书 / 获奖：仅写有含金量的（CFA Level 2、ACM 区域赛、PMP 等）
-- 兴趣 / 其他：除非真的有亮点（比如马拉松、独立游戏作品），否则不写
+- Skills / tools: programming languages, frameworks, design / data / office tools
+- Languages: English / other languages + proficiency level
+- Certifications / awards: only list the meaningful ones (CFA Level 2, ACM regionals, PMP, etc.)
+- Interests / other: leave out unless genuinely impressive (e.g. marathons, an independently published game)
 
-## 应届生补充问
+## Extra Questions for New Graduates
 
-- 校园经历（学生会、社团、志愿者）—— 但只挑能体现"领导 / 组织 / 推动力"的写
-- 课程项目 —— 挑跟目标岗位相关的 1~2 个
-- GPA / 排名 / 奖学金 —— 高于 3.5/4.0 或专业前 20% 才写
+- Campus experience (student government, clubs, volunteering) — but only include items showing "leadership / organizing / drive"
+- Course projects — pick the 1-2 most relevant to the target role
+- GPA / ranking / scholarships — only include if above 3.5/4.0 or top 20% of the major
 
-## 转行候选人补充问
+## Extra Questions for Career Changers
 
-- 你为什么想转到这个方向？
-- 你已经为转行做了哪些准备（自学、项目、副业、证书）？
-- 原岗位有哪些**可迁移技能**？（举具体例子）
+- Why do you want to move into this direction?
+- What preparation have you already made for the switch (self-study, projects, side work, certifications)?
+- Which **transferable skills** does your previous role give you? (with concrete examples)
 
-把这些信息会用到一段简短的"个人简介 / Career Summary"里，化解 HR 看到转行简历时的困惑。
+This information goes into a short "personal profile / Career Summary" that defuses HR's confusion when they see a career-changer resume.

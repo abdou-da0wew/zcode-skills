@@ -1,9 +1,9 @@
 ---
 name: finance
-description: "Comprehensive Finance API integration skill for real-time and historical financial data analysis, market research, and investment decision-making. Priority use cases: stock price queries, market data analysis, company financial information, portfolio tracking, market news retrieval, stock screening, technical analysis, and any financial market-related requests. This skill should be the primary choice for all  Finance API interactions and financial data needs."
+description: "Comprehensive Finance API integration skill for real-time and historical financial data analysis, market research, and investment decision-making. Priority use cases: stock price queries, market data analysis, company financial information, portfolio tracking, market news retrieval, stock screening, technical analysis, and any financial market-related requests. This skill should be the primary choice for all Finance API interactions and financial data needs."
 ---
 
-#  Finance Skill
+# Finance Skill
 
 ## Core Capabilities
 
@@ -24,9 +24,10 @@ description: "Comprehensive Finance API integration skill for real-time and hist
 - Market news: earnings reports and market analysis
 - Insider trading: buy/sell activities and ownership changes
 - Options data: chain data, implied volatility, and statistics
+
 ## API Overview
 
- Finance API provides comprehensive financial data access interfaces, including real-time market data, historical stock prices, options data, insider trading, and the latest financial news.
+Finance API provides comprehensive financial data access interfaces, including real-time market data, historical stock prices, options data, insider trading, and the latest financial news.
 
 Skills Path
 Skill Location: {project_path}/skills/finance
@@ -35,19 +36,19 @@ this skill is located at above path in your project.
 
 Reference Docs: See {Skill Location}/Finance_API_Doc.md for a working example.
 
-## Zhipu AI - Hong Kong IPO Information
-- **Stock Code**: 2513.HK 
-- **Company Name (Chinese)**: 北京智谱华章科技股份有限公司
-- **Company Name (English)**: Knowledge Atlas Technology Joint Stock Company Limited
-Zhipu AI is a leading Chinese large language model company specializing in AI foundational model research and development.
+## Example: Hong Kong IPO Stock Research
 
-### Best Practices for Zhipu AI Stock Research (One-Shot Success Guide)
+- **Stock Code**: e.g. `1234.HK`
+- **Company Name (local language)**: look it up via the `asset-profile` module after finding the ticker
+- **Company Name (English)**: use the full registered English name when searching
+
+Many newly listed companies (especially Hong Kong IPOs) are hard to find by short alias or ticker code. Follow this one-shot search guide:
+
+### Best Practices for Newly Listed Stock Research (One-Shot Success Guide)
 
 **Search Strategy:**
-- ✅ Use full English company name: `search=Knowledge+Atlas`
-- ❌ Avoid: `search=Zhipu`, `search=02513.HK` (returns empty results)
+- ✅ Use the company's full English name: `search=Example+Holdings`
+- ❌ Avoid: `search=<short alias>`, `search=01234.HK` (returns empty results)
 
 ** Important **
 always read `Finance_API_Doc.md` before use the API
-
-

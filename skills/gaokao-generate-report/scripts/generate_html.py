@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""将解析后的志愿 JSON + 推荐分析套用 HTML 模板，生成可视化报告。"""
+"""Apply the HTML template to the parsed volunteer JSON + recommendation analysis
+to generate a visual report."""
 
 from __future__ import annotations
 
@@ -17,40 +18,42 @@ SKILL_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_TEMPLATE = SKILL_ROOT / "templates" / "volunteer_report.html"
 
 VOLUNTEER_TYPE_LABELS = {
-    "ACADEMY_MAJOR": "院校志愿",
-    "ACADEMY_GROUP": "专业组",
-    "MAJOR_GROUP": "专业平行志愿",
+    "ACADEMY_MAJOR": "University-based volunteers",
+    "ACADEMY_GROUP": "Major group",
+    "MAJOR_GROUP": "Parallel major volunteers",
 }
 
+# Section labels are the English tier labels produced by fetch_volunteers.py
+# (TYPE_LABELS); the CSS class names (chong/wen/bao/...) are kept for styling.
 TYPE_CSS = {
-    "冲": "chong",
-    "稳": "wen",
-    "保": "bao",
-    "难": "nan",
-    "易": "yi",
+    "Reach": "chong",
+    "Match": "wen",
+    "Safety": "bao",
+    "Difficult": "nan",
+    "Easy": "yi",
 }
 
-SECTION_ORDER = ["冲", "稳", "保", "易", "难"]
+SECTION_ORDER = ["Reach", "Match", "Safety", "Easy", "Difficult"]
 SECTION_TITLE_CLASS = {
-    "冲": "title-chong",
-    "稳": "title-wen",
-    "保": "title-bao",
-    "易": "title-wen",
-    "难": "title-chong",
+    "Reach": "title-chong",
+    "Match": "title-wen",
+    "Safety": "title-bao",
+    "Easy": "title-wen",
+    "Difficult": "title-chong",
 }
 
 
 def format_subjects(subjects: str | None) -> str:
     if not subjects:
         return "—"
-    parts = [p.strip() for p in re.split(r"[,，]", subjects) if p.strip()]
+    parts = [p.strip() for p in re.split(r"[,\uFF0C]", subjects) if p.strip()]
     return "·".join(parts) if parts else subjects
 
 
 def split_tags(tags: str | None, limit: int = 8) -> list[str]:
     if not tags:
         return []
-    items = [t.strip() for t in re.split(r"[,，]", tags) if t.strip()]
+    items = [t.strip() for t in re.split(r"[,\uFF0C]", tags) if t.strip()]
     return items[:limit]
 
 
@@ -60,7 +63,7 @@ def build_school_tags(school: dict[str, Any]) -> list[str]:
     if school.get("property_name"):
         primary_parts.append(school["property_name"])
     if school.get("university_code"):
-        primary_parts.append(f"代码{school['university_code']}")
+        primary_parts.append(f"Code {school['university_code']}")
     if primary_parts:
         tags.append(" · ".join(primary_parts))
     loc_parts = []
@@ -69,7 +72,7 @@ def build_school_tags(school: dict[str, Any]) -> list[str]:
     if school.get("city_name"):
         loc_parts.append(school["city_name"])
     if loc_parts:
-        tags.append("".join(loc_parts))
+        tags.append(" · ".join(loc_parts))
     tags.extend(split_tags(school.get("tags")))
     return tags
 
@@ -77,8 +80,9 @@ def build_school_tags(school: dict[str, Any]) -> list[str]:
 def enrich_major(major: dict, rec_id: str | None = None) -> dict:
     major = dict(major)
     cost = major.get("study_cost")
-    if cost and not str(cost).endswith("元"):
-        major["study_cost_display"] = f"{cost}元"
+    # "\u5143" is the Chinese currency suffix (yuan) used by the API data.
+    if cost and not str(cost).endswith("\u5143"):
+        major["study_cost_display"] = f"{cost}\u5143"
     else:
         major["study_cost_display"] = cost or "—"
     major["rec_id"] = rec_id
@@ -120,12 +124,12 @@ def format_prob_range(probs: list[int]) -> tuple[int | None, int | None, str | N
 
 
 def sort_majors_by_rec(majors: list[dict]) -> list[dict]:
-    """推荐专业排在前面，其余保持相对顺序。"""
+    """Recommended majors first; the rest keep their relative order."""
     return sorted(majors, key=lambda m: (0 if m.get("rec_id") else 1))
 
 
 def university_rec_rank(uni: dict) -> int:
-    """同档位院校排序：推荐学校+推荐专业 > 仅推荐学校 > 其他。"""
+    """Rank within a tier: recommended school + major > school only > other."""
     has_school_rec = bool(uni.get("rec_id"))
     has_major_rec = False
     for m in uni.get("flat_majors") or []:
@@ -171,7 +175,7 @@ def flatten_majors(groups: list[dict]) -> list[dict]:
 
 
 def build_rec_maps(analysis: dict | None) -> tuple[dict[tuple, str], dict[tuple, str], dict[str, dict]]:
-    """返回 (school_rec_map, major_rec_map, rec_modals)。"""
+    """Return (school_rec_map, major_rec_map, rec_modals)."""
     if not analysis:
         return {}, {}, {}
 
@@ -218,9 +222,9 @@ def aggregate_universities(schools: list[dict], school_rec_map: dict, major_rec_
         major_groups = [g["major_group"] for g in groups if g["major_group"]]
         has_major_group = len(major_groups) > 0
         if len(major_groups) == 1:
-            group_subtitle = f"/ 专业组 {major_groups[0]}"
+            group_subtitle = f"/ Major group {major_groups[0]}"
         elif len(major_groups) > 1:
-            group_subtitle = f"/ {len(major_groups)}个专业组"
+            group_subtitle = f"/ {len(major_groups)} major groups"
         else:
             group_subtitle = ""
 
@@ -306,15 +310,15 @@ def enrich_context(data: dict, analysis: dict | None = None) -> dict:
     school_rec_map, major_rec_map, rec_modals = build_rec_maps(analysis)
 
     score = profile.get("score")
-    score_display = f"{score} 分" if score is not None else "—"
+    score_display = f"{score} pts" if score is not None else "—"
     if profile.get("rank"):
-        score_display += f" / 位次 {profile['rank']}"
+        score_display += f" / Rank {profile['rank']}"
 
     narrative = (analysis or {}).get("analysis") or {}
     student = (analysis or {}).get("student") or {}
 
     return {
-        "title": "高考志愿智能推荐方案",
+        "title": "Gaokao Volunteer Recommendation Report",
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "profile": profile,
         "student": student,
@@ -326,7 +330,7 @@ def enrich_context(data: dict, analysis: dict | None = None) -> dict:
         "volunteer_type_label": VOLUNTEER_TYPE_LABELS.get(
             profile.get("volunteer_type") or "", profile.get("volunteer_type") or "—"
         ),
-        "is_adjust_label": "服从" if profile.get("is_adjust") else "不服从",
+        "is_adjust_label": "Yes" if profile.get("is_adjust") else "No",
         "has_analysis": bool(narrative),
         "analysis": narrative,
         "rec_modals_json": json.dumps(rec_modals, ensure_ascii=False),
@@ -340,7 +344,7 @@ def render_report(
     analysis: dict | None = None,
 ) -> None:
     if not template_path.is_file():
-        raise FileNotFoundError(f"模板不存在: {template_path}")
+        raise FileNotFoundError(f"template not found: {template_path}")
 
     env = Environment(
         loader=FileSystemLoader(str(template_path.parent)),
@@ -354,47 +358,47 @@ def render_report(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="生成志愿推荐 HTML 报告")
-    parser.add_argument("-i", "--input", type=Path, required=True, help="fetch_volunteers.py 输出的 JSON")
-    parser.add_argument("-o", "--output", type=Path, required=True, help="HTML 输出路径")
-    parser.add_argument("-a", "--analysis", type=Path, help="Agent 产出的 analysis.json")
+    parser = argparse.ArgumentParser(description="Generate the volunteer recommendation HTML report")
+    parser.add_argument("-i", "--input", type=Path, required=True, help="JSON produced by fetch_volunteers.py")
+    parser.add_argument("-o", "--output", type=Path, required=True, help="HTML output path")
+    parser.add_argument("-a", "--analysis", type=Path, help="analysis.json produced by the agent")
     parser.add_argument(
         "-t",
         "--template",
         type=Path,
         default=DEFAULT_TEMPLATE,
-        help=f"Jinja2 模板路径（默认 {DEFAULT_TEMPLATE}）",
+        help=f"Jinja2 template path (default {DEFAULT_TEMPLATE})",
     )
     args = parser.parse_args()
 
     if not args.input.is_file():
-        print(f"错误: 输入文件不存在 {args.input}", file=sys.stderr)
+        print(f"Error: input file does not exist {args.input}", file=sys.stderr)
         return 1
 
     try:
         data = json.loads(args.input.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
-        print(f"错误: JSON 解析失败 — {e}", file=sys.stderr)
+        print(f"Error: JSON parsing failed - {e}", file=sys.stderr)
         return 1
 
     analysis = None
     if args.analysis:
         if not args.analysis.is_file():
-            print(f"错误: 分析文件不存在 {args.analysis}", file=sys.stderr)
+            print(f"Error: analysis file does not exist {args.analysis}", file=sys.stderr)
             return 1
         try:
             analysis = json.loads(args.analysis.read_text(encoding="utf-8"))
         except json.JSONDecodeError as e:
-            print(f"错误: analysis JSON 解析失败 — {e}", file=sys.stderr)
+            print(f"Error: failed to parse analysis JSON - {e}", file=sys.stderr)
             return 1
 
     try:
         render_report(data, args.template, args.output, analysis)
     except Exception as e:
-        print(f"错误: {e}", file=sys.stderr)
+        print(f"Error: {e}", file=sys.stderr)
         return 1
 
-    print(f"已生成 HTML 报告: {args.output}")
+    print(f"HTML report generated: {args.output}")
     return 0
 
 

@@ -1,23 +1,23 @@
 {
-  "province": "省份",
-  "classify": "综合 | 物理 | 历史 | 文科 | 理科",
-  "subjects": "物理,化学,生物",
+  "province": "<API province name, e.g. \u5c71\u4e1c = Shandong>",
+  "classify": "<\u7efc\u5408 (comprehensive) | \u7269\u7406 (physics) | \u5386\u53f2 (history) | \u6587\u79d1 (liberal arts) | \u7406\u79d1 (science)>",
+  "subjects": "<e.g. \u7269\u7406,\u5316\u5b66,\u751f\u7269 = physics,chemistry,biology>",
   "score": 0,
-  "batch": "本科批",
+  "batch": "<e.g. \u672c\u79d1\u6279 = undergraduate batch>",
   "rank": null,
   "gradeType": null,
-  "interests": "考生原话，勿概括改写",
-  "family_situation": "考生原话，勿概括改写",
-  "career_direction": "考生原话，勿概括改写",
+  "interests": "<student's own words, do not paraphrase>",
+  "family_situation": "<student's own words, do not paraphrase>",
+  "career_direction": "<student's own words, do not paraphrase>",
   "subject_scores": {
-    "语文": 0,
-    "数学": 0,
-    "英语": 0
+    "chinese": 0,
+    "math": 0,
+    "english": 0
   },
-  "preferred_cities": ["北京", "上海"],
-  "preferred_provinces": ["北京", "上海"],
-  "preferred_universities": ["考生明确提到的校名"],
-  "preferred_tags": ["仅录考生亲口说过的层次，如985"],
-  "preferred_major_classes": ["仅录考生明确提到的专业方向，勿从兴趣推断"],
-  "notes": "考生原话：禁忌、特殊诉求等不适合归入上述字段的内容"
+  "preferred_cities": ["<e.g. \u5317\u4eac = Beijing>"],
+  "preferred_provinces": ["<e.g. \u5317\u4eac = Beijing>"],
+  "preferred_universities": ["<full university name exactly as the student said it, e.g. \u5317\u4eac\u822a\u7a7a\u822a\u5929\u5927\u5b66 = Beihang University>"],
+  "preferred_tags": ["<only tiers the student explicitly said, e.g. 985>"],
+  "preferred_major_classes": ["<only major classes the student explicitly mentioned, e.g. \u8ba1\u7b97\u673a\u7c7b = Computer Science class; do not infer from interests>"],
+  "notes": "<student's own words: taboos, special requests, anything that does not fit the fields above>"
 }

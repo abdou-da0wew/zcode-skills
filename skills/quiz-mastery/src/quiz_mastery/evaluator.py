@@ -29,7 +29,7 @@ class Evaluator:
                         user_answer=user_answer,
                         is_correct=None,
                         score=None,
-                        feedback="需要人工/LLM评判",
+                        feedback="Needs human/LLM review",
                         error_type="pending_review",
                         needs_review=True,
                     )
@@ -43,7 +43,7 @@ class Evaluator:
                         user_answer=None,
                         is_correct=False,
                         score=0.0,
-                        feedback=f"未作答。正确答案：{q.answer}。{q.explanation}",
+                        feedback=f"Not answered. Correct answer: {q.answer}. {q.explanation}",
                         error_type="no_answer",
                         needs_review=False,
                     )
@@ -68,7 +68,7 @@ class Evaluator:
                     feedback=(
                         q.explanation
                         if is_correct
-                        else f"回答错误。正确答案：{q.answer}。{q.explanation}"
+                        else f"Wrong answer. Correct answer: {q.answer}. {q.explanation}"
                     ),
                     error_type="none" if is_correct else "concept_confusion",
                     needs_review=False,

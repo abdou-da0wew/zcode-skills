@@ -130,8 +130,8 @@ Rules:
 Prefer honest labels:
 
 - Demo data
-- 示例数据
-- 待填写
+- Sample data (zh)
+- To be filled in
 - Replace with verified figures
 - Source pending
 

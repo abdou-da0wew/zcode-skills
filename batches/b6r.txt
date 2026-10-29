@@ -1,0 +1,7 @@
+gaokao-collect-student-info/SKILL.md
+gaokao-recommend-majors/SKILL.md
+gaokao-recommend-majors/career_reference.md
+gaokao-recommend-majors/examples/major_recommendation_template.json
+gaokao-recommend-schools/SKILL.md
+gaokao-recommend-schools/career_reference.md
+gaokao-recommend-schools/examples/school_recommendation_template.json

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-jd_gap.py — 把 parse_jd.py 的 JSON 与简历文本做 gap 分析
+jd_gap.py — Run a gap analysis between parse_jd.py's JSON and the resume text
 
-用法：
+Usage:
     python jd_gap.py --jd jd_parsed.json --resume resume.md --out gap.md
 
-输出 markdown 报告：完美命中 / 隐性命中 / 真缺口 三类，附改写建议。
+Outputs a markdown report with three categories — perfect hits / implicit hits / true gaps — plus rewrite advice.
 """
 
 from __future__ import annotations
@@ -26,18 +26,18 @@ def load_resume_text(path: Path) -> str:
             from docx import Document
         except ImportError:
             print(
-                "✗ 缺少 python-docx：pip install python-docx --break-system-packages",
+                "✗ python-docx is missing: pip install python-docx --break-system-packages",
                 file=sys.stderr,
             )
             sys.exit(1)
         doc = Document(str(path))
         return "\n".join(p.text for p in doc.paragraphs)
-    print(f"✗ 暂不支持的格式：{suffix}", file=sys.stderr)
+    print(f"✗ Unsupported format: {suffix}", file=sys.stderr)
     sys.exit(1)
 
 
 def find_evidence(resume_text: str, keyword: str, window: int = 30) -> str | None:
-    """在简历里找关键词，返回上下文片段；找不到返回 None。"""
+    """Search the resume for the keyword; return a context snippet, or None if absent."""
     pattern = re.escape(keyword)
     m = re.search(pattern, resume_text, flags=re.IGNORECASE)
     if not m:
@@ -49,16 +49,12 @@ def find_evidence(resume_text: str, keyword: str, window: int = 30) -> str | Non
 
 
 def fuzzy_hit(resume_text: str, keyword: str) -> str | None:
-    """模糊命中：取关键词的中文 / 英文核心，做包含匹配。"""
-    # 拿前 2 个字 / 前 5 个字符
+    """Fuzzy hit: match on the keyword's stem fragments (prefix / suffix) for containment."""
+    # Take the first / last 4 characters as stem candidates
     candidates = []
-    if re.search(r"[一-龥]", keyword):
-        if len(keyword) >= 4:
-            candidates.append(keyword[:2])
-            candidates.append(keyword[-2:])
-    else:
-        if len(keyword) >= 4:
-            candidates.append(keyword[:4].lower())
+    if len(keyword) >= 4:
+        candidates.append(keyword[:4].lower())
+        candidates.append(keyword[-4:].lower())
     text_low = resume_text.lower()
     for c in candidates:
         if c and c in text_low:
@@ -69,17 +65,17 @@ def fuzzy_hit(resume_text: str, keyword: str) -> str | None:
 def analyze(jd: dict, resume_text: str) -> dict:
     perfect, implicit, missing = [], [], []
 
-    # 用 must_have 句子里抽出来的 skills 作为对比项
+    # Compare against the skills extracted from must-have sentences
     candidates = jd.get("skills_extracted", []) + jd.get("must_have", [])
 
     seen = set()
     for c in candidates:
-        # 句子层面太长，截短
+        # Sentences are too long; shorten them
         keyword = c.strip()
         if len(keyword) > 30:
-            # 从长句子里抽更短的关键词
+            # Extract shorter keywords from long sentences
             short_tokens = re.findall(
-                r"[A-Za-z][A-Za-z0-9+/.\-_]{1,20}|[一-龥]{2,6}",
+                r"[A-Za-z][A-Za-z0-9+/.\-_]{1,20}",
                 keyword,
             )
             for t in short_tokens:
@@ -107,58 +103,58 @@ def process_one(keyword, resume_text, perfect, implicit, missing):
 
 
 def render(jd: dict, gap: dict) -> str:
-    lines = ["# JD ⇄ Resume Gap 分析报告", ""]
+    lines = ["# JD ⇄ Resume Gap Analysis Report", ""]
 
     spec = jd.get("special_requirements", {})
     if spec:
-        lines += ["## JD 硬条件", ""]
+        lines += ["## JD Hard Requirements", ""]
         for k, v in spec.items():
-            lines.append(f"- **{k}**：{v}")
+            lines.append(f"- **{k}**: {v}")
         lines.append("")
 
-    lines += ["## ✅ 完美命中（简历里有明确证据）", ""]
+    lines += ["## ✅ Perfect Hits (clear evidence in the resume)", ""]
     if gap["perfect"]:
         for item in gap["perfect"][:30]:
-            lines.append(f"- **{item['keyword']}** —— 证据：`...{item['evidence']}...`")
+            lines.append(f"- **{item['keyword']}** — evidence: `...{item['evidence']}...`")
     else:
-        lines.append("（无）")
+        lines.append("(none)")
     lines.append("")
 
-    lines += ["## 🟡 隐性命中（简历里有近似但用词不同，建议改写时对齐）", ""]
+    lines += ["## 🟡 Implicit Hits (related experience with different wording; align terms when rewriting)", ""]
     if gap["implicit"]:
         for item in gap["implicit"][:20]:
-            lines.append(f"- **JD 关键词：{item['keyword']}**（简历里出现：`{item['fuzzy_match']}`）")
+            lines.append(f"- **JD keyword: {item['keyword']}** (found in resume as: `{item['fuzzy_match']}`)")
     else:
-        lines.append("（无）")
+        lines.append("(none)")
     lines.append("")
 
-    lines += ["## 🔴 真缺口（简历完全没有，需要确认 / 补充 / 转换叙事）", ""]
+    lines += ["## 🔴 True Gaps (entirely absent from the resume; confirm / add / reframe)", ""]
     if gap["missing"]:
         for kw in gap["missing"][:30]:
             lines.append(f"- **{kw}**")
     else:
-        lines.append("（无）")
+        lines.append("(none)")
     lines.append("")
 
     lines += [
         "---",
-        "## 改写建议",
+        "## Rewrite Advice",
         "",
-        "1. **完美命中** 的部分保留，但确保措辞与 JD 一致（比如 JD 用『A/B 测试』就别写『AB 实验』）",
-        "2. **隐性命中** 是性价比最高的优化点 —— 把简历里的近义词改成 JD 的措辞",
-        "3. **真缺口** 分两类：",
-        "   - 你做过但没写？→ 补到对应经历的 bullet 里",
-        "   - 你没做过？→ **不要编造**。可以在 cover letter / Summary 里诚实说明 transferable skill",
-        "4. 把改后的简历再跑一次 ats_check.py 看命中率是否提升",
+        "1. **Perfect hits**: keep them, but make sure the wording matches the JD (e.g. if the JD says 'A/B testing', don't write 'AB experiment')",
+        "2. **Implicit hits** are the highest-leverage optimization — replace the resume's near-synonyms with the JD's exact wording",
+        "3. **True gaps** come in two kinds:",
+        "   - You did it but never wrote it down? → add it to the matching experience's bullets",
+        "   - You never did it? → **don't fabricate**. Address transferable skills honestly in the cover letter / Summary",
+        "4. Re-run ats_check.py on the rewritten resume to see whether the hit rate improved",
     ]
     return "\n".join(lines)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--jd", required=True, help="parse_jd.py 输出的 json")
-    parser.add_argument("--resume", required=True, help="简历文件 (.md/.txt/.docx)")
-    parser.add_argument("--out", help="输出 markdown 路径")
+    parser.add_argument("--jd", required=True, help="JSON produced by parse_jd.py")
+    parser.add_argument("--resume", required=True, help="Resume file (.md/.txt/.docx)")
+    parser.add_argument("--out", help="Output markdown path")
     args = parser.parse_args()
 
     jd = json.loads(Path(args.jd).read_text(encoding="utf-8"))
@@ -168,7 +164,7 @@ def main() -> None:
 
     if args.out:
         Path(args.out).write_text(report, encoding="utf-8")
-        print(f"✓ Gap 报告已生成：{args.out}")
+        print(f"✓ Gap report written to: {args.out}")
     else:
         print(report)
 

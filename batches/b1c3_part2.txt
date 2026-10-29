@@ -1,0 +1,2 @@
+design/design-templates/wireframe-sketch/foolscap-wireframe.html
+design/design-templates/pricing-page/pricing-cn.html

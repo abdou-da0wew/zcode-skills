@@ -231,42 +231,43 @@ def build_extraction_prompt(content: str) -> dict:
         dict with 'system_prompt' and 'user_prompt' keys.
     """
     system_prompt = (
-        "你是一个专业的知识点提取助手。从用户提供的学习资料中提取核心知识点。\n"
-        "严格按照要求的 JSON 格式输出，不要输出任何其他内容。"
+        "You are a professional knowledge-point extraction assistant. Extract the core "
+        "knowledge points from the study material provided by the user.\n"
+        "Strictly output in the required JSON format; do not output anything else."
     )
 
-    user_prompt = f"""请从以下学习资料中提取核心知识点。
+    user_prompt = f"""Extract the core knowledge points from the following study material.
 
-## 学习资料内容
+## Study material content
 
 {content}
 
-## 提取要求
-1. 每个知识点必须包含以下字段：
-   - id: 唯一标识符（格式：kp_001, kp_002, ...）
-   - title: 知识点名称（简洁明确）
-   - definition: 知识点的定义（一句话概括）
-   - description: 详细描述（可包含原文中的关键内容）
-   - tags: 标签列表（用于分类和检索）
-2. 提取所有重要的概念、原理、定义、公式等
-3. 每个知识点应该是独立的、可测试的单元
-4. description 应尽量保留原文中的关键表述
+## Extraction requirements
+1. Every knowledge point must contain the following fields:
+   - id: unique identifier (format: kp_001, kp_002, ...)
+   - title: knowledge point name (concise and clear)
+   - definition: definition of the knowledge point (one sentence)
+   - description: detailed description (may include key content from the source text)
+   - tags: list of tags (for classification and retrieval)
+2. Extract all important concepts, principles, definitions, formulas, etc.
+3. Each knowledge point should be a standalone, testable unit
+4. The description should preserve key wording from the source text where possible
 
-## 输出格式
-输出纯 JSON 数组，每个元素格式如下：
+## Output format
+Output a plain JSON array; each element has the following shape:
 ```json
 [
   {{
     "id": "kp_001",
-    "title": "知识点名称",
-    "definition": "一句话定义",
-    "description": "详细描述，包含原文关键内容",
-    "tags": ["标签1", "标签2"]
+    "title": "Knowledge point name",
+    "definition": "One-sentence definition",
+    "description": "Detailed description with key content from the source",
+    "tags": ["tag1", "tag2"]
   }}
 ]
 ```
 
-请直接输出 JSON 数组，不要包含 markdown 代码块标记或其他文字。"""
+Output the JSON array directly, without markdown code fences or any other text."""
 
     return {
         "system_prompt": system_prompt,

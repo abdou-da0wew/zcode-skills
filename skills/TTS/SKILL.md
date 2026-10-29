@@ -1,12 +1,14 @@
 ---
 name: TTS
-description: Implement text-to-speech (TTS) capabilities using the z-ai-web-dev-sdk. Use this skill when the user needs to convert text into natural-sounding speech, create audio content, build voice-enabled applications, or generate spoken audio files. Supports multiple voices, adjustable speed, and various audio formats.
+description: Implement text-to-speech (TTS) capabilities using any OpenAI-compatible server that exposes the /audio/speech endpoint. Use this skill when the user needs to convert text into natural-sounding speech, create audio content, build voice-enabled applications, or generate spoken audio files. Supports multiple voices, adjustable speed, and various audio formats. Works with any OpenAI-compatible LLM server (open-source or free), designed for the DiveeOI agent (OpenCode-based).
 license: MIT
 ---
 
 # TTS (Text to Speech) Skill
 
-This skill guides the implementation of text-to-speech (TTS) functionality using the z-ai-web-dev-sdk package, enabling conversion of text into natural-sounding speech audio.
+This skill guides the implementation of text-to-speech (TTS) functionality using plain HTTP calls to an OpenAI-compatible `/audio/speech` endpoint (no SDK, no extra dependencies), enabling conversion of text into natural-sounding speech audio.
+
+It works with any OpenAI-compatible server that implements the speech route (open-source or free) — gateways fronting Kokoro, Piper, Coqui, and similar open-source TTS engines, plus hosted OpenAI-compatible APIs — and is designed for the DiveeOI agent (OpenCode-based).
 
 ## Skills Path
 
@@ -14,42 +16,40 @@ This skill guides the implementation of text-to-speech (TTS) functionality using
 
 This skill is located at the above path in your project.
 
-**Reference Scripts**: Example test scripts are available in the `{Skill Location}/scripts/` directory for quick testing and reference. See `{Skill Location}/scripts/tts.ts` for a working example.
+**Reference Scripts**: See `{Skill Location}/tts.ts` for a working example.
 
 ## Overview
 
 Text-to-Speech allows you to build applications that generate spoken audio from text input, supporting various voices, speeds, and output formats for diverse use cases.
 
-**IMPORTANT**: z-ai-web-dev-sdk MUST be used in backend code only. Never use it in client-side code.
+**IMPORTANT**: Keep your API key in backend code or environment variables only. Never hardcode credentials in client-side code.
 
 ## API Limitations and Constraints
 
-Before implementing TTS functionality, be aware of these important limitations:
+Before implementing TTS functionality, be aware of these common limitations (exact values depend on your server):
 
 ### Input Text Constraints
-- **Maximum length**: 1024 characters per request
-- Text exceeding this limit must be split into smaller chunks
+- **Maximum length**: server-dependent; the OpenAI convention is 4096 characters per request (some servers allow less)
+- Text exceeding the limit must be split into smaller chunks
 
 ### Audio Parameters
-- **Speed range**: 0.5 to 2.0
+- **Speed range**: 0.5 to 2.0 (OpenAI convention)
   - 0.5 = half speed (slower)
   - 1.0 = normal speed (default)
   - 2.0 = double speed (faster)
-- **Volume range**: Greater than 0, up to 10
-  - Default: 1.0
-  - Values must be greater than 0 (exclusive) and up to 10 (inclusive)
+- **Volume**: not part of the OpenAI `/audio/speech` convention; most servers ignore extra fields. Apply gain offline when needed.
 
 ### Format and Streaming
-- **Streaming limitation**: When `stream: true` is enabled, only `pcm` format is supported
-- **Non-streaming**: Supports `wav`, `pcm`, and `mp3` formats
-- **Sample rate**: 24000 Hz (recommended)
+- **Streaming limitation**: when `stream: true` is enabled, many servers only support the `pcm` format
+- **Non-streaming**: usually supports `wav`, `pcm`, and `mp3` formats
+- **Sample rate**: 24000 Hz is common (server-dependent)
 
 ### Best Practice for Long Text
 ```javascript
 function splitTextIntoChunks(text, maxLength = 1000) {
   const chunks = [];
   const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-  
+
   let currentChunk = '';
   for (const sentence of sentences) {
     if ((currentChunk + sentence).length <= maxLength) {
@@ -60,80 +60,101 @@ function splitTextIntoChunks(text, maxLength = 1000) {
     }
   }
   if (currentChunk) chunks.push(currentChunk.trim());
-  
+
   return chunks;
 }
 ```
 
 ## Prerequisites
 
-The z-ai-web-dev-sdk package is already installed. Import it as shown in the examples below.
+- Node.js 18+ (for the global `fetch` API) or any HTTP client
+- An OpenAI-compatible server exposing `POST /audio/speech`
+- No npm packages required — examples use built-in APIs only
+
+## Configuration (Environment Variables)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LLM_BASE_URL` | `http://localhost:11434/v1` | OpenAI-compatible base URL of the server hosting the TTS model |
+| `LLM_API_KEY` | (empty) | API key sent as `Authorization: Bearer <key>`; leave empty for local servers |
+| `TTS_MODEL` | `tts-1` | TTS model name (server-dependent) |
+| `TTS_VOICE` | `alloy` | Voice id (server-dependent; see Available Voices below) |
+
+### Shared Client Helper
+
+```javascript
+const BASE_URL = process.env.LLM_BASE_URL ?? "http://localhost:11434/v1";
+const API_KEY = process.env.LLM_API_KEY ?? "";
+const TTS_MODEL = process.env.TTS_MODEL ?? "tts-1";
+const TTS_VOICE = process.env.TTS_VOICE ?? "alloy";
+```
 
 ## CLI Usage (For Simple Tasks)
 
-For simple text-to-speech conversions, you can use the z-ai CLI instead of writing code. This is ideal for quick audio generation, testing voices, or simple automation.
+For simple text-to-speech conversions, you can use `curl` instead of writing code. This is ideal for quick audio generation, testing voices, or simple automation.
 
 ### Basic TTS
 
 ```bash
-# Convert text to speech (default WAV format)
-z-ai tts --input "Hello, world" --output ./hello.wav
-
-# Using short options
-z-ai tts -i "Hello, world" -o ./hello.wav
+# Convert text to speech (default WAV format) and save the raw audio bytes
+curl -s "$LLM_BASE_URL/audio/speech" \
+  -H "Content-Type: application/json" \
+  ${LLM_API_KEY:+-H "Authorization: Bearer $LLM_API_KEY"} \
+  -d '{"model": "tts-1", "input": "Hello, world", "voice": "alloy", "response_format": "wav"}' \
+  --output ./hello.wav
 ```
 
 ### Different Voices and Speed
 
 ```bash
-# Use specific voice
-z-ai tts -i "Welcome to our service" -o ./welcome.wav --voice tongtong
+# Use a specific voice
+curl -s "$LLM_BASE_URL/audio/speech" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "tts-1", "input": "Welcome to our service", "voice": "nova", "response_format": "wav"}' \
+  --output ./welcome.wav
 
 # Adjust speech speed (0.5-2.0)
-z-ai tts -i "This is faster speech" -o ./fast.wav --speed 1.5
-
-# Slower speech
-z-ai tts -i "This is slower speech" -o ./slow.wav --speed 0.8
+curl -s "$LLM_BASE_URL/audio/speech" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "tts-1", "input": "This is faster speech", "voice": "alloy", "speed": 1.5, "response_format": "wav"}' \
+  --output ./fast.wav
 ```
 
 ### Different Output Formats
 
 ```bash
 # MP3 format
-z-ai tts -i "Hello World" -o ./hello.mp3 --format mp3
+curl -s "$LLM_BASE_URL/audio/speech" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "tts-1", "input": "Hello World", "voice": "alloy", "response_format": "mp3"}' \
+  --output ./hello.mp3
 
-# WAV format (default)
-z-ai tts -i "Hello World" -o ./hello.wav --format wav
-
-# PCM format
-z-ai tts -i "Hello World" -o ./hello.pcm --format pcm
-```
-
-### Streaming Output
-
-```bash
-# Stream audio generation
-z-ai tts -i "This is a longer text that will be streamed" -o ./stream.wav --stream
+# WAV format (default in these examples)
+curl -s "$LLM_BASE_URL/audio/speech" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "tts-1", "input": "Hello World", "voice": "alloy", "response_format": "wav"}' \
+  --output ./hello.wav
 ```
 
 ### CLI Parameters
 
-- `--input, -i <text>`: **Required** - Text to convert to speech (max 1024 characters)
-- `--output, -o <path>`: **Required** - Output audio file path
-- `--voice, -v <voice>`: Optional - Voice type (default: tongtong)
-- `--speed, -s <number>`: Optional - Speech speed, 0.5-2.0 (default: 1.0)
-- `--format, -f <format>`: Optional - Output format: wav, mp3, pcm (default: wav)
-- `--stream`: Optional - Enable streaming output (only supports pcm format)
+- Request body fields follow the standard OpenAI Speech schema:
+  - `model`: **Required** - TTS model name (default: `tts-1`)
+  - `input`: **Required** - Text to convert to speech (respect the server's max length)
+  - `voice`: Optional - Voice id (default: `alloy`)
+  - `speed`: Optional - Speech speed, 0.5-2.0 (default: 1.0)
+  - `response_format`: Optional - Output format: `wav`, `mp3`, `pcm`, `opus`, `aac`, `flac` (server-dependent)
+  - `stream`: Optional - Enable streaming output (often only supports `pcm`)
 
-### When to Use CLI vs SDK
+### When to Use CLI vs Code
 
-**Use CLI for:**
+**Use curl for:**
 - Quick text-to-speech conversions
 - Testing different voices and speeds
 - Simple batch audio generation
 - Command-line automation scripts
 
-**Use SDK for:**
+**Use code for:**
 - Dynamic audio generation in applications
 - Integration with web services
 - Custom audio processing pipelines
@@ -144,22 +165,28 @@ z-ai tts -i "This is a longer text that will be streamed" -o ./stream.wav --stre
 ### Simple Text to Speech
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function textToSpeech(text, outputPath) {
-  const zai = await ZAI.create();
-
-  const response = await zai.audio.tts.create({
-    input: text,
-    voice: 'tongtong',
-    speed: 1.0,
-    response_format: 'wav',
-    stream: false
+  const res = await fetch(`${BASE_URL}/audio/speech`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: JSON.stringify({
+      model: TTS_MODEL,
+      input: text,
+      voice: 'alloy',
+      speed: 1.0,
+      response_format: 'wav',
+      stream: false
+    }),
   });
+  if (!res.ok) throw new Error(`TTS request failed (${res.status}): ${await res.text()}`);
 
-  // Get array buffer from Response object
-  const arrayBuffer = await response.arrayBuffer();
+  // The endpoint returns raw binary audio
+  const arrayBuffer = await res.arrayBuffer();
   const buffer = Buffer.from(new Uint8Array(arrayBuffer));
 
   fs.writeFileSync(outputPath, buffer);
@@ -174,22 +201,27 @@ await textToSpeech('Hello, world!', './output.wav');
 ### Multiple Voice Options
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function generateWithVoice(text, voice, outputPath) {
-  const zai = await ZAI.create();
-
-  const response = await zai.audio.tts.create({
-    input: text,
-    voice: voice, // Available voices: tongtong, chuichui, xiaochen, jam, kazi, douji, luodo
-    speed: 1.0,
-    response_format: 'wav',
-    stream: false
+  const res = await fetch(`${BASE_URL}/audio/speech`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: JSON.stringify({
+      model: TTS_MODEL,
+      input: text,
+      voice: voice, // Available voices depend on the server (alloy, echo, fable, onyx, nova, shimmer, ...)
+      speed: 1.0,
+      response_format: 'wav',
+      stream: false
+    }),
   });
+  if (!res.ok) throw new Error(`TTS request failed (${res.status})`);
 
-  // Get array buffer from Response object
-  const arrayBuffer = await response.arrayBuffer();
+  const arrayBuffer = await res.arrayBuffer();
   const buffer = Buffer.from(new Uint8Array(arrayBuffer));
 
   fs.writeFileSync(outputPath, buffer);
@@ -197,34 +229,39 @@ async function generateWithVoice(text, voice, outputPath) {
 }
 
 // Usage
-await generateWithVoice('Welcome to our service', 'tongtong', './welcome.wav');
+await generateWithVoice('Welcome to our service', 'alloy', './welcome.wav');
 ```
 
 ### Adjustable Speed
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function generateWithSpeed(text, speed, outputPath) {
-  const zai = await ZAI.create();
-
-  // Speed range: 0.5 to 2.0 (API constraint)
+  // Speed range (OpenAI convention): 0.5 to 2.0
   // 0.5 = half speed (slower)
   // 1.0 = normal speed (default)
   // 2.0 = double speed (faster)
-  // Values outside this range will cause API errors
+  // Values outside the supported range may cause server errors
 
-  const response = await zai.audio.tts.create({
-    input: text,
-    voice: 'tongtong',
-    speed: speed,
-    response_format: 'wav',
-    stream: false
+  const res = await fetch(`${BASE_URL}/audio/speech`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: JSON.stringify({
+      model: TTS_MODEL,
+      input: text,
+      voice: 'alloy',
+      speed: speed,
+      response_format: 'wav',
+      stream: false
+    }),
   });
+  if (!res.ok) throw new Error(`TTS request failed (${res.status})`);
 
-  // Get array buffer from Response object
-  const arrayBuffer = await response.arrayBuffer();
+  const arrayBuffer = await res.arrayBuffer();
   const buffer = Buffer.from(new Uint8Array(arrayBuffer));
 
   fs.writeFileSync(outputPath, buffer);
@@ -238,41 +275,42 @@ await generateWithSpeed('This is an important announcement', 0.8, './slow.wav');
 await generateWithSpeed('Quick update', 1.3, './fast.wav');
 ```
 
-### Adjustable Volume
+### Extra Parameters (Volume and Beyond)
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
-async function generateWithVolume(text, volume, outputPath) {
-  const zai = await ZAI.create();
-
-  // Volume range: greater than 0, up to 10 (API constraint)
-  // Values must be > 0 (exclusive) and <= 10 (inclusive)
-  // Default: 1.0 (normal volume)
-
-  const response = await zai.audio.tts.create({
-    input: text,
-    voice: 'tongtong',
-    speed: 1.0,
-    volume: volume, // Optional parameter
-    response_format: 'wav',
-    stream: false
+async function generateWithExtraParams(text, outputPath, extraParams = {}) {
+  // NOTE: `volume` is not part of the OpenAI /audio/speech convention.
+  // Servers that support it will honor the extra field; others ignore it.
+  // For guaranteed loudness control, apply gain to the audio buffer afterwards.
+  const res = await fetch(`${BASE_URL}/audio/speech`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: JSON.stringify({
+      model: TTS_MODEL,
+      input: text,
+      voice: 'alloy',
+      speed: 1.0,
+      response_format: 'wav',
+      stream: false,
+      ...extraParams   // e.g. { volume: 5.0 } on servers that support it
+    }),
   });
+  if (!res.ok) throw new Error(`TTS request failed (${res.status})`);
 
-  // Get array buffer from Response object
-  const arrayBuffer = await response.arrayBuffer();
+  const arrayBuffer = await res.arrayBuffer();
   const buffer = Buffer.from(new Uint8Array(arrayBuffer));
 
   fs.writeFileSync(outputPath, buffer);
   return outputPath;
 }
 
-// Usage - louder audio
-await generateWithVolume('This is an announcement', 5.0, './loud.wav');
-
-// Usage - quieter audio
-await generateWithVolume('Whispered message', 0.5, './quiet.wav');
+// Usage - request louder audio on servers that support a volume field
+await generateWithExtraParams('This is an announcement', './loud.wav', { volume: 5.0 });
 ```
 
 ## Advanced Use Cases
@@ -280,12 +318,10 @@ await generateWithVolume('Whispered message', 0.5, './quiet.wav');
 ### Batch Processing
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 
 async function batchTextToSpeech(textArray, outputDir) {
-  const zai = await ZAI.create();
   const results = [];
 
   // Ensure output directory exists
@@ -298,16 +334,24 @@ async function batchTextToSpeech(textArray, outputDir) {
       const text = textArray[i];
       const outputPath = path.join(outputDir, `audio_${i + 1}.wav`);
 
-      const response = await zai.audio.tts.create({
-        input: text,
-        voice: 'tongtong',
-        speed: 1.0,
-        response_format: 'wav',
-        stream: false
+      const res = await fetch(`${BASE_URL}/audio/speech`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+        },
+        body: JSON.stringify({
+          model: TTS_MODEL,
+          input: text,
+          voice: 'alloy',
+          speed: 1.0,
+          response_format: 'wav',
+          stream: false
+        }),
       });
+      if (!res.ok) throw new Error(`TTS request failed (${res.status})`);
 
-      // Get array buffer from Response object
-      const arrayBuffer = await response.arrayBuffer();
+      const arrayBuffer = await res.arrayBuffer();
       const buffer = Buffer.from(new Uint8Array(arrayBuffer));
 
       fs.writeFileSync(outputPath, buffer);
@@ -342,35 +386,35 @@ console.log('Generated:', results.length, 'audio files');
 ### Dynamic Content Generation
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 class TTSGenerator {
-  constructor() {
-    this.zai = null;
-  }
-
-  async initialize() {
-    this.zai = await ZAI.create();
-  }
-
   async generateAudio(text, options = {}) {
     const {
-      voice = 'tongtong',
+      voice = 'alloy',
       speed = 1.0,
       format = 'wav'
     } = options;
 
-    const response = await this.zai.audio.tts.create({
-      input: text,
-      voice: voice,
-      speed: speed,
-      response_format: format,
-      stream: false
+    const res = await fetch(`${BASE_URL}/audio/speech`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+      },
+      body: JSON.stringify({
+        model: TTS_MODEL,
+        input: text,
+        voice: voice,
+        speed: speed,
+        response_format: format,
+        stream: false
+      }),
     });
+    if (!res.ok) throw new Error(`TTS request failed (${res.status})`);
 
-    // Get array buffer from Response object
-    const arrayBuffer = await response.arrayBuffer();
+    // The endpoint returns raw binary audio
+    const arrayBuffer = await res.arrayBuffer();
     return Buffer.from(new Uint8Array(arrayBuffer));
   }
 
@@ -386,7 +430,6 @@ class TTSGenerator {
 
 // Usage
 const generator = new TTSGenerator();
-await generator.initialize();
 
 await generator.saveAudio(
   'Hello, this is a test',
@@ -402,25 +445,29 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { text, voice = 'tongtong', speed = 1.0 } = await req.json();
+    const { text, voice = 'alloy', speed = 1.0 } = await req.json();
 
-    // Import ZAI SDK
-    const ZAI = (await import('z-ai-web-dev-sdk')).default;
-
-    // Create SDK instance
-    const zai = await ZAI.create();
-
-    // Generate TTS audio
-    const response = await zai.audio.tts.create({
-      input: text.trim(),
-      voice: voice,
-      speed: speed,
-      response_format: 'wav',
-      stream: false,
+    const res = await fetch(`${process.env.LLM_BASE_URL}/audio/speech`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.LLM_API_KEY
+          ? { Authorization: `Bearer ${process.env.LLM_API_KEY}` }
+          : {}),
+      },
+      body: JSON.stringify({
+        model: process.env.TTS_MODEL ?? 'tts-1',
+        input: text.trim(),
+        voice: voice,
+        speed: speed,
+        response_format: 'wav',
+        stream: false,
+      }),
     });
+    if (!res.ok) throw new Error(`TTS request failed (${res.status})`);
 
-    // Get array buffer from Response object
-    const arrayBuffer = await response.arrayBuffer();
+    // The endpoint returns raw binary audio
+    const arrayBuffer = await res.arrayBuffer();
     const buffer = Buffer.from(new Uint8Array(arrayBuffer));
 
     // Return audio as response
@@ -437,7 +484,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : '生成语音失败，请稍后重试',
+        error: error instanceof Error ? error.message : 'Failed to generate speech, please try again later',
       },
       { status: 500 }
     );
@@ -471,7 +518,6 @@ function prepareTextForTTS(text) {
 
 ### 2. Error Handling
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function safeTTS(text, outputPath) {
@@ -481,22 +527,28 @@ async function safeTTS(text, outputPath) {
       throw new Error('Text input cannot be empty');
     }
 
-    if (text.length > 1024) {
-      throw new Error('Text input exceeds maximum length of 1024 characters');
+    if (text.length > 4096) {
+      throw new Error('Text input exceeds the maximum length supported by the server');
     }
 
-    const zai = await ZAI.create();
-
-    const response = await zai.audio.tts.create({
-      input: text,
-      voice: 'tongtong',
-      speed: 1.0,
-      response_format: 'wav',
-      stream: false
+    const res = await fetch(`${BASE_URL}/audio/speech`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+      },
+      body: JSON.stringify({
+        model: TTS_MODEL,
+        input: text,
+        voice: 'alloy',
+        speed: 1.0,
+        response_format: 'wav',
+        stream: false
+      }),
     });
+    if (!res.ok) throw new Error(`TTS request failed (${res.status})`);
 
-    // Get array buffer from Response object
-    const arrayBuffer = await response.arrayBuffer();
+    const arrayBuffer = await res.arrayBuffer();
     const buffer = Buffer.from(new Uint8Array(arrayBuffer));
 
     fs.writeFileSync(outputPath, buffer);
@@ -516,24 +568,13 @@ async function safeTTS(text, outputPath) {
 }
 ```
 
-### 3. SDK Instance Reuse
+### 3. Connection Reuse
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-
-// Create a singleton instance
-let zaiInstance = null;
-
-async function getZAIInstance() {
-  if (!zaiInstance) {
-    zaiInstance = await ZAI.create();
-  }
-  return zaiInstance;
-}
-
-// Usage
-const zai = await getZAIInstance();
-const response = await zai.audio.tts.create({ ... });
+// fetch with keep-alive reuses TCP connections automatically.
+// For very high volumes, prefer a single long-lived HTTP agent over
+// creating a new connection per request.
+const res = await fetch(`${BASE_URL}/audio/speech`, { /* ... */ });
 ```
 
 ## Common Use Cases
@@ -552,18 +593,15 @@ const response = await zai.audio.tts.create({ ... });
 
 ```javascript
 import express from 'express';
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 
 const app = express();
 app.use(express.json());
 
-let zaiInstance;
 const outputDir = './audio-output';
 
-async function initZAI() {
-  zaiInstance = await ZAI.create();
+async function init() {
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
@@ -571,7 +609,7 @@ async function initZAI() {
 
 app.post('/api/tts', async (req, res) => {
   try {
-    const { text, voice = 'tongtong', speed = 1.0 } = req.body;
+    const { text, voice = 'alloy', speed = 1.0 } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
@@ -580,15 +618,23 @@ app.post('/api/tts', async (req, res) => {
     const filename = `tts_${Date.now()}.wav`;
     const outputPath = path.join(outputDir, filename);
 
-    const response = await zaiInstance.audio.tts.create({
-      input: text,
-      voice: voice,
-      speed: speed,
-      response_format: 'wav',
-      stream: false
+    const response = await fetch(`${BASE_URL}/audio/speech`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+      },
+      body: JSON.stringify({
+        model: TTS_MODEL,
+        input: text,
+        voice: voice,
+        speed: speed,
+        response_format: 'wav',
+        stream: false
+      }),
     });
+    if (!response.ok) throw new Error(`TTS request failed (${response.status})`);
 
-    // Get array buffer from Response object
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(new Uint8Array(arrayBuffer));
 
@@ -606,7 +652,7 @@ app.post('/api/tts', async (req, res) => {
 
 app.use('/audio', express.static('audio-output'));
 
-initZAI().then(() => {
+init().then(() => {
   app.listen(3000, () => {
     console.log('TTS API running on port 3000');
   });
@@ -616,25 +662,22 @@ initZAI().then(() => {
 ## Troubleshooting
 
 **Issue**: "Input text exceeds maximum length"
-- **Solution**: Text input is limited to 1024 characters. Split longer text into chunks using the `splitTextIntoChunks` function shown in the API Limitations section
+- **Solution**: Text input length is server-limited (the OpenAI convention is 4096 characters). Split longer text into chunks using the `splitTextIntoChunks` function shown in the API Limitations section
 
 **Issue**: "Invalid speed parameter" or unexpected speed behavior
 - **Solution**: Speed must be between 0.5 and 2.0. Check your speed value is within this range
 
-**Issue**: "Invalid volume parameter"
-- **Solution**: Volume must be greater than 0 and up to 10. Ensure volume value is in range (0, 10]
-
 **Issue**: "Stream format not supported" with WAV/MP3
-- **Solution**: Streaming mode only supports PCM format. Either use `response_format: 'pcm'` with streaming, or disable streaming (`stream: false`) for WAV/MP3 output
+- **Solution**: Streaming mode often only supports PCM format. Either use `response_format: 'pcm'` with streaming, or disable streaming (`stream: false`) for WAV/MP3 output
 
-**Issue**: "SDK must be used in backend"
-- **Solution**: Ensure z-ai-web-dev-sdk is only imported in server-side code
+**Issue**: "API key exposed in client code"
+- **Solution**: Read `LLM_API_KEY` from environment variables in server-side code only
 
 **Issue**: "TypeError: response.audio is undefined"
-- **Solution**: The SDK returns a standard Response object, use `await response.arrayBuffer()` instead of accessing `response.audio`
+- **Solution**: The endpoint returns raw binary audio, use `await res.arrayBuffer()` instead of accessing `response.audio`
 
 **Issue**: Generated audio file is empty or corrupted
-- **Solution**: Ensure you're calling `await response.arrayBuffer()` and properly converting to Buffer: `Buffer.from(new Uint8Array(arrayBuffer))`
+- **Solution**: Ensure you're calling `await res.arrayBuffer()` and properly converting to Buffer: `Buffer.from(new Uint8Array(arrayBuffer))`
 
 **Issue**: Audio sounds unnatural
 - **Solution**: Prepare text properly (remove special characters, expand abbreviations)
@@ -645,9 +688,12 @@ initZAI().then(() => {
 **Issue**: Next.js caching old API route
 - **Solution**: Create a new API route endpoint or restart the dev server
 
+**Issue**: 404 on `/audio/speech`
+- **Solution**: Your server does not implement the OpenAI speech route. Point `LLM_BASE_URL` at a gateway or TTS server that does
+
 ## Performance Tips
 
-1. **Reuse SDK Instance**: Create ZAI instance once and reuse
+1. **Reuse HTTP Connections**: `fetch` with keep-alive reuses connections across requests
 2. **Implement Caching**: Cache generated audio for repeated text
 3. **Batch Processing**: Process multiple texts efficiently
 4. **Optimize Text**: Remove unnecessary content before generation
@@ -657,52 +703,62 @@ initZAI().then(() => {
 
 ### API Constraints
 
-**Input Text Length**: Maximum 1024 characters per request. For longer text:
+**Input Text Length**: Server-dependent maximum per request (OpenAI convention: 4096 characters). For longer text:
 ```javascript
 // Split long text into chunks
 const longText = "..."; // Your long text here
 const chunks = splitTextIntoChunks(longText, 1000);
 
 for (const chunk of chunks) {
-  const response = await zai.audio.tts.create({
-    input: chunk,
-    voice: 'tongtong',
-    speed: 1.0,
-    response_format: 'wav',
-    stream: false
+  const res = await fetch(`${BASE_URL}/audio/speech`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: JSON.stringify({
+      model: TTS_MODEL,
+      input: chunk,
+      voice: 'alloy',
+      speed: 1.0,
+      response_format: 'wav',
+      stream: false
+    }),
   });
   // Process each chunk...
 }
 ```
 
-**Streaming Format Limitation**: When using `stream: true`, only `pcm` format is supported. For `wav` or `mp3` output, use `stream: false`.
+**Streaming Format Limitation**: When using `stream: true`, many servers only support the `pcm` format. For `wav` or `mp3` output, use `stream: false`.
 
-**Sample Rate**: Audio is generated at 24000 Hz sample rate (recommended setting for playback).
+**Sample Rate**: Audio is commonly generated at 24000 Hz sample rate (server-dependent).
 
-### Response Object Format
+### Response Format
 
-The `zai.audio.tts.create()` method returns a standard **Response** object (not a custom object with an `audio` property). Always use:
+The `/audio/speech` endpoint returns raw **binary audio** in the requested format. Always use:
 
 ```javascript
 // ✅ CORRECT
-const response = await zai.audio.tts.create({ ... });
-const arrayBuffer = await response.arrayBuffer();
+const res = await fetch(`${BASE_URL}/audio/speech`, { ... });
+const arrayBuffer = await res.arrayBuffer();
 const buffer = Buffer.from(new Uint8Array(arrayBuffer));
 
 // ❌ WRONG - This will not work
-const response = await zai.audio.tts.create({ ... });
 const buffer = Buffer.from(response.audio); // response.audio is undefined
 ```
 
 ### Available Voices
 
-- `tongtong` - 温暖亲切
-- `chuichui` - 活泼可爱
-- `xiaochen` - 沉稳专业
-- `jam` - 英音绅士
-- `kazi` - 清晰标准
-- `douji` - 自然流畅
-- `luodo` - 富有感染力
+Voice availability depends entirely on your server. Servers following the OpenAI convention typically expose:
+
+- `alloy` - balanced, neutral
+- `echo` - calm, steady
+- `fable` - expressive, storyteller
+- `onyx` - deep, authoritative
+- `nova` - bright, energetic
+- `shimmer` - warm, friendly
+
+Open-source engines (Kokoro, Piper, Coqui) expose their own voice ids — check your server's documentation and set `TTS_VOICE` accordingly.
 
 ### Speed Range
 
@@ -710,26 +766,25 @@ const buffer = Buffer.from(response.audio); // response.audio is undefined
 - Default: `1.0` (normal speed)
 - Maximum: `2.0` (double speed)
 
-**Important**: Speed values outside the range [0.5, 2.0] will result in API errors.
+**Important**: Speed values outside the supported range may result in server errors.
 
 ### Volume Range
 
-- Minimum: Greater than `0` (exclusive)
-- Default: `1.0` (normal volume)
-- Maximum: `10` (inclusive)
-
-**Note**: Volume parameter is optional. When not specified, defaults to 1.0.
+- Not part of the OpenAI `/audio/speech` convention
+- Servers that support it accept a `volume` field (typically `> 0`, up to `10`, default `1.0`)
+- For portable behavior, apply gain to the audio buffer offline
 
 ## Remember
 
-- Always use z-ai-web-dev-sdk in backend code only
-- **Input text is limited to 1024 characters maximum** - split longer text into chunks
-- **Speed must be between 0.5 and 2.0** - values outside this range will cause errors
-- **Volume must be greater than 0 and up to 10** - optional parameter with default 1.0
-- **Streaming only supports PCM format** - use non-streaming for WAV or MP3 output
-- The SDK returns a standard Response object - use `await response.arrayBuffer()`
-- Convert ArrayBuffer to Buffer using `Buffer.from(new Uint8Array(arrayBuffer))`
-- Handle audio buffers properly when saving to files
+- Works with any OpenAI-compatible server exposing `/audio/speech` (gateways fronting Kokoro, Piper, Coqui, ..., or hosted OpenAI-compatible APIs)
+- Designed for the DiveeOI agent (OpenCode-based)
+- Configuration via environment variables: `LLM_BASE_URL`, `LLM_API_KEY`, `TTS_MODEL`, `TTS_VOICE`
+- The endpoint is `POST {LLM_BASE_URL}/audio/speech` with `{model, input, voice, speed, response_format}` and returns **raw binary audio**
+- **Input text length is server-limited** - split longer text into chunks
+- **Speed should be between 0.5 and 2.0** - values outside this range may cause errors
+- **Streaming often only supports PCM format** - use non-streaming for WAV or MP3 output
+- Convert the response with `await res.arrayBuffer()` and `Buffer.from(new Uint8Array(arrayBuffer))`
+- Keep your API key in server-side code only
 - Implement error handling for production applications
 - Consider caching for frequently generated content
 - Clean up old audio files periodically to manage storage

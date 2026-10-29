@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """
-star_story_builder.py — 从简历文本里抽出工作 / 项目经历，生成"故事矩阵"骨架
+star_story_builder.py — Extract work / project experiences from resume text and
+generate a "story matrix" skeleton
 
-用法：
+Usage:
     python star_story_builder.py --resume resume.md --out stories.md
 
-输出一份 markdown，包含：
-- 检测到的 N 个经历（按时间倒序）
-- 每个经历的 STAR 骨架占位（让用户 / 模型补全）
-- 每个故事可以回答的行为题清单
+Outputs a markdown file containing:
+- The N experiences detected (reverse-chronological)
+- A STAR skeleton placeholder for each experience (for the user / model to fill in)
+- The list of behavioral questions each story can answer
 """
 
 from __future__ import annotations
@@ -21,28 +22,28 @@ from pathlib import Path
 
 COMMON_BEHAVIORAL_QUESTIONS = {
     "ownership": [
-        "讲一次你 ownership 体现得最好的经历",
-        "你做过的最有成就感的项目",
-        "讲一次你主动推动事情",
+        "Describe the experience where you demonstrated ownership best",
+        "The project you're most proud of",
+        "Describe a time you proactively drove something forward",
     ],
     "collab": [
-        "讲一次你跨部门 / 跨团队推动事情",
-        "讲一次你和同事意见不合，怎么解决",
-        "讲一次你说服别人改变想法",
+        "Describe a time you drove an initiative across departments / teams",
+        "Describe a time you disagreed with a colleague and how you resolved it",
+        "Describe a time you persuaded someone to change their mind",
     ],
     "challenge": [
-        "讲一次你在资源 / 时间不足下完成目标",
-        "讲一次你做艰难决策的经历",
-        "讲一次你打破常规 / 创新的经历",
+        "Describe a time you delivered a goal with insufficient resources / time",
+        "Describe a time you made a difficult decision",
+        "Describe a time you broke convention / innovated",
     ],
     "failure": [
-        "讲一次你失败 / 没达成目标的经历",
-        "讲一次你犯过的最大错误",
-        "讲一次接到负面反馈，怎么应对",
+        "Describe a time you failed / missed a goal",
+        "Describe your biggest mistake",
+        "Describe how you responded to negative feedback",
     ],
     "learning": [
-        "讲一次你快速学会全新领域的经历",
-        "你最近学到的最重要的事是什么",
+        "Describe a time you quickly learned a completely new domain",
+        "What's the most important thing you've learned recently?",
     ],
 }
 
@@ -55,25 +56,26 @@ def load_resume_text(path: Path) -> str:
         try:
             from docx import Document
         except ImportError:
-            print("✗ 缺少 python-docx", file=sys.stderr)
+            print("✗ python-docx is missing", file=sys.stderr)
             sys.exit(1)
         return "\n".join(p.text for p in Document(str(path)).paragraphs)
-    print(f"✗ 暂不支持 {suffix}", file=sys.stderr)
+    print(f"✗ Unsupported format: {suffix}", file=sys.stderr)
     sys.exit(1)
 
 
 def extract_experiences(text: str) -> list[dict]:
     """
-    简易抽取：找形如 "公司 | 岗位 | 时间" 或 "项目名 | ..." 的行作为锚点，
-    然后取该行后面、下一个锚点之前的内容作为经历内容。
+    Lightweight extraction: treat lines shaped like "Company | Role | Dates"
+    or "Project | ..." as anchors, then collect everything after that line and
+    before the next anchor as the experience content.
     """
     lines = text.splitlines()
     experiences: list[dict] = []
     current = None
 
-    # 匹配锚点（含 | 或 ｜，且包含日期/年份）
+    # Match anchors (containing | and a date / year)
     anchor_re = re.compile(
-        r"^(?P<title>[^\n]+?[|｜][^\n]+?[|｜][^\n]+)$"
+        r"^(?P<title>[^\n]+?[|][^\n]+?[|][^\n]+)$"
     )
 
     for line in lines:
@@ -92,18 +94,18 @@ def extract_experiences(text: str) -> list[dict]:
 
 
 def categorize_story(bullets: list[str]) -> list[str]:
-    """根据 bullet 关键词，判断这个故事最适合回答哪一类行为题。"""
+    """Based on bullet keywords, decide which category of behavioral question this story fits best."""
     text = " ".join(bullets).lower()
     cats = []
-    if any(k in text for k in ["主导", "owner", "推动", "drive", "lead", "0-1"]):
+    if any(k in text for k in ["led", "led the", "owner", "owned", "drove", "drive", "lead", "0-1", "0 to 1"]):
         cats.append("ownership")
-    if any(k in text for k in ["跨部门", "跨团队", "协作", "对接", "合作"]):
+    if any(k in text for k in ["cross-team", "cross-functional", "cross-department", "collaborat", "stakeholder", "partner"]):
         cats.append("collab")
-    if any(k in text for k in ["紧急", "时间紧", "资源", "决策", "突破"]):
+    if any(k in text for k in ["tight deadline", "limited resources", "resource", "decision", "breakthrough", "urgent"]):
         cats.append("challenge")
-    if any(k in text for k in ["失败", "下线", "回滚", "复盘", "教训", "踩坑"]):
+    if any(k in text for k in ["failed", "failure", "rollback", "retro", "lesson", "pitfall", "postmortem", "post-mortem"]):
         cats.append("failure")
-    if any(k in text for k in ["新", "学习", "陌生", "首次", "从零"]):
+    if any(k in text for k in ["new", "learn", "first time", "from scratch", "unfamiliar"]):
         cats.append("learning")
     return cats or ["ownership"]
 
@@ -111,49 +113,49 @@ def categorize_story(bullets: list[str]) -> list[str]:
 def render(experiences: list[dict]) -> str:
     if not experiences:
         return (
-            "# 故事矩阵（未检测到经历）\n\n"
-            "无法从简历里自动抽取出工作 / 项目经历。可能是因为：\n"
-            "1. 简历格式不是 `公司 | 岗位 | 时间` 的常见结构\n"
-            "2. 经历用普通段落写，没有明显的锚点\n\n"
-            "建议：手工告诉我你最有代表性的 3~5 段经历，我来帮你做 STAR 拆解。\n"
+            "# Story Matrix (no experiences detected)\n\n"
+            "No work / project experiences could be auto-extracted from the resume. Possible reasons:\n"
+            "1. The resume doesn't follow the common `Company | Role | Dates` structure\n"
+            "2. Experiences are written as plain paragraphs with no clear anchors\n\n"
+            "Suggestion: tell me your 3-5 most representative experiences manually, and I'll build the STAR breakdown for you.\n"
         )
 
-    out = ["# 故事矩阵（Story Matrix）", ""]
-    out.append(f"从简历里检测到 {len(experiences)} 段经历，按 STAR 拆解如下。")
-    out.append("**请补充每个 STAR 段落里 `[占位]` 的内容**，准备好后这些故事可以覆盖 80% 的行为面问题。")
+    out = ["# Story Matrix", ""]
+    out.append(f"Detected {len(experiences)} experiences from the resume; STAR breakdown below.")
+    out.append("**Please fill in every `[placeholder]` in each STAR section** — once ready, these stories can cover 80% of behavioral questions.")
     out.append("")
 
     for idx, exp in enumerate(experiences[:8], start=1):
         cats = categorize_story(exp["bullets"])
-        out.append(f"## 故事 {idx}：{exp['title']}")
+        out.append(f"## Story {idx}: {exp['title']}")
         out.append("")
-        out.append("**简历原始 bullet：**")
+        out.append("**Original resume bullets:**")
         for b in exp["bullets"][:5]:
             out.append(f"- {b}")
         out.append("")
-        out.append("**STAR 拆解（请补全）：**")
-        out.append("- **S（背景）**：[占位 - 一句话点明背景 / 痛点]")
-        out.append("- **T（任务）**：[占位 - 你的具体任务和目标]")
-        out.append("- **A（动作）**：[占位 - 分 2~4 步，每步带动词 + 决策依据]")
-        out.append("- **R（结果）**：[占位 - 量化结果 + 一句反思]")
+        out.append("**STAR breakdown (fill in):**")
+        out.append("- **S (Situation)**: [placeholder - one sentence framing the context / pain point]")
+        out.append("- **T (Task)**: [placeholder - your specific task and goal]")
+        out.append("- **A (Action)**: [placeholder - 2-4 steps, each with a verb + decision rationale]")
+        out.append("- **R (Result)**: [placeholder - quantified result + one line of reflection]")
         out.append("")
 
         question_pool = []
         for cat in cats:
             question_pool.extend(COMMON_BEHAVIORAL_QUESTIONS.get(cat, []))
-        out.append(f"**最适合回答的行为题（{', '.join(cats)}）：**")
+        out.append(f"**Behavioral questions this story answers best ({', '.join(cats)}):**")
         for q in question_pool[:4]:
             out.append(f"- {q}")
         out.append("")
         out.append("---")
         out.append("")
 
-    out.append("## 使用建议")
+    out.append("## Usage Tips")
     out.append("")
-    out.append("- 把每个故事的 STAR 段落填好，每段控制在 30~90 秒讲完")
-    out.append("- 面试时灵活组合：同一个故事可以从不同角度回答不同题")
-    out.append("- 至少准备 **3 个完整故事**（成功 + 失败 + 协作 各一个），覆盖 80% 行为题")
-    out.append('- 每个故事里强调「我」做了什么，避免大量「我们」')
+    out.append("- Fill in each story's STAR sections; keep each segment within 30-90 seconds when spoken")
+    out.append("- Mix and match in the interview: the same story can answer different questions from different angles")
+    out.append("- Prepare at least **3 complete stories** (one success + one failure + one collaboration) to cover 80% of behavioral questions")
+    out.append('- Within each story emphasize what "I" did; avoid heavy use of "we"')
     return "\n".join(out)
 
 
@@ -169,7 +171,7 @@ def main() -> None:
 
     if args.out:
         Path(args.out).write_text(report, encoding="utf-8")
-        print(f"✓ 故事矩阵已生成：{args.out}")
+        print(f"✓ Story matrix written to: {args.out}")
     else:
         print(report)
 

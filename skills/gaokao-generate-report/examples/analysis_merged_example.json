@@ -1,24 +1,24 @@
 {
   "student": {
-    "interests": "考生兴趣爱好",
-    "family_situation": "家庭情况",
-    "career_direction": "就业方向",
-    "subject_scores": { "语文": 125, "数学": 138 },
-    "preferred_cities": ["北京", "上海"],
-    "notes": "补充说明"
+    "interests": "<student's interests>",
+    "family_situation": "<family situation>",
+    "career_direction": "<career direction>",
+    "subject_scores": { "chinese": 125, "math": 138 },
+    "preferred_cities": ["<e.g. Beijing = \u5317\u4eac>", "Shanghai"],
+    "notes": "<additional notes>"
   },
   "analysis": {
-    "intro": "来自 major_recommendation.intro",
-    "strategy": "来自 major_recommendation.strategy",
+    "intro": "from major_recommendation.intro",
+    "strategy": "from major_recommendation.strategy",
     "major_directions": [
       {
         "icon": "🧑‍💻",
-        "title": "专业方向名称",
-        "match_level": "极高",
-        "description": "方向说明"
+        "title": "<major direction name>",
+        "match_level": "<Very high>",
+        "description": "<direction description>"
       }
     ],
-    "school_strategy": "来自 school_recommendation.school_strategy"
+    "school_strategy": "from school_recommendation.school_strategy"
   },
   "recommended_majors": [],
   "recommended_schools": []

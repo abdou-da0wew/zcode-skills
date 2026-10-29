@@ -1,50 +1,50 @@
-# 互联网产品 / 运营 / PM 简历模板
+# Internet Product / Operations / PM Resume Template
 
-## 结构（顺序很重要）
+## Structure (order matters)
 
 ```
-姓名｜电话｜邮箱｜城市｜目标岗位
-（应届可加：在读学校 + 期望毕业时间）
+Name | Phone | Email | City | Target role
+(new grads may add: current school + expected graduation date)
 
-【个人简介 / Summary】（2~3 行，可选）
-一句话定位：X 年 ___ 经验，专注 ___，擅长 ___，曾在 ___ 主导 ___
+[Personal Profile / Summary] (2-3 lines, optional)
+One-line positioning: X years of ___ experience, focused on ___, strong at ___, previously led ___ at ___
 
-【工作经历】（社招放最前；应届放教育下面）
-公司 A | 岗位 | 起止时间
-- bullet 1（核心成绩，量化）
-- bullet 2（次重要成绩）
-- bullet 3（横向能力 / 影响力）
+[Work Experience] (experienced hires first; new grads put it below education)
+Company A | Role | Start-End dates
+- bullet 1 (core achievement, quantified)
+- bullet 2 (second-most-important achievement)
+- bullet 3 (cross-cutting ability / influence)
 
-【项目经历】（与岗位强相关的 2~4 个）
-项目名 | 角色 | 时间
-- 背景：___（一句话）
-- 动作：___（你做了什么）
-- 结果：___（量化）
+[Project Experience] (the 2-4 most role-relevant projects)
+Project name | Role | Dates
+- Background: ___ (one sentence)
+- Actions: ___ (what you did)
+- Results: ___ (quantified)
 
-【教育背景】
-学校 | 专业 | 学历 | 起止时间
-（GPA 高于 3.5/4.0 才写）
+[Education]
+School | Major | Degree | Start-End dates
+(only include GPA if above 3.5/4.0)
 
-【技能 / 工具】
-- 数据：SQL（熟练）、Python（pandas/numpy）、Tableau
-- 产品工具：Figma / Axure / 墨刀
-- 协作：Notion / 飞书 / Jira
-- 语言：英语 CET-6 / 雅思 7.0
+[Skills / Tools]
+- Data: SQL (proficient), Python (pandas/numpy), Tableau
+- Product tools: Figma / Axure / MockingBot
+- Collaboration: Notion / Lark / Jira
+- Languages: English CET-6 / IELTS 7.0
 
-【其他】（可选）
-证书 / 自媒体 / 开源项目 / 演讲 / 获奖
+[Other] (optional)
+Certifications / content creation / open-source projects / talks / awards
 ```
 
-## 风格要点
+## Style Points
 
-- bullet 句式："动词 + 对象 + 方法 + 结果（数字）"
-- 突出 ownership：用"主导/负责/推动"，不要用"参与/协助"
-- 数字密度：每段经历 ≥ 60% 的 bullet 含数字
-- 长度：1 页（≤ 3 年经验）；最多 2 页（5+ 年）
+- Bullet pattern: "verb + object + method + result (number)"
+- Highlight ownership: use "led / owned / drove", never "participated / assisted"
+- Number density: ≥ 60% of bullets per experience contain numbers
+- Length: 1 page (≤ 3 years of experience); at most 2 pages (5+ years)
 
-## 常见加分项
+## Common Plus Points
 
-- 0-1 项目经历（哪怕规模小）
-- 跨部门 / 跨业务线协作
-- 业务复盘文章 / 公开演讲
-- 数据驱动 case（写清楚假设→实验→结论）
+- 0-to-1 project experience (even at small scale)
+- Cross-department / cross-business-line collaboration
+- Retrospective write-ups / public talks
+- Data-driven cases (spell out hypothesis → experiment → conclusion)

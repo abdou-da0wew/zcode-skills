@@ -1,78 +1,78 @@
-# 金融 / 咨询 / 商科 关键词库
+# Finance / Consulting / Business Keyword Library
 
-## 投行 / IBD
-
-**Must-have**
-- 财务建模（DCF、LBO、Comps、Precedent Transactions）
-- 估值方法、敏感性分析、scenario analysis
-- 行业研究、招股书 / pitchbook、deal experience
-- Excel 建模、PowerPoint 高阶、Bloomberg、Capital IQ、Wind
-
-**职级 & 信号**
-- Analyst（应届/1-3 年）：execution、模型搭建
-- Associate（3-6 年）：项目管理、客户接触
-- VP / Director：deal origination、客户关系
-
-**典型雇主**
-- 外资九大行：高盛、摩根士丹利、摩根大通、美林、巴克莱、瑞银、瑞信、德银、花旗
-- 中资头部：中金、中信、华泰联合、海通、招商
-- 精品行：Lazard、Centerview、Moelis、Evercore、华兴、汉能
-
-## 咨询（Consulting）
+## Investment Banking / IBD
 
 **Must-have**
-- 结构化思维（MECE、issue tree、hypothesis-driven）
-- Case Interview 能力：market sizing、profitability、M&A、market entry
-- 行业知识 + 客户沟通
-- 工具：PowerPoint（必）、Excel（必）、Tableau / Alteryx（加分）
+- Financial modeling (DCF, LBO, Comps, Precedent Transactions)
+- Valuation methods, sensitivity analysis, scenario analysis
+- Industry research, prospectus / pitchbook, deal experience
+- Excel modeling, advanced PowerPoint, Bloomberg, Capital IQ, Wind
 
-**MBB 信号**：先 sizing 再框架，框架要 collectively exhaustive，假设清晰可证伪
+**Levels & signals**
+- Analyst (new grad / 1-3 yrs): execution, model building
+- Associate (3-6 yrs): project management, client exposure
+- VP / Director: deal origination, client relationships
 
-**典型雇主**
-- MBB：McKinsey、BCG、Bain
-- Big 4 战略：Strategy&（PwC）、Monitor Deloitte、EY-Parthenon、KPMG Strategy
-- 二线：Roland Berger、Oliver Wyman、A.T. Kearney、L.E.K.
-- 内资：埃森哲战略（已并入）、华兴 Alpha、艾瑞、易观、罗兰贝格本土化团队
+**Typical employers**
+- Bulge brackets: Goldman Sachs, Morgan Stanley, J.P. Morgan, BofA Merrill Lynch, Barclays, UBS, Credit Suisse, Deutsche Bank, Citi
+- Top Chinese houses: CICC, CITIC, Huatai United, Haitong, China Merchants
+- Elite boutiques: Lazard, Centerview, Moelis, Evercore, China Renaissance, Hannam
 
-## 买方 / 二级市场（Buy Side）
-
-**Must-have**
-- 行业研究、公司研究、估值模型
-- 投资逻辑、催化剂、风险点
-- 写作能力（投研报告）
-
-**细分**
-- 公募基金：行业研究员 / 基金经理助理
-- 私募 / 对冲基金：基本面 / 量化 / CTA / 多策略
-- 险资 / 资管：稳健、负债端思维
-- VC / PE：早期 / 成长期 / 并购，技术 + 商业判断
-
-## 量化（Quant）
+## Consulting
 
 **Must-have**
-- 数学：随机过程、统计、优化、概率
-- 编程：Python（必）、C++ / Java（HFT 必）、Q/KDB
-- 策略类型：CTA、stat arb、market making、HFT、ML 因子
-- 工具：vnpy、聚宽、米筐、Bloomberg、Wind、Tushare
+- Structured thinking (MECE, issue tree, hypothesis-driven)
+- Case Interview skills: market sizing, profitability, M&A, market entry
+- Industry knowledge + client communication
+- Tools: PowerPoint (must), Excel (must), Tableau / Alteryx (a plus)
 
-**典型雇主**
-- 国际：Two Sigma、Citadel、Jane Street、Jump Trading、HRT、DRW
-- 国内：九坤、明汯、灵均、宽德、幻方、鸣石、致诚卓远
+**MBB signals**: sizing before framework, framework must be collectively exhaustive, hypotheses clear and falsifiable
 
-## 战略 / 商业分析（in-house）
+**Typical employers**
+- MBB: McKinsey, BCG, Bain
+- Big 4 strategy: Strategy& (PwC), Monitor Deloitte, EY-Parthenon, KPMG Strategy
+- Tier 2: Roland Berger, Oliver Wyman, A.T. Kearney, L.E.K.
+- Domestic: Accenture Strategy (since merged), China Renaissance Alpha, iResearch, Analysys, localized Roland Berger teams
+
+## Buy Side / Public Markets
 
 **Must-have**
-- 商业模型理解、unit economics、市场地图
-- 数据驱动决策、SQL 基础
-- 战略 deck 输出、跨部门推动力
+- Industry research, company research, valuation models
+- Investment thesis, catalysts, risk factors
+- Writing skills (research reports)
 
-**典型场景**：互联网战投、车企战略、新消费品牌战略、跨国公司中国区战略
+**Sub-tracks**
+- Mutual funds: industry researcher / assistant portfolio manager
+- Private funds / hedge funds: fundamental / quant / CTA / multi-strategy
+- Insurance capital / asset management: stability-focused, liability-side thinking
+- VC / PE: early / growth / buyout, technical + commercial judgment
 
-## 财务 / FP&A / 内审 / 税务
+## Quant
 
-略，按需补充。
+**Must-have**
+- Math: stochastic processes, statistics, optimization, probability
+- Programming: Python (must), C++ / Java (must for HFT), Q/KDB
+- Strategy types: CTA, stat arb, market making, HFT, ML factors
+- Tools: vnpy, JoinQuant, RiceQuant, Bloomberg, Wind, Tushare
 
-## 反信号
-- 投行 / 咨询岗位简历**没有 deal / case 列表** → 致命
-- 量化岗**没有策略实盘 / 回测结果** → 弱
-- 公募 / PE 岗**没有具体 coverage 行业** → 假研究员
+**Typical employers**
+- International: Two Sigma, Citadel, Jane Street, Jump Trading, HRT, DRW
+- China: Ubiquant, Minghong, Lingjun, Kuande, High-Flyer, Mingshi, Zhicheng Zhuoyuan
+
+## Strategy / Business Analysis (in-house)
+
+**Must-have**
+- Business model understanding, unit economics, market mapping
+- Data-driven decision making, basic SQL
+- Strategy deck output, cross-department drive
+
+**Typical scenarios**: corporate venture/strategy at internet firms, automaker strategy, new consumer brand strategy, multinational APAC/China strategy
+
+## Accounting / FP&A / Internal Audit / Tax
+
+Omitted; add as needed.
+
+## Red Flags
+- An IB / consulting resume with **no deal / case list** → fatal
+- A quant resume with **no live strategy / backtest results** → weak
+- A public-fund / PE resume with **no specific coverage industries** → fake researcher

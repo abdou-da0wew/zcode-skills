@@ -1,29 +1,29 @@
-# 框架识别特征
+# Framework Identification Signatures
 
 ## Three.js
 
-**未混淆**：`THREE.`, `WebGLRenderer`, `ShaderMaterial`, `BufferGeometry`
+**Un-obfuscated**: `THREE.`, `WebGLRenderer`, `ShaderMaterial`, `BufferGeometry`
 
-**混淆后**（通过构造参数推断）：
+**Obfuscated** (inferred from constructor arguments):
 
-| 调用模式 | 原始类 |
+| Call pattern | Original class |
 |---------|--------|
 | `new X({canvas, antialias, alpha})` | `WebGLRenderer` |
-| `new X(fov, aspect, near, far)` — 4 数字 | `PerspectiveCamera` |
-| `new X(-1, 1, 1, -1, 0, 1)` — 6 参数 | `OrthographicCamera` |
+| `new X(fov, aspect, near, far)` — 4 numbers | `PerspectiveCamera` |
+| `new X(-1, 1, 1, -1, 0, 1)` — 6 args | `OrthographicCamera` |
 | `new X(w, h, {wrapS, minFilter})` | `WebGLRenderTarget` |
 | `new X(data, w, h, format, type)` — Float32Array | `DataTexture` |
-| `new X(2, 2)` 作为几何体 | `PlaneGeometry` |
+| `new X(2, 2)` used as geometry | `PlaneGeometry` |
 | `new X({uniforms, vertexShader, fragmentShader})` | `ShaderMaterial` |
 | `X.getElapsedTime()` | `Clock` |
 
-**常量**：`ClampToEdgeWrapping`, `NearestFilter`, `RGBAFormat`, `FloatType`, `DoubleSide`
+**Constants**: `ClampToEdgeWrapping`, `NearestFilter`, `RGBAFormat`, `FloatType`, `DoubleSide`
 
 ## 2D Canvas
 
-`dataEngine: null` 时，用 `getContext('2d')` 有无 + `createShader`/`shaderSource` 有无区分：
-- 有 `getContext('2d')`，无 WebGL 调用 → 纯 2D Canvas
-- 有 WebGL 调用 → Raw WebGL / PixiJS
+When `dataEngine: null`, distinguish using the presence of `getContext('2d')` vs `createShader`/`shaderSource`:
+- Has `getContext('2d')`, no WebGL calls → pure 2D Canvas
+- Has WebGL calls → Raw WebGL / PixiJS
 
 ## Raw WebGL
 
@@ -40,13 +40,13 @@ gl.bindBuffer / gl.bindFramebuffer / gl.drawArrays
 
 `BABYLON.Engine`, `BABYLON.ShaderMaterial`, `BABYLON.Effect.ShadersStore`
 
-## GPGPU 模式
+## GPGPU Pattern
 
-两个 `WebGLRenderTarget`（ping-pong）+ `OrthographicCamera(-1,1,1,-1,0,1)` + `PlaneGeometry(2,2)` + `DataTexture` 初始位置 + `setRenderTarget` 循环
+Two `WebGLRenderTarget`s (ping-pong) + `OrthographicCamera(-1,1,1,-1,0,1)` + `PlaneGeometry(2,2)` + `DataTexture` initial positions + a `setRenderTarget` loop
 
-## 常见噪声
+## Common Noise
 
-| 函数 | 类型 |
+| Function | Type |
 |------|------|
 | `snoise` | Simplex noise (Ashima) |
 | `cnoise` | Classic Perlin |

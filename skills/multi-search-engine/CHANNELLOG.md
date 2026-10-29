@@ -1,47 +1,47 @@
 # Multi Search Engine
 
-## 基本信息
+## Basic Information
 
-- **名称**: multi-search-engine
-- **版本**: v2.0.1
-- **描述**: 集成17个搜索引擎（8国内+9国际），支持高级搜索语法
-- **发布时间**: 2026-02-06
+- **Name**: multi-search-engine
+- **Version**: v2.0.1
+- **Description**: Integrates 17 search engines (8 domestic CN + 9 international), supports advanced search syntax
+- **Release date**: 2026-02-06
 
-## 搜索引擎
+## Search Engines
 
-**国内（8个）**: 百度、必应、360、搜狗、微信、头条、集思录
-**国际（9个）**: Google、DuckDuckGo、Yahoo、Brave、Startpage、Ecosia、Qwant、WolframAlpha
+**Domestic (8)**: Baidu, Bing, 360, Sogou, WeChat, Toutiao, Jisilu
+**International (9)**: Google, DuckDuckGo, Yahoo, Brave, Startpage, Ecosia, Qwant, WolframAlpha
 
-## 核心功能
+## Core Features
 
-- 高级搜索操作符（site:, filetype:, intitle:等）
-- DuckDuckGo Bangs快捷命令
-- 时间筛选（小时/天/周/月/年）
-- 隐私保护搜索
-- WolframAlpha知识计算
+- Advanced search operators (site:, filetype:, intitle:, etc.)
+- DuckDuckGo Bangs shortcuts
+- Time filters (hour/day/week/month/year)
+- Privacy-preserving search
+- WolframAlpha knowledge computation
 
-## 更新记录
+## Update History
 
 ### v2.0.1 (2026-02-06)
-- 精简文档，优化发布
+- Streamlined documentation, optimized for release
 
 ### v2.0.0 (2026-02-06)
-- 新增9个国际搜索引擎
-- 强化深度搜索能力
+- Added 9 international search engines
+- Strengthened deep search capabilities
 
 ### v1.0.0 (2026-02-04)
-- 初始版本：8个国内搜索引擎
+- Initial version: 8 domestic search engines
 
-## 使用示例
+## Usage Examples
 
 ```javascript
-// Google搜索
+// Google search
 web_fetch({"url": "https://www.google.com/search?q=python"})
 
-// 隐私搜索
+// Privacy search
 web_fetch({"url": "https://duckduckgo.com/html/?q=privacy"})
 
-// 站内搜索
+// Site-restricted search
 web_fetch({"url": "https://www.google.com/search?q=site:github.com+python"})
 ```
 

@@ -3,21 +3,21 @@ Excel
 PowerPoint
 Word
 Notion
-飞书
+Lark
 Jira
 Asana
-英语
-项目管理
-跨部门协作
-推动落地
+English
+project management
+cross-team collaboration
+driving execution
 ownership
-数据驱动
-用户同理心
-快速学习
-影响力
-说服力
-量化
-可迁移
+data-driven
+user empathy
+rapid learning
+influence
+persuasion
+quantification
+transferable
 0-1
 1-N
 ROI

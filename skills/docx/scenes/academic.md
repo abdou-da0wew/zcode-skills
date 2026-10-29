@@ -97,13 +97,13 @@ styles: {
 
 | Level | Format | Example |
 |-------|--------|---------|
-| H1 | Chapter X + title | 第一章 绪论 (Chapter 1 Introduction) |
+| H1 | Chapter X + title | `\u7b2c\u4e00\u7ae0 \u7eea\u8bba` (Chapter 1 Introduction) |
 | H2 | X.X + section title | 1.1 Research Background |
 | H3 | X.X.X + subsection | 1.1.1 Domestic Research Status |
 
 ### Mandatory Rules
-1. **H1 must use "第X章" format** — not "一、", not "Chapter 1", not "第1章"
-2. **H2/H3 use Arabic decimal numbering** (1.1, 1.1.1) — no "(一)", "1)"
+1. **H1 must use the `\u7b2cX\u7ae0` chapter format** (literally "Di-X Zhang", i.e. "Chapter X") — not `\u4e00\u3001` style, not "Chapter 1", not the Arabic-numeral variant `\u7b2c1\u7ae0`
+2. **H2/H3 use Arabic decimal numbering** (1.1, 1.1.1) — no parenthesized-Chinese-numeral style (`\uff08\u4e00\uff09`), no "1)"
 3. **No mixing multiple numbering systems**
 4. **No level-skipping** (cannot jump from H1 to H3)
 5. **All body headings must use `heading: HeadingLevel.HEADING_X`** (TOC depends on this)
@@ -112,18 +112,18 @@ styles: {
 // ✅ Correct
 new Paragraph({
   heading: HeadingLevel.HEADING_1,
-  children: [new TextRun({ text: "第一章 绪论", bold: true, size: 32, font: { eastAsia: "SimHei", ascii: "Times New Roman" } })]
+  children: [new TextRun({ text: "\u7b2c\u4e00\u7ae0 \u7eea\u8bba" /* Chapter 1 Introduction */, bold: true, size: 32, font: { eastAsia: "SimHei", ascii: "Times New Roman" } })]
 })
 new Paragraph({
   heading: HeadingLevel.HEADING_2,
-  children: [new TextRun({ text: "1.1 研究背景", bold: true, size: 30, font: { eastAsia: "SimHei", ascii: "Times New Roman" } })]
+  children: [new TextRun({ text: "1.1 \u7814\u7a76\u80cc\u666f" /* 1.1 Research Background */, bold: true, size: 30, font: { eastAsia: "SimHei", ascii: "Times New Roman" } })]
 })
 ```
 
 ### Non-Body Headings
 Abstract, Table of Contents, References, Appendices, Acknowledgments:
 - Use H1 style (San Hao SimHei centered) for TOC indexing
-- But **no numbering** (write directly: "摘　要", "参考文献", etc. — these are non-numbered standalone section headings)
+- But **no numbering** (write standalone titles directly, e.g. `\u6458\u8981` ("Abstract"), `\u53c2\u8003\u6587\u732e` ("References") — these are non-numbered standalone section headings)
 
 ---
 
@@ -280,11 +280,11 @@ function buildAcademicCover(info) {
 
   // ⚠️ Use safeText() for all values — never output "undefined"
   const infoRows = [
-    ["College", safeText(college, "【College】")],
-    ["Major", safeText(major, "【Major】")],
-    ["Author", safeText(author, "【Author】")],
-    ["Student ID", safeText(studentId, "【Student ID】")],
-    ["Advisor", safeText(advisor, "【Advisor】")],
+    ["College", safeText(college, "[College]")],
+    ["Major", safeText(major, "[Major]")],
+    ["Author", safeText(author, "[Author]")],
+    ["Student ID", safeText(studentId, "[Student ID]")],
+    ["Advisor", safeText(advisor, "[Advisor]")],
   ];
 
   const infoTable = new Table({
@@ -319,11 +319,11 @@ function buildAcademicCover(info) {
   // ★ Rule 8: All large-font paragraphs must set explicit line spacing
   return [
     new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 1200, after: 400, line: Math.ceil(22 * 23), lineRule: "atLeast" },
-      children: [new TextRun({ text: safeText(school, "【University Name】"), size: 44, bold: true, font: { eastAsia: "SimHei" } })] }),
+      children: [new TextRun({ text: safeText(school, "[University Name]"), size: 44, bold: true, font: { eastAsia: "SimHei" } })] }),
     new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 800, line: Math.ceil(18 * 23), lineRule: "atLeast" },
       children: [new TextRun({ text: "Undergraduate Thesis", size: 36, font: { eastAsia: "SimHei" } })] }),
     new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200, line: Math.ceil(18 * 23), lineRule: "atLeast" },
-      children: [new TextRun({ text: safeText(title, "【Thesis Title】"), size: 36, bold: true, font: { eastAsia: "SimHei", ascii: "Times New Roman" } })] }),
+      children: [new TextRun({ text: safeText(title, "[Thesis Title]"), size: 36, bold: true, font: { eastAsia: "SimHei", ascii: "Times New Roman" } })] }),
     titleEN ? new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 1200, line: Math.ceil(16 * 23), lineRule: "atLeast" },
       children: [new TextRun({ text: titleEN, size: 32, font: { ascii: "Times New Roman" } })] })
       : new Paragraph({ spacing: { after: 1200 }, children: [] }),
@@ -334,7 +334,7 @@ function buildAcademicCover(info) {
 }
 ```
 
-### Thesis Proposal Report Cover (开题报告)
+### Thesis Proposal Report Cover
 
 Thesis proposal reports use a similar cover layout but with different document type label. The key layout rule is the same: **title above author info, evenly spaced**.
 
@@ -368,9 +368,9 @@ function buildProposalCover(info) {
 
   // ⚠️ Use safeText() for all values
   const infoRows = [
-    ["姓名 (Name)", safeText(author, "XXX")],
-    ["专业 (Major)", safeText(major, "XXX")],
-    ["入学时间 (Enrollment)", safeText(info.enrollment, "XXX")],
+    ["Name", safeText(author, "XXX")],
+    ["Major", safeText(major, "XXX")],
+    ["Enrollment", safeText(info.enrollment, "XXX")],
   ];
 
   const infoTable = new Table({
@@ -400,19 +400,19 @@ function buildProposalCover(info) {
     })),
   });
 
-  // ⚠️ Correct order: doc type label → info table → "论文题目" label → TITLE → subtitle
+  // ⚠️ Correct order: doc type label → info table → "Thesis Title" label → TITLE → subtitle
   // Layout balanced: upper 40% for header + info, middle 20% for title, lower 40% for whitespace
   // ★ Rule 8: All large-font paragraphs must set explicit line spacing
   return [
     new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 1500, after: 600, line: Math.ceil(18 * 23), lineRule: "atLeast" },
-      children: [new TextRun({ text: safeText(year, "2025") + " 届本科毕业论文开题报告",
+      children: [new TextRun({ text: safeText(year, "2025") + " Undergraduate Thesis Proposal Report",
         size: 36, bold: true, font: { eastAsia: "SimHei", ascii: "Times New Roman" } })] }),
     infoTable,
     new Paragraph({ spacing: { before: 1200 } }),  // Balanced whitespace
     new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 },
-      children: [new TextRun({ text: "论文题目", size: 28, font: { eastAsia: "SimSun", ascii: "Times New Roman" } })] }),
+      children: [new TextRun({ text: "Thesis Title", size: 28, font: { eastAsia: "SimSun", ascii: "Times New Roman" } })] }),
     new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200, line: Math.ceil(16 * 23), lineRule: "atLeast" },
-      children: [new TextRun({ text: safeText(title, "【Thesis Title】"), size: 32, bold: true,
+      children: [new TextRun({ text: safeText(title, "[Thesis Title]"), size: 32, bold: true,
         font: { eastAsia: "SimHei", ascii: "Times New Roman" } })] }),
     subtitle ? new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 800 },
       children: [new TextRun({ text: "——" + subtitle, size: 28,
@@ -427,7 +427,7 @@ function buildProposalCover(info) {
 Both thesis cover and proposal cover use info tables. These MUST follow the cross-engine rules:
 - Table uses **percentage widths** (`WidthType.PERCENTAGE`), NOT DXA — WPS renders DXA widths differently in nested contexts
 - Table width: adaptive 55–75%, centered via `alignment: CENTER` (calculated by `calcR5MetaLayout()`)
-- Label column: **LEFT aligned**, plain text + "：", NO full-width space padding, NO borders
+- Label column: **LEFT aligned**, plain text + full-width colon (U+FF1A), NO full-width space padding, NO borders
 - Value column: **LEFT aligned**, `bottom: single sz=4` border = fixed-length underline
 - Cell `margins.top/bottom: 60` is acceptable (small values) but avoid larger values
 - All paragraphs with font size > 12pt (body) must set `spacing: { line: Math.ceil(fontPt * 23), lineRule: "atLeast" }` to prevent top clipping (Rule 8)
@@ -442,9 +442,9 @@ Both thesis cover and proposal cover use info tables. These MUST follow the cros
 
 ### Chinese Abstract
 **Format:**
-- Title: "摘　要" (space in middle), San Hao SimHei centered, H1 style
+- Title: `\u6458\u8981` ("Abstract" — two chars separated by a full-width space), San Hao SimHei centered, H1 style
 - Body: Xiao Si SimSun, justified, first-line indent 480 twips
-- Keywords: "关键词：" SimHei bold + content SimSun normal, 3–8 keywords, semicolon-separated
+- Keywords: `\u5173\u952e\u8bcd\uff1a` ("Keywords:") SimHei bold + content SimSun normal, 3–8 keywords, semicolon-separated
 
 **Content structure (mandatory):**
 1. Research background (1–2 sentences)
@@ -463,7 +463,7 @@ Both thesis cover and proposal cover use info tables. These MUST follow the cros
 - Use formal academic English, avoid Chinglish
 
 ### Table of Contents
-- Title: "目　录", San Hao SimHei centered
+- Title: `\u76ee\u5f55` ("Table of Contents" — chars separated by a full-width space), San Hao SimHei centered
 - Use `TableOfContents` field for auto-generation, display at least H1–H2, recommend H3
 - Run `"$DOCX_SCRIPTS/add_toc_placeholders.py" --auto` after generation
 - TOC on its own page
@@ -573,7 +573,7 @@ Where X = chapter number, Y = sequential number within chapter.
 new Paragraph({ alignment: AlignmentType.CENTER,
   children: [new ImageRun({ data: imgBuf, transformation: { width: w, height: h }, type: "png" })] }),
 new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 60, after: 200 },
-  children: [new TextRun({ text: "图3-1 System Architecture", size: 21,
+  children: [new TextRun({ text: "Figure 3-1 System Architecture", size: 21,
     font: { eastAsia: "SimSun", ascii: "Times New Roman" } })] }),
 ```
 

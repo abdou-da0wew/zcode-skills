@@ -1,385 +1,390 @@
-# 标点全规则 Punctuation：风格 / 挤压 / 避头尾 / 破折号
+# Punctuation, the Complete Rules: Styles / Squeezing / Kinsoku / Em Dash
 
-中文排版的"暗物质"。占文本面积 5%–15%，决定 95% 的"专业感"。本文按 6 个主题展开：4 种标点风格、加法/减法模式、4 级避头尾、行内挤压/拉伸优先级、破折号专题、Unicode 码位速查。
+The "dark matter" of Chinese typesetting. It occupies 5%–15% of text area but decides 95% of the "professional feel". This file unfolds six topics: 4 punctuation styles, additive vs subtractive models, 4 kinsoku strictness levels, in-line squeeze/stretch priority, an em-dash deep dive, and a Unicode codepoint quick reference.
 
-## 一、4 种标点风格
+## 1. The four punctuation styles
 
-不要混用。一个项目锁定一种风格。
+Never mix. Lock one style per project.
 
-### 1. 全角式（Full-width）
-- 所有标点占 1 个汉字宽
-- 出现场景：默认网页排版（引擎不调）、《普列汉诺夫美学论文选》等老派出版
-- 优点：纵横对齐严格
-- 缺点：标点连用形成"白窟窿"（` "。（ ` 三符 ≈ 3 格空白）
-- CSS：默认行为（无需特别处理）
+### 1. Fullwidth style
+- Every punctuation mark occupies 1 Han width
+- Seen in: default web typesetting (engine doesn't adjust), older-school print publications
+- Pros: strict horizontal/vertical alignment
+- Cons: consecutive marks create "white holes" (a closing mark + full stop + opening mark ≈ 3 cells of blank)
+- CSS: default behavior (no special handling)
 
-### 2. 半角式（Half-width）
-- 所有标点占 0.5 个汉字宽
-- 出现场景：辞典（《汉语大字典》节约空间）、苹果中国官网 2018 年（用 WebFont SF Pro SC）
-- 优点：紧凑，西文混排自然
-- 缺点：句末停顿感弱，影响阅读节奏
-- CSS：`font-feature-settings: "halt" 1;` 或换用半宽字体
+### 2. Halfwidth style
+- Every punctuation mark occupies 0.5 Han width
+- Seen in: dictionaries (space saving), Apple's China website in 2018 (via the SF Pro SC webfont)
+- Pros: compact; mixes naturally with Western text
+- Cons: weak sentence-end pause; hurts reading rhythm
+- CSS: `font-feature-settings: "halt" 1;` or switch to a halfwidth-capable font
 
-### 3. 开明式（Kaiming-style，大陆纸媒主流）
-- **句末标点全宽**：`。 ？ ！`（句号、问号、叹号）
-- **句内标点半宽**：`， 、 ； ：`（逗号、顿号、分号、冒号）
-- 出现场景：大陆纸媒、方正飞腾默认、绝大多数大陆图书
-- **推荐用于大陆现代横排正文**
-- CSS：手动控制或用 InDesign 标点挤压预设
+### 3. Kaiming style (Mainland print mainstream)
+- **Sentence-end punctuation fullwidth**: full stop, question mark, exclamation mark (U+3002, U+FF1F, U+FF01)
+- **Within-sentence punctuation halfwidth**: comma, ideographic comma, semicolon, colon (U+FF0C, U+3001, U+FF1B, U+FF1A)
+- Seen in: Mainland print media, Founder FIT default, most Mainland books
+- **Recommended for modern Mainland horizontal body text**
+- CSS: manual control or InDesign punctuation-squeezing presets
 
-### 4. 居中式（Centered，港台主流）
-- 所有标点全宽 + 字面正中
-- 同时适应横排和直排（标点位置一致）
-- 出现场景：港台几乎所有出版物、传统书法集
-- 优点：方向无关、对纵横对齐友好
-- 缺点：横排时"。"看着像浮在中间
-- CSS：港台地区字体（如华康、文鼎）自带这种字面分布
+### 4. Centered style (HK/TW mainstream)
+- All punctuation fullwidth + glyph face centered in the cell
+- Works for both horizontal and vertical (punctuation position identical)
+- Seen in: almost all HK/TW publications, traditional calligraphy collections
+- Pros: direction-agnostic; friendly to horizontal/vertical alignment
+- Cons: in horizontal text the full stop looks like it floats mid-cell
+- CSS: HK/TW fonts (e.g. DynaFont, Arphic) carry this face distribution natively
 
-### 选择决策表
+### Selection decision table
 
-| 项目类型 | 推荐风格 | 备注 |
+| Project type | Recommended style | Note |
 |---|---|---|
-| 大陆现代图书 / 杂志 / 报刊 | 开明式 | 主流选择 |
-| 大陆学术论文 / 招股书 / 公文 | 开明式 | 严肃 |
-| 港台繁体书籍 | 居中式 | 民国延续 |
-| 字典 / 辞海 / 工具书 | 半角式 | 节约空间 |
-| 网页正文（无引擎支持时） | 全角式（被迫） | 加 `text-spacing-trim` 可改善 |
-| 现代网页 / App（有引擎） | 开明式 + `text-spacing-trim` | 推荐 |
-| 古籍影印 / 文言 | 居中式或全角式 | 配直排 |
+| Mainland modern books / magazines / periodicals | Kaiming | Mainstream choice |
+| Mainland academic papers / prospectuses / official documents | Kaiming | Formal |
+| HK/TW traditional books | Centered | Republican-era continuity |
+| Dictionaries / reference books | Halfwidth | Space saving |
+| Web body text (no engine support) | Fullwidth (forced) | `text-spacing-trim` improves it |
+| Modern web / App (engine available) | Kaiming + `text-spacing-trim` | Recommended |
+| Classical facsimiles / literary Chinese | Centered or fullwidth | Pairs with vertical writing |
 
-## 二、加法模式 vs 减法模式
+## 2. Additive model vs subtractive model
 
-**这是认知误区的重灾区。**
+**A minefield of misconceptions.**
 
-### 加法模式（Additive，专业排版的方式）
-- 标点本身 = **半宽**
-- 加上一侧或两侧的**空隙**凑成全宽
-- 调整对象 = 空隙（可拿掉、可缩半、可拉满）
-- 采用方：InDesign、QuarkXPress、JIS、Adobe 全系
-- 标点连用时：把相邻一侧的空隙拿掉
+### Additive model (the professional typesetting way)
+- The punctuation glyph itself = **halfwidth**
+- Gaps on one or both sides complete the fullwidth
+- What you adjust = the gap (removable, halvable, stretchable)
+- Used by: InDesign, QuarkXPress, JIS, all Adobe products
+- When punctuation runs together: remove the adjacent gap
 
-### 减法模式（Subtractive，大众默认认知）
-- 标点本身 = **全宽**
-- 通过"挤压"去掉部分宽度
-- 调整对象 = 标点字面本身
-- 采用方：方正自家排版软件、Word 中文版部分预设
-- 问题：在加法模式的字体上做减法会算错
+### Subtractive model (the popular mental model)
+- The punctuation glyph itself = **fullwidth**
+- "Squeezing" removes part of the width
+- What you adjust = the glyph face itself
+- Used by: Founder's own typesetting software, some Simplified-Chinese Word presets
+- Problem: subtracting on an additive-model font computes wrong
 
-### 实操判断
+### Practical judgment
 
-**用 InDesign / Adobe 系统**：默认加法模式。选字体时优先选标点"偏靠式"的字库（思源、华文、蒙纳）；规避方正大量正文字体（方正新书宋、方正悠黑、方正宋一）—— 它们把标点摆在字面正中（"居中式"），与 Adobe 算法错位。
+**Using InDesign / Adobe systems**: additive model by default. Prefer fonts whose punctuation is face-shifted (Source Han, STFonts, Monotype); avoid many Founder body faces (Founder XinSong, FZ YouHei, Founder SongOne) — they center punctuation in the cell ("centered style"), which misaligns with Adobe's algorithm.
 
-**用方正飞腾**：默认减法模式，方正字库内部自洽，不会出问题。
+**Using Founder FIT**: subtractive model by default; internally consistent with Founder fonts, no problem.
 
-**Web / CSS**：现代 `text-spacing-trim: space-all` 是加法模式实现。
+**Web / CSS**: modern `text-spacing-trim: space-all` is an additive-model implementation.
 
-### 加法模式下标点的 3 类分组
+### The 3 gap groups under the additive model
 
-| 类别 | 标点 | 空隙 |
+| Group | Punctuation | Gap |
 |---|---|---|
-| **第 1 类**：默认密排不加空 | 着重号、分隔号、连接号短横、日文 `？！` | 0 |
-| **第 2 类**：一边加二分空（大陆 + 日文绝大多数） | 大陆问号 / 叹号 / 冒号 / 分号 / 逗号 / 顿号 / 句号；蝌蚪引号 ""''；圆括号 ()；书名号《》 | 半宽 + 二分空 = 全宽 |
-| **第 3 类**：两边各加四分空（港台多数 + 日文中点） | 港台问号 / 叹号 / 冒号；日文 `・` | 半宽 + 左 1/4 + 右 1/4 = 全宽 |
+| **Group 1**: default solid, no gap added | Emphasis dots, separator slash, short hyphen, Japanese question/exclamation | 0 |
+| **Group 2**: half-cell gap on one side (Mainland + most Japanese) | Mainland question/exclamation/colon/semicolon/comma/ideographic comma/full stop; curly quotes (U+201C/D, U+2018/9); parentheses; book-title marks (U+300A/B) | halfwidth + half gap = fullwidth |
+| **Group 3**: quarter-cell gap on both sides (most HK/TW + Japanese middle dot) | HK/TW question/exclamation/colon; Japanese middle dot (U+30FB) | halfwidth + 1/4 left + 1/4 right = fullwidth |
 
-## 三、行末半角原则（GB/T 15834-2011 §5.1.10）
+## 3. End-of-line halfwidth principle (GB/T 15834-2011 §5.1.10)
 
-**强制规则**：标点排在一行末尾时，若为全宽字符**应占半角字符的宽度**。即"行末标点 → 半宽"。
+**Mandatory rule**: when a fullwidth punctuation mark lands at the end of a line, it **should occupy only halfwidth width**. I.e. "end-of-line punctuation → halfwidth".
 
-- 这是中国大陆和多数中国出版社的硬性规范
-- 视觉效果：行尾对齐（不会因末标点全宽撑出视觉外凸）
-- 实现：InDesign "标点挤压" → 行尾减半（自动）；CSS `hanging-punctuation: allow-end` 让标点悬挂到版心外
+- A hard rule in Mainland China and most Chinese publishing houses
+- Visual effect: line ends align (no visual protrusion from a fullwidth final mark)
+- Implementation: InDesign "punctuation squeeze" → halve at line end (automatic); CSS `hanging-punctuation: allow-end` lets punctuation hang outside the type area
 
-## 四、避头尾 4 级严格度（W3C CLReq §6.1.1）
+## 4. Kinsoku: 4 strictness levels (W3C CLReq §6.1.1)
 
-**同一文档内必须统一一种严格度。**
+**One strictness level per document.**
 
-### 0 级：none（不处理）
-- 不做任何避头尾
-- 见于港台部分报刊（标点居中无突兀）
-- 大陆不推荐
+### Level 0: none
+- No kinsoku processing
+- Found in some HK/TW newspapers (centered punctuation never looks abrupt)
+- Not recommended for Mainland work
 
-### 1 级：basic（基本处理，最低标准）
-- **不可在行首**：`。， 、 ； ： ！ ？ … 》 」 』 ） 】`、所有"结束"括号和引号、连接号 `–`、间隔号 `·`、分隔号 `/`
-- **不可在行尾**：`（ 【 《 「 『 " '`、所有"开始"括号和引号
+### Level 1: basic (minimum standard)
+- **Never at line start**: full stop (U+3002), comma (U+FF0C), ideographic comma (U+3001), semicolon (U+FF1B), colon (U+FF1A), exclamation (U+FF01), question (U+FF1F), ellipsis (U+2026), em dash (U+2014), middle dot (U+00B7), all "closing" brackets and quotes (U+FF09, U+3011, U+300B, U+300D, U+300F, U+FF5D, U+3009), closing curly quotes (U+2019, U+201D), en dash (U+2013), slash (U+002F)
+- **Never at line end**: all "opening" brackets and quotes (U+FF08, U+3010, U+300A, U+300C, U+300E, U+201C, U+2018)
 
-### 2 级：GB 法（大陆国标，推荐用于正式出版）
-- basic 全部规则
-- **加**：分隔号 `/` 也不可在行尾
-- 这是中国大陆图书业的默认级别
+### Level 2: GB method (Mainland national standard; recommended for formal publishing)
+- All basic rules
+- **Plus**: the slash (U+002F) may not end a line either
+- This is the default level of the Mainland book industry
 
-### 3 级：strict（严格，推荐用于精装/正式出版）
-- GB 法全部规则
-- **加**：破折号 `——` 不可在行首
-- **加**：省略号 `……` 不可在行首
-- InDesign "简体中文避头尾" 默认即此级
+### Level 3: strict (recommended for hardcover/formal publishing)
+- All GB rules
+- **Plus**: the em dash (U+2014 pair) may not start a line
+- **Plus**: the ellipsis (U+2026 pair) may not start a line
+- InDesign's "Simplified Chinese kinsoku" defaults to this level
 
-### 完整字符表
+### Complete character reference
 
-#### 不可出现在行首
+#### Never at line start
 ```
-。，、；：？！…—··――
-）】〗〕〉》」』〙〗｠
-’"
-%‰‱℃℉°′″
-／、‧/
-```
-
-#### 不可出现在行尾
-```
-（【〖〔〈《「『〘〖｟
-‘"
-$¥€£¢₩₫
+U+3002 full stop
+U+FF0C comma            U+3001 ideographic comma
+U+FF1B semicolon        U+FF1A colon
+U+FF1F question mark    U+FF01 exclamation
+U+2026 ellipsis         U+2014 em dash
+U+00B7 middle dot       U+2013 en dash
+All closing brackets/braces: U+FF09 U+3011 U+3017 U+3011 U+3009 U+300B U+300D U+300F U+3019 U+3017 U+FF60
+All closing quotes: U+2019 U+201D
+Trailing symbols: U+0025 % U+2030 per-mille U+2031 per-ten-thousand U+2103 deg-C U+2109 deg-F U+00B0 degree U+2032 prime U+2033 double-prime
+Separator slash: U+002F U+FF0F U+2027 hyphenation point
 ```
 
-#### 不可分离（不可在中间断开）
+#### Never at line end
 ```
-——     破折号（2 字宽视为一体）
-……     省略号（2 字宽视为一体）
-123456 阿拉伯数字内部及小数点
-50%   数字 + 百分号 / 千分号 / 度数
-20℃  数字 + 单位
-±5    符号 + 数字
-m²    被标记词 + 上下标
-①②    注释记号 + 被注词
-word   西文单词（按 hyphenation）
+All opening brackets/braces: U+FF08 U+3010 U+3016 U+3014 U+3008 U+300A U+300C U+300E U+3018 U+3016 U+FF5F
+All opening quotes: U+2018 U+201C
+Currency symbols: U+0024 $ U+00A5 ¥ U+20AC € U+00A3 £ U+00A2 ¢ U+20A9 ₩ U+20AB ₫
 ```
 
-### 处理顺序："先挤进后推出"
+#### Inseparable (never split in the middle)
+```
+U+2014 ×2   em dash (the 2-cell pair is one unit)
+U+2026 ×2   ellipsis (the 2-cell pair is one unit)
+123456      inside Arabic numerals and the decimal point
+50%         number + percent / per-mille / degree signs
+20℃         number + unit (e.g. U+2103)
+±5          sign + number
+m²          marked word + super/subscript (U+00B2)
+①②         annotation marks + annotated word (U+2460…)
+word        Western words (per hyphenation rules)
+```
 
-W3C 明文规则。
+### Processing order: "squeeze in first, push out second"
 
-1. **第一步**：检查标点能否通过"宽度挤压"塞回前行末
-   - 行末全宽标点 → 半宽
-   - 连续标点 → 拿掉相邻一侧的空隙
-   - 中西间距 1/4 em → 1/8 em
-2. **第二步**：仍塞不下，从前行末字推入下行
-3. **第三步**：前行多出的空间按拉伸优先级处理
-4. **第四步**：最后才平均加大字间距
+An explicit W3C rule.
 
-**口诀**：**挤进只需腾半字宽，推出至少动一字宽；正文排版应尽量少调**。
+1. **Step 1**: check whether the punctuation can be squeezed back into the previous line's end via "width squeezing"
+   - End-of-line fullwidth punctuation → halfwidth
+   - Consecutive punctuation → remove the adjacent gap
+   - Chinese-Western gap 1/4 em → 1/8 em
+2. **Step 2**: still doesn't fit — push the previous line's last character to the next line
+3. **Step 3**: distribute the previous line's extra space by stretch priority
+4. **Step 4**: only then increase letter spacing evenly
 
-### 推出后救济：均排（justify within）
+**Mnemonic**: **squeezing in only needs to free half a character width; pushing out moves at least a full character width; body typesetting should adjust as little as possible.**
 
-行内调整无法整齐时，按拉伸优先级把空间分配出去。详见下一节。
+### Relief after pushing: justify within
 
-## 五、行内挤压 / 拉伸优先级（W3C CLReq §6.2.2）
+When in-line adjustment cannot make the line even, distribute space by stretch priority. See the next section.
 
-**这是排版引擎的内部算法表，知道了它你才知道为什么 InDesign 那样调字。**
+## 5. In-line squeeze / stretch priority (W3C CLReq §6.2.2)
 
-### 挤压优先级（从高到低）
+**This is the engine's internal algorithm table; knowing it tells you why InDesign adjusts what it does.**
 
-| 优先级 | 对象 | 挤压幅度 |
+### Squeeze priority (high to low)
+
+| Priority | Target | Squeeze amount |
 |---|---|---|
-| a | **行末标点** | 固定半字宽（GB/T 15834-2011 §5.1.10） |
-| b | 行内西文词距 | 最小 **1/4 em**，多处同等量 |
-| c | 间隔号 `·` | 从两侧同等量挤，最小到 0（结果半字宽） |
-| d | 夹注符号（括号）| 开始括号前侧、结束括号后侧，最小到半字宽 |
-| e | 逗号 / 顿号 / 分号 | 后侧或两侧同等量挤，最小到半字宽 |
-| f | 中西间距 | 最小 **1/8 em**（部分风格固定 1/4 em 不允许调） |
-| g | 句号 / 问号 / 叹号 | 有空间则挤到半字宽（部分风格不允许调，因句末停顿大） |
+| a | **End-of-line punctuation** | Fixed half character width (GB/T 15834-2011 §5.1.10) |
+| b | In-line Western word spacing | Minimum **1/4 em**, equal amounts at multiple sites |
+| c | Middle dot (U+00B7) | Squeeze equally from both sides, minimum to 0 (result: half width) |
+| d | Interlinear marks (brackets) | Before opening / after closing brackets, minimum to half width |
+| e | Comma / ideographic comma / semicolon | Squeeze the trailing side or both sides equally, minimum to half width |
+| f | Chinese-Western gap | Minimum **1/8 em** (some styles fix 1/4 em and forbid adjustment) |
+| g | Full stop / question / exclamation | Squeeze to half width if space allows (some styles forbid it — the sentence-end pause is large) |
 
-### 拉伸优先级（从高到低）
+### Stretch priority (high to low)
 
-| 优先级 | 对象 | 拉伸幅度 |
+| Priority | Target | Stretch amount |
 |---|---|---|
-| a | 西文词距 | 最大 **1/2 em**，多处同等量 |
-| b | 中西间距 | 从 1/4 em 默认值起，最大 **1/2 em**（实际多数风格只到 1/3 em）|
-| c（最后选项） | 字间距 | 同等量拉，但**不可对禁则字间距拉伸**；连接号、分隔号及其前后字符避免拉伸 |
+| a | Western word spacing | Maximum **1/2 em**, equal amounts at multiple sites |
+| b | Chinese-Western gap | From the 1/4 em default up to maximum **1/2 em** (in practice most styles stop at 1/3 em) |
+| c (last resort) | Letter spacing | Stretch equally, but **never stretch spacing adjacent to kinsoku-restricted characters**; avoid stretching around en dashes and slashes |
 
-### 关键数值速查
+### Key values quick reference
 
-| 间距 | 最小 | 默认 | 最大 |
+| Gap | Minimum | Default | Maximum |
 |---|---|---|---|
-| 西文词距 | 1/4 em | 1/3 em | 1/2 em |
-| 中西间距 | 1/8 em | 1/4 em | 1/2 em |
-| 间隔号两侧 | 0 | 1/4 em | 1/4 em |
-| 行末标点 | 半字宽 | 半字宽 | 半字宽（不变） |
-| 连续标点共 2 字 | 1 字 | 1.5 字 | 2 字 |
+| Western word spacing | 1/4 em | 1/3 em | 1/2 em |
+| Chinese-Western gap | 1/8 em | 1/4 em | 1/2 em |
+| Around middle dot | 0 | 1/4 em | 1/4 em |
+| End-of-line punctuation | Half width | Half width | Half width (fixed) |
+| Consecutive punctuation totaling 2 cells | 1 cell | 1.5 cells | 2 cells |
 
-## 六、连续标点处理（W3C CLReq §6.3.2）
+## 6. Consecutive punctuation (W3C CLReq §6.3.2)
 
-**最常见的灾难现场**：标点连用形成"白窟窿"。
+**The most common disaster scene**: consecutive punctuation forms "white holes".
 
-未处理：
+Untreated (schematic — each fullwidth mark occupies one cell):
 ```
-（明）钟惺、谭元春《唐诗归》钟评后二句"二
-句儿童皆诵之，然其言自足不朽"。（清）弘历
+(Note) Author, "Book Title" comment on the two lines, "the verse
+was recited by every child, yet the words alone suffice". (Source) Editor
                               ↑↑↑
-                       "。（ 三个全角占 3 格
+          closing quote + full stop + opening paren = 3 full cells of blank
 ```
 
-处理后：
+Treated (schematic):
 ```
-（明）钟惺、谭元春《唐诗归》钟评后二句"二句儿童皆
-诵之，然其言自足不朽"。（清）弘历《唐宋诗醇》评
+(Note) Author, "Book Title" comment on the two lines, "the verse was recited by
+every child, yet the words alone suffice". (Source) Editor's comment
                        ↑↑
-            "。（ 挤压到约 1.5 字宽
+          the trio squeezed to about 1.5 cells
 ```
 
-### 规则
-- 任意两个相邻标点共 2 字宽时**应缩到 1.5 字宽**
-- 可进一步缩到 1 字（但通常不缩到 1 字，避免读者错觉两符号是一个）
-- 挤压方向让开始/结束括号紧靠被夹内容
+### Rules
+- When any two adjacent punctuation marks together occupy 2 cells, **shrink to 1.5 cells**
+- May shrink further to 1 cell (but usually don't — readers may misread two marks as one)
+- Squeeze direction: opening/closing brackets hug the content they enclose
 
-### 实现
-- InDesign：段落 → 中文排版设置 → "标点挤压" → 选"简体中文默认"或自定义
-- CSS：`text-spacing-trim: space-all`（自动处理）
+### Implementation
+- InDesign: Paragraph → Chinese Typography Settings → "Punctuation Squeeze" → choose "Simplified Chinese default" or custom
+- CSS: `text-spacing-trim: space-all` (handles it automatically)
 
-## 七、破折号专题
+## 7. Em dash deep dive
 
-**最容易出错的单一符号。**
+**The single most error-prone symbol.**
 
-### 1. 码位优先级
-1. **U+2E3A** TWO EM DASH `⸺` —— 正式码位，占 2 字一体，**首选**
-2. **U+2014** EM DASH `—` × 2 —— 事实标准，思源字体通过 `ccmp` 替换为长横，**主用**
-3. ❌ U+2015 HORIZONTAL BAR `―` —— 简中字库多数会断开
-4. ❌ U+2500 BOX DRAWINGS LIGHT HORIZONTAL `─` —— 语义错误（制表符）
-5. ❌ U+30FC KATAKANA-HIRAGANA PROLONGED SOUND MARK `ー` —— 日文长音符
-6. ❌ U+FF0D FULLWIDTH HYPHEN-MINUS `－` —— 半宽连接符
-7. ❌ U+002D HYPHEN-MINUS `-` —— ASCII 连字符
+### 1. Codepoint priority
+1. **U+2E3A** TWO-EM DASH `⸺` — the proper codepoint; 2 cells as one glyph, **first choice**
+2. **U+2014** EM DASH `—` × 2 — the de facto standard; Source Han fonts substitute a continuous long bar via `ccmp`, **primary use**
+3. ❌ U+2015 HORIZONTAL BAR `―` — most Simplified-Chinese fonts break it
+4. ❌ U+2500 BOX DRAWINGS LIGHT HORIZONTAL `─` — semantically wrong (a table-drawing character)
+5. ❌ U+30FC KATAKANA-HIRAGANA PROLONGED SOUND MARK — a Japanese long-vowel mark
+6. ❌ U+FF0D FULLWIDTH HYPHEN-MINUS — a halfwidth connector
+7. ❌ U+002D HYPHEN-MINUS `-` — the ASCII hyphen
 
-### 2. 字体推荐（破折号正确实现）
+### 2. Font recommendations (correct em-dash implementation)
 
-**推荐**：
-- 思源黑体 / 思源宋体（通过 OpenType `ccmp` 把连续两个 U+2014 替换为整段长横，再用 `locl` 在 CJK 语言下切换为字框居中字形）
-- 苹方 PingFang
+**Recommended**:
+- Source Han Sans / Source Han Serif (via OpenType `ccmp` replaces two consecutive U+2014 with one continuous bar; `locl` switches to a cell-centered glyph under CJK languages)
+- PingFang
 - HarmonyOS Sans / MiSans
 
-**雷区**（破折号断开 / 顶格 / 下沉）：
-- 中易宋体、中易仿宋（破折号"无论如何接不上"）
-- 旧版微软雅黑（破折号下沉且双连超过两字宽）
-- 华文黑体（破折号顶格不居中）
-- 兰亭黑（破折号顶格且不居中）
+**Minefields** (dash breaks / rides the cell edge / sinks):
+- ZhongYi Song / ZhongYi FangSong ("will not connect no matter what")
+- Old versions of Microsoft YaHei (dash sinks and the pair exceeds 2 cells)
+- STHeiti (dash rides the edge, not centered)
+- LanTingHei (dash rides the edge and is not centered)
 
-### 3. 字体优先级陷阱（CSS）
+### 3. Font-stack trap (CSS)
 
-❌ **错误**：
+❌ **Wrong**:
 ```css
-font-family: "Helvetica", "PingFang SC";   /* 英文字体在前 */
+font-family: "Helvetica", "PingFang SC";   /* Latin font first */
 ```
-连续两个 `—` 会优先取 Helvetica 字形，导致下沉、断开、双横之间留白。
+Two consecutive `—` glyphs take Helvetica's shapes, causing sinking, breaking, and a gap between the two bars.
 
-✅ **正确（方案 A）**：删掉英文字体，用系统中文字体
+✅ **Correct (option A)**: drop the Latin font, use system Chinese fonts
 ```css
 font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 ```
 
-✅ **正确（方案 B）**：用 `unicode-range` 拆 `@font-face`
+✅ **Correct (option B)**: split `@font-face` with `unicode-range`
 ```css
 @font-face {
   font-family: "Helvetica Local";
   src: local("Helvetica");
-  unicode-range: U+0000-007F;       /* 只用于 ASCII */
+  unicode-range: U+0000-007F;       /* ASCII only */
 }
 body {
   font-family: "Helvetica Local", "PingFang SC", sans-serif;
 }
 ```
 
-✅ **正确（方案 C）**：声明 `lang` 激活 `locl`
+✅ **Correct (option C)**: declare `lang` to activate `locl`
 ```html
 <html lang="zh-CN">
 ```
 
-### 4. 防破折号中间断开
+### 4. Preventing a break between the two em dashes
 
-**InDesign**：
-1. 段落面板 → "禁止断字" 勾选（默认开）
-2. 避头尾规则集 → "禁止分开的字符" → 加入 `U+2014`、`U+2015`、`U+2500`
-3. 不要只勾"不换行"（那只是局部手动）
+**InDesign**:
+1. Paragraph panel → check "No Hyphenation" (on by default)
+2. Kinsoku rule set → "characters that must not be separated" → add U+2014, U+2015, U+2500
+3. Don't just tick "no line break" (that's only a local manual fix)
 
-**Word**：
-- 中文版"后置标点"里的 `―` 实际是 U+2015，不是 U+2014
-- 要让 U+2014 也避头尾，须手动加进"自定义后置标点"
-- 终极保险：选中单个 `—`，格式→字体→字符间距→缩放 200%，硬把单 em dash 变成两字宽（来自《排版与校对规范》）
+**Word**:
+- The `―` in the Simplified edition's "trailing punctuation" list is actually U+2015, not U+2014
+- To give U+2014 kinsoku treatment, add it manually to "custom trailing punctuation"
+- Last-resort trick: select a single `—`, Format → Font → Character Spacing → Scale 200%, forcing one em dash to occupy two cells (from the Typesetting and Proofreading Standards)
 
-**CSS**：
+**CSS**:
 ```html
-<!-- 两个 em dash 之间禁止断行 -->
-他说—&#8288;—我不去了。
+<!-- forbid a line break between the two em dashes -->
+He said—&#8288;—I'm not going.
 ```
 
-### 5. 国标依据
-- GB/T 15834-2011 §4.10 / §5.1.4：破折号占两个字位置、上下居中、**不能中间断开**
+### 5. National-standard basis
+- GB/T 15834-2011 §4.10 / §5.1.4: the em dash occupies two cells, vertically centered, **must not break in the middle**
 
-## 八、Unicode 码位速查（W3C CLReq 推荐）
+## 8. Unicode codepoint quick reference (W3C CLReq recommendations)
 
-| 符号 | Unicode | 推荐 | 不推荐替代 |
+| Mark | Unicode | Recommended | Not recommended alternatives |
 |---|---|---|---|
-| 句号 | U+3002 。 | ✅ | U+FF0E ． / U+002E . |
-| 逗号 | U+FF0C ， | ✅ | U+002C , |
-| 顿号 | U+3001 、 | ✅ | — |
-| 分号 | U+FF1B ； | ✅ | U+003B ; |
-| 冒号 | U+FF1A ： | ✅ | U+003A : |
-| 问号 | U+FF1F ？ | ✅ | U+003F ? |
-| 叹号 | U+FF01 ！ | ✅ | U+0021 ! |
-| 弯双引号开 | U+201C " | ✅（横排）| — |
-| 弯双引号闭 | U+201D " | ✅（横排）| — |
-| 直角引号开 | U+300C 「 | ✅（直排）| — |
-| 直角引号闭 | U+300D 」 | ✅（直排）| — |
-| 双重直角引号开 | U+300E 『 | ✅（直排）| — |
-| 双重直角引号闭 | U+300F 』 | ✅（直排）| — |
-| 圆括号开 | U+FF08 （ | ✅ | U+0028 ( |
-| 圆括号闭 | U+FF09 ） | ✅ | U+0029 ) |
-| 书名号开 | U+300A 《 | ✅ | — |
-| 书名号闭 | U+300B 》 | ✅ | — |
-| 单书名号开 | U+3008 〈 | ✅ | — |
-| 单书名号闭 | U+3009 〉 | ✅ | — |
-| 破折号 | U+2E3A ⸺ / U+2014×2 —— | ✅ | U+2015 / U+2500 / U+30FC |
-| 省略号 | U+2026×2 …… | ✅ | U+22EF（横直自动居中替代）|
-| 连接号短横 | U+2013 – | ✅ | — |
-| 连接号一字线 | U+2014 — | ✅ | — |
-| 浪纹线 | U+FF5E ～ | ✅ | U+007E ~ |
-| 间隔号 | U+00B7 · | ✅ | U+30FB / U+2027 / U+2022 |
-| 分隔号 | U+002F / 或 U+FF0F ／ | ✅ | — |
-| 着重号 | U+25CF ● 或 U+2022 • | ✅ | — |
+| Full stop | U+3002 | ✅ | U+FF0E / U+002E |
+| Comma | U+FF0C | ✅ | U+002C |
+| Ideographic comma (dunhao) | U+3001 | ✅ | — |
+| Semicolon | U+FF1B | ✅ | U+003B |
+| Colon | U+FF1A | ✅ | U+003A |
+| Question mark | U+FF1F | ✅ | U+003F |
+| Exclamation | U+FF01 | ✅ | U+0021 |
+| Opening curly double quote | U+201C | ✅ (horizontal) | — |
+| Closing curly double quote | U+201D | ✅ (horizontal) | — |
+| Opening corner quote | U+300C | ✅ (vertical) | — |
+| Closing corner quote | U+300D | ✅ (vertical) | — |
+| Opening double corner quote | U+300E | ✅ (vertical) | — |
+| Closing double corner quote | U+300F | ✅ (vertical) | — |
+| Opening parenthesis | U+FF08 | ✅ | U+0028 |
+| Closing parenthesis | U+FF09 | ✅ | U+0029 |
+| Opening book-title mark | U+300A | ✅ | — |
+| Closing book-title mark | U+300B | ✅ | — |
+| Opening single book-title mark | U+3008 | ✅ | — |
+| Closing single book-title mark | U+3009 | ✅ | — |
+| Em dash | U+2E3A `⸺` / U+2014 × 2 `——` | ✅ | U+2015 / U+2500 / U+30FC |
+| Ellipsis | U+2026 × 2 | ✅ | U+22EF (auto-centered alternative for horizontal and vertical) |
+| En dash | U+2013 | ✅ | — |
+| One-cell dash | U+2014 | ✅ | — |
+| Wavy dash | U+FF5E | ✅ | U+007E |
+| Middle dot | U+00B7 | ✅ | U+30FB / U+2027 / U+2022 |
+| Separator slash | U+002F or U+FF0F | ✅ | — |
+| Emphasis dot | U+25CF or U+2022 | ✅ | — |
 
-## 九、CSS 完整实现（现代浏览器，2024+）
+## 9. Complete CSS implementation (modern browsers, 2024+)
 
 ```css
 .body-text {
-  /* 字间距：密排 */
+  /* Letter spacing: solid setting */
   letter-spacing: 0;
 
-  /* 标点空间挤压（加法模式实现） */
+  /* Punctuation space squeezing (additive-model implementation) */
   text-spacing-trim: space-all;
 
-  /* 标点悬挂到版心外（行尾标点视觉对齐） */
+  /* Punctuation hangs outside the type area (aligns end-of-line punctuation visually) */
   hanging-punctuation: allow-end;
 
-  /* 严格避头尾 */
+  /* Strict kinsoku */
   line-break: strict;
 
-  /* 不在词中断 */
+  /* Never break inside words */
   word-break: keep-all;
 
-  /* 超长 URL 允许换行 */
+  /* Allow overlong URLs to wrap */
   overflow-wrap: break-word;
 
-  /* 两端对齐 */
+  /* Justify both edges */
   text-align: justify;
 
-  /* 中文字间分布 */
+  /* Distribute spacing between Chinese characters */
   text-justify: inter-character;
 
-  /* 标点宽度优化（OpenType） */
+  /* Punctuation width optimization (OpenType) */
   font-feature-settings:
-    "halt" 1,         /* 半宽间距 */
-    "palt" 1;         /* 成比例排（标题用） */
+    "halt" 1,         /* halfwidth spacing */
+    "palt" 1;         /* proportional setting (for titles) */
 }
 
-/* 标题：不要 halt，标题密排 */
+/* Titles: no halt; titles set solid */
 h1, h2, h3 {
-  font-feature-settings: "palt" 1;  /* 仅成比例排 */
+  font-feature-settings: "palt" 1;  /* proportional only */
 }
 
-/* 网页 / H5 / 卡片正文：通常不做首行缩进 */
+/* Web / H5 / card body: usually no first-line indent */
 p {
   text-indent: 0;
   margin: 0 0 1em 0;
 }
 
-/* 书籍 / 公文 / 古典长文如需首行缩进，应由对应 template 明确指定 */
+/* Books / official documents / classical long-form: indent only when the corresponding template specifies it */
 .book-copy p,
 .official-doc p,
 .classical-copy p {
@@ -387,27 +392,27 @@ p {
   margin: 0;
 }
 
-/* 引文段：不要斜体；缩进/边线/底色由版式决定 */
+/* Quote blocks: never italic; indent/rule/background decided by the layout */
 blockquote {
   font-style: normal;
 }
 ```
 
-旧浏览器降级：用 `<wbr>` 手工断行；用脚本处理（如 `kerning.js`）。
+Legacy-browser fallback: use `<wbr>` for manual line breaking; use a script (e.g. `kerning.js`).
 
-## 十、检查清单（标点相关）
+## 10. Checklist (punctuation-related)
 
-排印完成前必过：
+Must pass before finalizing:
 
-- [ ] 标点风格（全角 / 半角 / 开明 / 居中）是否全文统一？
-- [ ] 行末全宽标点是否变为半宽？
-- [ ] 避头尾级别（basic / GB / strict）是否选定并启用？
-- [ ] 连续标点是否被挤压到 1.5 字宽内？
-- [ ] 破折号是否用了 U+2014×2（不是 4 个连字符）？
-- [ ] 破折号字体是否选了思源 / 苹方而不是中易 / 旧版雅黑？
-- [ ] 破折号是否被加入"禁止分开"集？
-- [ ] 引号横排用弯""'',直排用直角「」『』？
-- [ ] CSS `font-family` 是否把中文字体放在英文字体之前？
-- [ ] HTML 是否声明了 `lang="zh-CN"` 或 `lang="zh-TW"`？
-- [ ] 段落组织是否符合媒介：网页/卡片不机械首行缩进，书籍/公文/古典长文才按模板缩进？
-- [ ] 中英混排是否有 1/4 字宽间距？
+- [ ] Is the punctuation style (fullwidth / halfwidth / Kaiming / centered) consistent throughout?
+- [ ] Is end-of-line fullwidth punctuation converted to halfwidth?
+- [ ] Is a kinsoku level (basic / GB / strict) chosen and enabled?
+- [ ] Is consecutive punctuation squeezed to within 1.5 cells?
+- [ ] Does the em dash use U+2014 × 2 (not four hyphens)?
+- [ ] Is the dash rendered by Source Han / PingFang rather than ZhongYi / old YaHei?
+- [ ] Is the em dash added to the "must not separate" set?
+- [ ] Are quotes curly (U+201C/D) in horizontal text and corner brackets (U+300C/D, U+300E/F) in vertical text?
+- [ ] Does CSS `font-family` put the Chinese font before the Latin font?
+- [ ] Does the HTML declare `lang="zh-CN"` or `lang="zh-TW"`?
+- [ ] Does paragraph treatment match the medium: web/cards don't mechanically indent first lines; books/official documents/classical long-form indent per template?
+- [ ] Does Chinese-English mixing carry a 1/4-cell gap?

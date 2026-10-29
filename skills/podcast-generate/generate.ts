@@ -1,16 +1,28 @@
 #!/usr/bin/env tsx
 /**
- * generate.ts - 统一入口（纯 SDK 版本）
- * 原资料 -> podcast_script.md + podcast.wav
+ * generate.ts - Unified entry point (OpenAI-compatible HTTP version)
+ * Source material -> podcast_script.md + podcast.wav
  *
- * 只使用 z-ai-web-dev-sdk，不依赖 z-ai CLI
+ * Uses plain HTTP calls against an OpenAI-compatible LLM server and an
+ * OpenAI-compatible /audio/speech TTS endpoint. No proprietary SDK, no CLI
+ * dependency, no extra npm packages.
+ *
+ * Configuration (environment variables):
+ *   LLM_BASE_URL    - OpenAI-compatible base URL (default: http://localhost:11434/v1)
+ *   LLM_API_KEY     - API key sent as a Bearer token (default: empty)
+ *   LLM_MODEL       - chat model used for script writing (default: qwen2.5)
+ *   TTS_MODEL       - TTS model name (default: tts-1)
+ *   TTS_HOST_VOICE  - voice id for the host (default: onyx; availability depends on server)
+ *   TTS_GUEST_VOICE - voice id for the guest (default: nova; availability depends on server)
+ *   SEARCH_BASE_URL - metasearch endpoint for --topic mode (SearXNG JSON API convention,
+ *                     e.g. http://localhost:8080; default: http://localhost:8080)
+ *   SEARCH_API_KEY  - optional API key for the search endpoint
  *
  * Usage:
  *   tsx generate.ts --input=material.txt --out_dir=out
  *   tsx generate.ts --input=material.md --out_dir=out --duration=5
  */
 
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -18,6 +30,18 @@ import os from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// -----------------------------
+// Environment / endpoints
+// -----------------------------
+const BASE_URL = process.env.LLM_BASE_URL ?? 'http://localhost:11434/v1';
+const API_KEY = process.env.LLM_API_KEY ?? '';
+const LLM_MODEL = process.env.LLM_MODEL ?? 'qwen2.5';
+const TTS_MODEL = process.env.TTS_MODEL ?? 'tts-1';
+const TTS_HOST_VOICE = process.env.TTS_HOST_VOICE ?? 'onyx';
+const TTS_GUEST_VOICE = process.env.TTS_GUEST_VOICE ?? 'nova';
+const SEARCH_BASE_URL = (process.env.SEARCH_BASE_URL ?? 'http://localhost:8080').replace(/\/+$/, '');
+const SEARCH_API_KEY = process.env.SEARCH_API_KEY ?? '';
 
 // -----------------------------
 // Types
@@ -53,15 +77,15 @@ const DEFAULT_CONFIG: GenConfig = {
   mode: 'dual',
   temperature: 0.9,
   durationManual: 0,
-  charsPerMin: 240,
-  hostName: '小谱',
-  guestName: '锤锤',
-  audience: '白领小白',
-  tone: '轻松但有信息密度',
+  charsPerMin: 900, // ~150 spoken words/min for English text (~6 chars per word)
+  hostName: 'Alex',
+  guestName: 'Sam',
+  audience: 'curious beginners and busy professionals',
+  tone: 'relaxed but information-dense',
   maxAttempts: 3,
   timeoutSec: 300,
-  voiceHost: 'xiaochen',
-  voiceGuest: 'chuichui',
+  voiceHost: TTS_HOST_VOICE,
+  voiceGuest: TTS_GUEST_VOICE,
   speed: 1.0,
   pauseMs: 200,
 };
@@ -136,92 +160,92 @@ function buildPrompts(
 
   if (cfg.mode === 'dual') {
     system = (
-      `你是一个播客脚本编剧，擅长把资料提炼成双人对谈播客。` +
-      `角色固定为男主持「${cfg.hostName}」与女嘉宾「${cfg.guestName}」。` +
-      `你写作口播化、信息密度适中、有呼吸感、节奏自然。` +
-      `你必须严格遵守输出格式与字数预算。`
+      `You are a podcast scriptwriter who excels at turning source material into a two-host dialogue podcast.` +
+      `The roles are fixed: male host "${cfg.hostName}" and female guest "${cfg.guestName}".` +
+      `You write in a spoken, conversational style with moderate information density, natural breathing room, and rhythm.` +
+      `You must strictly follow the output format and the word budget.`
     );
 
-    const hintBlock = attemptHint ? `\n【上一次生成纠偏提示】\n${attemptHint}\n` : '';
+    const hintBlock = attemptHint ? `\n[CORRECTION HINT FROM THE PREVIOUS ATTEMPT]\n${attemptHint}\n` : '';
 
-    user = `请把下面【资料】改写为中文播客脚本，形式为双人对谈（男主持 ${cfg.hostName} + 女嘉宾 ${cfg.guestName}）。
-时长目标：${durationMin} 分钟。
+    user = `Rewrite the [SOURCE MATERIAL] below into an English podcast script, in the form of a two-person dialogue (male host ${cfg.hostName} + female guest ${cfg.guestName}).
+Duration target: ${durationMin} minutes.
 
-【硬性约束】
-1) 总字数必须在 ${budgetLow} 到 ${budgetHigh} 字之间（目标约 ${budgetTarget} 字）。
-2) 严格使用轮次交替输出：每段必须以"**${cfg.hostName}**："或"**${cfg.guestName}**："开头。
-3) 必须包含完整的叙事结构（但不要在对话中写出结构标签）：
-   - 开场：Hook 引入 + 本期主题介绍
-   - 主体：3个不同维度的内容，用自然过渡语连接
-   - 总结：回顾要点 + 行动建议（1句话，明确可执行）
-4) 不要在对话中写"核心点1"、"第一点"等结构标签，用自然的过渡语如"说到这个"、"还有个有趣的事"、"另外"等
-5) 不要照念原文，不要大段引用；要用口播化表达。
-6) 受众：${cfg.audience}
-7) 风格：${cfg.tone}
+[HARD CONSTRAINTS]
+1) The total length must be between ${budgetLow} and ${budgetHigh} characters (target roughly ${budgetTarget} characters).
+2) Strictly alternate turns: every paragraph must start with "${cfg.hostName}:" or "${cfg.guestName}:" (the name wrapped in double asterisks).
+3) It must contain a complete narrative structure (but do NOT write structural labels inside the dialogue):
+   - Opening: a hook + introduction of today's topic
+   - Body: content from 3 different angles, connected with natural transitions
+   - Wrap-up: recap the key points + one actionable piece of advice (1 sentence, clearly actionable)
+4) Do not write structural labels like "Key point 1" or "First point" in the dialogue; use natural transitions such as "speaking of which", "here's another interesting thing", "also", etc.
+5) Do not read the source verbatim and do not quote long passages; use spoken, conversational phrasing.
+6) Audience: ${cfg.audience}
+7) Style: ${cfg.tone}
 
-【呼吸感与自然对话 - 重要！】
-为了营造真实播客的呼吸感，请：
-1) 适度加入语气词和感叹词：嗯、哦、啊、对、没错、哈哈、哇、天呐、啧啧等
-2) 多用互动式表达："你说得对"、"这就很有意思了"、"等等，让我想想"、"我懂你的意思"
-3) 适当加入思考和停顿的暗示："这个问题嘛..."、"怎么说呢..."、"其实..."
-4) 避免过于密集的信息输出，每段控制在3-5句话，给听众消化时间
-5) 用类比和生活化的例子来解释复杂概念
-6) 两人之间要有自然的呼应和追问，而不是各说各话
-7) 不同主题之间用自然过渡语连接，不要出现"核心点1/2/3"等标签
+[BREATHING ROOM AND NATURAL DIALOGUE - IMPORTANT!]
+To create the breathing room of a real podcast:
+1) Add conversational interjections in moderation: mm, oh, ah, right, exactly, haha, wow, gosh, etc.
+2) Use interactive phrasing: "you're right about that", "now that's interesting", "wait, let me think", "I see what you mean"
+3) Add hints of thinking and pausing: "hmm, that question...", "how should I put it...", "actually..."
+4) Avoid overly dense information; keep each paragraph to 3-5 sentences to give listeners time to digest
+5) Use analogies and everyday examples to explain complex concepts
+6) The two speakers should respond to and follow up on each other, not talk past each other
+7) Connect different topics with natural transitions; never use labels like "Key point 1/2/3"
 
-【输出格式示例】
-**${cfg.hostName}**：开场……
-**${cfg.guestName}**：回应……
-（一直交替到结束）
+[OUTPUT FORMAT EXAMPLE]
+**${cfg.hostName}**: Opening...
+**${cfg.guestName}**: Response...
+(keep alternating until the end)
 
 ${hintBlock}
-【资料】
+[SOURCE MATERIAL]
 ${material}
 `;
   } else {
     const speakerName = cfg.mode === 'single-male' ? cfg.hostName : cfg.guestName;
-    const gender = cfg.mode === 'single-male' ? '男性' : '女性';
+    const gender = cfg.mode === 'single-male' ? 'male' : 'female';
 
     system = (
-      `你是一个${gender}单人播客主播，名字叫「${speakerName}」。` +
-      `你擅长把资料提炼成单人独白式播客，像讲课、读书分享、知识科普一样。` +
-      `你写作口播化、信息密度适中、有呼吸感、节奏自然。` +
-      `你必须严格遵守输出格式与字数预算。`
+      `You are a ${gender} solo podcast host named "${speakerName}".` +
+      `You excel at turning source material into a monologue-style podcast, like a lecture, a book share, or a knowledge explainer.` +
+      `You write in a spoken, conversational style with moderate information density, natural breathing room, and rhythm.` +
+      `You must strictly follow the output format and the word budget.`
     );
 
-    const hintBlock = attemptHint ? `\n【上一次生成纠偏提示】\n${attemptHint}\n` : '';
+    const hintBlock = attemptHint ? `\n[CORRECTION HINT FROM THE PREVIOUS ATTEMPT]\n${attemptHint}\n` : '';
 
-    user = `请把下面【资料】改写为中文单人播客脚本，形式为独白式讲述（主播：${speakerName}）。
-时长目标：${durationMin} 分钟。
+    user = `Rewrite the [SOURCE MATERIAL] below into an English solo podcast script, in the form of a monologue (host: ${speakerName}).
+Duration target: ${durationMin} minutes.
 
-【硬性约束】
-1) 总字数必须在 ${budgetLow} 到 ${budgetHigh} 字之间（目标约 ${budgetTarget} 字）。
-2) 所有内容均由「${speakerName}」一人讲述，每段都以"**${speakerName}**："开头。
-3) 必须包含完整的叙事结构（但不要在对话中写出结构标签）：
-   - 开场：Hook 引入 + 本期主题介绍
-   - 主体：3个不同维度的内容，用自然过渡语连接
-   - 总结：回顾要点 + 行动建议（1句话，明确可执行）
-4) 不要在对话中写"核心点1"、"第一点"等结构标签，用自然的过渡语如"说到这个"、"还有个有趣的事"、"另外"等
-5) 不要照念原文，不要大段引用；要用口播化表达。
-6) 受众：${cfg.audience}
-7) 风格：${cfg.tone}
+[HARD CONSTRAINTS]
+1) The total length must be between ${budgetLow} and ${budgetHigh} characters (target roughly ${budgetTarget} characters).
+2) Everything is spoken by "${speakerName}" alone; every paragraph starts with "${speakerName}:" (the name wrapped in double asterisks).
+3) It must contain a complete narrative structure (but do NOT write structural labels inside the dialogue):
+   - Opening: a hook + introduction of today's topic
+   - Body: content from 3 different angles, connected with natural transitions
+   - Wrap-up: recap the key points + one actionable piece of advice (1 sentence, clearly actionable)
+4) Do not write structural labels like "Key point 1" or "First point" in the dialogue; use natural transitions such as "speaking of which", "here's another interesting thing", "also", etc.
+5) Do not read the source verbatim and do not quote long passages; use spoken, conversational phrasing.
+6) Audience: ${cfg.audience}
+7) Style: ${cfg.tone}
 
-【单人播客的呼吸感 - 重要！】
-为了营造自然的单人播客呼吸感，请：
-1) 适度加入语气词和感叹词：嗯、哦、啊、对、没错、哈哈、哇、天呐、啧啧等
-2) 多用自问自答式表达："你可能会问...答案是..."、"这是为什么呢？让我来解释..."
-3) 适当加入思考和停顿的暗示："这个问题嘛..."、"怎么说呢..."、"其实..."
-4) 避免过于密集的信息输出，每段控制在3-5句话，给听众消化时间
-5) 用类比和生活化的例子来解释复杂概念
-6) 像在和朋友聊天一样，而不是在念课文
+[BREATHING ROOM FOR A SOLO PODCAST - IMPORTANT!]
+To create a natural solo-podcast rhythm:
+1) Add conversational interjections in moderation: mm, oh, ah, right, exactly, haha, wow, gosh, etc.
+2) Use self-question-and-answer phrasing: "you might ask... and the answer is...", "why is that? Let me explain..."
+3) Add hints of thinking and pausing: "hmm, that question...", "how should I put it...", "actually..."
+4) Avoid overly dense information; keep each paragraph to 3-5 sentences to give listeners time to digest
+5) Use analogies and everyday examples to explain complex concepts
+6) Talk like you are chatting with a friend, not reading an essay aloud
 
-【输出格式示例】
-**${speakerName}**：开场，大家好，我是${speakerName}，今天我们来聊……
-**${speakerName}**：说到这个，最近有个特别有意思的事……
-（所有内容都由${speakerName}讲述，分段输出）
+[OUTPUT FORMAT EXAMPLE]
+**${speakerName}**: Opening - hello everyone, I'm ${speakerName}, today we're talking about...
+**${speakerName}**: Speaking of which, something really interesting happened recently...
+(everything is spoken by ${speakerName}, output paragraph by paragraph)
 
 ${hintBlock}
-【资料】
+[SOURCE MATERIAL]
 ${material}
 `;
   }
@@ -229,23 +253,63 @@ ${material}
   return [system, user];
 }
 
-async function callZAI(
+async function chatCompletions(body: Record<string, unknown>): Promise<any> {
+  const res = await fetch(`${BASE_URL}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`LLM request failed (${res.status}): ${await res.text()}`);
+  return res.json();
+}
+
+async function callLLM(
   systemPrompt: string,
   userPrompt: string,
   temperature: number
 ): Promise<string> {
-  const zai = await ZAI.create();
-
-  const completion = await zai.chat.completions.create({
+  const completion = await chatCompletions({
+    model: LLM_MODEL,
     messages: [
-      { role: 'assistant', content: systemPrompt },
+      { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
     ],
-    thinking: { type: 'disabled' },
+    temperature,
   });
 
   const content = completion.choices[0]?.message?.content || '';
   return content;
+}
+
+/**
+ * Web search via a pluggable, self-hostable metasearch endpoint.
+ * Convention: SearXNG JSON API (GET {SEARCH_BASE_URL}/search?q=...&format=json),
+ * which is the most common open-source search convention. Works with any
+ * SearXNG instance (public or self-hosted) or any endpoint that returns
+ * {"results": [{"title"|"url"|"content", ...}]}.
+ */
+async function webSearch(query: string, num: number): Promise<Array<{ name: string; snippet: string; url: string }>> {
+  const url = `${SEARCH_BASE_URL}/search?q=${encodeURIComponent(query)}&format=json`;
+  const res = await fetch(url, {
+    headers: {
+      'Accept': 'application/json',
+      ...(SEARCH_API_KEY ? { Authorization: `Bearer ${SEARCH_API_KEY}` } : {}),
+    },
+  });
+  if (!res.ok) throw new Error(`Search request failed (${res.status}): ${await res.text()}`);
+
+  const data: any = await res.json();
+  const results: any[] = Array.isArray(data?.results) ? data.results : [];
+
+  // Normalize to the {name, snippet, url} shape used by the script builder
+  return results.slice(0, num).map((r: any) => ({
+    name: r.title ?? r.name ?? '',
+    snippet: r.content ?? r.snippet ?? '',
+    url: r.url ?? '',
+  }));
 }
 
 function scriptToSegments(script: string, hostName: string, guestName: string): Segment[] {
@@ -255,8 +319,8 @@ function scriptToSegments(script: string, hostName: string, guestName: string): 
   let current: Segment | null = null;
   let idx = 0;
 
-  const hostPrefix = `**${hostName}**：`;
-  const guestPrefix = `**${guestName}**：`;
+  const hostPrefix = `**${hostName}**:`;
+  const guestPrefix = `**${guestName}**:`;
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
@@ -299,79 +363,90 @@ function validateScript(
   const reasons: string[] = [];
 
   if (cfg.mode === 'dual') {
-    const hostTag = `**${cfg.hostName}**：`;
-    const guestTag = `**${cfg.guestName}**：`;
+    const hostTag = `**${cfg.hostName}**:`;
+    const guestTag = `**${cfg.guestName}**:`;
 
-    if (!script.includes(hostTag)) reasons.push(`缺少主持人标识：${hostTag}`);
-    if (!script.includes(guestTag)) reasons.push(`缺少嘉宾标识：${guestTag}`);
+    if (!script.includes(hostTag)) reasons.push(`Missing host tag: ${hostTag}`);
+    if (!script.includes(guestTag)) reasons.push(`Missing guest tag: ${guestTag}`);
 
     const turns = script.split('\n').filter(line =>
       line.startsWith(hostTag) || line.startsWith(guestTag)
     );
-    if (turns.length < 8) reasons.push('对谈轮次过少：建议至少 8 轮');
+    if (turns.length < 8) reasons.push('Too few dialogue turns: at least 8 recommended');
   } else {
     const speakerName = cfg.mode === 'single-male' ? cfg.hostName : cfg.guestName;
-    const speakerTag = `**${speakerName}**：`;
+    const speakerTag = `**${speakerName}**:`;
 
-    if (!script.includes(speakerTag)) reasons.push(`缺少主播标识：${speakerTag}`);
+    if (!script.includes(speakerTag)) reasons.push(`Missing host tag: ${speakerTag}`);
 
     const turns = script.split('\n').filter(line => line.startsWith(speakerTag));
-    if (turns.length < 5) reasons.push('播客段数过少：建议至少 5 段');
+    if (turns.length < 5) reasons.push('Too few podcast segments: at least 5 recommended');
   }
 
   const n = countNonWsChars(script);
   if (n < budgetLow || n > budgetHigh) {
-    reasons.push(`字数不在预算：当前约 ${n} 字，预算 ${budgetLow}-${budgetHigh}`);
+    reasons.push(`Character count outside budget: currently ~${n} chars, budget ${budgetLow}-${budgetHigh}`);
   }
 
-  // 只检查开场和总结，不检查"核心点1/2/3"标签（因为不应该出现在对话中）
-  const mustHave = ['开场', '总结'];
+  // Only check the opening and wrap-up; do not check for "Key point 1/2/3" labels
+  // (they should not appear in the dialogue).
+  const mustHave = ['opening', 'wrap-up'];
   for (const kw of mustHave) {
     if (!script.includes(kw)) {
-      reasons.push(`缺少结构要素：${kw}（请在对话中自然引入）`);
+      reasons.push(`Missing structural element: ${kw} (introduce it naturally in the dialogue)`);
     }
   }
 
-  // 检查是否有足够的对话轮次（确保内容覆盖了多个主题）
+  // Check that there are enough dialogue turns (ensures coverage of multiple topics)
   const lineCount = script.split('\n').filter(l => l.trim()).length;
   if (lineCount < 10) {
-    reasons.push('对话轮次过少，建议至少10段对话');
+    reasons.push('Too few dialogue turns; at least 10 paragraphs recommended');
   }
 
   return [reasons.length === 0, reasons];
 }
 
 function makeRetryHint(reasons: string[], cfg: GenConfig, budgetLow: number, budgetHigh: number): string {
-  const lines = ['请严格修复以下问题后重新生成：'];
+  const lines = ['Please strictly fix the following problems and regenerate:'];
   for (const r of reasons) lines.push(`- ${r}`);
-  lines.push(`- 总字数必须在 ${budgetLow}-${budgetHigh} 之间。`);
+  lines.push(`- The total length must be between ${budgetLow}-${budgetHigh} characters.`);
 
   if (cfg.mode === 'dual') {
-    lines.push(`- 每段必须以"**${cfg.hostName}**："或"**${cfg.guestName}**："开头。`);
+    lines.push(`- Every paragraph must start with "${cfg.hostName}:" or "${cfg.guestName}:" (names wrapped in double asterisks).`);
   } else {
     const speakerName = cfg.mode === 'single-male' ? cfg.hostName : cfg.guestName;
-    lines.push(`- 所有内容都由一人讲述，每段必须以"**${speakerName}**："开头。`);
+    lines.push(`- Everything is spoken by one person; every paragraph must start with "${speakerName}:" (name wrapped in double asterisks).`);
   }
 
-  lines.push('- 必须包含开场和总结，中间用自然过渡语连接不同主题，不要出现"核心点1/2/3"等标签。');
+  lines.push('- Include an opening and a wrap-up; connect different topics with natural transitions and never use labels like "Key point 1/2/3".');
   return lines.join('\n');
 }
 
 async function ttsRequest(
-  zai: any,
   text: string,
   voice: string,
   speed: number
 ): Promise<Buffer> {
-  const response = await zai.audio.tts.create({
-    input: text,
-    voice: voice,
-    speed: speed,
-    response_format: 'wav',
-    stream: false,
+  // OpenAI-compatible speech endpoint: POST {BASE_URL}/audio/speech
+  // Returns raw binary audio in the requested format.
+  const res = await fetch(`${BASE_URL}/audio/speech`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: JSON.stringify({
+      model: TTS_MODEL,
+      input: text,
+      voice: voice,
+      speed: speed,
+      response_format: 'wav',
+      stream: false,
+    }),
   });
+  if (!res.ok) throw new Error(`TTS request failed (${res.status}): ${await res.text()}`);
 
-  const arrayBuffer = await response.arrayBuffer();
+  const arrayBuffer = await res.arrayBuffer();
   const buffer = Buffer.from(new Uint8Array(arrayBuffer));
   return buffer;
 }
@@ -472,7 +547,7 @@ async function main() {
   const outDir = args.out_dir;
   const topic = args.topic;
 
-  // 检查参数：必须提供 input 或 topic 之一
+  // Validate arguments: exactly one of input or topic must be provided
   if ((!inputPath && !topic) || !outDir) {
     console.error('Usage: tsx generate.ts --input=<file> --out_dir=<dir>');
     console.error('   OR: tsx generate.ts --topic=<search-term> --out_dir=<dir>');
@@ -481,7 +556,7 @@ async function main() {
     console.error('  # From file');
     console.error('  npm run generate -- --input=article.txt --out_dir=out');
     console.error('  # From web search');
-    console.error('  npm run generate -- --topic="最新AI新闻" --out_dir=out');
+    console.error('  npm run generate -- --topic="latest AI news" --out_dir=out');
     process.exit(1);
   }
 
@@ -503,35 +578,31 @@ async function main() {
     fs.mkdirSync(outDir, { recursive: true });
   }
 
-  // 根据模式获取资料
+  // Fetch the source material depending on the mode
   let material: string;
   let inputSource: string;
 
   if (inputPath) {
-    // 模式1：从文件读取
+    // Mode 1: read from a file
     console.log(`[MODE] Reading from file: ${inputPath}`);
     material = readText(inputPath);
     inputSource = `file:${inputPath}`;
   } else if (topic) {
-    // 模式2：联网搜索
+    // Mode 2: web search
     console.log(`[MODE] Searching web for topic: ${topic}`);
-    const zai = await ZAI.create();
 
-    const searchResults = await zai.functions.invoke('web_search', {
-      query: topic,
-      num: 10
-    });
+    const searchResults = await webSearch(topic, 10);
 
     if (!Array.isArray(searchResults) || searchResults.length === 0) {
-      console.error(`未找到关于"${topic}"的搜索结果`);
+      console.error(`No search results found for "${topic}"`);
       process.exit(2);
     }
 
     console.log(`[SEARCH] Found ${searchResults.length} results`);
 
-    // 将搜索结果转换为文本资料
+    // Convert the search results into text material
     material = searchResults
-      .map((r: any, i: number) => `【来源 ${i + 1}】${r.name}\n${r.snippet}\n链接：${r.url}`)
+      .map((r: any, i: number) => `[Source ${i + 1}] ${r.name}\n${r.snippet}\nLink: ${r.url}`)
       .join('\n\n');
 
     inputSource = `web_search:${topic}`;
@@ -558,9 +629,6 @@ async function main() {
   let attemptHint = '';
   let lastScript: string | null = null;
 
-  // Initialize ZAI SDK (reuse for TTS)
-  const zai = await ZAI.create();
-
   // Generate script
   for (let attempt = 1; attempt <= cfg.maxAttempts; attempt++) {
     const [systemPrompt, userPrompt] = buildPrompts(
@@ -575,7 +643,7 @@ async function main() {
 
     try {
       console.log(`[LLM] Attempt ${attempt}/${cfg.maxAttempts}...`);
-      const content = await callZAI(systemPrompt, userPrompt, cfg.temperature);
+      const content = await callLLM(systemPrompt, userPrompt, cfg.temperature);
       lastScript = content;
 
       const [ok, reasons] = validateScript(content, cfg, low, high);
@@ -593,7 +661,7 @@ async function main() {
   }
 
   if (!lastScript) {
-    console.error('[ERROR] 未生成任何脚本输出。');
+    console.error('[ERROR] No script output was generated.');
     process.exit(1);
   }
 
@@ -606,7 +674,7 @@ async function main() {
   const segments = scriptToSegments(lastScript, cfg.hostName, cfg.guestName);
   console.log(`[INFO] Parsed ${segments.length} segments`);
 
-  // Generate TTS using SDK
+  // Generate TTS audio
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'podcast_segments_'));
   const produced: string[] = [];
 
@@ -629,7 +697,7 @@ async function main() {
 
       console.log(`[TTS] [${i + 1}/${segments.length}] idx=${seg.idx} speaker=${seg.speaker} voice=${voice}`);
 
-      const buffer = await ttsRequest(zai, text, voice, cfg.speed);
+      const buffer = await ttsRequest(text, voice, cfg.speed);
       fs.writeFileSync(wavPath, buffer);
       produced.push(wavPath);
     }

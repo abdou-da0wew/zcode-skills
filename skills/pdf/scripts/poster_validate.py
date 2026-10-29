@@ -1173,8 +1173,9 @@ def check_tex(tex_path: str) -> dict:
 
     # ---- 5. CJK_ASCII_QUOTES ----
     # Detect ASCII " adjacent to CJK characters (common LLM mistake).
-    # LaTeX interprets " as right double quote, so "北漂" renders with two
-    # right quotes. Chinese text must use Unicode smart quotes “…”.
+    # LaTeX interprets " as right double quote, so a quoted CJK term (e.g.
+    # "beipiao") renders with two right quotes. CJK text must use Unicode
+    # smart quotes U+201C/U+201D.
     cjk_quote_pattern = re.compile(
         r'[\u4e00-\u9fff\u3400-\u4dbf]"'
         r'|"[\u4e00-\u9fff\u3400-\u4dbf]'

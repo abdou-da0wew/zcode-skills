@@ -1,158 +1,158 @@
-# 标题断句 与 一般断行 Title Line Breaking & Word Wrapping
+# Title Line Breaking & Word Wrapping
 
-中文排版里最容易被忽略的一组规则。**正文断行和标题断行逻辑完全相反**——正文按字、标题按词。这个差异不知道，就会把"我外交部强烈谴责伊拉克"和"大使馆被炸事件"在标题里硬切两行。
+The most easily ignored rule set in Chinese typesetting. **Body-text wrapping and title wrapping follow completely opposite logics** — body breaks by character, titles break by word. Not knowing this, you will hard-split "our foreign ministry strongly condemns Iraq" and "the embassy bombing incident" across two title lines.
 
-## 一、核心原则
+## 1. Core principles
 
-| 文本类型 | 断行逻辑 | 原因 |
+| Text type | Breaking logic | Reason |
 |---|---|---|
-| **正文** | 按字断，不按词 | 汉语双音节词约占 60%，按词断会形成锯齿状右缘，方块字硕大无法形成西文那样的"波浪状" |
-| **标题** | 必须按词断 | 字数少、视觉占比大，词被切开会产生歧义和阅读阻塞 |
-| **诗词** | 按句断（每句独占一行或按对齐排列） | 节奏感优先 |
-| **目录、列表** | 按条目断（必要时换行用次行缩进） | 凸排（hanging）保持检索性 |
+| **Body** | Break by character, not by word | ~60% of Mandarin words are disyllabic; word-based breaking creates a zigzag right edge — square glyphs are too large to form the Latin "wavy" edge |
+| **Titles** | Must break by word | Few characters, large visual share; a split word creates ambiguity and reading blockage |
+| **Poetry** | Break by line (each verse on its own line, or aligned) | Rhythm first |
+| **TOCs, lists** | Break by entry (wrap with a hanging indent when needed) | Hanging keeps scannability |
 
-## 二、标题断行规则
+## 2. Title line-breaking rules
 
-### 1. 不可在词中间断开
+### 1. Never break inside a word
 
-绝对不可拆的"词单位"：
-- **专有名词**：人名（毛泽东 / 习近平 / 苏炳添）、地名（北京 / 哈尔滨 / 上海浦东）、机构名（外交部 / 中央电视台）、品牌（华为 / 字节跳动）
-- **术语**：人工智能、深度学习、量子纠缠、新冠肺炎
-- **数字 + 单位**：3 公斤、500 万、第 5 章
-- **数字串**：2024 年、100 元
-- **书名 / 影片名 / 歌名**：《静夜思》、《流浪地球 2》
-- **成语 / 熟语**：守株待兔、海纳百川（4 字成语整体不拆）
+"Word units" that must never be split:
+- **Proper nouns**: personal names (e.g. statesmen, athletes), place names (Beijing / Harbin / Shanghai Pudong), institutions (Ministry of Foreign Affairs, CCTV), brands (Huawei / ByteDance)
+- **Terms**: artificial intelligence, deep learning, quantum entanglement, COVID-19
+- **Number + unit**: 3 kg, 5 million, chapter 5
+- **Number strings**: 2024, 100 yuan
+- **Book / film / song titles**: "Quiet Night Thoughts", "The Wandering Earth 2"
+- **Idioms / set phrases**: 4-character idioms are never split (e.g. "waiting by the stump for rabbits", "the sea accepts a hundred rivers")
 
-### 2. 虚词位禁忌
+### 2. Function-word position taboos
 
-| 字 / 词 | 禁忌位置 | 原因 |
+| Word (pinyin) | Forbidden position | Reason |
 |---|---|---|
-| **的、地、得、之、所** | **不入行首** | 修饰关系断了 |
-| **和、与、及、或、跟、同** | **不入行末** | 并列关系悬空 |
-| **是、为、乃** | 不入行首 | 系动词需有主语 |
-| **在、于、对、向、从** | 不入行末 | 介词需带宾语 |
-| **了、着、过** | 不入行首 | 助词依附前字 |
-| **吗、呢、吧、啊、哦** | 不入行首（语气词通常）| 同上 |
+| **de / di / de / zhi / suo** (particle-like modifiers) | **Never at line start** | The modification relation is severed |
+| **he / yu / ji / huo / gen / tong** (and / with / or) | **Never at line end** | The parallel relation dangles |
+| **shi / wei / nai** (copulas) | Not at line start | A copula needs its subject |
+| **zai / yu / dui / xiang / cong** (prepositions) | Not at line end | A preposition needs its object |
+| **le / zhe / guo** (aspect particles) | Not at line start | They attach to the preceding character |
+| **ma / ne / ba / a / o** (mood particles) | Not at line start (usually) | Same as above |
 
-### 3. 标题反例与修正
+### 3. Title counter-examples and fixes
 
-❌ **反例 1**（歧义）：
+❌ **Counter-example 1** (ambiguous):
 ```
-我外交部强烈谴责伊拉克
-大使馆被炸事件
+wo waijiaobu qianglie qianze Yilake
+dashiguan bei zha shijian
 ```
-读者可能误解为"伊拉克大使馆被炸"。
+The reader may misparse this as "the Iraqi embassy was bombed".
 
-✅ **修正**：
+✅ **Fixed**:
 ```
-我外交部强烈谴责
-伊拉克大使馆被炸事件
-```
-
-❌ **反例 2**（词中断）：
-```
-苹果发布全新人工智
-能芯片 M5
+wo waijiaobu qianglie qianze
+Yilake dashiguan bei zha shijian
 ```
 
-✅ **修正**：
+❌ **Counter-example 2** (mid-word break):
 ```
-苹果发布全新
-人工智能芯片 M5
-```
-
-❌ **反例 3**（虚词位）：
-```
-中国队战胜了美国队和
-日本队
+pingguo fabu quanxin rengongzhi
+neng xinpian M5
 ```
 
-✅ **修正**（"和"不入行末）：
+✅ **Fixed**:
 ```
-中国队战胜了
-美国队和日本队
+pingguo fabu quanxin
+rengong zhineng xinpian M5
 ```
 
-### 4. 标题占行规则（铅排经验值）
+❌ **Counter-example 3** (function-word position):
+```
+zhongguodui zhansheng le Meiguo dui he
+Riben dui
+```
 
-标题必须占整数倍正文行高，否则跨栏对不齐。
+✅ **Fixed** ("he"/and never ends a line):
+```
+zhongguodui zhansheng le
+Meiguo dui he Riben dui
+```
 
-| 标题层级 | 占行（含上下空白） | 典型字号（正文 9pt 时） |
+### 4. Title line-occupation rules (metal-type experience values)
+
+A title must occupy an integer multiple of the body line height, or columns stop aligning.
+
+| Title level | Lines occupied (including whitespace) | Typical size (with 9pt body) |
 |---|---|---|
-| 大标题（章首） | 4–5 行 | 18–24pt |
-| 中标题（节首） | 2–3 行 | 12–15pt |
-| 小标题 | 1–2 行 | 10–12pt |
-| 双行标题（主 + 副）| 3 行 | 主 12pt + 副 9pt |
-| 同行标题（小节首）| 1 行（接续正文）| 9pt 加粗 |
+| Major title (chapter opener) | 4–5 | 18–24pt |
+| Medium title (section opener) | 2–3 | 12–15pt |
+| Minor title | 1–2 | 10–12pt |
+| Two-part title (main + sub) | 3 | Main 12pt + sub 9pt |
+| Run-in title (subsection head) | 1 line (continues into body) | 9pt bold |
 
-**关键原则**：标题字号 + 上下空白 = 正文行高 × N。**否则后面所有正文都对不齐基线**。
+**Key principle**: title size + surrounding whitespace = body line height × N. **Otherwise every following line of body text misses the baseline**.
 
-### 5. 标题在页面中的位置
+### 5. Title position on the page
 
-- **大标题（章首）**：必出现在**正面页**
-  - 横排左翻书 → 右页（奇数页）
-  - 直排右翻书 → 左页（奇数页）
-  - 若大标题前一章末页停在正面页 → 反面页留空白（"双白页"是必要的，不要为省纸打破）
-- **换页 vs 单页起**：
-  - 换页：从新页开始，不论奇偶（中小标题用）
-  - 单页起：必从正面页开始（大标题用）
-- **中小标题孤行处理**：若中小标题落到页末且后续正文容不下，**整个标题换到下一页开头**
+- **Major titles (chapter openers)**: must appear on the **front page**
+  - Horizontal, left-turning book → right page (odd pages)
+  - Vertical, right-turning book → left page (odd pages)
+  - If the previous chapter's last page already ends on a front page → leave the verso blank (the "double blank page" is necessary; don't break it to save paper)
+- **New page vs front-page start**:
+  - New page: start from the next page regardless of parity (medium/minor titles)
+  - Front-page start: must begin on a front page (major titles)
+- **Medium/minor-title widow handling**: if a title lands at a page bottom with no room for its following body, **move the whole title to the top of the next page**
 
-### 6. 标题对齐方式
+### 6. Title alignment
 
-| 排版方向 | 大标题对齐 | 小标题对齐 |
+| Direction | Major title | Minor title |
 |---|---|---|
-| 横排 | 多居中 | 多左对齐 / 段首空格 |
-| 直排 | 对行首（顶天） / 下沉（如下字常用 2 字位）| 同 |
+| Horizontal | Mostly centered | Mostly left-aligned / indented from paragraph start |
+| Vertical | Aligned to the first line (flush top) / dropped start (commonly 2 cells down) | Same |
 
-**直排标题"下字 2 字位置"**：直排时标题从天头空 2 字开始，避免顶天造成压抑。
+**Vertical titles' "2-cell drop"**: vertical titles start 2 cells below the head margin, avoiding the oppression of a flush-top start.
 
-### 7. 同行标题
+### 7. Run-in titles
 
-小节标题不换行，直接接续正文。处理：
+Subsection heads that don't break; body continues on the same line. Treatment:
 
 ```
-四、本章小结  本章我们讨论了……
+4. Chapter summary  In this chapter we discussed…
        ↑
-   1 字空白
+   1-character gap
 ```
 
-- 标题与正文之间空 1 字位置
-- 若标题字号非整数倍，调整空白让正文头尾对齐
+- One character of space between the head and the body
+- If the head's size is not an integer multiple, adjust the gap so the body's first and last lines align
 
-## 三、CSS / HTML 实现标题断行
+## 3. CSS / HTML implementation of title breaking
 
-### 方法 1：手工 `<br>` 控制断点（最稳）
+### Method 1: manual `<br>` to control break points (most reliable)
 ```html
 <h1>
-  我外交部强烈谴责<br>
-  伊拉克大使馆被炸事件
+  wo waijiaobu qianglie qianze<br>
+  Yilake dashiguan bei zha shijian
 </h1>
 ```
 
-### 方法 2：`<wbr>` 提示断点（允许在此换行）
+### Method 2: `<wbr>` to hint break points (may wrap here)
 ```html
-<h1>苹果发布全新<wbr>人工智能芯片 M5</h1>
+<h1>pingguo fabu quanxin<wbr>rengong zhineng xinpian M5</h1>
 ```
 
-### 方法 3：U+2060 WORD JOINER（禁止在此换行）
+### Method 3: U+2060 WORD JOINER (forbid a break here)
 ```html
-<h1>第&#8288;5&#8288;章&nbsp;深度学习</h1>
+<h1>di&#8288;5&#8288;zhang&nbsp;shendu xuexi</h1>
 ```
-注意：**不要**用 `&#8205;`（U+200D ZERO WIDTH JOINER）—— 那是给阿拉伯文/天城文连写用的，对中文断行无效。
+Note: do **not** use `&#8205;` (U+200D ZERO WIDTH JOINER) — that is for Arabic/Devanagari joining; it has no effect on Chinese line breaking.
 
-### 方法 4：CSS `text-wrap: balance`（现代浏览器）
+### Method 4: CSS `text-wrap: balance` (modern browsers)
 ```css
 h1, h2, h3 {
-  text-wrap: balance;       /* 让多行标题各行字数尽量均衡 */
+  text-wrap: balance;       /* balance the per-line character counts of multi-line titles */
 }
 ```
 
-### 方法 5：响应式断点（不同屏宽换不同断点）
+### Method 5: responsive break points (different breakpoints per screen width)
 ```html
 <h1>
-  我外交部强烈谴责<br class="md-only">
-  <wbr>伊拉克大使馆被炸事件
+  wo waijiaobu qianglie qianze<br class="md-only">
+  <wbr>Yilake dashiguan bei zha shijian
 </h1>
 <style>
   @media (min-width: 768px) {
@@ -161,189 +161,189 @@ h1, h2, h3 {
 </style>
 ```
 
-## 四、正文断行规则
+## 4. Body-text line-breaking rules
 
-正文按字断，但 6 类位置**不能拆**（不可分离禁则）：
+Body breaks by character, but 6 classes of positions **must not split** (the inseparable-pairs rules):
 
-### 1. 阿拉伯数字内部不拆
-- ❌ `100`<br>`0 元`
-- ✅ 整体到下一行
+### 1. Never split inside Arabic numerals
+- ❌ `100`<br>`0 yuan`
+- ✅ Move the whole number to the next line
 
-### 2. 数字 + 单位不拆
-- 数字 + `%`、`‰`、`°`、`℃`、`℉` 不拆
-- 数字 + `±`、`+`、`−` 之前的符号不拆
-- 数字 + 货币 `¥`、`$`、`€`、`£` 不拆
+### 2. Never split number + unit
+- Number + `%`, `‰`, `°`, `℃`, `℉` never split
+- Number + signs like `±`, `+`, `−` never split
+- Number + currency `¥`, `$`, `€`, `£` never split
 
-### 3. 上下标 / 注释记号 + 被标记词不拆
+### 3. Never split super/subscripts / annotation marks + their marked word
 - ❌ `m`<br>`²`
-- ❌ 苹果<sup>1</sup> <br> 公司
-- ✅ 注释上标紧贴前一个字
+- ❌ Apple<sup>1</sup> <br> Inc.
+- ✅ The annotation superscript hugs the preceding character
 
-### 4. 破折号 / 省略号不可拆开
-- 破折号 `——`（2 字宽）不可在中间断开
-- 省略号 `……`（2 字宽）不可在中间断开
-- 连续多个破折号 `————` 允许在每一组之间拆
+### 4. Em dashes / ellipses must not split
+- The em dash `——` (2 cells wide) must not break in the middle
+- The ellipsis `……` (2 cells wide) must not break in the middle
+- Multiple consecutive em dashes `————` may break between each pair
 
-### 5. 西文单词按 hyphenation 断
-- 横排中混排的西文单词遇行尾按西文连字符规则断词
-- 直排中旋转 90° 的西文单词除连字符外不拆
+### 5. Western words break per hyphenation
+- Western words inside horizontal text follow Western hyphenation rules at line ends
+- Rotated Western words inside vertical text do not split except at hyphens
 
-### 6. URL / 邮件地址特殊处理
-- 建议在 `@`、`/`、`?` 等符号处断行
-- **不得加连字符**（连字符会被误解为 URL 的一部分）
-- **不改大小写**
-- CSS：`overflow-wrap: anywhere`（针对长 URL）
+### 6. Special handling for URLs / email addresses
+- Break at symbols like `@`, `/`, `?`
+- **Never add a hyphen** (it would be misread as part of the URL)
+- **Never change casing**
+- CSS: `overflow-wrap: anywhere` (for long URLs)
 
-### CSS 实现"不可分离禁则"
+### CSS implementation of the inseparable-pairs rules
 
 ```css
 .body-text {
-  word-break: keep-all;            /* 不在词中间断 */
-  overflow-wrap: break-word;        /* 但允许长 URL 换行 */
-  line-break: strict;               /* 严格避头尾 */
-  text-spacing-trim: space-all;     /* 标点空间挤压 */
-  hanging-punctuation: allow-end;   /* 末行标点悬挂 */
+  word-break: keep-all;            /* never break inside words */
+  overflow-wrap: break-word;        /* but allow long URLs to wrap */
+  line-break: strict;               /* strict kinsoku */
+  text-spacing-trim: space-all;     /* punctuation space squeezing */
+  hanging-punctuation: allow-end;   /* hanging final-line punctuation */
 }
 
-/* 关键：不要这样写 */
+/* Critical: do not write this */
 .bad {
-  word-break: break-all;            /* ❌ 会让中文按字硬断，避头尾全失效 */
+  word-break: break-all;            /* ❌ hard-breaks Chinese per character; kinsoku fully disabled */
 }
 
-/* 不可断的小组：数字+单位、上下标 */
+/* Inseparable small groups: number+unit, super/subscripts */
 .unit, .superscript-group {
-  white-space: nowrap;              /* 整组不换行 */
+  white-space: nowrap;              /* the whole group stays on one line */
 }
 ```
 
-### 不可断小组的 HTML 标记
+### HTML markup for inseparable groups
 
 ```html
-<!-- 数字+单位 -->
-温度 <span class="unit">25 ℃</span>
-价格 <span class="unit">¥ 999.99</span>
+<!-- number + unit -->
+temp <span class="unit">25 ℃</span>
+price <span class="unit">¥ 999.99</span>
 
-<!-- 上下标 -->
-面积 <span class="superscript-group">10 m<sup>2</sup></span>
+<!-- super/subscript -->
+area <span class="superscript-group">10 m<sup>2</sup></span>
 
-<!-- 注释记号 -->
-苹果公司<sup class="superscript-group">①</sup>
+<!-- annotation mark -->
+Apple Inc.<sup class="superscript-group">①</sup>
 
-<!-- 用 U+2060 也可 -->
-温度 25&#8288;℃
+<!-- U+2060 works too -->
+temp 25&#8288;℃
 ```
 
-## 五、孤行孤字（Widow & Orphan）
+## 5. Widows & orphans
 
-排版的"末页综合症"：段末单字、页首单行。**不修就是失败。**
+Typesetting's "last-page syndrome": a single character at a paragraph's end, a single line at a page's top. **Leaving them unfixed is a failure.**
 
-### 1. 孤字不成行（Orphan）
+### 1. An orphan character must not form a line
 
-**症状**：段落最后一行只有 1 个字 + 1 个标点。
+**Symptom**: the paragraph's last line holds only 1 character + 1 punctuation mark.
 
-**3 种救济**（按优先级）：
+**3 reliefs** (by priority):
 
-#### 救济 A：挤进上行（首选）
-- 通过标点宽度调整：把上一行的标点全部从全宽改为半宽，腾出空间
-- 通过中西间距调整：把中西混排的 1/4 em 间距压到 1/8 em
-- 通过字距均压：上一行字距压缩 1/24 em
+#### Relief A: squeeze into the previous line (first choice)
+- Punctuation width adjustment: convert all of the previous line's punctuation from fullwidth to halfwidth to free space
+- Chinese-Western gap adjustment: compress the 1/4 em mixing gap to 1/8 em
+- Tracking even-out: compress the previous line's tracking by 1/24 em
 
-#### 救济 B：删字让孤字回前行
-- 与作者商议删去 1–2 个字
-- 修改句法（"非常" → "很"）
+#### Relief B: delete a character to pull the orphan back
+- Agree with the author to cut 1–2 characters
+- Rework the syntax (e.g. "feichang" → "hen")
 
-#### 救济 C：加字让末行≥3 字
-- 与作者商议补 1 字让末行不再"孤"
-- 加补缀词（"了"、"的"、"则"）
+#### Relief C: add a character so the last line holds ≥ 3
+- Agree with the author to pad 1 character so the last line is no longer "lonely"
+- Add filler particles (le / de / ze)
 
-#### 救济 D（次选）：均排末行
-- 让末行 1 个字均排到整个版心宽度
-- 适用于诗歌、对联，**不适用于现代文**（看着别扭）
+#### Relief D (second choice): even out the last line
+- Distribute the single last-line character across the whole type-area width
+- Applies to poetry and couplets, **not to modern prose** (looks wrong)
 
-### 2. 孤行不成页（Widow）
+### 2. A widow line must not open a page
 
-**症状**：页首是前段的最后一行（1 行 + 段间空白）。
+**Symptom**: the page opens with the previous paragraph's final line (1 line + paragraph gap).
 
-**4 种救济**（按优先级）：
+**4 reliefs** (by priority):
 
-#### 救济 A：孤行回前页（突出版心）
-- 让孤行超出地脚版心 1 行，与前段连在一起
-- 此页地脚临时缩小 1 行（在不严格场合允许）
+#### Relief A: return the widow to the previous page (extend the type area)
+- Let the widow exceed the foot of the type area by 1 line, joining the previous paragraph
+- Temporarily shrink this page's foot by 1 line (permitted in non-strict contexts)
 
-#### 救济 B：前页末段取 1 行
-- 修改前段，让前段在前页最后一行结束自然停顿
-- 让新段从本页开始（最自然）
+#### Relief B: take 1 line from the previous page's last paragraph
+- Revise the previous paragraph so it ends on a natural pause at the last line
+- Let the new paragraph start on this page (most natural)
 
-#### 救济 C：删字
-- 删本段开头 1 行字数，让孤行不再孤
+#### Relief C: delete characters
+- Cut one line's worth from this paragraph's opening so the widow isn't alone
 
-#### 救济 D：加字
-- 在前段补 1 行字数
+#### Relief D: add characters
+- Pad one line's worth into the previous paragraph
 
-### 3. CSS 实现
+### 3. CSS implementation
 
 ```css
 p {
-  orphans: 2;       /* 段末至少留 2 行（避免 1 字孤悬）*/
-  widows: 2;        /* 段首至少留 2 行（避免 1 行孤悬）*/
+  orphans: 2;       /* keep at least 2 lines at a paragraph's end (no lone character) */
+  widows: 2;        /* keep at least 2 lines at a paragraph's start (no lone line) */
 }
 
-/* 段不要被分页符切断 */
+/* Keep paragraphs from being cut by page breaks */
 h1, h2, h3 {
-  page-break-after: avoid;       /* 标题后不分页 */
-  break-after: avoid-page;        /* 同上，现代写法 */
+  page-break-after: avoid;       /* no page break after a title */
+  break-after: avoid-page;        /* same, modern syntax */
 }
 
 img, figure {
-  page-break-inside: avoid;       /* 图片不被切断 */
+  page-break-inside: avoid;       /* images are never cut */
   break-inside: avoid;
 }
 ```
 
-## 六、断行控制工具汇总
+## 6. Line-break control tools summary
 
-| 工具 | 控制粒度 | 用法 | 平台 |
+| Tool | Granularity | Usage | Platforms |
 |---|---|---|---|
-| `<br>` | 强制换行 | HTML | 所有 |
-| `<wbr>` | 软断点（允许在此换行） | HTML5 | 现代浏览器 |
-| `&#8288;` (U+2060 WJ) | 禁止在此换行 | HTML 字符 | 现代浏览器 |
-| `&nbsp;` | 不可换行空格 | HTML 字符 | 所有 |
-| `white-space: nowrap` | 整段不换行 | CSS | 所有 |
-| `word-break: keep-all` | 单词内不断（不要 `break-all`） | CSS | 所有现代 |
-| `overflow-wrap: break-word` | 超长词允许换行 | CSS | 现代浏览器 |
-| `line-break: strict` | 严格避头尾 | CSS | 现代浏览器 |
-| `text-wrap: balance` | 多行均衡 | CSS | 现代浏览器（2024+） |
-| `hyphens: auto` | 西文自动连字符 | CSS | 现代浏览器 |
+| `<br>` | Forced break | HTML | All |
+| `<wbr>` | Soft break point (may wrap here) | HTML5 | Modern browsers |
+| `&#8288;` (U+2060 WJ) | Forbid a break here | HTML entity | Modern browsers |
+| `&nbsp;` | Non-breaking space | HTML entity | All |
+| `white-space: nowrap` | No wrapping for the whole element | CSS | All |
+| `word-break: keep-all` | Never break inside words (never `break-all`) | CSS | All modern |
+| `overflow-wrap: break-word` | Allow overlong words to wrap | CSS | Modern browsers |
+| `line-break: strict` | Strict kinsoku | CSS | Modern browsers |
+| `text-wrap: balance` | Balanced multi-line | CSS | Modern browsers (2024+) |
+| `hyphens: auto` | Automatic Western hyphenation | CSS | Modern browsers |
 
-## 七、InDesign / Word 中的断行设置
+## 7. Line-breaking settings in InDesign / Word
 
 ### InDesign
-1. **关闭"连数字"**（默认开启会把"以防万一"中的"万一"误判数字）：
-   - 不打开任何文档 → 段落面板选项 → 关闭"连数字" → 影响所有新文档
-2. **选用 Adobe CJK 单行书写器**（不是段落书写器）
-   - 段落书写器会把单行字距调整污染相邻行
-3. **避头尾设置**：选"简体中文避头尾"，避头尾间断类型选"先推入"或"确定调整量优先级"
-4. **段落面板"禁止断字"**勾选（默认开），破折号才不被拆
+1. **Turn off "digit linking"** (on by default, it misreads things like the "wan yi" inside "in case of emergency" as digits):
+   - With no document open → Paragraph panel options → turn off "digit linking" → affects all new documents
+2. **Use the Adobe CJK single-line composer** (not the paragraph composer)
+   - The paragraph composer pollutes neighboring lines with single-line spacing adjustments
+3. **Kinsoku settings**: choose "Simplified Chinese kinsoku"; for the in-kinsoku handling type choose "push in first" or "fixed adjustment priority"
+4. **Paragraph panel "No Hyphenation"** checked (on by default) so em dashes don't split
 
 ### Word
-1. 段落对话框 → 中文版式
-2. 勾选"允许标点溢出边界"
-3. 勾选"按中文习惯控制首尾字符"
-4. "首尾字符"选"标准"或"严格"
-5. **注意**：Word 默认中文"后置标点"不包含 `U+2014`，破折号需要手动加入"自定义后置标点"
+1. Paragraph dialog → Asian Typography
+2. Check "Allow punctuation to overflow the boundary"
+3. Check "Control first/last characters per Chinese conventions"
+4. Set "first/last characters" to "Standard" or "Strict"
+5. **Note**: Word's default Chinese "trailing punctuation" list does not include U+2014; add the em dash to "custom trailing punctuation" manually
 
-## 八、检查清单（断行相关）
+## 8. Checklist (line-breaking-related)
 
-排印完成前必过：
+Must pass before finalizing:
 
-- [ ] 所有标题是否按词断、不在词中间硬断？
-- [ ] 标题中"的"是否在行首？"和/与"是否在行末？
-- [ ] 标题占行是否为正文行高整数倍？
-- [ ] 大标题是否在正面页（横右页 / 直左页）？
-- [ ] 数字 + 单位是否整组不分行？（用 `<span class="unit">` 或 `&#8288;`）
-- [ ] 破折号、省略号是否未被中间拆开？
-- [ ] 注释上标是否与被标记词紧贴？
-- [ ] 段末是否有"孤字 + 标点"？
-- [ ] 页首是否有"孤行"？
-- [ ] URL / 邮箱是否在合理位置断（不加连字符）？
-- [ ] CSS 是否用 `word-break: keep-all` 而不是 `break-all`？
+- [ ] Do all titles break by word, never hard-split mid-word?
+- [ ] Does the particle *de* start a title line? Do "and/with" words end a title line?
+- [ ] Is each title's line occupation an integer multiple of the body line height?
+- [ ] Are major titles on the front page (right page horizontal / left page vertical)?
+- [ ] Do number + unit groups stay unsplit? (use `<span class="unit">` or `&#8288;`)
+- [ ] Are em dashes and ellipses never split in the middle?
+- [ ] Do annotation superscripts hug their marked word?
+- [ ] Any "orphan character + punctuation" at a paragraph end?
+- [ ] Any widow line at a page top?
+- [ ] Do URLs/emails break at sensible positions (no added hyphens)?
+- [ ] Does CSS use `word-break: keep-all` instead of `break-all`?

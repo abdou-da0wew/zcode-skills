@@ -1,75 +1,75 @@
-# 简历定向改写原则
+# Targeted Resume Rewriting Principles
 
-## 核心原则
+## Core Principles
 
-### 1. 不编造，只重组
+### 1. Never fabricate; only reorganize
 
-简历里的事实部分（公司、岗位、时间、量化数字）**一字不改**。
-可以改的：
-- bullet 的措辞和顺序
-- 强调的角度（同一段经历，不同 JD 强调不同侧面）
-- 项目分类（"相关项目"放前，"其他项目"放后）
+The factual parts of the resume (companies, titles, dates, quantified figures) **stay unchanged, to the letter**.
+What you may change:
+- The wording and order of bullets
+- The angle of emphasis (the same experience highlights different facets for different JDs)
+- Project grouping ("relevant projects" first, "other projects" after)
 
-### 2. 把 JD 的关键词嵌入到真实经验里，而不是单独贴
+### 2. Embed JD keywords inside real experience instead of pasting them separately
 
-❌ 错：在简历末尾加一行"关键词：A/B 测试、用户增长、SQL、Python"
-✅ 对：把"我做过的灰度对比"改成"A/B 测试（灰度对比）"，让关键词嵌在真实场景里
+❌ Wrong: adding a line at the end of the resume reading "Keywords: A/B testing, user growth, SQL, Python"
+✅ Right: changing "the gray-release comparison I ran" to "A/B testing (gray-release comparison)", so the keyword lives inside a real scenario
 
-### 3. 用 JD 的动词
+### 3. Use the JD's verbs
 
-JD 说"主导 ___ 系统设计"，如果你是这段经历的负责人，把"参与"改成"主导"。
+The JD says "lead ___ system design"; if you owned that experience, change "participated" to "led".
 
-但**前提是真的主导**——agent 在改写前必须确认：
-- 这段经历你是 leader 吗？是的话改"主导"；不是就保留"参与"或写明"作为 _ 角色 协助 ___"
+But the **precondition is that you really led it** — the agent must confirm before rewriting:
+- Were you the leader of this experience? If yes, use "led"; if not, keep "participated" or write "supported ___ as a ___ role"
 
-### 4. 重排经历顺序
+### 4. Reorder experiences
 
-工作经历（按时间倒序）—— 不可改，否则失实。
-项目经历 / 实习经历 —— 可以改，把与 JD 强相关的放前面。
+Work experience (reverse-chronological) — must not change, otherwise it becomes inaccurate.
+Project experience / internships — may be reordered; put the ones strongly related to the JD first.
 
-更进一步：可以拆成两个小标题：
+Going further, you can split into two sub-headings:
 ```
-【相关项目】（与目标岗位强相关）
+[Relevant Projects] (strongly related to the target role)
 - ...
-【其他项目】
+[Other Projects]
 - ...
 ```
 
-### 5. Summary 要直接对位 JD must-have
+### 5. The Summary must map directly onto the JD's must-haves
 
-JD 说"5 年 C 端产品 + SQL + A/B 测试"
-Summary 改成："5 年 C 端互联网产品经验，主导过 ___ 增长项目，熟练使用 SQL 与 A/B 测试驱动决策"
+The JD says "5 years of consumer product + SQL + A/B testing"
+Rewrite the Summary as: "5 years of consumer internet product experience, led ___ growth projects, proficient in SQL and A/B-test-driven decision-making"
 
-### 6. 技能列表也要倾斜
+### 6. Tilt the skills list too
 
-JD 说"Python / Spark / Flink"，简历技能列表把这三个放前面。
-不会的不要写。
+The JD says "Python / Spark / Flink"; put those three first in the resume's skills list.
+Don't list what you don't know.
 
-### 7. 适度补 nice-to-have
+### 7. Fill in nice-to-haves moderately
 
-如果 JD 的 nice-to-have 你**真的有**但简历没写，补上。
-如果没有，不补——nice-to-have 本来就不是硬门槛，不影响过简历筛选。
+If a JD nice-to-have is something you **genuinely have** but the resume omits, add it.
+If you don't have it, skip it — nice-to-haves are not hard requirements and won't block the resume screen.
 
-## 改写后的双向校验
+## Two-Way Verification After Rewriting
 
-每条改后 bullet 自问：
-- 这是不是用户真实做过的？
-- 这条 bullet 在 JD 里能找到对应的关键词 / 职责吗？
-- 量化数字有保留吗？
+For every rewritten bullet, ask:
+- Did the user really do this?
+- Can this bullet be mapped to a keyword / responsibility in the JD?
+- Were the quantified numbers preserved?
 
-每段经历自问：
-- 是否覆盖了 JD 的至少 1 条 must-have？
-- 是否突出了用户在这段经历里"真正的高光"？
+For every experience block, ask:
+- Does it cover at least 1 JD must-have?
+- Does it highlight the user's "true spotlight moment" in this experience?
 
-整份简历自问：
-- ATS 命中率有提升吗？
-- HR 看 30 秒能不能 get 到"为什么这个候选人适合这个岗位"？
-- 有没有让真实经历变形 / 失实？
+For the resume as a whole, ask:
+- Did the ATS hit rate improve?
+- Can HR grasp "why this candidate fits this role" within a 30-second skim?
+- Did anything distort real experience into something inaccurate?
 
-## 当用户与 JD 严重不匹配时
+## When the User Is a Poor Match for the JD
 
-诚实告诉用户：
-- "JD 里有 N 条 must-have 你的简历完全没有覆盖，这个岗位投递成功率较低"
-- "建议你考虑：(a) 投匹配度更高的类似岗位 (b) 在 cover letter 里诚实说明 transferable skill (c) 先补技能再投"
+Be honest with the user:
+- "The JD has N must-haves your resume doesn't cover at all; the odds for this application are low"
+- "Suggested options: (a) apply to similar roles with a better fit (b) honestly address transferable skills in the cover letter (c) build the missing skills first, then apply"
 
-不要为了"看起来匹配"而扭曲简历。
+Never bend the resume to "look like a match".

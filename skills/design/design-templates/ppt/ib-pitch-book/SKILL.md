@@ -1,6 +1,6 @@
 ---
 name: ib-pitch-book
-description: 投行 strategic-alternatives pitch book — trading comps / precedent transactions / valuation football field / DCF sensitivity / 战略选项矩阵 / 流程建议。改写 assets/template.html 保留 IB-specific chrome / disclosure bands / source labels。用于 Board / sell-side 讨论材料。**不是** VC 融资 deck。工作流改自 Anthropic financial-services Pitch Agent (Apache-2.0)。
+description: Investment-banking strategic-alternatives pitch book — trading comps / precedent transactions / valuation football field / DCF sensitivity / strategic-options matrix / process recommendation. Adapt assets/template.html keeping the IB-specific chrome / disclosure bands / source labels. For Board / sell-side discussion materials. **Not** a VC fundraising deck. Workflow adapted from the Anthropic financial-services Pitch Agent (Apache-2.0).
 visibility: public
 mode: template
 carrier: deck
@@ -8,9 +8,9 @@ scenario: finance
 pattern_source: pattern.html
 source_priority: skill-first
 triggers:
-  - "做个投行 pitch book"
-  - "做个并购材料"
-  - "做个战略选项 deck"
+  - "make an investment-banking pitch book"
+  - "make M&A materials"
+  - "make a strategic alternatives deck"
   - "ib pitch book"
   - "investment banking pitch"
   - "strategic alternatives"
@@ -19,9 +19,9 @@ triggers:
   - "football field valuation"
   - "trading comps"
   - "precedent transactions"
-  - "投行 pitch"
-  - "并购材料"
-  - "战略选项"
+  - "IB pitch"
+  - "M&A materials"
+  - "strategic options"
 od:
   upstream: "https://github.com/anthropics/financial-services/tree/main/plugins/agent-plugins/pitch-agent"
   preview:

@@ -8,17 +8,17 @@ Bloomberg
 Capital IQ
 Wind
 Choice
-财务建模
-估值
-敏感性分析
-行业研究
+financial modeling
+valuation
+sensitivity analysis
+sector research
 deal
-路演
-招股书
-投资逻辑
+roadshow
+prospectus
+investment thesis
 catalyst
-催化剂
-风险点
+catalysts
+risk factors
 ROE
 ROIC
 EBITDA
@@ -31,7 +31,7 @@ hypothesis
 MECE
 issue tree
 PowerPoint
-Excel 高阶
+advanced Excel
 VBA
 SQL
 Python
@@ -40,11 +40,11 @@ CPA
 FRM
 ACCA
 PMP
-量化
-策略
-回测
-因子
-基本面
-技术面
-夏普
-最大回撤
+quant
+strategy
+backtesting
+factor
+fundamentals
+technical analysis
+Sharpe
+max drawdown

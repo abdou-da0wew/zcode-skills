@@ -39,19 +39,19 @@ except ImportError:
 
 # CJK punctuation forbidden at line start
 LINE_START_FORBIDDEN = set(
-    "。、，；：！？）】〛〉」』"
-    "\u201c\u201d"  # "" curly double quotes
-    "\u2026"        # … ellipsis
-    "\u2014"        # — em dash
-    "\uff5e"        # ～ fullwidth tilde
-    "\u00b7"        # · middle dot
+    "\u3002\u3001\uff0c\uff1b\uff1a\uff01\uff1f\uff09\u3011\u301b\u3009\u300d\u300f"
+    "\u201c\u201d"  # curly double quotes
+    "\u2026"        # ellipsis
+    "\u2014"        # em dash
+    "\uff5e"        # fullwidth tilde
+    "\u00b7"        # middle dot
 )
 
 # CJK punctuation forbidden at line end
 LINE_END_FORBIDDEN = set(
-    "（【《〈「"
-    "\u2018\u2019"  # '' curly single quotes
-    "\u201c"        # " left curly double quote
+    "\uff08\u3010\u300a\u3008\u300c"
+    "\u2018\u2019"  # curly single quotes
+    "\u201c"        # left curly double quote
 )
 
 # Minimum fill ratio for last page (DISABLED — caused false positives)
@@ -740,7 +740,7 @@ def check_metadata(doc, result):
 def check_toc_without_cover(doc, result):
     """Detect TOC on page 1 without a preceding cover page.
     
-    If the first page contains Table of Contents / 目录, it means the document
+    If the first page contains a Table of Contents title (English or CJK), it means the document
     has a TOC but no cover page. This is a structural issue — documents with
     TOC should have: Cover (p1) → TOC (p2) → Content (p3+).
     """
@@ -757,7 +757,7 @@ def check_toc_without_cover(doc, result):
     
     toc_keywords = [
         "table of contents", "contents",
-        "目录", "目 录",
+        "\u76ee\u5f55", "\u76ee \u5f55",
     ]
     
     has_toc = any(kw in first_300 for kw in toc_keywords)
@@ -779,7 +779,7 @@ def check_toc_placeholder(doc, result):
     remain a placeholder with no actual entries.
 
     Detection strategy:
-      1. Find pages that contain TOC title keywords ("目录", "Table of Contents")
+      1. Find pages that contain TOC title keywords (CJK "mulu" or "Table of Contents")
       2. Check for explicit placeholder text ("Placeholder for table of contents")
       3. Check if the TOC page has suspiciously little content (title only, no entries)
       4. Check if entries exist but have no page numbers (another multiBuild failure mode)
@@ -790,7 +790,7 @@ def check_toc_placeholder(doc, result):
 
     toc_keywords = [
         "table of contents", "contents",
-        "目录", "目 录", "目  录",
+        "\u76ee\u5f55", "\u76ee \u5f55", "\u76ee  \u5f55",
     ]
     placeholder_phrases = [
         "placeholder for table of contents",
@@ -906,7 +906,7 @@ def check_body_page_numbers(doc, result):
         return  # Too short to have cover + TOC + body
 
     # --- Step 1: Find TOC pages ---
-    toc_keywords = ["table of contents", "contents", "目录", "目 录", "目  录"]
+    toc_keywords = ["table of contents", "contents", "\u76ee\u5f55", "\u76ee \u5f55", "\u76ee  \u5f55"]
     toc_last_page = -1
     check_limit = min(5, total_pages)
     for i in range(check_limit):

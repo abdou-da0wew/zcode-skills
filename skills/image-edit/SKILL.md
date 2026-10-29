@@ -1,12 +1,14 @@
 ---
 name: image-edit
-description: Implement AI image editing and modification capabilities using the z-ai-web-dev-sdk. Use this skill when the user needs to edit existing images, create variations, modify visual content, redesign assets, or transform images based on text descriptions. Supports multiple image sizes and returns base64 encoded results. Also includes CLI tool for quick image editing.
+description: Implement AI image editing and modification capabilities using any OpenAI-compatible server that exposes the /images/edits endpoint. Use this skill when the user needs to edit existing images, create variations, modify visual content, redesign assets, or transform images based on text descriptions. Supports multiple image sizes and returns base64 encoded results. Works with any OpenAI-compatible LLM server (open-source or free), designed for the DiveeOI agent (OpenCode-based).
 license: MIT
 ---
 
 # Image Edit Skill
 
-This skill guides the implementation of image editing and modification functionality using the z-ai-web-dev-sdk package and CLI tool, enabling intelligent transformation and editing of images based on text descriptions.
+This skill guides the implementation of image editing and modification functionality using plain OpenAI-compatible HTTP calls (no SDK, no extra dependencies), enabling intelligent transformation and editing of images based on text descriptions.
+
+It works with any OpenAI-compatible server that exposes the `POST /images/edits` route (open-source or free) — hosted OpenAI-compatible APIs and gateways fronting editable diffusion models (e.g. Stable Diffusion img2img backends) — and is designed for the DiveeOI agent (OpenCode-based).
 
 ## Skills Path
 
@@ -20,54 +22,114 @@ this skill is located at above path in your project.
 
 Image Edit allows you to build applications that modify, transform, and enhance existing images using AI models. Perfect for redesigning assets, creating variations, improving visual content, and transforming images based on textual descriptions.
 
-**IMPORTANT**: z-ai-web-dev-sdk MUST be used in backend code only. Never use it in client-side code.
+**IMPORTANT**: Keep your API key in backend code or environment variables only. Never hardcode credentials in client-side code.
 
-## SDK API Method
+## API Endpoint
 
-The image editing functionality uses the following API method:
+The image editing functionality uses the standard OpenAI images-edit convention:
 
-```javascript
-await zai.images.generations.edit({
-  prompt: string,              // Required: Description of the edit to apply
-  images: [{ url: string }],  // Required: Array with image URL or base64 data URL
-  size?: string,              // Optional: Output size (default: '1024x1024')
-  model?: string              // Optional: Model name
-})
+```
+POST {LLM_BASE_URL}/images/edits        (multipart/form-data)
 ```
 
-**Important**: The `images` parameter must be an array of objects with a `url` property, not a plain string.
+**Multipart form fields:**
 
-**API Endpoint**: `POST /images/generations/edit`
+```javascript
+// form fields for POST /images/edits
+{
+  image: Blob,               // Required: the source image (binary upload)
+  prompt: string,            // Required: description of the edit to apply
+  model: string,             // Required: image editing model (IMAGE_EDIT_MODEL)
+  size: string,              // Optional: output size (default: '1024x1024')
+  n: number,                 // Optional: number of images (default: 1)
+  response_format: 'b64_json' // Optional: request base64 output
+}
+```
 
-**Returns**: `ImageGenerationResponse` with base64 encoded edited image
+**Returns**: JSON with `data[0].b64_json` containing the base64 encoded edited image (some servers return `data[0].base64` instead — the helper below accepts both).
+
+**Server support note**: chat-only servers (plain Ollama, plain vLLM) do **not** implement `/images/edits`. Point `LLM_BASE_URL` at a gateway or image server that does. The route mapping documented here is the most common OpenAI-compatible convention.
 
 ## Prerequisites
 
-The z-ai-web-dev-sdk package is already installed. Import it as shown in the examples below.
+- Node.js 18+ (for the global `fetch`, `FormData`, and `Blob` APIs) or any HTTP client
+- An OpenAI-compatible server exposing `POST /images/edits`
+- No npm packages required — examples use built-in APIs only
+
+## Configuration (Environment Variables)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LLM_BASE_URL` | `http://localhost:11434/v1` | OpenAI-compatible base URL |
+| `LLM_API_KEY` | (empty) | API key sent as `Authorization: Bearer <key>`; leave empty for local servers |
+| `IMAGE_EDIT_MODEL` | falls back to `IMAGE_MODEL`, then `stable-diffusion-xl` | Image editing model name (server-dependent) |
+
+### Shared Client Helper
+
+All examples below use this helper (plain `fetch`, zero dependencies):
+
+```javascript
+const BASE_URL = process.env.LLM_BASE_URL ?? "http://localhost:11434/v1";
+const API_KEY = process.env.LLM_API_KEY ?? "";
+const IMAGE_EDIT_MODEL = process.env.IMAGE_EDIT_MODEL ?? process.env.IMAGE_MODEL ?? "stable-diffusion-xl";
+
+// Turn an image source (local path, http(s) URL, or base64 data URL) into a Blob
+async function imageSourceToBlob(imageSource) {
+  if (imageSource.startsWith('data:')) {
+    const [meta, payload] = imageSource.split(',', 2);
+    const mime = meta.slice(5).split(';')[0] || 'image/png';
+    return new Blob([Buffer.from(payload, 'base64')], { type: mime });
+  }
+  if (/^https?:\/\//i.test(imageSource)) {
+    const res = await fetch(imageSource);
+    if (!res.ok) throw new Error(`Failed to download source image (${res.status})`);
+    const mime = res.headers.get('content-type') ?? 'image/png';
+    return new Blob([Buffer.from(await res.arrayBuffer())], { type: mime });
+  }
+  // Local file path
+  const fs = await import('fs');
+  return new Blob([fs.readFileSync(imageSource)], { type: 'image/png' });
+}
+
+async function editImageRequest(imageSource, prompt, size) {
+  const imageBlob = await imageSourceToBlob(imageSource);
+
+  const form = new FormData();
+  form.append('image', imageBlob, 'image.png');
+  form.append('prompt', prompt);
+  form.append('model', IMAGE_EDIT_MODEL);
+  form.append('size', size);
+  form.append('response_format', 'b64_json');
+  form.append('n', '1');
+
+  const res = await fetch(`${BASE_URL}/images/edits`, {
+    method: 'POST',
+    headers: {
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: form,
+  });
+  if (!res.ok) throw new Error(`Image edit request failed (${res.status}): ${await res.text()}`);
+  return res.json();
+}
+```
 
 ## Basic Image Editing
 
 ### Simple Image Transformation
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function editImage(imageSource, editPrompt, outputPath, size = '1024x1024') {
-  const zai = await ZAI.create();
+  const response = await editImageRequest(imageSource, editPrompt, size);
 
-  const response = await zai.images.generations.edit({
-    prompt: editPrompt,
-    images: [{ url: imageSource }],  // Array of objects with url property
-    size: size
-  });
+  const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
 
-  const imageBase64 = response.data[0].base64;
-  
   // Save edited image
   const buffer = Buffer.from(imageBase64, 'base64');
   fs.writeFileSync(outputPath, buffer);
-  
+
   console.log(`Edited image saved to ${outputPath}`);
   return outputPath;
 }
@@ -79,7 +141,7 @@ await editImage(
   './landscape_night.png'
 );
 
-// Usage - Using local image converted to base64
+// Usage - Using local image converted to base64 data URL
 import { readFileSync } from 'fs';
 const imageBuffer = readFileSync('./photo.jpg');
 const base64Image = imageBuffer.toString('base64');
@@ -95,22 +157,13 @@ await editImage(
 ### Create Image Variations
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-import fs from 'fs';
-
 async function createVariation(imageSource, baseDescription, variation, outputPath, size = '1024x1024') {
-  const zai = await ZAI.create();
-
   // Combine base description with variation request
   const prompt = `${baseDescription}, ${variation}`;
 
-  const response = await zai.images.generations.edit({
-    prompt: prompt,
-    images: [{ url: imageSource }],
-    size: size
-  });
+  const response = await editImageRequest(imageSource, prompt, size);
 
-  const imageBase64 = response.data[0].base64;
+  const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
   const buffer = Buffer.from(imageBase64, 'base64');
   fs.writeFileSync(outputPath, buffer);
 
@@ -140,10 +193,7 @@ await createVariation(
 ### Multiple Image Sizes for Editing
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-import fs from 'fs';
-
-// Supported sizes
+// Commonly supported sizes (server-dependent)
 const SUPPORTED_SIZES = [
   '1024x1024',  // Square
   '768x1344',   // Portrait
@@ -159,15 +209,9 @@ async function editImageWithSize(imageSource, editPrompt, size, outputPath) {
     throw new Error(`Unsupported size: ${size}. Use one of: ${SUPPORTED_SIZES.join(', ')}`);
   }
 
-  const zai = await ZAI.create();
+  const response = await editImageRequest(imageSource, editPrompt, size);
 
-  const response = await zai.images.generations.edit({
-    prompt: editPrompt,
-    images: [{ url: imageSource }],
-    size: size
-  });
-
-  const imageBase64 = response.data[0].base64;
+  const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
   const buffer = Buffer.from(imageBase64, 'base64');
   fs.writeFileSync(outputPath, buffer);
 
@@ -196,62 +240,69 @@ await editImageWithSize(
 
 ## CLI Tool Usage
 
-The z-ai CLI tool provides a convenient way to edit images directly from the command line.
+The `curl` command provides a convenient way to edit images directly from the command line.
 
 ### Basic CLI Usage
 
 ```bash
-# Edit image with full options
-z-ai image-edit --prompt "Change the background to sunset colors" --image "./photo.png" --output "./edited.png"
-
-# Short form
-z-ai image-edit -p "Make it darker and moodier" -i "./original.jpg" -o "./moody.png"
+# Edit image with full options (multipart upload, OpenAI-style)
+curl -s "$LLM_BASE_URL/images/edits" \
+  ${LLM_API_KEY:+-H "Authorization: Bearer $LLM_API_KEY"} \
+  -F image=@./photo.png \
+  -F prompt="Change the background to sunset colors" \
+  -F model=stable-diffusion-xl \
+  -F size=1024x1024 \
+  -F response_format=b64_json \
+  | jq -r '.data[0].b64_json' | base64 -d > ./edited.png
 
 # Specify output size
-z-ai image-edit -p "Redesign in modern style" -i "./design.png" -o "./modern.png" -s 1344x768
-
-# Using remote image URL
-z-ai image-edit -p "Convert to landscape orientation" -i "https://example.com/photo.png" -o "./landscape.png" -s 1344x768
+curl -s "$LLM_BASE_URL/images/edits" \
+  -F image=@./design.png \
+  -F prompt="Redesign in modern style" \
+  -F size=1344x768 \
+  -F response_format=b64_json \
+  | jq -r '.data[0].b64_json' | base64 -d > ./modern.png
 ```
 
 ### CLI Parameters
 
-- `--prompt, -p`: **Required** - Description of the edit to apply
-- `--image, -i`: **Required** - Original image URL or local file path
-- `--output, -o`: **Required** - Output image file path (PNG format)
-- `--size, -s`: Optional - Image size, default is 1024x1024
-- `--help, -h`: Optional - Display help information
+- `image=@<path>`: **Required** - Original image uploaded as multipart form data
+- `prompt`: **Required** - Description of the edit to apply
+- `model`: Optional - Image editing model (default: `IMAGE_EDIT_MODEL`)
+- `size`: Optional - Image size, default is 1024x1024
+- `n`: Optional - Number of images to generate (default: 1)
 
 ### Supported Sizes
 
-- `1024x1024`, `768x1344`, `864x1152`, `1344x768`, `1152x864`, `1440x720`, `720x1440`
+- `1024x1024`, `768x1344`, `864x1152`, `1344x768`, `1152x864`, `1440x720`, `720x1440` (server-dependent)
 
 ### CLI Use Cases for Image Editing
 
 ```bash
+edit() { curl -s "$LLM_BASE_URL/images/edits" -F image=@"$2" -F prompt="$1" \
+  -F model="${IMAGE_EDIT_MODEL:-stable-diffusion-xl}" -F size="${4:-1024x1024}" \
+  -F response_format=b64_json | jq -r '.data[0].b64_json' | base64 -d > "$3"; }
+
 # Redesign existing asset
-z-ai image-edit -p "Redesign the logo with gradients and modern styling" -i "./logo.png" -o "./logo_v2.png" -s 1024x1024
+edit "Redesign the logo with gradients and modern styling" ./logo.png ./logo_v2.png
 
 # Change color scheme
-z-ai image-edit -p "Change color scheme to blue and white, professional style" -i "./original.png" -o "./recolored.png" -s 1440x720
+edit "Change color scheme to blue and white, professional style" ./original.png ./recolored.png 1440x720
 
 # Style transformation
-z-ai image-edit -p "Transform to oil painting style, vibrant colors" -i "./photo.jpg" -o "./oil_painting.png" -s 1152x864
+edit "Transform to oil painting style, vibrant colors" ./photo.jpg ./oil_painting.png 1152x864
 
 # Background replacement
-z-ai image-edit -p "Replace background with modern office setting" -i "./portrait.png" -o "./new_background.png" -s 1344x768
+edit "Replace background with modern office setting" ./portrait.png ./new_background.png 1344x768
 
 # Lighting adjustment
-z-ai image-edit -p "Adjust to golden hour lighting, warm tones" -i "./landscape.jpg" -o "./golden_hour.png" -s 1024x1024
+edit "Adjust to golden hour lighting, warm tones" ./landscape.jpg ./golden_hour.png
 
 # Element modification
-z-ai image-edit -p "Replace the red car with a blue motorcycle" -i "./scene.png" -o "./modified.png" -s 1344x768
+edit "Replace the red car with a blue motorcycle" ./scene.png ./modified.png 1344x768
 
 # Mood transformation
-z-ai image-edit -p "Transform to dark moody atmosphere with dramatic lighting" -i "./bright.jpg" -o "./moody.png" -s 1440x720
-
-# Using remote image URL
-z-ai image-edit -p "Add a hat to the person" -i "https://example.com/photo.png" -o "./result.png" -s 1024x1024
+edit "Transform to dark moody atmosphere with dramatic lighting" ./bright.jpg ./moody.png 1440x720
 ```
 
 ## Advanced Use Cases
@@ -259,13 +310,10 @@ z-ai image-edit -p "Add a hat to the person" -i "https://example.com/photo.png" 
 ### Batch Image Editing
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 
 async function batchEditImages(editInstructions, outputDir, size = '1024x1024') {
-  const zai = await ZAI.create();
-
   // Ensure output directory exists
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
@@ -279,13 +327,9 @@ async function batchEditImages(editInstructions, outputDir, size = '1024x1024') 
       const filename = `edited_${i + 1}.png`;
       const outputPath = path.join(outputDir, filename);
 
-      const response = await zai.images.generations.edit({
-        prompt: instruction.prompt,
-        images: [{ url: instruction.imageSource }],
-        size: size
-      });
+      const response = await editImageRequest(instruction.imageSource, instruction.prompt, size);
 
-      const imageBase64 = response.data[0].base64;
+      const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
       const buffer = Buffer.from(imageBase64, 'base64');
       fs.writeFileSync(outputPath, buffer);
 
@@ -313,17 +357,17 @@ async function batchEditImages(editInstructions, outputDir, size = '1024x1024') 
 
 // Usage - Create multiple variations from the same image
 const editInstructions = [
-  { 
+  {
     imageSource: './original.jpg',
-    prompt: 'Change background to blue gradient' 
+    prompt: 'Change background to blue gradient'
   },
-  { 
+  {
     imageSource: './original.jpg',
-    prompt: 'Transform to black and white, high contrast' 
+    prompt: 'Transform to black and white, high contrast'
   },
-  { 
+  {
     imageSource: './original.jpg',
-    prompt: 'Add sunset lighting effects' 
+    prompt: 'Add sunset lighting effects'
   }
 ];
 
@@ -334,7 +378,6 @@ console.log(`Edited ${results.filter(r => r.success).length} images`);
 ### Image Editing Service
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -342,13 +385,10 @@ import crypto from 'crypto';
 class ImageEditingService {
   constructor(outputDir = './edited-images') {
     this.outputDir = outputDir;
-    this.zai = null;
     this.editHistory = [];
   }
 
   async initialize() {
-    this.zai = await ZAI.create();
-    
     if (!fs.existsSync(this.outputDir)) {
       fs.mkdirSync(this.outputDir, { recursive: true });
     }
@@ -360,7 +400,7 @@ class ImageEditingService {
       .update(`${editPrompt}-${Date.now()}`)
       .digest('hex')
       .substring(0, 8);
-    
+
     return `edited_${hash}.png`;
   }
 
@@ -371,13 +411,9 @@ class ImageEditingService {
       filename = null
     } = options;
 
-    const response = await this.zai.images.generations.edit({
-      prompt: editPrompt,
-      images: [{ url: imageSource }],
-      size: size
-    });
+    const response = await editImageRequest(imageSource, editPrompt, size);
 
-    const imageBase64 = response.data[0].base64;
+    const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
     const buffer = Buffer.from(imageBase64, 'base64');
 
     // Determine output path
@@ -405,7 +441,7 @@ class ImageEditingService {
 
   async createVariations(imageSource, basePrompt, variations, options = {}) {
     const results = [];
-    
+
     for (const variation of variations) {
       const fullPrompt = `${basePrompt}, ${variation}`;
       const result = await this.edit(imageSource, fullPrompt, options);
@@ -453,21 +489,12 @@ console.log('Edit history:', service.getEditHistory());
 ### Style Transfer and Transformation
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-import fs from 'fs';
-
 async function applyStyleTransfer(imageSource, content, style, outputPath, size = '1024x1024') {
-  const zai = await ZAI.create();
-
   const prompt = `${content} transformed into ${style} style, maintain composition and subject`;
 
-  const response = await zai.images.generations.edit({
-    prompt: prompt,
-    images: [{ url: imageSource }],
-    size: size
-  });
+  const response = await editImageRequest(imageSource, prompt, size);
 
-  const imageBase64 = response.data[0].base64;
+  const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
   const buffer = Buffer.from(imageBase64, 'base64');
   fs.writeFileSync(outputPath, buffer);
 
@@ -504,21 +531,12 @@ await applyStyleTransfer(
 ### Element Replacement
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-import fs from 'fs';
-
 async function replaceElement(imageSource, baseScene, replaceWhat, replaceWith, outputPath, size = '1024x1024') {
-  const zai = await ZAI.create();
-
   const prompt = `${baseScene}, replace ${replaceWhat} with ${replaceWith}, keep everything else identical`;
 
-  const response = await zai.images.generations.edit({
-    prompt: prompt,
-    images: [{ url: imageSource }],
-    size: size
-  });
+  const response = await editImageRequest(imageSource, prompt, size);
 
-  const imageBase64 = response.data[0].base64;
+  const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
   const buffer = Buffer.from(imageBase64, 'base64');
   fs.writeFileSync(outputPath, buffer);
 
@@ -601,27 +619,18 @@ await editImage('Replace background with beach scene', './beach_bg.png', size);
 ### 3. Error Handling with Retry
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-import fs from 'fs';
-
 async function safeEditImage(imageSource, editPrompt, size, outputPath, retries = 3) {
   let lastError;
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      const zai = await ZAI.create();
+      const response = await editImageRequest(imageSource, editPrompt, size);
 
-      const response = await zai.images.generations.edit({
-        prompt: editPrompt,
-        images: [{ url: imageSource }],
-        size: size
-      });
-
-      if (!response.data || !response.data[0] || !response.data[0].base64) {
+      const imageBase64 = response.data?.[0]?.b64_json ?? response.data?.[0]?.base64;
+      if (!imageBase64) {
         throw new Error('Invalid response from image editing API');
       }
 
-      const imageBase64 = response.data[0].base64;
       const buffer = Buffer.from(imageBase64, 'base64');
       fs.writeFileSync(outputPath, buffer);
 
@@ -668,7 +677,6 @@ async function safeEditImage(imageSource, editPrompt, size, outputPath, retries 
 
 ```javascript
 import express from 'express';
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 
@@ -676,11 +684,9 @@ const app = express();
 app.use(express.json());
 app.use('/edited-images', express.static('edited-images'));
 
-let zaiInstance;
 const outputDir = './edited-images';
 
-async function initZAI() {
-  zaiInstance = await ZAI.create();
+async function init() {
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
@@ -688,33 +694,29 @@ async function initZAI() {
 
 app.post('/api/edit-image', async (req, res) => {
   try {
-    const { 
-      imageSource,           // URL or base64 data URL
-      editPrompt, 
-      size = '1024x1024', 
-      baseDescription = '' 
+    const {
+      imageSource,           // URL, data URL, or local path
+      editPrompt,
+      size = '1024x1024',
+      baseDescription = ''
     } = req.body;
 
     if (!imageSource || !editPrompt) {
-      return res.status(400).json({ 
-        error: 'imageSource and editPrompt are required' 
+      return res.status(400).json({
+        error: 'imageSource and editPrompt are required'
       });
     }
 
     // Combine base description with edit instruction
-    const fullPrompt = baseDescription 
+    const fullPrompt = baseDescription
       ? `${baseDescription}, ${editPrompt}`
       : editPrompt;
 
-    const response = await zaiInstance.images.generations.edit({
-      prompt: fullPrompt,
-      images: [{ url: imageSource }],
-      size: size
-    });
+    const response = await editImageRequest(imageSource, fullPrompt, size);
 
-    const imageBase64 = response.data[0].base64;
+    const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
     const buffer = Buffer.from(imageBase64, 'base64');
-    
+
     const filename = `edited_${Date.now()}.png`;
     const filepath = path.join(outputDir, filename);
     fs.writeFileSync(filepath, buffer);
@@ -735,16 +737,16 @@ app.post('/api/edit-image', async (req, res) => {
 
 app.post('/api/create-variations', async (req, res) => {
   try {
-    const { 
-      imageSource,      // URL or base64 data URL
-      baseDescription, 
-      variations, 
-      size = '1024x1024' 
+    const {
+      imageSource,      // URL, data URL, or local path
+      baseDescription,
+      variations,
+      size = '1024x1024'
     } = req.body;
 
     if (!imageSource || !baseDescription || !variations || !Array.isArray(variations)) {
-      return res.status(400).json({ 
-        error: 'imageSource, baseDescription and variations array are required' 
+      return res.status(400).json({
+        error: 'imageSource, baseDescription and variations array are required'
       });
     }
 
@@ -753,15 +755,11 @@ app.post('/api/create-variations', async (req, res) => {
     for (const variation of variations) {
       const fullPrompt = `${baseDescription}, ${variation}`;
 
-      const response = await zaiInstance.images.generations.edit({
-        prompt: fullPrompt,
-        images: [{ url: imageSource }],
-        size: size
-      });
+      const response = await editImageRequest(imageSource, fullPrompt, size);
 
-      const imageBase64 = response.data[0].base64;
+      const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
       const buffer = Buffer.from(imageBase64, 'base64');
-      
+
       const filename = `variation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.png`;
       const filepath = path.join(outputDir, filename);
       fs.writeFileSync(filepath, buffer);
@@ -784,7 +782,7 @@ app.post('/api/create-variations', async (req, res) => {
   }
 });
 
-initZAI().then(() => {
+init().then(() => {
   app.listen(3000, () => {
     console.log('Image editing API running on port 3000');
   });
@@ -803,27 +801,38 @@ echo "Creating style variations..."
 
 ORIGINAL_IMAGE="./product.jpg"
 BASE="Professional product photo of laptop"
+SIZES_MODEL="${IMAGE_EDIT_MODEL:-stable-diffusion-xl}"
 
-z-ai image-edit -p "$BASE, modern minimalist style, white background" -i "$ORIGINAL_IMAGE" -o "./variations/minimal.png" -s 1024x1024
-z-ai image-edit -p "$BASE, dramatic lighting, dark background" -i "$ORIGINAL_IMAGE" -o "./variations/dramatic.png" -s 1024x1024
-z-ai image-edit -p "$BASE, on wooden desk, natural lighting" -i "$ORIGINAL_IMAGE" -o "./variations/natural.png" -s 1024x1024
+edit_variant() {
+  curl -s "$LLM_BASE_URL/images/edits" \
+    -F image=@"$ORIGINAL_IMAGE" \
+    -F prompt="$1" \
+    -F model="$SIZES_MODEL" \
+    -F size="${3:-1024x1024}" \
+    -F response_format=b64_json \
+    | jq -r '.data[0].b64_json' | base64 -d > "$2"
+}
+
+edit_variant "$BASE, modern minimalist style, white background" "./variations/minimal.png"
+edit_variant "$BASE, dramatic lighting, dark background" "./variations/dramatic.png"
+edit_variant "$BASE, on wooden desk, natural lighting" "./variations/natural.png"
 
 echo "Variations created successfully!"
 ```
 
 ## Troubleshooting
 
-**Issue**: "SDK must be used in backend"
-- **Solution**: Ensure z-ai-web-dev-sdk is only used in server-side code
+**Issue**: "API key must be kept server-side"
+- **Solution**: Read `LLM_API_KEY` from environment variables and only use it in server-side code
 
 **Issue**: Invalid size parameter
-- **Solution**: Use only supported sizes: 1024x1024, 768x1344, 864x1152, 1344x768, 1152x864, 1440x720, 720x1440
+- **Solution**: Use only sizes supported by your server, e.g. 1024x1024, 768x1344, 864x1152, 1344x768, 1152x864, 1440x720, 720x1440
 
 **Issue**: Edited image doesn't match intention
 - **Solution**: Be more specific in edit prompts. Include what to change AND what to preserve
 
-**Issue**: CLI command not found
-- **Solution**: Ensure z-ai CLI is properly installed and in PATH
+**Issue**: 404 or 405 on `/images/edits`
+- **Solution**: Your server does not implement the OpenAI images-edit route. Point `LLM_BASE_URL` at a gateway or image server that does
 
 **Issue**: Image quality loss after editing
 - **Solution**: Use larger size options and include quality terms in prompts
@@ -882,11 +891,16 @@ echo "Variations created successfully!"
 - `1440x720` - Wide landscape
 - `720x1440` - Tall portrait
 
+(Size availability is server-dependent; the list above reflects the most common convention.)
+
 ## Remember
 
-- Always use z-ai-web-dev-sdk in backend code only
-- The SDK is already installed - import as shown
-- CLI tool is available for quick image editing
+- Works with any OpenAI-compatible server exposing `POST /images/edits` (hosted OpenAI-compatible APIs, gateways fronting editable diffusion models)
+- Designed for the DiveeOI agent (OpenCode-based)
+- Configuration via environment variables: `LLM_BASE_URL`, `LLM_API_KEY`, `IMAGE_EDIT_MODEL`
+- The source image is uploaded as multipart form data (`image` field); the edit instruction goes in the `prompt` field
+- The response contains the edited image as base64 (`data[0].b64_json`, or `data[0].base64` on some servers)
+- Keep your API key in server-side code only
 - Be specific about what to change AND what to preserve
 - Include base description for better context
 - Use appropriate size for the edit type

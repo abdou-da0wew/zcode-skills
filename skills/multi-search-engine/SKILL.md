@@ -1,11 +1,13 @@
 ---
 name: "multi-search-engine"
-description: "Multi search engine integration with 8 domestic (CN) search engines. Supports advanced search operators, time filters, site search, and WeChat article search. No API keys required."
+description: "Multi search engine integration with 8 domestic (CN) search engines plus pluggable international backends. Supports advanced search operators, time filters, site search, and WeChat article search. No API keys required."
 ---
 
 # Multi Search Engine v2.0.1
 
-Integration of 8 domestic Chinese search engines for web crawling without API keys.
+Integration of 8 domestic Chinese search engines for web crawling without API keys, plus a documented pluggable pattern for adding any international/self-hosted backend.
+
+This skill uses direct URL fetching (no proprietary SDK). Any agent tool that fetches a URL (e.g. `web_fetch`) can drive it.
 
 ## Search Engines (Domestic - CN Only)
 
@@ -31,14 +33,33 @@ web_fetch({"url": "https://cn.bing.com/search?q=site:github.com+react&ensearch=0
 web_fetch({"url": "https://www.baidu.com/s?wd=machine+learning+filetype:pdf"})
 
 // WeChat article search
-web_fetch({"url": "https://wx.sogou.com/weixin?type=2&query=人工智能+最新进展"})
+web_fetch({"url": "https://wx.sogou.com/weixin?type=2&query=AI+latest+developments"})
 
 // Toutiao search
-web_fetch({"url": "https://so.toutiao.com/search?keyword=新能源+政策"})
+web_fetch({"url": "https://so.toutiao.com/search?keyword=renewable+energy+policy"})
 
 // Jisilu financial data
 web_fetch({"url": "https://www.jisilu.cn/explore/?keyword=REITs"})
 ```
+
+## Pluggable International Backends
+
+Beyond the built-in CN engines, any search backend can be plugged in via
+environment configuration while keeping the same calling pattern:
+
+- **SearXNG (self-hosted, recommended)**: set `SEARCH_BASE_URL` to your
+  instance and query its JSON API —
+  `GET {SEARCH_BASE_URL}/search?q={keyword}&format=json`
+  (returns `{"results": [{title, url, content}, ...]}`).
+- **DuckDuckGo-style**: `https://duckduckgo.com/html/?q={keyword}` (HTML
+  results; parse or use a proxy).
+- **Google/Bing/Brave etc.**: use the URL patterns documented in
+  `references/international-search.md`.
+- Optional auth: pass `SEARCH_API_KEY` as a Bearer token when the backend
+  requires one.
+
+The output shape across backends is normalized to
+`{results: [{name, url, snippet}, ...]}` so downstream prompts stay stable.
 
 ## Advanced Operators
 

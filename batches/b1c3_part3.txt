@@ -1,0 +1,2 @@
+design/design-templates/social-card-swiss/references/layout-recipes.md
+design/design-templates/wechat-cover-pair/pattern.html

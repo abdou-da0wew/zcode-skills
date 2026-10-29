@@ -1,68 +1,71 @@
 ---
 name: gaokao-recommend-schools
 description: >-
-  基于推荐专业列表、考生画像与志愿列表，由 Agent 分析推荐院校并给出个性化理由，
-  输出结构化 school_recommendation.json。适用于高考院校推荐、选大学、冲稳保院校布局。
+  Based on the recommended major list, the student profile, and the volunteer list, the
+  agent analyzes and recommends universities with personalized reasons, outputting a
+  structured school_recommendation.json. Use it for gaokao university recommendation,
+  choosing a university, or laying out reach/match/safety schools.
 ---
 
-# 推荐院校与理由
+# Recommended Universities & Reasons
 
-本 Skill 是流水线的**第四步**：在已确定专业方向的基础上，从 `parsed.json` 中推荐院校并说明理由。
+This skill is the **fourth step** of the pipeline: with the major directions already
+decided, it recommends universities from `parsed.json` and explains the reasons.
 
-## 上下游
+## Upstream / downstream
 
-- **上游**：`student.json` + `parsed.json` + `major_recommendation.json`
-- **下游**：[gaokao-generate-report](../gaokao-generate-report/SKILL.md)
+- **Upstream**: `student.json` + `parsed.json` + `major_recommendation.json`
+- **Downstream**: [gaokao-generate-report](../gaokao-generate-report/SKILL.md)
 
-## 输入
+## Inputs
 
-1. `student.json` — 意向城市、家庭、就业方向等
-2. `parsed.json` — 院校标签、城市、冲稳保档位、录取概率
-3. `major_recommendation.json` — 已推荐专业及方向，用于判断院校专业契合度
+1. `student.json` — preferred cities, family situation, career direction, etc.
+2. `parsed.json` — university tags, cities, reach/match/safety tiers, admission probabilities
+3. `major_recommendation.json` — the already-recommended majors and directions, used to judge how well a university's majors fit
 
-## Agent 分析任务
+## Agent analysis tasks
 
-1. 优先推荐**包含已推荐专业**或**优势学科与专业方向契合**的院校。
-2. 结合 `preferred_cities`、城市产业机会（可参考 [career_reference.md](career_reference.md) 城市表）、院校层次（985/211/双一流等）。
-3. 兼顾冲/稳/保布局：核心目标放稳档，冲顶名校与保底院校均需有代表。
-4. 挑选 **6–12 所**院校，每所撰写个性化 `modal` 推荐理由。
+1. Prioritize universities that **include already-recommended majors** or whose **strong disciplines match the chosen major directions**.
+2. Combine `preferred_cities`, city industry opportunities (see the city table in [career_reference.md](career_reference.md)), and university tiers (985/211/Double First-Class, etc.).
+3. Balance the reach/match/safety layout: place core targets in the match tier, and make sure both reach-tier elite universities and safety schools are represented.
+4. Pick **6–12** universities and write a personalized `modal` recommendation reason for each.
 
-## 推荐理由应覆盖
+## Recommendation reasons should cover
 
-- **地域优势**：城市产业与实习就业资源
-- **院校层次**：标签与社会认可度
-- **专业契合**：与 `major_recommendation.json` 的关联
-- **录取性价比**：档位与概率是否匹配考生诉求
+- **Location advantage**: the city's industries and internship/employment resources
+- **University tier**: tags and social recognition
+- **Major fit**: the connection with `major_recommendation.json`
+- **Admission value**: whether the tier and probability match the student's expectations
 
-## 硬性约束
+## Hard constraints
 
-`recommended_schools` 每项的 `university_name`、`university_code` 必须与 `parsed.json` **完全一致**。
+Each entry's `university_name` and `university_code` in `recommended_schools` must be **exactly identical** to `parsed.json`.
 
-## 输出
+## Output
 
-保存为 `output/school_recommendation.json`，结构见 [examples/school_recommendation_template.json](examples/school_recommendation_template.json)。
+Save as `output/school_recommendation.json`; see [examples/school_recommendation_template.json](examples/school_recommendation_template.json) for the structure.
 
 ```json
 {
-  "school_strategy": "院校布局策略（冲/稳/保如何分配）",
+  "school_strategy": "University-tier layout strategy (how reach/match/safety are allocated)",
   "recommended_schools": [
     {
       "university_name": "...",
       "university_code": "...",
       "modal": {
-        "title": "学校推荐原因：...",
-        "body": "<h4>推荐原因</h4><ul><li>...</li></ul>"
+        "title": "Why this school is recommended: ...",
+        "body": "<h4>Reasons for recommendation</h4><ul><li>...</li></ul>"
       }
     }
   ]
 }
 ```
 
-## 向用户交付
+## Delivering to the user
 
-- 保存 JSON 绝对路径
-- 用自然语言解读院校推荐逻辑与梯度布局
+- Give the user the absolute path of the saved JSON
+- Explain in natural language the university-recommendation logic and the tier layout
 
-## 附加资源
+## Additional resources
 
-- [career_reference.md](career_reference.md) — 城市产业与院校层次参考
+- [career_reference.md](career_reference.md) — city-industry and university-tier reference

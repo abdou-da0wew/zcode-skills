@@ -1,12 +1,14 @@
 ---
 name: image-generation
-description: Implement AI image generation capabilities using the z-ai-web-dev-sdk. Use this skill when the user needs to create images from text descriptions, generate visual content, create artwork, design assets, or build applications with AI-powered image creation. Supports multiple image sizes and returns base64 encoded images. Also includes CLI tool for quick image generation.
+description: Implement AI image generation capabilities using any OpenAI-compatible server that exposes the /images/generations endpoint. Use this skill when the user needs to create images from text descriptions, generate visual content, create artwork, design assets, or build applications with AI-powered image creation. Supports multiple image sizes and returns base64 encoded images. Works with any OpenAI-compatible LLM server (open-source or free), designed for the DiveeOI agent (OpenCode-based).
 license: MIT
 ---
 
 # Image Generation Skill
 
-This skill guides the implementation of image generation functionality using the z-ai-web-dev-sdk package and CLI tool, enabling creation of high-quality images from text descriptions.
+This skill guides the implementation of image generation functionality using plain OpenAI-compatible HTTP calls (no SDK, no extra dependencies), enabling creation of high-quality images from text descriptions.
+
+It works with any OpenAI-compatible server that exposes the `POST /images/generations` route (open-source or free) — gateways fronting open-source diffusion models (Stable Diffusion XL/3, FLUX, Qwen-Image) and hosted OpenAI-compatible APIs — and is designed for the DiveeOI agent (OpenCode-based).
 
 ## Skills Path
 
@@ -20,34 +22,66 @@ this skill is located at above path in your project.
 
 Image Generation allows you to build applications that create visual content from text prompts using AI models, enabling creative workflows, design automation, and visual content production.
 
-**IMPORTANT**: z-ai-web-dev-sdk MUST be used in backend code only. Never use it in client-side code.
+**IMPORTANT**: Keep your API key in backend code or environment variables only. Never hardcode credentials in client-side code.
 
 ## Prerequisites
 
-The z-ai-web-dev-sdk package is already installed. Import it as shown in the examples below.
+- Node.js 18+ (for the global `fetch` API) or any HTTP client
+- An OpenAI-compatible server exposing `POST /images/generations`
+- No npm packages required — examples use built-in APIs only
+
+## Configuration (Environment Variables)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LLM_BASE_URL` | `http://localhost:11434/v1` | OpenAI-compatible base URL |
+| `LLM_API_KEY` | (empty) | API key sent as `Authorization: Bearer <key>`; leave empty for local servers |
+| `IMAGE_MODEL` | `stable-diffusion-xl` | Image model name (server-dependent, e.g. `stable-diffusion-xl`, `flux.1-schnell`, `qwen-image`) |
+
+### Shared Client Helper
+
+All examples below use this helper (plain `fetch`, zero dependencies):
+
+```javascript
+const BASE_URL = process.env.LLM_BASE_URL ?? "http://localhost:11434/v1";
+const API_KEY = process.env.LLM_API_KEY ?? "";
+const IMAGE_MODEL = process.env.IMAGE_MODEL ?? "stable-diffusion-xl";
+
+async function generateImageRequest(prompt, size) {
+  const res = await fetch(`${BASE_URL}/images/generations`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: JSON.stringify({
+      model: IMAGE_MODEL,
+      prompt: prompt,
+      size: size,
+      response_format: 'b64_json',
+    }),
+  });
+  if (!res.ok) throw new Error(`Image generation request failed (${res.status}): ${await res.text()}`);
+  return res.json();
+}
+```
 
 ## Basic Image Generation
 
 ### Simple Image Creation
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function generateImage(prompt, outputPath) {
-  const zai = await ZAI.create();
+  const response = await generateImageRequest(prompt, '1024x1024');
 
-  const response = await zai.images.generations.create({
-    prompt: prompt,
-    size: '1024x1024'
-  });
+  const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
 
-  const imageBase64 = response.data[0].base64;
-  
   // Save image
   const buffer = Buffer.from(imageBase64, 'base64');
   fs.writeFileSync(outputPath, buffer);
-  
+
   console.log(`Image saved to ${outputPath}`);
   return outputPath;
 }
@@ -62,10 +96,9 @@ await generateImage(
 ### Multiple Image Sizes
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
-// Supported sizes
+// Commonly supported sizes (server-dependent)
 const SUPPORTED_SIZES = [
   '1024x1024',  // Square
   '768x1344',   // Portrait
@@ -81,14 +114,9 @@ async function generateImageWithSize(prompt, size, outputPath) {
     throw new Error(`Unsupported size: ${size}. Use one of: ${SUPPORTED_SIZES.join(', ')}`);
   }
 
-  const zai = await ZAI.create();
+  const response = await generateImageRequest(prompt, size);
 
-  const response = await zai.images.generations.create({
-    prompt: prompt,
-    size: size
-  });
-
-  const imageBase64 = response.data[0].base64;
+  const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
   const buffer = Buffer.from(imageBase64, 'base64');
   fs.writeFileSync(outputPath, buffer);
 
@@ -115,44 +143,55 @@ await generateImageWithSize(
 
 ## CLI Tool Usage
 
-The z-ai CLI tool provides a convenient way to generate images directly from the command line.
+The `curl` command provides a convenient way to generate images directly from the command line.
 
 ### Basic CLI Usage
 
 ```bash
-# Generate image with full options
-z-ai image --prompt "A beautiful landscape" --output "./image.png"
-
-# Short form
-z-ai image -p "A cute cat" -o "./cat.png"
+# Generate image with full options (OpenAI-style JSON request)
+curl -s "$LLM_BASE_URL/images/generations" \
+  -H "Content-Type: application/json" \
+  ${LLM_API_KEY:+-H "Authorization: Bearer $LLM_API_KEY"} \
+  -d '{"model": "stable-diffusion-xl", "prompt": "A beautiful landscape", "size": "1024x1024", "response_format": "b64_json"}' \
+  | jq -r '.data[0].b64_json' | base64 -d > ./image.png
 
 # Specify size
-z-ai image -p "A sunset" -o "./sunset.png" -s 1344x768
+curl -s "$LLM_BASE_URL/images/generations" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "stable-diffusion-xl", "prompt": "A sunset", "size": "1344x768", "response_format": "b64_json"}' \
+  | jq -r '.data[0].b64_json' | base64 -d > ./sunset.png
 
 # Portrait orientation
-z-ai image -p "A portrait" -o "./portrait.png" -s 768x1344
+curl -s "$LLM_BASE_URL/images/generations" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "stable-diffusion-xl", "prompt": "A portrait", "size": "768x1344", "response_format": "b64_json"}' \
+  | jq -r '.data[0].b64_json' | base64 -d > ./portrait.png
 ```
 
 ### CLI Use Cases
 
 ```bash
+gen() { curl -s "$LLM_BASE_URL/images/generations" -H "Content-Type: application/json" \
+  -d "{\"model\": \"${IMAGE_MODEL:-stable-diffusion-xl}\", \"prompt\": \"$1\", \"size\": \"${3:-1024x1024}\", \"response_format\": \"b64_json\"}" \
+  | jq -r '.data[0].b64_json' | base64 -d > "$2"; }
+
 # Website hero image
-z-ai image -p "Modern tech office with diverse team collaborating" -o "./hero.png" -s 1440x720
+gen "Modern tech office with diverse team collaborating" ./hero.png 1440x720
 
 # Product image
-z-ai image -p "Sleek smartphone on minimalist desk, professional product photography" -o "./product.png" -s 1024x1024
+gen "Sleek smartphone on minimalist desk, professional product photography" ./product.png
 
 # Blog post illustration
-z-ai image -p "Abstract visualization of data flowing through networks" -o "./blog_header.png" -s 1344x768
+gen "Abstract visualization of data flowing through networks" ./blog_header.png 1344x768
 
 # Social media content
-z-ai image -p "Vibrant illustration of community connection" -o "./social.png" -s 1024x1024
+gen "Vibrant illustration of community connection" ./social.png
 
 # Website favicon/logo
-z-ai image -p "Simple geometric logo with blue gradient, minimal design" -o "./logo.png" -s 1024x1024
+gen "Simple geometric logo with blue gradient, minimal design" ./logo.png
 
 # Background pattern
-z-ai image -p "Subtle geometric pattern, pastel colors, website background" -o "./bg_pattern.png" -s 1440x720
+gen "Subtle geometric pattern, pastel colors, website background" ./bg_pattern.png 1440x720
 ```
 
 ## Advanced Use Cases
@@ -160,13 +199,10 @@ z-ai image -p "Subtle geometric pattern, pastel colors, website background" -o "
 ### Batch Image Generation
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 
 async function generateImageBatch(prompts, outputDir, size = '1024x1024') {
-  const zai = await ZAI.create();
-
   // Ensure output directory exists
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
@@ -180,12 +216,9 @@ async function generateImageBatch(prompts, outputDir, size = '1024x1024') {
       const filename = `image_${i + 1}.png`;
       const outputPath = path.join(outputDir, filename);
 
-      const response = await zai.images.generations.create({
-        prompt: prompt,
-        size: size
-      });
+      const response = await generateImageRequest(prompt, size);
 
-      const imageBase64 = response.data[0].base64;
+      const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
       const buffer = Buffer.from(imageBase64, 'base64');
       fs.writeFileSync(outputPath, buffer);
 
@@ -225,7 +258,6 @@ console.log(`Generated ${results.filter(r => r.success).length} images`);
 ### Image Generation Service
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -233,13 +265,10 @@ import crypto from 'crypto';
 class ImageGenerationService {
   constructor(outputDir = './generated-images') {
     this.outputDir = outputDir;
-    this.zai = null;
     this.cache = new Map();
   }
 
   async initialize() {
-    this.zai = await ZAI.create();
-    
     if (!fs.existsSync(this.outputDir)) {
       fs.mkdirSync(this.outputDir, { recursive: true });
     }
@@ -261,7 +290,7 @@ class ImageGenerationService {
 
     // Check cache
     const cacheKey = this.generateCacheKey(prompt, size);
-    
+
     if (useCache && this.cache.has(cacheKey)) {
       const cachedPath = this.cache.get(cacheKey);
       if (fs.existsSync(cachedPath)) {
@@ -275,12 +304,9 @@ class ImageGenerationService {
     }
 
     // Generate new image
-    const response = await this.zai.images.generations.create({
-      prompt: prompt,
-      size: size
-    });
+    const response = await generateImageRequest(prompt, size);
 
-    const imageBase64 = response.data[0].base64;
+    const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
     const buffer = Buffer.from(imageBase64, 'base64');
 
     // Determine output path
@@ -328,9 +354,9 @@ console.log('Generated:', result.path);
 
 ```bash
 # Using CLI for quick website asset generation
-z-ai image -p "Modern tech hero banner, blue gradient" -o "./assets/hero.png" -s 1440x720
-z-ai image -p "Team collaboration illustration" -o "./assets/team.png" -s 1344x768
-z-ai image -p "Simple geometric logo" -o "./assets/logo.png" -s 1024x1024
+gen "Modern tech hero banner, blue gradient" ./assets/hero.png 1440x720
+gen "Team collaboration illustration" ./assets/team.png 1344x768
+gen "Simple geometric logo" ./assets/logo.png 1024x1024
 ```
 
 ## Best Practices
@@ -386,7 +412,6 @@ await generateImage('website hero image', size, './hero.png');
 ### 3. Error Handling
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function safeGenerateImage(prompt, size, outputPath, retries = 3) {
@@ -394,18 +419,13 @@ async function safeGenerateImage(prompt, size, outputPath, retries = 3) {
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      const zai = await ZAI.create();
+      const response = await generateImageRequest(prompt, size);
 
-      const response = await zai.images.generations.create({
-        prompt: prompt,
-        size: size
-      });
-
-      if (!response.data || !response.data[0] || !response.data[0].base64) {
+      const imageBase64 = response.data?.[0]?.b64_json ?? response.data?.[0]?.base64;
+      if (!imageBase64) {
         throw new Error('Invalid response from image generation API');
       }
 
-      const imageBase64 = response.data[0].base64;
       const buffer = Buffer.from(imageBase64, 'base64');
       fs.writeFileSync(outputPath, buffer);
 
@@ -450,7 +470,6 @@ async function safeGenerateImage(prompt, size, outputPath, retries = 3) {
 
 ```javascript
 import express from 'express';
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 import path from 'path';
 
@@ -458,11 +477,9 @@ const app = express();
 app.use(express.json());
 app.use('/images', express.static('generated-images'));
 
-let zaiInstance;
 const outputDir = './generated-images';
 
-async function initZAI() {
-  zaiInstance = await ZAI.create();
+async function init() {
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
@@ -476,14 +493,11 @@ app.post('/api/generate-image', async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    const response = await zaiInstance.images.generations.create({
-      prompt: prompt,
-      size: size
-    });
+    const response = await generateImageRequest(prompt, size);
 
-    const imageBase64 = response.data[0].base64;
+    const imageBase64 = response.data[0].b64_json ?? response.data[0].base64;
     const buffer = Buffer.from(imageBase64, 'base64');
-    
+
     const filename = `img_${Date.now()}.png`;
     const filepath = path.join(outputDir, filename);
     fs.writeFileSync(filepath, buffer);
@@ -502,7 +516,7 @@ app.post('/api/generate-image', async (req, res) => {
   }
 });
 
-initZAI().then(() => {
+init().then(() => {
   app.listen(3000, () => {
     console.log('Image generation API running on port 3000');
   });
@@ -519,26 +533,30 @@ initZAI().then(() => {
 # Generate website assets using CLI
 echo "Generating website assets..."
 
-z-ai image -p "Modern tech hero banner, blue gradient" -o "./assets/hero.png" -s 1440x720
-z-ai image -p "Team collaboration illustration" -o "./assets/team.png" -s 1344x768
-z-ai image -p "Simple geometric logo" -o "./assets/logo.png" -s 1024x1024
+gen() { curl -s "$LLM_BASE_URL/images/generations" -H "Content-Type: application/json" \
+  -d "{\"model\": \"${IMAGE_MODEL:-stable-diffusion-xl}\", \"prompt\": \"$1\", \"size\": \"$3\", \"response_format\": \"b64_json\"}" \
+  | jq -r '.data[0].b64_json' | base64 -d > "$2"; }
+
+gen "Modern tech hero banner, blue gradient" ./assets/hero.png 1440x720
+gen "Team collaboration illustration" ./assets/team.png 1344x768
+gen "Simple geometric logo" ./assets/logo.png 1024x1024
 
 echo "Assets generated successfully!"
 ```
 
 ## Troubleshooting
 
-**Issue**: "SDK must be used in backend"
-- **Solution**: Ensure z-ai-web-dev-sdk is only used in server-side code
+**Issue**: "API key must be kept server-side"
+- **Solution**: Read `LLM_API_KEY` from environment variables and only use it in server-side code
 
 **Issue**: Invalid size parameter
-- **Solution**: Use only supported sizes: 1024x1024, 768x1344, 864x1152, 1344x768, 1152x864, 1440x720, 720x1440
+- **Solution**: Use only sizes supported by your server, e.g. 1024x1024, 768x1344, 864x1152, 1344x768, 1152x864, 1440x720, 720x1440
 
 **Issue**: Generated image doesn't match prompt
 - **Solution**: Make prompts more specific and descriptive. Include style, details, and quality terms
 
-**Issue**: CLI command not found
-- **Solution**: Ensure z-ai CLI is properly installed and in PATH
+**Issue**: 404 on `/images/generations`
+- **Solution**: Your server does not implement the OpenAI images route. Point `LLM_BASE_URL` at a gateway or image server that does
 
 **Issue**: Image file is corrupted
 - **Solution**: Verify base64 decoding and file writing are correct
@@ -571,12 +589,17 @@ echo "Assets generated successfully!"
 - `1440x720` - Wide landscape
 - `720x1440` - Tall portrait
 
+(Size availability is server-dependent; the list above reflects the most common convention.)
+
 ## Remember
 
-- Always use z-ai-web-dev-sdk in backend code only
-- The SDK is already installed - import as shown
-- CLI tool is available for quick image generation
-- Supported sizes are specific - use the provided list
+- Works with any OpenAI-compatible server exposing `POST /images/generations` (gateways fronting Stable Diffusion, FLUX, Qwen-Image, ..., or hosted OpenAI-compatible APIs)
+- Designed for the DiveeOI agent (OpenCode-based)
+- Configuration via environment variables: `LLM_BASE_URL`, `LLM_API_KEY`, `IMAGE_MODEL`
+- The endpoint is `POST {LLM_BASE_URL}/images/generations` with `{model, prompt, size, response_format: "b64_json"}`
+- The response contains the image as base64 (`data[0].b64_json`, or `data[0].base64` on some servers)
+- Keep your API key in server-side code only
+- Supported sizes are server-specific - use the provided list as guidance
 - Base64 images need to be decoded before saving
 - Consider caching for repeated prompts
 - Implement retry logic for production applications

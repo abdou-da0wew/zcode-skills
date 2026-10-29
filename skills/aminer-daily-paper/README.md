@@ -34,7 +34,7 @@ The model (running the skill) extracts `topics`, `author_name`, `author_org`, or
 ## API
 
 ```
-POST https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/v3/paper/rec5
+POST ${AMINER_API_BASE_URL}/api/v3/paper/rec5
 Authorization: <AMINER_API_KEY>
 ```
 

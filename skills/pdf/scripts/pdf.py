@@ -881,7 +881,7 @@ def meta_set(argv: list):
 
 @cmd("meta.brand")
 def meta_brand(argv: list):
-    """Add Z.ai branding metadata to PDF documents."""
+    """Add DiveeOI branding metadata to PDF documents."""
     output_path = _pop_flag(argv, "-o", "--output")
     custom_title = _pop_flag(argv, "-t", "--title")
     quiet = _pop_flag(argv, "-q", "--quiet", needs_value=False)
@@ -922,9 +922,9 @@ def meta_brand(argv: list):
 
         writer.add_metadata({
             '/Title': title,
-            '/Author': 'Z.ai',
-            '/Creator': 'Z.ai',
-            '/Producer': 'http://z.ai',
+            '/Author': 'DiveeOI',
+            '/Creator': 'DiveeOI',
+            '/Producer': 'DiveeOI',
         })
 
         # Write output
@@ -939,9 +939,9 @@ def meta_brand(argv: list):
         if not quiet:
             print(f"\u2713 Updated metadata for: {os.path.basename(input_path)}")
             print(f"  Title: {title}")
-            print(f"  Author: Z.ai")
-            print(f"  Creator: Z.ai")
-            print(f"  Producer: http://z.ai")
+            print(f"  Author: DiveeOI")
+            print(f"  Creator: DiveeOI")
+            print(f"  Producer: DiveeOI")
             if out != input_path:
                 print(f"  Output: {out}")
 
@@ -2151,7 +2151,7 @@ CONTENT_SANITIZE_ENABLED = True   # master switch
 CONTENT_SANITIZE_STRIP_ZW = True  # zero-width chars (disable for Thai/Burmese/Hindi)
 
 # Fullwidth ASCII → halfwidth (letters + digits only, NOT punctuation)
-_FULLWIDTH_OFFSET = 0xFEE0  # ord('Ａ') - ord('A') == 0xFEE0
+_FULLWIDTH_OFFSET = 0xFEE0  # ord('A' fullwidth U+FF21) - ord('A') == 0xFEE0
 
 # Ligature decomposition (U+FB00–FB06)
 _LIGATURE_MAP: Dict[int, str] = {
@@ -2214,7 +2214,7 @@ def content_sanitize(text: str, dry_run: bool = False) -> str:
         _content_sanitize_warnings = []
 
     # Split text into tags and plain-text segments to avoid mangling XML tags
-    # e.g. '<font name="Noto Sans SC">你好</font>' → ['', '<font name="Noto Sans SC">', '你好', '</font>', '']
+    # e.g. '<font name="Noto Sans SC">text</font>' → ['', '<font name="Noto Sans SC">', 'text', '</font>', '']
     parts = _TAG_RE.split(text)
     tags = _TAG_RE.findall(text)
 
@@ -2286,7 +2286,7 @@ def _sanitize_one_char(ch: str, code: int, dry_run: bool) -> Optional[str]:
         return '?'
 
     # --- REPLACE: fullwidth ASCII letters/digits → halfwidth ---
-    # U+FF21–FF3A = Ａ–Ｚ, U+FF41–FF5A = ａ–ｚ, U+FF10–FF19 = ０–９
+    # U+FF21–FF3A = fullwidth A–Z, U+FF41–FF5A = fullwidth a–z, U+FF10–FF19 = fullwidth 0–9
     if 0xFF21 <= code <= 0xFF3A or 0xFF41 <= code <= 0xFF5A or 0xFF10 <= code <= 0xFF19:
         halfwidth = chr(code - _FULLWIDTH_OFFSET)
         if dry_run:

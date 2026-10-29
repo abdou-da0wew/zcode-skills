@@ -1,45 +1,45 @@
-# 通用关键词库（跨行业）
+# General Keyword Library (cross-industry)
 
-## 通用软技能（任何岗位都吃香）
+## General Soft Skills (valuable in any role)
 
-- Ownership / 主人翁意识
-- 跨部门 / 跨团队协作
-- 推动落地 / drive
-- 业务 sense / 商业化思维
-- 数据驱动 / 量化思维
-- 用户同理心 / 客户导向
-- Learning agility / 快速学习
-- Ambiguity tolerance / 应对模糊
-- 影响力 / 说服力
+- Ownership
+- Cross-department / cross-team collaboration
+- Driving delivery / drive
+- Business sense / commercial thinking
+- Data-driven / quantitative thinking
+- User empathy / customer orientation
+- Learning agility / fast learning
+- Ambiguity tolerance / working through ambiguity
+- Influence / persuasion
 
-## 通用硬技能
+## General Hard Skills
 
-- SQL（半数岗位需要）
-- Excel 高阶（vlookup、pivot、power query、宏 / VBA）
-- PowerPoint / Keynote（结构化输出）
-- 英语（书面 + 口语，外企 / 跨境必备）
-- 项目管理：Jira / Asana / Notion / 飞书
+- SQL (needed by half of all roles)
+- Advanced Excel (vlookup, pivot, power query, macros / VBA)
+- PowerPoint / Keynote (structured output)
+- English (written + spoken; a must for foreign companies / cross-border roles)
+- Project management: Jira / Asana / Notion / Lark (Feishu)
 
-## 通用职业资质
+## General Career Credentials
 
-- 学历：本科 / 硕士 / 博士 + 学校 tier
-- 证书：CFA、CPA、ACCA、PMP、AWS / GCP / Azure 认证
-- 语言：托福 / 雅思 / 多语种
+- Education: bachelor's / master's / PhD + school tier
+- Certificates: CFA, CPA, ACCA, PMP, AWS / GCP / Azure certifications
+- Languages: TOEFL / IELTS / multilingual
 
-## 量化结果通用模板
+## Universal Template for Quantified Results
 
-写简历 / 画像时，**所有动作都尽量量化**。模板：
+When writing resumes / profiles, **quantify every accomplishment wherever possible**. Template:
 
-- "通过 ___，使 ___ 提升 X%（基线 Y → 现状 Z）"
-- "在 ___ 期间，覆盖 ___ 业务，规模 X 万 / 亿"
-- "主导 ___ 项目，缩短 ___ 时间 X%"
-- "管理 X 人团队，覆盖 X 个业务线"
+- "Through ___, improved ___ by X% (baseline Y → current Z)"
+- "During ___, covered ___ business lines at a scale of X0k / X00M"
+- "Led the ___ project, cutting ___ time by X%"
+- "Managed a team of X, covering X business lines"
 
-## 转行 / 跨界叙事关键词
+## Career-Switch / Cross-Domain Narrative Keywords
 
-- "可迁移技能"（transferable skill）
-- "跨界视角"
-- "第一性原理"
-- "从 0 到 1 / 从 1 到 N"
+- "Transferable skills"
+- "Cross-domain perspective"
+- "First principles"
+- "0 to 1 / 1 to N"
 
-转行候选人的画像应该突出**结构化思维 + 学习速度 + 已有 case**，而不是硬编技能词。
+A career switcher's profile should highlight **structured thinking + learning speed + existing cases**, not hard-injected skill words.

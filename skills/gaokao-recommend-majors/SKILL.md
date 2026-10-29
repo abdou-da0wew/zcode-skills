@@ -1,48 +1,52 @@
 ---
 name: gaokao-recommend-majors
 description: >-
-  基于考生画像与 API 志愿列表，由 Agent 分析推荐适合的专业方向、就业出口与具体专业清单，
-  输出结构化 major_recommendation.json。适用于高考专业推荐、选专业、就业方向分析。
+  Based on the student profile and the API volunteer list, the agent analyzes and
+  recommends suitable major directions, career outcomes, and a concrete list of
+  majors, outputting a structured major_recommendation.json. Use it for gaokao
+  major recommendation, choosing a major, or career-direction analysis.
 ---
 
-# 推荐专业与就业方向
+# Recommended Majors & Career Directions
 
-本 Skill 是流水线的**第三步**：纯 Agent 分析，无规则脚本。结合考生兴趣、成绩、就业意向与 `parsed.json` 中的真实专业，产出个性化专业推荐。
+This skill is the **third step** of the pipeline: pure agent analysis, no rule-based
+scripts. It combines the student's interests, scores, career intentions, and the real
+majors in `parsed.json` to produce personalized major recommendations.
 
-## 上下游
+## Upstream / downstream
 
-- **上游**：`student.json` + `parsed.json`（来自信息采集与获取志愿）
-- **下游**：[gaokao-recommend-schools](../gaokao-recommend-schools/SKILL.md) 读取 `major_recommendation.json`
+- **Upstream**: `student.json` + `parsed.json` (from info collection and volunteer fetching)
+- **Downstream**: [gaokao-recommend-schools](../gaokao-recommend-schools/SKILL.md) reads `major_recommendation.json`
 
-## 输入
+## Inputs
 
-1. `student.json` — 考生完整画像
-2. `parsed.json` — 冲/稳/保志愿及每校 `majors`（含 `claim` 选科要求、录取概率）
+1. `student.json` — the student's complete profile
+2. `parsed.json` — reach/match/safety volunteers and each school's `majors` (including the `claim` subject requirements and admission probabilities)
 
-## Agent 分析任务
+## Agent analysis tasks
 
-1. 阅读 [career_reference.md](career_reference.md) 了解常见专业大类与就业出口（**参考，非硬规则**）。
-2. 综合选科要求、各科成绩、兴趣、家庭、就业方向，判断 2–4 个**专业方向**（`major_directions`）。
-3. 从 `parsed.json` 中挑选 **8–15 个**最契合的具体专业，写入 `recommended_majors`。
-4. 撰写综合开篇 `intro` 与整体策略 `strategy`（专业优先视角）。
+1. Read [career_reference.md](career_reference.md) to learn the common major classes and career outcomes (**reference only, not hard rules**).
+2. Weigh subject requirements, per-subject scores, interests, family situation, and career direction to decide on 2–4 **major directions** (`major_directions`).
+3. Pick the **8–15** best-matching concrete majors from `parsed.json` and write them into `recommended_majors`.
+4. Write the comprehensive opening `intro` and the overall `strategy` (major-first perspective).
 
-## 硬性约束
+## Hard constraints
 
-`recommended_majors` 每项的 `university_name`、`university_code`、`major_name`、`major_code` 必须与 `parsed.json` **完全一致**，否则最终报告无法显示 🔥 标签。
+Each entry's `university_name`, `university_code`, `major_name`, and `major_code` in `recommended_majors` must be **exactly identical** to `parsed.json`, otherwise the final report cannot display the 🔥 tag.
 
-生成前在 `parsed.json` 中检索确认字段值。
+Before generating, search `parsed.json` to confirm the field values.
 
-## 输出
+## Output
 
-保存为 `output/major_recommendation.json`，结构见 [examples/major_recommendation_template.json](examples/major_recommendation_template.json)。
+Save as `output/major_recommendation.json`; see [examples/major_recommendation_template.json](examples/major_recommendation_template.json) for the structure.
 
 ```json
 {
-  "student": { "...辅助画像字段..." },
-  "intro": "综合测评开篇（HTML 可用 <strong>）",
-  "strategy": "填报策略（专业视角）",
+  "student": { "...auxiliary profile fields..." },
+  "intro": "Comprehensive evaluation opening (HTML <strong> allowed)",
+  "strategy": "Application strategy (major-first perspective)",
   "major_directions": [
-    { "icon": "🧑‍💻", "title": "...", "match_level": "极高", "description": "..." }
+    { "icon": "🧑‍💻", "title": "...", "match_level": "Very high", "description": "..." }
   ],
   "recommended_majors": [
     {
@@ -56,11 +60,11 @@ description: >-
 }
 ```
 
-## 向用户交付
+## Delivering to the user
 
-- 保存 JSON 绝对路径
-- 用自然语言解读推荐的专业方向与 Top 专业理由
+- Give the user the absolute path of the saved JSON
+- Explain in natural language the recommended major directions and why the top majors were chosen
 
-## 附加资源
+## Additional resources
 
-- [career_reference.md](career_reference.md) — 专业/职业方向参考
+- [career_reference.md](career_reference.md) — major / career-direction reference

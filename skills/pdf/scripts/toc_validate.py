@@ -60,19 +60,19 @@ STANDARD_HEADING_STYLES = {
 }
 
 # TOC keywords to search for in PDF text
-TOC_KEYWORDS = ['目录', '目 录', '目  录', 'table of contents', 'contents']
+TOC_KEYWORDS = ['\u76ee\u5f55', '\u76ee \u5f55', '\u76ee  \u5f55', 'table of contents', 'contents']  # CJK 'mulu' variants + English
 
 # Hint phrases that should not leak into final PDF
 HINT_PHRASES = [
-    '提示：本目录通过域代码生成',
-    '右键更新域',
+    '\u63d0\u793a\uff1a\u672c\u76ee\u5f55\u901a\u8fc7\u57df\u4ee3\u7801\u751f\u6210',  # 'Tip: this TOC is generated via field codes'
+    '\u53f3\u952e\u66f4\u65b0\u57df',  # 'right-click to update field'
     'Update Field',
     'right-click',
     'Tip: This table of contents',
 ]
 
 # Hint text indicators for DOCX styling check
-HINT_INDICATORS = ['提示', 'Tip:', 'Update Field', '更新域']
+HINT_INDICATORS = ['\u63d0\u793a', 'Tip:', 'Update Field', '\u66f4\u65b0\u57df']  # 'tip' / 'update field'
 
 # Gray color values (hex, case-insensitive)
 GRAY_COLORS = {'808080', '999999', 'a0a0a0', 'a5a5a5', 'b0b0b0', 'c0c0c0',
@@ -1029,7 +1029,7 @@ def _find_toc_sdt_indices(body_elem) -> List[int]:
                 sdtPr = child.find('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}sdtPr')
                 if sdtPr is not None:
                     alias = sdtPr.find('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}alias')
-                    if alias is not None and alias.get(_w('val'), '').upper() in ('TOC', '目录'):
+                    if alias is not None and alias.get(_w('val'), '').upper() in ('TOC', '\u76ee\u5f55'):
                         indices.append(idx)
                         continue
                     docPartObj = sdtPr.find('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}docPartObj')
@@ -1138,7 +1138,7 @@ def fix_docx(docx_path: str, output_path: Optional[str] = None) -> Dict[str, Any
     body_children = list(body)
     para_to_body_idx = {}  # map paragraph element to body child index
     pi = 0
-    caption_filter = re.compile(r'^[表图]\s*\d')
+    caption_filter = re.compile(r'^[\u8868\u56fe]\s*\d')  # CJK captions: Table/Figure prefix
     for ci, child in enumerate(body_children):
         if child.tag == _w('p'):
             para_to_body_idx[id(child)] = ci
@@ -1266,12 +1266,12 @@ def fix_docx(docx_path: str, output_path: Optional[str] = None) -> Dict[str, Any
 
     # Determine language for TOC title
     content_lang = _detect_language(heading_texts)
-    toc_title = "目  录" if content_lang == 'zh' else "Table of Contents"
+    toc_title = "\u76ee  \u5f55" if content_lang == 'zh' else "Table of Contents"  # CJK title uses full-width space
 
     # Re-extract headings from the python-docx document for consistency
     doc_headings = []  # (element_index, text, level)
     # Pattern to filter out table/figure captions styled as headings
-    caption_re = re.compile(r'^[表图]\s*\d')
+    caption_re = re.compile(r'^[\u8868\u56fe]\s*\d')  # CJK captions: Table/Figure prefix
     for ci, child in enumerate(doc_children):
         if child.tag == qn('w:p'):
             pPr = child.find(qn('w:pPr'))
@@ -1287,7 +1287,7 @@ def fix_docx(docx_path: str, output_path: Optional[str] = None) -> Dict[str, Any
                         text = ''.join(text_parts).strip()
                         level = _get_heading_level(style_val)
                         if text and level > 0:
-                            # Skip table/figure captions (e.g. "表 1：xxx", "图 2：xxx")
+                            # Skip table/figure captions (e.g. "Table 1: xxx", "Figure 2: xxx")
                             if caption_re.match(text):
                                 continue
                             doc_headings.append((ci, text, level))
@@ -1320,7 +1320,7 @@ def fix_docx(docx_path: str, output_path: Optional[str] = None) -> Dict[str, Any
                 sdtPr = child.find(qn('w:sdtPr'))
                 if sdtPr is not None:
                     alias = sdtPr.find(qn('w:alias'))
-                    if alias is not None and alias.get(qn('w:val'), '').upper() in ('TOC', '目录'):
+                    if alias is not None and alias.get(qn('w:val'), '').upper() in ('TOC', '\u76ee\u5f55'):
                         is_toc_sdt = True
                     docPartObj = sdtPr.find(qn('w:docPartObj'))
                     if docPartObj is not None:
@@ -1823,7 +1823,7 @@ def fix_docx_accurate_pages(fixed_docx_path: str, pass1_pdf_path: str, output_pa
     # --- Step 1: Extract headings from the fixed DOCX ---
     doc = Document(fixed_docx_path)
     headings = []
-    caption_pattern = re.compile(r'^[表图]\s*\d')
+    caption_pattern = re.compile(r'^[\u8868\u56fe]\s*\d')  # CJK captions: Table/Figure prefix
     for p in doc.paragraphs:
         style_name = p.style.name if p.style else ''
         if style_name.startswith('Heading'):

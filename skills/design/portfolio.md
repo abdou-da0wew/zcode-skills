@@ -87,7 +87,7 @@ The bio should feel like a person wrote it, not a LinkedIn profile generator.
 
 - Bad: "I'm a passionate designer who loves crafting beautiful experiences."
 - Good: "Senior visual designer at Deloitte Digital. Former pianist — my thinking is both visual and structural."
-- Good: "I design AI products in Beijing. Previously made tools for researchers at Zhipu AI."
+- Good: "I design AI products in Beijing. Previously made tools for researchers at Nebula AI."
 
 **Placement:** The bio should be accessible but NOT the first thing you see. Work first, identity second. Common good placements:
 - Fixed side panel (always visible but secondary to the work area)

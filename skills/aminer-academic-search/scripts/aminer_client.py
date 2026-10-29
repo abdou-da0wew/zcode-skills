@@ -37,7 +37,7 @@ import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Optional
 
-BASE_URL = "https://publicapi.chatglm.cn/chatglm_public/skill/aminer"
+BASE_URL = os.environ.get("AMINER_API_BASE_URL", "")  # set to your AMiner API gateway
 
 REQUEST_TIMEOUT_SECONDS = 30
 MAX_RETRIES = 3
@@ -635,9 +635,11 @@ def workflow_org_analysis(token: str, org: str) -> dict:
         data = disamb["data"]
         if isinstance(data, list) and data:
             first = data[0]
-            org_id = first.get("一级ID") or first.get("二级ID")
+            # The API returns Chinese-encoded keys; "\u4e00\u7ea7ID" == primary institution ID,
+            # "\u4e8c\u7ea7ID" == secondary institution ID.
+            org_id = first.get("\u4e00\u7ea7ID") or first.get("\u4e8c\u7ea7ID")
         elif isinstance(data, dict):
-            org_id = data.get("一级ID") or data.get("二级ID")
+            org_id = data.get("\u4e00\u7ea7ID") or data.get("\u4e8c\u7ea7ID")
 
     if not org_id:
         print("      Disambiguation pro returned no ID; trying org search...", file=sys.stderr)

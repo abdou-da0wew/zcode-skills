@@ -1,108 +1,117 @@
 ---
 name: dot-matrix-xhs
-description: Bayer 抖动黑白点阵的小红书封面 / 杂志感海报 / 独立刊物封面模板 — 黑底 + Canvas 真做 Bayer 8×8 有序抖动把任意图片转成纯黑白点阵 + 上下双向 vignette + 杂志栏目式四角文字（刊号 / 栏目 / wordmark / credit）+ Noto Sans JP Black 中文超大粗黑标题 2×2 网格 + 中心方括号期号。4 套版式骨架（单图封面 / 上图下字 / 系列三联 / 内页长文），容器查询 cqh 适配任意尺寸。触发：用户要"点阵感 / dither / 1-bit / 黑白颗粒 / 小红书封面 / Vol 期号海报 / 独立刊物 / 报纸印刷感"。NOT 多区块产品页，NOT 彩色海报。
+description: >-
+  Bayer-dithered black-and-white dot-matrix covers for Rednote — magazine-feel posters / indie
+  zine cover template. Black ground + real Canvas Bayer 8x8 ordered dithering that turns any
+  photo into a pure black-and-white dot matrix, plus a top-and-bottom vignette, magazine-column
+  four-corner text (issue number / column / wordmark / credit), an oversized heavy CJK display
+  title set with Noto Sans JP Black in a 2x2 grid, and a center bracketed issue number. 4 layout
+  skeletons (single-image cover / image-top text-bottom / series triptych / long-form inner
+  page); container-query (cqh) units keep the type crisp at any size. Triggers: "dot-matrix
+  feel / dither / 1-bit / black-and-white grain / Rednote cover / Vol issue poster / indie zine
+  / newsprint feel". NOT multi-section product pages, NOT color posters.
 visibility: public
 mode: template
 carrier: fixed-image
 scenario: social-content
-pattern_source: 点阵.html
+pattern_source: dot-matrix.html
 source_priority: skill-first
 triggers:
-  - "做个点阵小红书封面"
-  - "黑白颗粒封面"
-  - "1-bit 海报"
-  - "Vol 期号封面"
-  - "独立刊物封面"
-  - "报纸印刷感封面"
-  - "dither 抖动"
+  - "make a dot-matrix Rednote cover"
+  - "black-and-white grain cover"
+  - "1-bit poster"
+  - "Vol issue cover"
+  - "indie zine cover"
+  - "newsprint-feel cover"
+  - "dither"
 related_patterns: social-card-editorial
 ---
 
-# dot-matrix-xhs — Bayer 抖动黑白点阵封面
+# dot-matrix-xhs — Bayer-dithered black-and-white dot-matrix covers
 
-把任意一张照片实时做 Bayer 8×8 有序抖动，变成"报纸印刷点阵"，叠在杂志感四角文字 + 中文 2×2 大标题骨架上。**容器比例固定 1280×1644（小红书纵版封面）**，但用 container-query (cqh) 单位排版，缩到任何尺寸都不糊。
+Take any photo and run a real-time Bayer 8x8 ordered dither on it, turning it into a "newsprint dot matrix", then layer it under magazine-style four-corner text and the CJK 2x2 display-title skeleton. **The container ratio is fixed at 1280x1644 (Rednote portrait cover)**, but layout uses container-query (cqh) units, so it stays crisp when scaled to any size.
 
-## 怎么用这份 skill
+## How to use this skill
 
-1. **看气质**：先 Read `点阵.html`（深夜篝火 / a fire at midnight 范例），重点看 Bayer dithering 的颗粒密度、暗角强度、四角栏目字的层级关系。**这一步只是为了"知道对的样子长什么样"。**
-2. **挑骨架**：从下面 4 个版式骨架里选一个（单图封面 / 上图下字 / 系列三联 / 内页长文），**禁止整张 clone 深夜篝火**（同样的 2×2 + 中部方括号 + 底部 wordmark 一起出现就是撞脸）。
-3. **抄积木**：Canvas Bayer 函数、容器查询排版、四角文字布局可以直接搬。
-4. **过红线**：写完对照"必须 / 禁止"清单自检。
+1. **Get the feel first**: Read `dot-matrix.html` (the "A Fire at Midnight" example) and study the Bayer dithering grain density, vignette strength, and the hierarchy of the four corner columns. **This step only exists to learn what "right" looks like.**
+2. **Pick a skeleton**: choose one of the 4 layout skeletons below (single-image cover / image-top text-bottom / series triptych / long-form inner page). **Do not clone "A Fire at Midnight" wholesale** (the same 2x2 + center brackets + bottom wordmark appearing together is a face-clone).
+3. **Copy the building blocks**: the Canvas Bayer function, container-query typography, and four-corner text layout can be taken as-is.
+4. **Check the red lines**: after writing, self-check against the "Must / Must not" list.
 
-## 视觉 DNA — 这些不能丢
+## Visual DNA — none of this can be dropped
 
-少了任意一条就不再是点阵杂志感：
+Drop any one item and it is no longer dot-matrix magazine feel:
 
-1. **黑底 + Canvas 真做 Bayer 抖动**：底层一定是一张被 Bayer 8×8 抖动过的图，**不是 CSS noise，不是 SVG filter，不是预渲染好的 PNG，必须 Canvas 实时跑**。任何图（人物、风景、物件）经过 `adjustBrightness(-20~-30) + adjustLevels(60~80, 190~210) + bayerDither` 后才是对的。
-2. **像素硬边渲染**：canvas 必须 `image-rendering:pixelated`，缩放时点阵保持硬边，不能因放大变模糊变灰。
-3. **上下双向 vignette**：`linear-gradient(180deg, rgba(0,0,0,.55) 0%, transparent 18%, transparent 70%, rgba(0,0,0,.45) 100%)`，让顶部刊号和底部 wordmark 有底气；**不要四角 vignette**（圆形会立刻变成手机相机镜头味）。
-4. **杂志栏目式四角**：左上=刊号 (`No 04 / 2026`)、右上=栏目英文+中文小字、左下=主 wordmark、右下=年份+credit。**至少填 3 角**，这是独立刊物的标识；少于 3 角就只是张图配字。
-5. **超大粗黑中文标题**：`Noto Sans JP Black` + `PingFang SC` 兜底，`font-weight:900`，`line-height:1.1`，`letter-spacing:0`（中文密排不加字距）。**禁止细体 / 楷书 / 隶书 / 圆体**。
-6. **白字带轻 text-shadow**：所有覆盖在点阵图上的文字都要 `text-shadow:0 0 .8cqh rgba(0,0,0,.85)`，让白字在浅色点阵区域也读得清。
+1. **Black ground + real Canvas Bayer dither**: the base layer is always an image that has been Bayer 8x8 dithered — **not CSS noise, not an SVG filter, not a pre-rendered PNG; it must run live on Canvas**. Any image (portrait, landscape, object) only becomes correct after `adjustBrightness(-20~-30) + adjustLevels(60~80, 190~210) + bayerDither`.
+2. **Hard-edged pixel rendering**: the canvas must have `image-rendering:pixelated`; the dot matrix keeps hard edges when scaled and never turns blurry or grey.
+3. **Top-and-bottom vignette**: `linear-gradient(180deg, rgba(0,0,0,.55) 0%, transparent 18%, transparent 70%, rgba(0,0,0,.45) 100%)`, which gives the top issue number and bottom wordmark their footing; **no four-corner vignette** (a circular falloff instantly reads as a phone-camera lens).
+4. **Magazine-column four corners**: top-left = issue number (`No 04 / 2026`), top-right = column in English + small CJK, bottom-left = main wordmark, bottom-right = year + credit. **Fill at least 3 corners** — this is the indie-zine signature; fewer than 3 is just an image with captions.
+5. **Oversized heavy CJK display title**: `Noto Sans JP Black` with `PingFang SC` fallback, `font-weight:900`, `line-height:1.1`, `letter-spacing:0` (dense CJK setting adds no tracking). **No light weights / kaiti / lishu / rounded faces**.
+6. **White text with a light text-shadow**: every piece of text over the dot-matrix image gets `text-shadow:0 0 .8cqh rgba(0,0,0,.85)` so white type stays readable even over light dither areas.
 
-## 必须 / 禁止（写完自检）
+## Must / Must not (self-check after writing)
 
-**必须**：
-- [ ] Canvas 真做了 Bayer dithering（不是 CSS 滤镜、不是 SVG noise、不是预渲染图）
-- [ ] 容器有固定 `aspect-ratio`（封面用 1280/1644，海报可自由）
-- [ ] 容器加 `container-type:size`，排版单位用 `cqh` / `cqw`
-- [ ] 四角至少 3 角有内容（刊号、栏目、wordmark、credit 选 3）
-- [ ] 主标题字重 ≥ 800
-- [ ] 中文 webfont 按"四件套"加载（preconnect + preload + print-onload + noscript）
-- [ ] canvas 三行 `image-rendering:pixelated / -moz-crisp-edges / crisp-edges` 一个不能少
+**Must**:
+- [ ] Canvas really performs Bayer dithering (not a CSS filter, not SVG noise, not a pre-rendered image)
+- [ ] The container has a fixed `aspect-ratio` (1280/1644 for covers; posters may choose freely)
+- [ ] The container sets `container-type:size` and layout units use `cqh` / `cqw`
+- [ ] At least 3 of the 4 corners carry content (pick 3 of: issue number, column, wordmark, credit)
+- [ ] Main title weight ≥ 800
+- [ ] The CJK webfont loads with the "four-piece" setup (preconnect + preload + print-onload + noscript)
+- [ ] The canvas carries all three `image-rendering:pixelated / -moz-crisp-edges / crisp-edges` lines
 
-**禁止**：
-- [ ] 不要照抄"2×2 中文字阵列 + 中心方括号 + 底部 wordmark"完整组合 — 那是深夜篝火的指纹
-- [ ] 不要用 SVG noise / `filter: contrast` / `background-image: radial-gradient(...dot)` 模拟点阵 — 一眼假
-- [ ] 不要让点阵保留灰阶（Bayer 输出必须是纯黑 0 或纯白 255 二值，不允许中间值）
-- [ ] 不要给图加饱和色调（黄昏滤镜、青蓝调、奶油色）— 这套审美就是 1-bit 纯黑白
-- [ ] 不要圆角 — 框架、按钮、卡片全是直角
-- [ ] 不要 emoji / 3D 贴纸 / 渐变色 / 玻璃拟态 / 阴影漂浮
-- [ ] 标题不要 PingFang Regular / Source Han Sans Light — 必须 Heavy / Black 字重
-- [ ] 不要照搬"深/夜/篝/火 + VOL IV / 2026 + 夜火 wordmark + 小红书号 955873829" — 那是范例的指纹
+**Must not**:
+- [ ] Do not reproduce the full "2x2 CJK character array + center brackets + bottom wordmark" combination — that is the "A Fire at Midnight" fingerprint
+- [ ] Do not fake the dot matrix with SVG noise / `filter: contrast` / `background-image: radial-gradient(...dot)` — it reads fake instantly
+- [ ] Do not let the dot matrix keep greys (Bayer output must be pure black 0 or pure white 255, binary, no in-between values)
+- [ ] Do not add saturated color to the image (sunset filters, teal-blue casts, cream tones) — this aesthetic is 1-bit pure black and white
+- [ ] No rounded corners — frames, buttons, cards are all square
+- [ ] No emoji / 3D stickers / gradient color / glassmorphism / floating shadows
+- [ ] No PingFang Regular / Source Han Sans Light for titles — Heavy / Black weight is required
+- [ ] Do not copy "SHEN / YE / GOU / HUO + VOL IV / 2026 + Night Fire wordmark + Rednote ID 955873829" — that is the example's fingerprint
 
-## 四套版式骨架（任选一套，不要再做"深夜篝火"组合）
+## The four layout skeletons (pick one; do not rebuild the "A Fire at Midnight" combo)
 
-每套都自带点阵 + 四角文字 DNA，但**结构截然不同**，让产物不撞脸。
+Each skeleton carries the dither + four-corner-text DNA, but **the structures are completely different**, so outputs do not look like clones.
 
-### 骨架 A — 单图封面（深夜篝火原型，可参考但慎用）
+### Skeleton A — Single-image cover ("A Fire at Midnight" prototype; reference with care)
 ```
-[底层]  Bayer 点阵全屏图 + 上下 vignette
-[四角]  左上刊号 / 右上栏目+中文 / 左下 wordmark / 右下 credit
-[上中]  hr 分割线 + 2×2 中文超大标题 + 英文斜体副标
-[正中]  方括号期号或主题词
+[Base]    Full-bleed Bayer dithered image + top/bottom vignette
+[Corners] Top-left issue no. / top-right column + small CJK / bottom-left wordmark / bottom-right credit
+[Upper]   hr divider + 2x2 oversized CJK title + English italic subtitle
+[Center]  Bracketed issue number or theme word
 ```
-适合：单张视觉强烈的照片做封面（人物特写、风景、静物）。1280×1644。
+Good for: a single visually strong photo as the cover (portrait close-up, landscape, still life). 1280x1644.
 
-### 骨架 B — 上图下字
+### Skeleton B — Image on top, text below
 ```
-[上 60%]  Bayer 点阵图 + 顶部刊号 + 栏目
-[下 40%]  纯黑区，左侧大标题（横排单行或两行），右侧引文 + 出处
-[底栏]    细线 + wordmark + 期号
+[Top 60%]    Bayer dithered image + issue number + column
+[Bottom 40%] Pure black zone; large title on the left (one or two lines), quote + attribution on the right
+[Footer bar] Hairline + wordmark + issue number
 ```
-适合：长标题或要放副文、引文、署名（不强求 2×2 网格的项目）。1280×1644 或 1080×1350。
+Good for: long titles, or projects that need deck copy, quotes, and attributions (no forced 2x2 grid). 1280x1644 or 1080x1350.
 
-### 骨架 C — 系列三联封面
+### Skeleton C — Series triptych
 ```
-[整张分 3 列]  每列一张独立 Bayer 点阵图（人物特写 / 物件 / 环境）
-              每列底部各有自己的小标题 + 编号 01 / 02 / 03
-[顶栏]        统一刊号 + 栏目
-[底栏]        统一 wordmark + 总集名
+[Split into 3 columns]  Each column is an independent Bayer dithered image (portrait / object / environment)
+                        Each column bottom carries its own small title + number 01 / 02 / 03
+[Top bar]               Shared issue number + column
+[Bottom bar]            Shared wordmark + collection name
 ```
-适合：系列报道、人物组照、产品组合、旅行游记封面。横版 1644×1280 或纵版 1280×1644。
+Good for: series reporting, group portraits, product lineups, travelogue covers. Landscape 1644x1280 or portrait 1280x1644.
 
-### 骨架 D — 内页 / 长文版心
+### Skeleton D — Inner page / long-form text column
 ```
-[顶栏]   刊号 + 栏目 + hr
-[左栏]   sticky 大标题 + 引文（占 40% 宽）
-[右栏]   长正文（多段 p + 行内引用），插 1-2 张 Bayer 小图
-[底栏]   页码 + wordmark
+[Top bar]    Issue number + column + hr
+[Left col]   Sticky large title + quote (40% width)
+[Right col]  Long body copy (multi-paragraph p + inline quotes), with 1-2 small dithered images
+[Bottom bar] Page number + wordmark
 ```
-适合：刊物内文页、长 essay、采访稿（不只是封面，还有阅读内容）。1280×1800+ 或 A4 比例。
+Good for: zine inner pages, long essays, interviews (not just a cover — actual reading content). 1280x1800+ or A4 ratio.
 
-## 可直接抄的代码积木
+## Copy-paste code blocks
 
-### Bayer 8×8 抖动（核心，不能简化）
+### Bayer 8x8 dither (core; do not simplify)
 ```js
 function bayerDither(ctx, W, H){
   const d = ctx.getImageData(0,0,W,H), px = d.data;
@@ -122,9 +131,9 @@ function bayerDither(ctx, W, H){
   ctx.putImageData(d,0,0);
 }
 ```
-**关键**：8×8 矩阵不要换 4×4（颗粒过粗）、不要换 Floyd-Steinberg（变成误差扩散的另一种味道，颗粒会"流"）。点阵密度 = canvas 内部分辨率：W=600 H=771 是封面默认，要更细就开到 900×1158，要更糙就 400×514。
+**Key point**: do not swap the 8x8 matrix for 4x4 (grain too coarse) and do not swap it for Floyd-Steinberg (error diffusion is a different flavor; the grain "flows"). Dot density = the canvas internal resolution: W=600 H=771 is the cover default; go 900x1158 for finer grain or 400x514 for coarser.
 
-### 预处理：压暗 + 拉对比（让 Bayer 出黑白分明的点阵）
+### Preprocessing: darken + stretch contrast (so Bayer produces a crisp black/white matrix)
 ```js
 function adjustBrightness(ctx, W, H, delta){
   const d = ctx.getImageData(0,0,W,H), px = d.data;
@@ -139,9 +148,9 @@ function adjustLevels(ctx, W, H, lo, hi){
   ctx.putImageData(d,0,0);
 }
 ```
-**调用顺序固定**：`drawImage → adjustBrightness(-25) → adjustLevels(70, 195) → bayerDither`。**不要先 dither 再调对比** — dither 已是二值化，之后调对比无效。
+**Call order is fixed**: `drawImage → adjustBrightness(-25) → adjustLevels(70, 195) → bayerDither`. **Never dither first and adjust contrast after** — the dither output is already binarized, so later contrast adjustments do nothing.
 
-### Canvas 元素配置
+### Canvas element setup
 ```html
 <canvas class="bg" id="bg" width="600" height="771"></canvas>
 <img class="src" id="src" src="YOUR_IMG_URL" crossorigin="anonymous" alt="">
@@ -157,9 +166,9 @@ canvas.bg{
 }
 img.src{ display:none }
 ```
-源图 `<img>` 只用来给 canvas drawImage，不直接显示。`crossorigin="anonymous"` 必须 — 否则 getImageData 跨域报错。
+The source `<img>` exists only to feed canvas `drawImage` and is never displayed. `crossorigin="anonymous"` is required — otherwise getImageData throws a cross-origin error.
 
-### 完整 Canvas 处理流程
+### Complete Canvas processing pipeline
 ```js
 (async function(){
   if (document.fonts && document.fonts.ready){ try { await document.fonts.ready; } catch(e){} }
@@ -183,7 +192,7 @@ img.src{ display:none }
 })();
 ```
 
-### 容器查询排版（适配任意尺寸不糊）
+### Container-query typography (crisp at any size)
 ```css
 .frame{
   position:relative;
@@ -196,9 +205,9 @@ img.src{ display:none }
 .title{ font-size:12cqh; }
 .credit{ font-size:.85cqh; letter-spacing:.28em; }
 ```
-**为什么 cqh 不用 vh**：vh 跟视口走，容器尺寸变了文字不跟。cqh 跟 `.frame` 容器走，封面缩到一半也保持版式比例。
+**Why cqh instead of vh**: vh tracks the viewport, so text does not follow when the container resizes. cqh tracks the `.frame` container, so the cover keeps its proportions even scaled to half size.
 
-### 上下双向 vignette
+### Top-and-bottom vignette
 ```css
 .vignette{
   position:absolute; inset:0; z-index:1; pointer-events:none;
@@ -207,9 +216,9 @@ img.src{ display:none }
     rgba(0,0,0,0) 70%, rgba(0,0,0,.45) 100%);
 }
 ```
-顶部更重一些（.55 vs .45），因为刊号比 credit 字号小、需要更多对比保护。
+The top is a bit heavier (.55 vs .45) because the issue number is set smaller than the credit and needs more contrast protection.
 
-### 四角栏目布局
+### Four-corner column layout
 ```css
 .layer{
   position:absolute; inset:0; z-index:2;
@@ -227,13 +236,13 @@ img.src{ display:none }
   display:flex; justify-content:space-between; align-items:flex-end;
 }
 ```
-`margin-top:auto` 让 footer 一定贴底，无论中间内容多少。
+`margin-top:auto` pins the footer to the bottom no matter how much content sits above it.
 
-### 中文 2×2 标题（仅骨架 A）
+### CJK 2x2 title (skeleton A only)
 ```html
 <div class="title-grid">
-  <div class="col"><span class="sm">深</span><span class="sm">篝</span></div>
-  <div class="col"><span class="lg">夜</span><span class="lg">火</span></div>
+  <div class="col"><span class="sm">SHEN</span><span class="sm">GOU</span></div>
+  <div class="col"><span class="lg">YE</span><span class="lg">HUO</span></div>
 </div>
 ```
 ```css
@@ -245,9 +254,9 @@ img.src{ display:none }
 .title-grid .col{ display:flex; flex-direction:column }
 .title-grid .sm, .title-grid .lg{ font-size:12cqh }
 ```
-**约束**：必须 4 个汉字，按词组拆成两列（深/篝 一列、夜/火 一列），不是按阅读顺序。3 字、5 字、6 字不用这个骨架。
+**Constraint**: it must be a 4-character CJK word split into two columns by position — characters 1 & 3 in one column, 2 & 4 in the other (romanized here as SHEN/GOU + YE/HUO, i.e. the example phrase "shen-ye-gou-huo", a bonfire at midnight) — reading down each column, not in linear reading order. Do not use this skeleton for 3, 5, or 6 characters.
 
-### 方括号期号装饰
+### Bracketed issue-number ornament
 ```css
 .brackets{
   position:relative; padding:1cqh 2.6cqh;
@@ -261,11 +270,11 @@ img.src{ display:none }
 .brackets::before{ top:0; left:0; border-right:none; border-bottom:none }
 .brackets::after{ bottom:0; right:0; border-left:none; border-top:none }
 ```
-左上 + 右下两个 L 角，模拟相机取景框 / 印刷裁切标记。
+Two L corners (top-left + bottom-right) imitate a camera viewfinder / print crop marks.
 
-## 中文 webfont 加载（必做）
+## CJK webfont loading (required)
 
-`Noto Sans JP` Heavy 是大字重日文体（带中文汉字 fallback），文件大；中文优先本地 PingFang/Heiti。按"四件套"：
+`Noto Sans JP` Heavy is a Japanese face with heavy weights (with CJK kanji fallback) and its files are large; CJK text prefers the local PingFang/Heiti stack. Use the "four-piece" setup:
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -277,42 +286,42 @@ img.src{ display:none }
 <noscript><link rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Sans+JP:wght@900&display=swap"></noscript>
 ```
-字体栈一定带 `'PingFang SC','Heiti SC'` 兜底；英文小字用 Inter（italic 给副标用）。
+The font stack must always include the `'PingFang SC','Heiti SC'` fallback; use Inter for small English text (italic reserved for subtitles).
 
-## 输入信息核对
+## Input checklist
 
-让用户给齐再动手：
-1. **一张底图**（必需）— URL 或本地路径。人脸 / 风景 / 静物都可，但**明暗对比要强**，灰蒙蒙的图 dither 后糊一片；建议先在图编软件里看一眼，能分清主体与背景就行
-2. **刊号 + 栏目**（必需）— `No 04 / 2026` + 栏目英文 (CAMPING / TRAVEL / FOOD…) + 中文小字 2-4 字
-3. **标题**（必需）— 骨架 A 是 4 字 + 英文斜体副标；骨架 B/C/D 自由长度
-4. **wordmark + credit**（必需）— 主品牌大字 2-4 字 + 年份 / 小红书号 / 作者名 / 出处
-5. **比例**（可选）— 默认 1280/1644，可指定 1080/1350、1644/1280、1×1
-6. **dither 颗粒密度**（可选）— "细 / 中 / 粗" 对应 canvas 内部宽度 900 / 600 / 400
+Get all of this from the user before starting:
+1. **A base image** (required) — URL or local path. Faces / landscapes / still life all work, but **contrast must be strong**; a washed-out image turns to mush after dithering. Check it in an image editor first — as long as the subject separates from the background, it is fine.
+2. **Issue number + column** (required) — `No 04 / 2026` + column in English (CAMPING / TRAVEL / FOOD...) + 2-4 CJK characters as small text.
+3. **Title** (required) — skeleton A: 4 characters + an English italic subtitle; skeletons B/C/D: free length.
+4. **Wordmark + credit** (required) — main brand in large type, 2-4 characters + year / Rednote ID / author name / source.
+5. **Ratio** (optional) — default 1280/1644; may specify 1080/1350, 1644/1280, or 1x1.
+6. **Dither grain density** (optional) — "fine / medium / coarse" maps to canvas internal widths 900 / 600 / 400.
 
-## 反模式速查（看到这些就回头改）
+## Anti-pattern quick reference (if you see these, go back and fix)
 
-| 症状 | 错在哪 | 修正 |
+| Symptom | What went wrong | Fix |
 |---|---|---|
-| 点阵糊一片，看不出原图 | 没做 adjustLevels 拉对比 | 加 `adjustLevels(70, 195)`，没有就不出点阵感 |
-| 点阵全黑或全白 | brightness/levels 调过头 | brightness ∈ [-30, -10]，levels lo<80 hi>180 |
-| 字飘在图上读不清 | 没加 text-shadow / 没 vignette | `text-shadow:0 0 .8cqh rgba(0,0,0,.85)` + 上下渐变 |
-| 缩放后点阵变模糊 | 漏了 `image-rendering:pixelated` | canvas 三行 image-rendering 全加 |
-| 字号缩放后不跟容器 | 用了 vh 而不是 cqh | 容器加 `container-type:size`，所有字号用 cqh |
-| 标题字太细看起来软 | 用了 PingFang Regular / Light | 换 Noto Sans JP 900 + PingFang Heavy 兜底 |
-| 中文标题字距大像招牌 | 加了 letter-spacing | 中文密排 `letter-spacing:0` |
-| 四角文字只填 1-2 角 | 杂志感塌成"图配字" | 至少填 3 角（刊号 / 栏目 / wordmark / credit 选 3） |
-| 用了 emoji / 圆角 / 彩色 | 违反 1-bit 黑白审美 | 删掉，回到纯黑白 + 直角 |
-| 点阵看着像 CSS noise | 没真做 Canvas Bayer | 必须 Canvas 跑 `bayerDither`，不能 SVG/CSS 模拟 |
-| 整张和深夜篝火一模一样 | 没选其他骨架 | 强制走 B/C/D 之一 |
+| Dot matrix is mush, original unrecognizable | No adjustLevels contrast stretch | Add `adjustLevels(70, 195)`; without it there is no dot-matrix feel |
+| Matrix all black or all white | brightness/levels pushed too far | brightness ∈ [-30, -10], levels lo<80 hi>180 |
+| Text floats unreadably over the image | Missing text-shadow / vignette | `text-shadow:0 0 .8cqh rgba(0,0,0,.85)` + top/bottom gradients |
+| Matrix blurs when scaled | Missing `image-rendering:pixelated` | Add all three image-rendering lines on the canvas |
+| Type does not follow the container when scaled | Used vh instead of cqh | Container sets `container-type:size`; all font sizes use cqh |
+| Title looks thin and soft | Used PingFang Regular / Light | Switch to Noto Sans JP 900 + PingFang Heavy fallback |
+| CJK title tracking looks like a shop sign | Added letter-spacing | Dense CJK setting: `letter-spacing:0` |
+| Corner text fills only 1-2 corners | Magazine feel collapses into "image with captions" | Fill at least 3 corners (pick 3 of issue no. / column / wordmark / credit) |
+| Emoji / rounded corners / color used | Violates the 1-bit black-and-white aesthetic | Remove them; return to pure black-and-white + square corners |
+| Matrix looks like CSS noise | Real Canvas Bayer never ran | Must run `bayerDither` on Canvas; no SVG/CSS simulation |
+| Output is a dead ringer for "A Fire at Midnight" | Another skeleton was not chosen | Force one of B/C/D |
 
-## 关于 点阵.html
+## About dot-matrix.html
 
-放在 skill 同目录，是「深夜篝火 · a fire at midnight」的完整范例（骨架 A 实现）。**只看 Bayer 调用顺序、cqh 排版结构、四角层级关系**，不要把"深/夜/篝/火 + VOL IV / 2026 + 夜火 wordmark + 小红书号 955873829"原文搬到新项目里 — 那是范例的指纹。
+It sits in the same directory as this skill and is the complete "A Fire at Midnight" example (a skeleton A implementation). **Study only the Bayer call order, the cqh layout structure, and the four-corner hierarchy** — do not carry "SHEN / YE / GOU / HUO + VOL IV / 2026 + Night Fire wordmark + Rednote ID 955873829" verbatim into a new project — that is the example's fingerprint.
 
-## 输出要求
+## Output requirements
 
-- 单文件 HTML（HTML + CSS + Canvas 处理 JS）
-- 容器查询 + 固定 `aspect-ratio`，缩放不糊
-- 中文 webfont 四件套加载
-- canvas 三行 `image-rendering` 全加
-- 不写注释解释 Bayer 是什么 — 调用顺序对就行
+- Single-file HTML (HTML + CSS + Canvas processing JS)
+- Container queries + fixed `aspect-ratio`; crisp when scaled
+- CJK webfont loaded with the four-piece setup
+- All three canvas `image-rendering` lines present
+- No comments explaining what Bayer is — a correct call order is enough

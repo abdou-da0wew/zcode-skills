@@ -1,136 +1,136 @@
 ---
 name: job-intent-tracker
-description: 帮助用户梳理求职意向、生成目标岗位画像，并维护一份结构化的"岗位投递追踪表"。当用户说"我想换工作 / 不知道投什么岗 / 帮我看看我适合什么岗位 / 帮我管理投递进度 / 我投了好几家但记不住状态了 / 想做一个求职 OKR / 整理一下求职方向"，或上传简历但没说要改简历时，应该主动触发本 skill。本 skill 也适用于实习生、应届生、转行候选人在求职启动阶段做"自我盘点 + 目标画像 + 投递管理"三件事。
+description: Helps users organize their job-search intent, generate target role profiles, and maintain a structured "application tracking sheet". Trigger proactively when the user says "I want to change jobs / I don't know what roles to apply for / help me see what roles suit me / help me manage my applications / I've applied to several places but can't keep track / I want to build a job-search OKR / help me organize my job-search direction", or uploads a resume without asking for resume edits. This skill also suits interns, new grads, and career switchers at the start of a job search doing three things: "self inventory + target profile + application management".
 ---
 
-# Job Intent Tracker（求职意向 + 岗位追踪）
+# Job Intent Tracker (job-search intent + application tracking)
 
-这个 skill 解决"求职启动期"的三个核心问题：
+This skill solves three core problems of the "job-search launch phase":
 
-1. **我适合投什么岗？** —— 从用户背景里抽取信号，反推 2~3 个目标方向
-2. **目标岗位长什么样？** —— 为每个方向生成"岗位画像 / Target Profile"
-3. **投了哪些、进度如何？** —— 维护一份结构化追踪表（Excel / Markdown 表）
+1. **Which roles should I apply for?** — extract signals from the user's background and work backwards to 2~3 target directions
+2. **What does the target role look like?** — generate a "role profile / Target Profile" for each direction
+3. **What have I applied to and how far along is it?** — maintain a structured tracking sheet (Excel / Markdown table)
 
-不要把这个 skill 用成"简历改写"或"面试题生成"——那是 resume-builder / jd-resume-tailor / interview-prep 的事。本 skill 只关心"方向"和"管理"。
-
----
-
-## 何时触发本 skill
-
-强信号（基本必须用）：
-- "我想换工作 / 想跳槽 / 想找下一份工作"
-- "帮我看看我适合什么岗位"
-- "帮我管理投递进度 / 跟踪一下我投的公司"
-- "我有 X 年 Y 经验，下一步该往哪走"
-- "我投了好多家但忘了进度"
-
-弱信号（先确认再用）：
-- 用户只丢了一份简历，没说目的 → 先问"你是想梳理方向、改简历，还是准备面试？"
-- 用户说"想找工作"但很模糊 → 先问"你心里有目标方向吗？还是想让我帮你判断方向？"
+Do not use this skill as "resume rewriting" or "interview question generation" — that's what resume-builder / jd-resume-tailor / interview-prep are for. This skill only cares about "direction" and "management".
 
 ---
 
-## 工作流程
+## When to Trigger This Skill
 
-按这个顺序走，一步都不要跳：
+Strong signals (basically always use it):
+- "I want to change jobs / job-hop / find my next role"
+- "Help me see what roles suit me"
+- "Help me manage my applications / track the companies I applied to"
+- "I have X years of Y experience — where should I go next?"
+- "I applied to lots of places but lost track of the status"
 
-### Step 1: 自我盘点（Background Intake）
+Weak signals (confirm first, then use):
+- The user only dropped a resume without stating a goal → first ask "Do you want to organize your direction, polish your resume, or prepare for interviews?"
+- The user says "I want a job" but is vague → first ask "Do you already have a target direction, or would you like me to help you figure one out?"
 
-用 AskUserQuestion（或在没有该工具时直接问）收集以下信息。**不要一次问完，分 2~3 轮，每轮 2~3 个问题**，否则用户会被"问卷感"劝退。
+---
 
-第一轮（必问）：
-- 当前 / 最近一份工作的岗位、公司类型、年限
-- 核心技能 3~5 个（关键词即可）
-- 目标行业 / 目标方向（如果用户有）—— 没有也没关系，跳到 Step 2
+## Workflow
 
-第二轮（看情况问）：
-- 期望薪资 range（用户不愿意说就跳过）
-- 城市偏好 / 是否接受 remote
-- 排除项（"不想做销售 / 不想加班 / 不接受出差"等）
+Follow this order; do not skip a single step:
 
-第三轮（深度信号，仅在前两轮信息不足以画像时问）：
-- 最有成就感的 1~2 个项目
-- 最不喜欢做的事
-- 5 年后的画面
+### Step 1: Background Intake
 
-如果用户上传了简历 .pdf / .docx，**先调用 pdf 或 docx skill 解析出文本**，再从中抽取以上信息，避免用户重复打字。
+Use AskUserQuestion (or ask directly when that tool is unavailable) to collect the following. **Do not ask everything at once — split it into 2~3 rounds of 2~3 questions each**, otherwise the user will be put off by the "questionnaire feel".
 
-### Step 2: 推荐求职方向
+Round 1 (must ask):
+- Current / most recent job's role, company type, years of experience
+- 3~5 core skills (keywords are fine)
+- Target industry / target direction (if the user has one) — if not, that's fine, skip to Step 2
 
-基于 Step 1 的信息，生成 2~3 个候选方向。每个方向都要写清楚：
+Round 2 (as needed):
+- Expected salary range (skip if the user prefers not to say)
+- City preference / open to remote
+- Exclusions ("no sales / no overtime / no business travel", etc.)
+
+Round 3 (deep signals; only ask when the first two rounds aren't enough to build a profile):
+- The 1~2 projects they're proudest of
+- What they dislike doing most
+- Where they see themselves in 5 years
+
+If the user uploaded a resume .pdf / .docx, **first call the pdf or docx skill to extract the text**, then pull the above information from it, so the user doesn't have to retype everything.
+
+### Step 2: Recommend Job Directions
+
+Based on Step 1's information, generate 2~3 candidate directions. For each direction, spell out:
 
 ```
-方向 N：<岗位名>（如：互联网产品经理 / 数据分析师 / 量化研究员）
-- 匹配度：高 / 中 / 低（高=核心技能直接命中；中=需补 1~2 个关键技能；低=需要转岗叙事）
-- 匹配理由：基于用户的 ___ 经验和 ___ 技能
-- 缺口：用户还需要补 ___ 才能成为强候选人
-- 典型雇主：<3~5 个具体公司或公司类型>
-- 薪资带（仅供参考）：__k - __k（注明"市场行情，仅供参考，建议用户自行通过职级查询"）
+Direction N: <role name> (e.g. internet product manager / data analyst / quant researcher)
+- Fit: high / medium / low (high = core skills are a direct hit; medium = 1~2 key skills to fill; low = requires a career-switch narrative)
+- Fit rationale: based on the user's ___ experience and ___ skills
+- Gaps: the user still needs ___ to become a strong candidate
+- Typical employers: <3~5 concrete companies or company types>
+- Salary band (for reference only): __k - __k (note "market reference only; advise the user to verify for their level")
 ```
 
-**重要：不要只推荐"安全"的方向。** 如果用户技能允许，至少给一个"跳一跳能够到"的方向，并诚实标注缺口。
+**Important: do not only recommend "safe" directions.** If the user's skills allow, include at least one "stretch" direction and honestly flag the gaps.
 
-### Step 3: 生成岗位画像（Target Profile）
+### Step 3: Generate the Role Profile (Target Profile)
 
-为用户**最终选定**的 1~2 个方向（让用户主动选），生成详细画像。模板在 `references/target_profile_template.md`，需要读取这个文件后再填充。
+For the 1~2 directions the user **finally picks** (let the user choose), generate a detailed profile. The template is in `references/target_profile_template.md`; read that file before filling it in.
 
-画像要包含：岗位职责典型描述、技能要求 must-have / nice-to-have、面试流程预期、对标公司列表（按 tier 分层）。
+The profile must include: typical responsibilities, skill requirements must-have / nice-to-have, expected interview process, and a benchmark company list (tiered).
 
-读取行业关键词库决定 must-have / nice-to-have：
-- 互联网产品 / 运营 / PM → `references/keywords_internet.md`
-- 技术 / 研发 / 数据 → `references/keywords_tech.md`
-- 金融 / 咨询 / 商科 → `references/keywords_finance.md`
-- 通用 / 跨行业 → `references/keywords_general.md`
+Read the industry keyword libraries to decide must-have / nice-to-have:
+- Internet product / operations / PM → `references/keywords_internet.md`
+- Tech / engineering / data → `references/keywords_tech.md`
+- Finance / consulting / business → `references/keywords_finance.md`
+- General / cross-industry → `references/keywords_general.md`
 
-### Step 4: 创建投递追踪表
+### Step 4: Create the Application Tracking Sheet
 
-调用 `scripts/init_tracker.py` 生成初始追踪表。脚本支持两种格式：
+Call `scripts/init_tracker.py` to generate the initial tracking sheet. The script supports two formats:
 
 ```bash
 python scripts/init_tracker.py --format xlsx --output /path/to/tracker.xlsx
-# 或
+# or
 python scripts/init_tracker.py --format md --output /path/to/tracker.md
 ```
 
-默认推荐 xlsx（用户可以排序、加 conditional formatting）。如果用户明确要求轻量，用 md。
+xlsx is recommended by default (the user can sort and add conditional formatting). If the user explicitly wants something lightweight, use md.
 
-追踪表的列结构（脚本里已经预设好，不要改）：
-公司、岗位、来源（猎头/官网/内推/招聘网站）、JD 链接、投递日期、当前阶段（投递/笔试/一面/二面/HR 面/Offer/Reject/沉默）、下一步动作、Deadline、薪资范围、内推人、备注
+The tracking sheet's column structure (predefined in the script; do not change):
+Company, Role, Source (recruiter / careers site / referral / job board), JD link, Application date, Current stage (applied / written test / first interview / second interview / HR interview / Offer / Rejected / No response), Next action, Deadline, Salary range, Referrer, Notes
 
-### Step 5: 用 Artifact 做"求职看板"（可选但推荐）
+### Step 5: Build a "Job-Search Dashboard" with an Artifact (optional but recommended)
 
-如果当前环境里有 `mcp__cowork__create_artifact` 工具，主动提议："要不要我把这个追踪表做成一个可以每天打开看的看板？"
+If the `mcp__cowork__create_artifact` tool is available in the current environment, proactively offer: "Want me to turn this tracking sheet into a dashboard you can open every day?"
 
-如果用户同意，创建一个 HTML artifact，从追踪表数据渲染：
-- 顶部 KPI：投递总数 / 进入面试数 / Offer 数 / 待跟进数
-- 中部表格：按"当前阶段"分组的 Kanban 视图
-- 底部提醒：3 天没动静的公司、deadline 临近的任务
-
----
-
-## 输出风格
-
-- **结构化、可执行**，不要泛泛而谈"建议你多投简历"这种话
-- 涉及薪资、行业判断时，**明确标注"市场参考、非承诺"**
-- 推荐方向时不要谄媚（不要把所有用户都推向"高薪 AI 岗"），诚实评估匹配度
-- 用户拒绝某个方向时不要劝，问清楚为什么然后调整
+If the user agrees, create an HTML artifact rendered from the tracking sheet data:
+- Top KPIs: total applications / interviews entered / offers / pending follow-ups
+- Middle table: Kanban view grouped by "current stage"
+- Bottom reminders: companies silent for 3+ days, tasks with deadlines approaching
 
 ---
 
-## 与其他 skill 的协作
+## Output Style
 
-- 用户选定方向后说"那帮我改简历" → 调用 `resume-builder`，把岗位画像传过去
-- 用户说"那针对这家公司的 JD 改一下" → 调用 `jd-resume-tailor`
-- 用户说"帮我准备面试" → 调用 `interview-prep`，把岗位画像传过去
-
-输出"我已经把你的岗位画像存到 ___，下一步可以让我用 resume-builder 改简历"这样的衔接句，让 agent 在多步任务里能流转。
+- **Structured and actionable**; never vague advice like "you should send out more resumes"
+- For salary and industry judgments, **always label "market reference, not a promise"**
+- When recommending directions, don't flatter (don't push every user toward "high-paying AI roles"); assess fit honestly
+- If the user rejects a direction, don't push — ask why, then adjust
 
 ---
 
-## 反模式（不要做）
+## Collaboration with Other Skills
 
-- ❌ 一上来就问 8 个问题
-- ❌ 不问用户偏好，直接推 5 个方向
-- ❌ 不给追踪表，只在聊天里讲一通
-- ❌ 把"运营 / 产品 / 项目经理"塞给所有文科背景用户
-- ❌ 看到"AI / 大模型"就无脑推 LLM 岗，不评估实际技能匹配
+- After the user picks a direction and says "now help me revise my resume" → call `resume-builder` and pass it the role profile
+- The user says "tailor it to this company's JD" → call `jd-resume-tailor`
+- The user says "help me prep for interviews" → call `interview-prep` and pass it the role profile
+
+Output hand-off sentences like "I've saved your role profile to ___; next you can have me revise your resume with resume-builder" so the agent can chain multi-step tasks smoothly.
+
+---
+
+## Anti-Patterns (don't do these)
+
+- ❌ Opening with 8 questions in a row
+- ❌ Pushing 5 directions without asking about the user's preferences
+- ❌ No tracking sheet — just talking at the user in chat
+- ❌ Shoving "operations / product / project manager" at every humanities-background user
+- ❌ Seeing "AI / large language models" and blindly pushing LLM roles without assessing actual skill fit

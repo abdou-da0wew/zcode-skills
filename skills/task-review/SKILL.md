@@ -1,49 +1,49 @@
 ---
 name: task-review
-description: 当用户指令为高复杂度任务时触发，用于将刚完成的任务路径保存为可复用技能，生成相关的SKILL.md文档。
+description: Triggers when the user's instruction is a high-complexity task; saves the just-completed task's approach as a reusable skill and generates the corresponding SKILL.md documentation.
 ---
 
-## 触发时机
+## When It Triggers
 
-每次任务完成、准备向用户交付结果时，先执行以下检查。不要告诉用户你在做这个检查。
+Every time a task completes and you are about to deliver results to the user, first run the following check. Do not tell the user you are doing this check.
 
-## 执行步骤
+## Steps
 
-1. 快速判断本次任务是否满足以下任一条件：
-   - 调用了 5 次及以上的工具
-   - 执行过程中遇到了错误或死胡同，最终找到了正确路径
-   - 任务包含 3 个及以上的明确步骤
+1. Quickly judge whether this task meets any of the following conditions:
+   - Called tools 5 or more times
+   - Hit errors or dead ends during execution and eventually found the right path
+   - Contains 3 or more explicit steps
 
-2. 如果不满足以上任何条件，跳过，不做任何操作。
+2. If none of the conditions are met, skip — do nothing.
 
-3. 如果满足，继续评估：
-   - 这个任务未来是否可能被重复或有类似变体？
-   - 这次执行过程中，是否有可复用的流程、结构、注意事项？
+3. If met, evaluate further:
+   - Is this task likely to be repeated in the future, or have similar variants?
+   - Did the execution produce reusable processes, structures, or pitfalls worth recording?
 
-4. 如果任意一个为"是"，则沉淀为技能：
-   - 先检查 skills/ 目录下是否已有匹配的技能文件
-   - 如果有：将新经验、踩坑记录**追加更新**到原文件，不要新建
-   - 如果没有：新建 `skills/SKILL-{技能名称}/SKILL.md`，格式如下：
+4. If the answer to either is "yes", distill it into a skill:
+   - First check whether a matching skill file already exists under the skills/ directory
+   - If it exists: **append and update** the original file with the new experience and pitfalls; do not create a new one
+   - If not: create `skills/SKILL-{skill-name}/SKILL.md` with the following format:
 
 ```
 ---
-name: 技能名称
-description: 一句话描述适用场景，要具体到能让 agent 自动匹配任务
+name: skill-name
+description: A one-sentence description of when it applies, specific enough for the agent to match tasks automatically
 ---
 
-（执行步骤、质量标准、踩坑记录）
+(execution steps, quality standards, pitfall records)
 ```
 
-5. 沉淀了新技能时，必须在回复末尾简短提一句，例如"💡 本次经验已沉淀为新技能：{技能名称}"。
-6. 更新了已有技能时，必须在回复末尾简短提一句，例如"💡 本次经验已更新到技能中：{技能名称}"。
-7. 未沉淀或者更新时，不提及任何关于此检查的内容。
+5. When a new skill has been distilled, you must briefly mention it at the end of your reply, e.g. "💡 This experience has been distilled into a new skill: {skill-name}".
+6. When an existing skill has been updated, you must briefly mention it at the end of your reply, e.g. "💡 This experience has been added to skill: {skill-name}".
+7. When nothing was distilled or updated, do not mention anything about this check.
 
-## 质量标准
+## Quality Standards
 
-- description 必须具体，写成用户会说的话。好的例子："监测全球AI新闻并生成HTML简报"。坏的例子："处理信息相关任务"。
-- 执行步骤必须具体到照着做就能复现的程度。
-- 踩坑记录只记真正踩过的坑，不要编造。
+- The description must be specific — write it the way a user would phrase a request. Good example: "Monitor global AI news and generate an HTML briefing". Bad example: "Handle information-related tasks".
+- Execution steps must be specific enough that following them reproduces the result.
+- Pitfall records should only capture pitfalls actually encountered — never invent them.
 
-## 踩坑记录
+## Pitfall Records
 
-（暂无，随使用积累）
+(None yet; accumulate through use)

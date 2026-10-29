@@ -1,33 +1,33 @@
-# Shader 代码提取：Agent Prompt 与反混淆
+# Shader Code Extraction: Agent Prompt & De-obfuscation
 
-## Agent 深度提取 Prompt 模板
+## Agent Deep-Extraction Prompt Template
 
-启动 Agent（subagent_type: general-purpose）分析 bundle：
+Launch an agent (subagent_type: general-purpose) to analyze the bundle:
 
 ```
-分析文件 /tmp/main.js（约 X MB 的 minified JS bundle），提取所有与视觉特效相关的代码。
+Analyze the file /tmp/main.js (a minified JS bundle of roughly X MB) and extract all visual-effect-related code.
 
-需要提取的内容：
+What to extract:
 
-1. **GLSL Shader 源码**：搜索包含 "precision", "uniform", "void main",
-   "gl_FragColor", "gl_Position" 的字符串。提取完整的 vertex/fragment shader。
+1. **GLSL shader source**: search for strings containing "precision", "uniform", "void main",
+   "gl_FragColor", "gl_Position". Extract the complete vertex/fragment shaders.
 
-2. **渲染相关 JS 类**：canvas/renderer 创建、粒子/几何体管理、
-   requestAnimationFrame 动画循环、鼠标交互代码。
+2. **Rendering-related JS classes**: canvas/renderer creation, particle/geometry management,
+   the requestAnimationFrame animation loop, and mouse interaction code.
 
-3. **符号映射表**：minified 变量名 → 原始含义
-   （THREE.Vector2, THREE.Color, THREE.Scene 等）
+3. **Symbol mapping table**: minified variable names → original meanings
+   (THREE.Vector2, THREE.Color, THREE.Scene, etc.)
 
-4. **配置和参数**：默认颜色、尺寸、密度等可调参数
+4. **Configs and parameters**: tunable parameters like default colors, sizes, density
 
-将所有提取的代码保存到 /tmp/extracted-effects.txt，按功能分段标注。
+Save all extracted code to /tmp/extracted-effects.txt, segmented and labeled by function.
 ```
 
-**关键**：Agent 能看到完整文件，主上下文放不下 1MB+ 的 bundle。
+**Key point**: the agent can see the whole file; a 1MB+ bundle does not fit in the main context.
 
-## 识别 Minified 符号
+## Identifying Minified Symbols
 
-通过构造参数和方法调用推断：
+Infer from constructor arguments and method calls:
 
 ```javascript
 new ??(40, w/h, 0.1, 1000)       → PerspectiveCamera(fov, aspect, near, far)
@@ -42,20 +42,20 @@ new ??(w, h, {minFilter, ...})   → WebGLRenderTarget
 ??.setAttribute()     → bufferGeometry
 ```
 
-## 框架脱壳（React / Vue 等 → Vanilla JS）
+## Framework Unwrapping (React / Vue etc. → Vanilla JS)
 
-Canvas 效果常被 React/Vue 等框架包装。脱壳思路：
+Canvas effects are often wrapped by frameworks like React/Vue. Unwrapping approach:
 
-1. **找副作用入口**：`useEffect`/`onMounted` 中的 Canvas 初始化代码就是核心逻辑
-2. **收集 cleanup**：所有销毁操作（`removeEventListener`、`cancelAnimationFrame`、`observer.disconnect()`）汇总为 `destroy()` 函数
-3. **丢弃响应式包装**：Canvas 状态（粒子位置、帧计数等）只在 RAF 内读写，直接用 `let` 变量，不需要 `useState`/`ref` 等响应式容器
+1. **Find the side-effect entry**: the Canvas initialization code inside `useEffect`/`onMounted` is the core logic
+2. **Collect the cleanup**: aggregate all teardown operations (`removeEventListener`, `cancelAnimationFrame`, `observer.disconnect()`) into a `destroy()` function
+3. **Drop the reactive wrappers**: Canvas state (particle positions, frame counters, etc.) is only read/written inside the RAF loop; plain `let` variables work — no `useState`/`ref` reactive containers needed
 
-原生 API（`IntersectionObserver`、`ResizeObserver`、`matchMedia` 等）不受框架影响，原样保留。
+Native APIs (`IntersectionObserver`, `ResizeObserver`, `matchMedia`, etc.) are framework-agnostic and stay as-is.
 
-## 反混淆规则
+## De-obfuscation Rules
 
-1. **类名**：根据构造参数和方法调用推断
-2. **变量名**：根据用途命名（`ringPos`, `particleScale`, `simMaterial`）
-3. **Shader 变量**：uniform/varying 名通常未被 minify（`uTime`, `vPosition`）
-4. **保留原始 GLSL**：shader 代码通常是完整字符串，直接提取
-5. **字符串注入**：`${someVar.noise}` 表示噪声库被注入到 shader 中
+1. **Class names**: infer from constructor arguments and method calls
+2. **Variable names**: name by purpose (`ringPos`, `particleScale`, `simMaterial`)
+3. **Shader variables**: uniform/varying names are usually not minified (`uTime`, `vPosition`)
+4. **Keep the original GLSL**: shader code is usually a complete string; extract it directly
+5. **String injection**: `${someVar.noise}` means a noise library was injected into the shader

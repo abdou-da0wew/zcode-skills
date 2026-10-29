@@ -1,9 +1,35 @@
 /**
- * dataFetcher.ts — 全部通过 finance skill 获取数据
+ * dataFetcher.ts — all data is fetched through the finance skill
+ *
+ * Works with any OpenAI-compatible LLM server: Ollama, vLLM, LM Studio, OpenRouter, ...
+ * Environment variables:
+ *   LLM_BASE_URL  — base URL of an OpenAI-compatible endpoint (default: http://localhost:11434/v1)
+ *   LLM_API_KEY   — API key / bearer token, if your server requires one (default: empty)
+ *   LLM_MODEL     — model name to use (default: qwen2.5)
  */
 
-import ZAI from "z-ai-web-dev-sdk";
 import { Market, FetchMode, StockData } from "./types";
+
+const BASE_URL = process.env.LLM_BASE_URL ?? "http://localhost:11434/v1";
+const API_KEY = process.env.LLM_API_KEY ?? "";
+export const MODEL = process.env.LLM_MODEL ?? "qwen2.5";
+
+// Node 18+ ships a global fetch; declare it minimally so the ES2020 lib config compiles.
+declare const fetch: (input: string, init?: Record<string, unknown>) => Promise<{ ok: boolean; status: number; text(): Promise<string>; json(): Promise<any> }>;
+
+/** Minimal OpenAI-compatible chat completions call (no extra dependencies). */
+export async function chatCompletions(body: Record<string, unknown>): Promise<any> {
+  const res = await fetch(`${BASE_URL}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`LLM request failed (${res.status}): ${await res.text()}`);
+  return res.json();
+}
 
 export function detectMarket(code: string): Market {
   if (/^\d{6}$/.test(code)) return "CN";
@@ -12,37 +38,36 @@ export function detectMarket(code: string): Market {
 }
 
 const MARKET_LABEL: Record<Market, string> = {
-  CN: "A股", HK: "港股", US: "美股",
+  CN: "A-share", HK: "HK stock", US: "US stock",
 };
 
-// ── 单只股票数据 ──────────────────────────────────────────
+// ── Single stock data ──────────────────────────────────────
 
 export async function fetchStockData(
   code: string,
   mode: FetchMode = "full"
 ): Promise<StockData> {
   const market = detectMarket(code);
-  const zai = await ZAI.create();
 
   const prompt = mode === "quote"
-    ? `查询 ${code}（${MARKET_LABEL[market]}）实时股价，只返回 JSON，字段：
-       name, price, prev_close, change_pct, change_amount, volume, amount, turnover, volume_ratio, market_cap, pe_ttm, pb。`
-    : `获取 ${code}（${MARKET_LABEL[market]}）完整股票数据，只返回 JSON，包含：
+    ? `Look up the real-time share price of ${code} (${MARKET_LABEL[market]}). Return JSON only, with fields:
+       name, price, prev_close, change_pct, change_amount, volume, amount, turnover, volume_ratio, market_cap, pe_ttm, pb.`
+    : `Fetch complete stock data for ${code} (${MARKET_LABEL[market]}). Return JSON only, including:
        name, price, prev_close, open, high, low, change_pct, change_amount, amplitude,
        volume, amount, turnover, volume_ratio, market_cap, pe_ttm, pb, high_52w, low_52w, dividend_yield,
-       ma5, ma10, ma20, bias_pct（相对MA20乖离率%）,
-       trend（"多头排列"/"空头排列"/"震荡整理"）, overbought_warning（bias_pct>5则true）,
-       support（支撑位）, resistance（压力位）, rsi,
-       kline_recent_10（最近10日，每项含 date/open/close/high/low/volume）,
-       profit_ratio（获利比例%）, avg_cost（平均成本）, chip_concentration（筹码集中度）,
+       ma5, ma10, ma20, bias_pct (deviation from MA20, %),
+       trend ("uptrend alignment" / "downtrend alignment" / "sideways consolidation"), overbought_warning (true if bias_pct>5),
+       support (support level), resistance (resistance level), rsi,
+       kline_recent_10 (last 10 daily candles, each with date/open/close/high/low/volume),
+       profit_ratio (profit-taking ratio %), avg_cost (average cost), chip_concentration (chip concentration),
        roe, gross_margin, net_margin, debt_ratio, eps, revenue_growth,
-       main_net（主力净流入金额）, main_net_pct（主力净流入占比%）。
-       缺失字段填 null，不得捏造。`;
+       main_net (main-capital net inflow amount), main_net_pct (main-capital net inflow ratio %).
+       Fill missing fields with null; never fabricate data.`;
 
   try {
-    const completion = await zai.chat.completions.create({
+    const completion = await chatCompletions({
+      model: MODEL,
       messages: [{ role: "user", content: prompt }],
-      thinking: { type: "disabled" },
     });
     const raw = completion.choices[0]?.message?.content ?? "";
     const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
@@ -52,7 +77,7 @@ export async function fetchStockData(
   }
 }
 
-// ── 批量抓取（串行）──────────────────────────────────────
+// ── Batch fetching (serial) ────────────────────────────────
 
 export async function fetchMultipleStocks(
   codes: string[],
@@ -66,65 +91,63 @@ export async function fetchMultipleStocks(
   return results;
 }
 
-// ── 全球宏观 ──────────────────────────────────────────────
+// ── Global macro ───────────────────────────────────────────
 
 export async function fetchGlobalMacro(): Promise<string> {
-  const zai = await ZAI.create();
   try {
-    const completion = await zai.chat.completions.create({
+    const completion = await chatCompletions({
+      model: MODEL,
       messages: [{
         role: "user",
-        content: `请获取今日全球市场关键信息，简洁 Markdown 输出，包含：
-- 美股三大指数昨收涨跌（道指/纳指/标普）
-- 美元指数、人民币汇率动向
-- 黄金、原油最新价格
-- 美联储最新政策动向（如有）
-- 影响 A股/港股的1-2条关键宏观事件
-控制在150字以内。`,
+        content: `Summarize today's key global market information in concise Markdown, covering:
+- Yesterday's closes and changes of the three major US indices (Dow / Nasdaq / S&P)
+- US dollar index and CNY exchange rate movements
+- Latest gold and crude oil prices
+- Latest Federal Reserve policy moves (if any)
+- 1-2 key macro events affecting A-shares/HK stocks
+Keep it under 150 words.`,
       }],
-      thinking: { type: "disabled" },
     });
-    return completion.choices[0]?.message?.content ?? "全球宏观数据获取失败";
+    return completion.choices[0]?.message?.content ?? "Failed to fetch global macro data";
   } catch (err: any) {
-    return `全球宏观数据获取失败：${err.message}`;
+    return `Failed to fetch global macro data: ${err.message}`;
   }
 }
 
-// ── 大盘复盘 ──────────────────────────────────────────────
+// ── Market overview ────────────────────────────────────────
 
 export async function fetchMarketOverview(): Promise<string> {
-  const zai = await ZAI.create();
   try {
-    const completion = await zai.chat.completions.create({
+    const completion = await chatCompletions({
+      model: MODEL,
       messages: [{
         role: "user",
-        content: `请获取今日 A股大盘数据，Markdown 输出，包含：
-- 上证/深证/创业板/科创50 最新点位和涨跌幅
-- 今日上涨/下跌/涨停/跌停家数，成交额
-- 领涨板块 TOP3 和领跌板块 TOP3
-- 北向资金净流入
-- 一句话后市展望和仓位策略
-控制在200字以内。`,
+        content: `Summarize today's A-share market data in Markdown, covering:
+- Latest levels and changes of the SSE / SZSE / ChiNext / STAR 50 indices
+- Number of advancers / decliners / limit-ups / limit-downs today, and total turnover
+- Top 3 leading and top 3 lagging sectors
+- Northbound capital net inflow
+- A one-sentence outlook and position strategy
+Keep it under 200 words.`,
       }],
-      thinking: { type: "disabled" },
     });
-    return completion.choices[0]?.message?.content ?? "大盘数据获取失败";
+    return completion.choices[0]?.message?.content ?? "Failed to fetch market overview data";
   } catch (err: any) {
-    return `大盘数据获取失败：${err.message}`;
+    return `Failed to fetch market overview data: ${err.message}`;
   }
 }
 
-// ── 数据校验 ──────────────────────────────────────────────
+// ── Data validation ────────────────────────────────────────
 
 export function validateStockData(data: StockData): {
   valid: boolean;
   warnings: string[];
 } {
   const warnings: string[] = [];
-  if (data.error) return { valid: false, warnings: [`数据获取失败：${data.error}`] };
-  if (!data.price) warnings.push("价格数据缺失");
-  if (!data.ma5 && !data.ma20) warnings.push("技术面数据缺失");
-  if (data.overbought_warning) warnings.push(`⚠️ 乖离率 ${data.bias_pct}% 超过5%，严禁追高`);
-  if (!data.roe && !data.pe_ttm) warnings.push("基本面数据不完整");
+  if (data.error) return { valid: false, warnings: [`Data fetch failed: ${data.error}`] };
+  if (!data.price) warnings.push("Price data missing");
+  if (!data.ma5 && !data.ma20) warnings.push("Technical data missing");
+  if (data.overbought_warning) warnings.push(`⚠️ Deviation rate ${data.bias_pct}% exceeds 5% — chasing highs is strictly prohibited`);
+  if (!data.roe && !data.pe_ttm) warnings.push("Fundamental data incomplete");
   return { valid: !!data.price, warnings };
 }

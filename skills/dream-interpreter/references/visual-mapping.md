@@ -1,81 +1,81 @@
-# 梦境意象 → 视觉元素映射
+# Dream Imagery → Visual Element Mapping
 
-## 情绪 → 配色方案
+## Mood → Color scheme
 
-| mood 值 | 情绪 | 主色 | 辅色 | 背景 |
+| mood value | Mood | Primary | Secondary | Background |
 |---------|------|------|------|------|
-| anxious | 焦虑/恐惧 | #2D1B69 深紫 | #1A1A2E 暗蓝 | 暗色渐变 |
-| peaceful | 平静/美好 | #F4D35E 暖黄 | #83C5BE 柔绿 | 浅色渐变 |
-| sad | 悲伤/失落 | #4A6FA5 灰蓝 | #2D3142 深灰 | 冷色渐变 |
-| surreal | 奇幻/荒诞 | #FF006E 霓虹粉 | #8338EC 电紫 | 深色+霓虹点缀 |
-| exciting | 兴奋/刺激 | #FF6B35 橙红 | #FFD700 金色 | 暖色渐变 |
-| nostalgic | 怀旧/温馨 | #DDA15E 琥珀 | #BC6C25 暖棕 | 柔光渐变 |
+| anxious | anxiety/fear | #2D1B69 deep purple | #1A1A2E dark blue | dark gradient |
+| peaceful | calm/pleasant | #F4D35E warm yellow | #83C5BE soft green | light gradient |
+| sad | sadness/loss | #4A6FA5 slate blue | #2D3142 dark gray | cool gradient |
+| surreal | fantastical/absurd | #FF006E neon pink | #8338EC electric purple | dark + neon accents |
+| exciting | excitement/thrill | #FF6B35 orange-red | #FFD700 gold | warm gradient |
+| nostalgic | nostalgia/warmth | #DDA15E amber | #BC6C25 warm brown | soft-light gradient |
 
-## 意象 → 视觉元素
+## Imagery → Visual elements
 
-每个视觉元素对应 p5.js 中的一个绘制模块。
+Each visual element corresponds to a drawing module in p5.js.
 
-### 自然元素
+### Natural elements
 
-| 意象关键词 | visual_element 值 | p5.js 表现 |
+| Imagery keywords | visual_element value | p5.js rendering |
 |-----------|-------------------|------------|
-| 水、海、河、湖、游泳 | water_ripple | 正弦波纹，从底部向上扩散 |
-| 雨 | rain_drops | 细线粒子从上方下落 |
-| 火、燃烧 | fire_particles | 橙红粒子向上飘散 |
-| 风、暴风 | wind_lines | 水平方向的曲线流动 |
-| 星空、夜空 | starfield | 随机闪烁的小光点 |
-| 月亮 | moon_glow | 圆形光晕，缓慢脉动 |
-| 太阳、光 | sun_rays | 放射状光线 |
-| 森林、树 | tree_silhouettes | 底部的树形剪影 |
-| 花、花园 | floating_petals | 缓慢飘落的花瓣形状 |
+| water, sea, river, lake, swimming | water_ripple | sinusoidal ripples spreading upward from the bottom |
+| rain | rain_drops | thin-line particles falling from above |
+| fire, burning | fire_particles | orange-red particles drifting upward |
+| wind, storm | wind_lines | horizontal flowing curves |
+| starry sky, night sky | starfield | small randomly twinkling points of light |
+| moon | moon_glow | circular halo, slow pulsing |
+| sun, light | sun_rays | radial beams |
+| forest, trees | tree_silhouettes | tree silhouettes along the bottom |
+| flowers, garden | floating_petals | slowly drifting petal shapes |
 
-### 空间/建筑
+### Spaces / architecture
 
-| 意象关键词 | visual_element 值 | p5.js 表现 |
+| Imagery keywords | visual_element value | p5.js rendering |
 |-----------|-------------------|------------|
-| 高楼、大厦、塔 | building | 几何线条搭建的建筑轮廓 |
-| 房间、室内 | room_frame | 透视线条构成的房间框架 |
-| 门 | door_shape | 中央的门形轮廓，可能开/关 |
-| 楼梯、阶梯 | stairs | 递进的台阶线条 |
-| 迷宫、走廊 | maze_lines | 随机生成的路径线条 |
-| 桥 | bridge_arc | 弧形桥梁轮廓 |
+| high-rise, skyscraper, tower | building | architectural outlines built from geometric lines |
+| room, indoors | room_frame | room frame made of perspective lines |
+| door | door_shape | central door outline, possibly opening/closing |
+| stairs, steps | stairs | ascending step lines |
+| maze, corridor | maze_lines | randomly generated path lines |
+| bridge | bridge_arc | arched bridge outline |
 
-### 动作/状态
+### Actions / states
 
-| 意象关键词 | visual_element 值 | p5.js 表现 |
+| Imagery keywords | visual_element value | p5.js rendering |
 |-----------|-------------------|------------|
-| 坠落、掉下 | falling_particles | 粒子加速下落 |
-| 飞、飘 | rising_particles | 粒子缓慢上升 |
-| 追逐、逃跑 | speed_lines | 高速水平线条 |
-| 困住、封闭 | cage_lines | 围合的线条逐渐收缩 |
-| 迷路 | scattered_dots | 随机漂移的光点 |
+| falling, dropping | falling_particles | particles accelerating downward |
+| flying, floating | rising_particles | particles slowly rising |
+| chase, escape | speed_lines | high-speed horizontal lines |
+| trapped, enclosed | cage_lines | enclosing lines gradually contracting |
+| lost | scattered_dots | randomly drifting points of light |
 
-### 人物/生物
+### People / creatures
 
-| 意象关键词 | visual_element 值 | p5.js 表现 |
+| Imagery keywords | visual_element value | p5.js rendering |
 |-----------|-------------------|------------|
-| 人、人影 | human_silhouette | 抽象人形剪影，淡入淡出 |
-| 人群 | crowd_dots | 多个小圆点聚散 |
-| 蛇 | snake_curve | S形曲线缓慢游动 |
-| 猫/狗/动物 | animal_shape | 简笔动物轮廓 |
-| 鸟/飞行生物 | bird_flight | V形轮廓横穿画面 |
-| 鱼/水生物 | fish_swim | 椭圆形在水纹中穿行 |
+| person, figure | human_silhouette | abstract human silhouette, fading in and out |
+| crowd | crowd_dots | many small dots gathering and scattering |
+| snake | snake_curve | slow S-shaped curve slithering |
+| cat/dog/animal | animal_shape | simple sketched animal outline |
+| bird/flying creature | bird_flight | V-shaped outline crossing the frame |
+| fish/aquatic creature | fish_swim | oval shapes weaving through water ripples |
 
-### 氛围修饰
+### Atmosphere modifiers
 
-| 意象关键词 | visual_element 值 | p5.js 表现 |
+| Imagery keywords | visual_element value | p5.js rendering |
 |-----------|-------------------|------------|
-| 黑暗、看不清 | dark_bg | 整体低亮度 + 模糊光斑 |
-| 模糊、朦胧 | blur_lights | 高斯模糊的光点 |
-| 闪烁、不稳定 | flicker_effect | 画面整体亮度随机波动 |
-| 旋转、眩晕 | spiral_motion | 螺旋运动的粒子 |
-| 安静、空旷 | minimal_space | 大面积留白 + 极少元素 |
+| darkness, can't see clearly | dark_bg | overall low brightness + blurred light patches |
+| blurry, hazy | blur_lights | Gaussian-blurred points of light |
+| flickering, unstable | flicker_effect | random fluctuation of overall frame brightness |
+| spinning, dizzy | spiral_motion | particles in spiral motion |
+| quiet, empty | minimal_space | large empty areas + minimal elements |
 
-## 映射规则
+## Mapping rules
 
-1. 从梦境描述中提取所有可识别意象
-2. 每个意象对应一个 visual_element
-3. visual_elements 数组最多 5 个元素（防止画面太乱）
-4. 优先选择与主要情节相关的意象
-5. 必须包含至少 1 个氛围修饰元素
-6. mood 取梦境中最强烈的情绪，color_scheme 对应 mood
+1. Extract every recognizable image from the dream description
+2. Each image maps to one visual_element
+3. The visual_elements array holds at most 5 elements (to keep the scene from getting too busy)
+4. Prefer imagery related to the main plot
+5. Include at least 1 atmosphere modifier element
+6. Take the mood from the strongest emotion in the dream; the color_scheme corresponds to the mood

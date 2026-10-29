@@ -1,0 +1,832 @@
+     1→# Layout Recipes
+     2→
+     3→These are static social-image recipes adapted from the Guizang PPT style language. They are not copied PPT templates.
+     4→
+     5→## Editorial Magazine x E-ink Recipes
+     6→
+     7→These structures (ledger / marginalia / pull-quote / photo-well / pipeline-vertical) work for **any topic** that wants a magazine-feature pace — outdoor, AI, finance, food, workplace, gaming, all welcome. The mode is a visual stance, not a content filter. See `style-system.md` "Style ↔ content type are decoupled" for the full reasoning.
+     8→
+     9→Portrait rule:
+    10→
+    11→- Every 3:4 page should occupy the vertical canvas intentionally. If the content only creates a thin table, switch to M08/M09/M10 below or add a large pull quote, evidence image, marginal column, or full-height ledger.
+    12→
+    13→**Content density rule (hard)**: on 1080×1440 cards, content must cover ≥75% of canvas height. Any pure-whitespace band >15% canvas height (>216px) needs a stated reason — hero-image breathing, single-sentence statement, or leading/trailing margins (combined ≤15%). Do NOT use `<div style="flex: 1"></div>` to push content to the vertical centre — Editorial magazines absorb whitespace across opposing pages; social cards are scrolled one at a time and under-filled cards read as "PowerPoint with a missing element." Each recipe below carries a `Minimum density:` line indicating the smallest content set that fills a 3:4 canvas. If your copy doesn't reach that floor, **shorten the canvas (switch to 1:1) or pick a different recipe** — never just publish under-filled.
+    14→
+    15→### M01 Cover: Magazine Issue Cover
+    16→
+    17→Best for Rednote page 1, portrait social cards, or article-card covers.
+    18→
+    19→Structure:
+    20→
+    21→- Top issue row: category, date, ratio, or account label.
+    22→- Large serif/Songti-like title, usually 2-4 lines.
+    23→- One large image or photo crop occupying 35%-55% of the page.
+    24→- Bottom issue strip with 3-5 points.
+    25→
+    26→Style:
+    27→
+    28→- Paper background, deep ink title.
+    29→- Photo can bleed inside a large rectangular well.
+    30→- Accent appears as one vertical rule, page number, or small label.
+    31→
+    32→### M02 Field Note Photo
+    33→
+    34→Best for outdoor, object, hardware, or real-world observation.
+    35→
+    36→Structure:
+    37→
+    38→- Large documentary photo.
+    39→- Narrow caption column or bottom caption band.
+    40→- One short takeaway in large type.
+    41→
+    42→Use when the photo is evidence, not decoration.
+    43→
+    44→### M03 Editorial Essay Split
+    45→
+    46→Best for explaining one idea with nuance.
+    47→
+    48→Structure:
+    49→
+    50→- Left: large title or pull quote.
+    51→- Right: 2-3 short paragraphs or numbered fragments.
+    52→- Thin rule between columns.
+    53→
+    54→Keep paragraphs short. If it becomes dense, split the page.
+    55→
+    56→**Minimum density (3:4)**: title + 3 short paragraphs OR title + 2 paragraphs + numbered footer list. Title alone is M04, not M03. If you have only a title + 1 paragraph, switch to M04 Pull Quote or fold a marginal column in for M11 Marginalia Essay.
+    57→
+    58→### M04 Pull Quote / Thesis
+    59→
+    60→Best for a core sentence or conclusion.
+    61→
+    62→Structure:
+    63→
+    64→- Large quote across the page.
+    65→- Small source/context row.
+    66→- Optional tiny note or issue marker.
+    67→
+    68→Use to create rhythm between dense pages.
+    69→
+    70→**Minimum density (3:4)**: this is the **one recipe** where ≤60% canvas content is allowed (hero statement = intentional whitespace). BUT you must add (a) source/context row 18-20px mono ≤15% from bottom, (b) date-stamp or 章号 kicker at top, (c) hairline rule above the source row. Without these three "anchor points," whitespace reads as missing content. Don't use M04 if you can't supply at least one anchor.
+    71→
+    72→### M05 Checklist / Buying Guide
+    73→
+    74→Best for Rednote practical content.
+    75→
+    76→Structure:
+    77→
+    78→- Header title.
+    79→- 4-6 rows, each with a number, item, and consequence.
+    80→- Optional small photo crop or material swatch.
+    81→
+    82→Avoid generic rounded cards; use rows, rules, columns, and issue labels.
+    83→
+    84→### M06 Evidence Wall
+    85→
+    86→Best for multiple screenshots, references, or small images.
+    87→
+    88→Structure:
+    89→
+    90→- 2x2 or 3-column image grid.
+    91→- Each image has a short caption.
+    92→- One larger headline anchors the interpretation.
+    93→
+    94→Use only when supplied images are readable at the final size.
+    95→
+    96→### M07 Closing Note
+    97→
+    98→Best for final page.
+    99→
+   100→Structure:
+   101→
+   102→- Big takeaway title (≤2 lines).
+   103→- **4-6 ledger items**, each 26-30px serif title + 16-18px serif sub-line ("consequence" / "reason" / "example"). Each item row should consume 100-140px vertical (border + padding + content).
+   104→- Closing block: pull-quote OR signature line OR price/CTA OR small marginalia (one of these is required).
+   105→- Small footer label.
+   106→
+   107→Mood should feel like the end of a magazine feature, not a sales banner.
+   108→
+   109→**Minimum density (3:4)**: title + **≥4 ledger items with sub-lines** + closing block. The previous "2-3 rules" version under-fills 3:4 by ~40%. If you genuinely only have 3 reasons, expand each to "title + 2-line consequence + example/quote" OR pair with a pull-quote closing block. **3 short ledger lines on a 3:4 canvas is a failure mode**; either expand or switch to M04 Pull Quote.
+   110→
+   111→### M08 Tall Ledger
+   112→
+   113→Best for lists, roles, pros/cons, gear items, product capabilities, and agent responsibilities.
+   114→
+   115→Structure:
+   116→
+   117→- Header title.
+   118→- 4-6 full-width rows.
+   119→- Each row minimum 118-170px on a 1080x1440 canvas.
+   120→- Left index/marginalia column, right title + consequence.
+   121→- Optional vertical accent strip or bottom issue note.
+   122→
+   123→Use when a normal table would become too short. Do not let the ledger occupy only the middle third of the page.
+   124→
+   125→### M09 Atmospheric Thesis
+   126→
+   127→Best for sparse but important points.
+   128→
+   129→Structure:
+   130→
+   131→- WebGL/ink-flow background visible across the page.
+   132→- One very large thesis or quote.
+   133→- 1-2 supporting notes.
+   134→- Small issue metadata and a bottom rule.
+   135→
+   136→Use this instead of forcing a small table onto a page with little content.
+   137→
+   138→### M10 Evidence Feature
+   139→
+   140→Best for supplied screenshots/photos.
+   141→
+   142→Structure:
+   143→
+   144→- Large screenshot/photo occupying 45%-65% of the vertical canvas.
+   145→- Headline and lead above or beside it.
+   146→- Bottom caption band with 2-3 takeaways.
+   147→
+   148→The image is not an afterthought. If the screenshot is important, it must be big enough to inspect.
+   149→
+   150→### M11 Marginalia Essay
+   151→
+   152→Best for nuanced explanation with moderate text.
+   153→
+   154→Structure:
+   155→
+   156→- Wide editorial title.
+   157→- Main column with 2-3 paragraphs.
+   158→- Narrow marginal column containing keywords, quote fragments, or small evidence crops.
+   159→- Hairline vertical rule between columns.
+   160→
+   161→Use this when M03 feels too empty but a ledger feels too mechanical.
+   162→
+   163→### M12 Section Divider
+   164→
+   165→Best for a mid-carousel breath between dense pages. Drop one between act 1 and act 2 of a 7-9 page Rednote set so the reader gets a beat of silence.
+   166→
+   167→Structure:
+   168→
+   169→- WebGL ink-flow background visible across most of the canvas (Editorial template mounts this by default).
+   170→- One mono `kicker` like `Act II` or `Part 2 of 3`.
+   171→- One large serif `h-display` naming the section (3-6 Chinese characters).
+   172→- One short subtitle in serif italic.
+   173→- Optional bottom `issue-strip` with the section's promise.
+   174→
+   175→HTML skeleton (3:4):
+   176→
+   177→```html
+   178→<section class="poster xhs" id="xhs-04">
+   179→  <canvas class="mag-bg" data-bg="ink-flow"></canvas>
+   180→  <div class="grain"></div>
+   181→  <div class="content stack gap-4" style="justify-content:center; align-items:flex-start">
+   182→    <p class="kicker">Act II · Part 2</p>
+   183→    <h1 class="h-display">实测结果</h1>
+   184→    <p class="h-sub">What actually happened.</p>
+   185→  </div>
+   186→  <div class="issue-strip">
+   187→    <span>Section · Findings</span>
+   188→    <span>—</span>
+   189→    <span>3 pages</span>
+   190→  </div>
+   191→</section>
+   192→```
+   193→
+   194→Adapt for 1:1: drop the subtitle, center the `h-display`, keep the ink-flow background strong. Adapt for 21:9: shift title to the left half, let the WebGL atmosphere occupy the right half.
+   195→
+   196→### M13 Hero Question
+   197→
+   198→Best for the last page of a Rednote carousel or for a sharp pivot mid-set. The question is the entire page.
+   199→
+   200→Structure:
+   201→
+   202→- WebGL ink-flow background.
+   203→- Quiet kicker like `The Question` or `留给你的`.
+   204→- Big serif question, broken into 2-3 lines on `<br>` at semantic breakpoints (not random wraps).
+   205→- One short single-sentence prompt in `lead`, often a hint or invitation to comment.
+   206→- Minimal metadata at bottom.
+   207→
+   208→**Minimum density (3:4)**: like M04, this is intentionally airy. Required anchors: top kicker (0-12% y) + bottom prompt + bottom metadata strip. The ink-flow WebGL background **must be visible** (don't let `.content` cover it). If the WebGL background is missing or the kicker is empty, the page reads as under-filled rather than meditative.
+   209→
+   210→HTML skeleton (3:4):
+   211→
+   212→```html
+   213→<section class="poster xhs" id="xhs-09">
+   214→  <canvas class="mag-bg" data-bg="ink-flow"></canvas>
+   215→  <div class="grain"></div>
+   216→  <div class="content stack gap-4" style="justify-content:center">
+   217→    <p class="kicker">The Question · 留给你的</p>
+   218→    <h1 class="h-display">
+   219→      下一次<br>
+   220→      你会先<br>
+   221→      问 AI 还是问朋友?
+   222→    </h1>
+   223→    <p class="lead">在评论区告诉我你的答案。</p>
+   224→  </div>
+   225→  <div class="issue-strip">
+   226→    <span>End · Page 9</span>
+   227→    <span>—</span>
+   228→    <span>欢迎留言</span>
+   229→  </div>
+   230→</section>
+   231→```
+   232→
+   233→Title length cap: 3 lines, each <= 6 Chinese characters at default size. If the question is longer, shorten it; do not shrink the `h-display`.
+   234→
+   235→### M14 Vertical Pipeline
+   236→
+   237→Best for explaining a 3-5 step workflow, decision tree, or recipe. PPT's pipeline is horizontal; for portrait social cards rotate it vertical.
+   238→
+   239→Structure:
+   240→
+   241→- `kicker` + `h-xl` page title.
+   242→- 3-5 `.pipeline-v .step` rows. Each row has step number (mono), step title (serif), one-line description (sans).
+   243→- Hairline between steps, gap 28-36px.
+   244→- Optional small evidence image to the right of the title, or a single bottom caption.
+   245→
+   246→HTML skeleton (3:4):
+   247→
+   248→```html
+   249→<section class="poster xhs" id="xhs-06">
+   250→  <canvas class="mag-bg" data-bg="ink-flow"></canvas>
+   251→  <div class="grain"></div>
+   252→  <div class="content stack gap-3">
+   253→    <p class="kicker">Workflow · 4 步</p>
+   254→    <h2 class="h-xl">我的写作流水线</h2>
+   255→    <div class="pipeline-v">
+   256→      <div class="step">
+   257→        <div class="step-nb">01</div>
+   258→        <div>
+   259→          <h3 class="step-title">Draft</h3>
+   260→          <p class="step-desc">用语音备忘录把想法说出来</p>
+   261→        </div>
+   262→      </div>
+   263→      <div class="step">
+   264→        <div class="step-nb">02</div>
+   265→        <div>
+   266→          <h3 class="step-title">Reorder</h3>
+   267→          <p class="step-desc">用 AI 把段落顺序重新排</p>
+   268→        </div>
+   269→      </div>
+   270→      <div class="step">
+   271→        <div class="step-nb">03</div>
+   272→        <div>
+   273→          <h3 class="step-title">Polish</h3>
+   274→          <p class="step-desc">人工逐句去 AI 味</p>
+   275→        </div>
+   276→      </div>
+   277→      <div class="step">
+   278→        <div class="step-nb">04</div>
+   279→        <div>
+   280→          <h3 class="step-title">Ship</h3>
+   281→          <p class="step-desc">同时发小红书、推特、公众号</p>
+   282→        </div>
+   283→      </div>
+   284→    </div>
+   285→  </div>
+   286→</section>
+   287→```
+   288→
+   289→Hard limit: 3-5 steps. If you have 6+, split into two pages or switch to M05 Checklist.
+   290→
+   291→### M15 Before / After
+   292→
+   293→Best for "old way vs new way", "before AI vs after AI", "rookie vs pro" comparisons. PPT's Before/After is left-right; on 3:4 portrait, stack top/bottom to avoid pinched columns.
+   294→
+   295→Structure:
+   296→
+   297→- `kicker` + `h-xl` page title.
+   298→- `.beforeafter` container with two `.ba-block` rows: one with class `before` (dimmed at .68 opacity), one without.
+   299→- Each block has its own kicker, mid title, and 3-4 short bullets.
+   300→
+   301→HTML skeleton (3:4):
+   302→
+   303→```html
+   304→<section class="poster xhs" id="xhs-07">
+   305→  <canvas class="mag-bg" data-bg="ink-flow"></canvas>
+   306→  <div class="grain"></div>
+   307→  <div class="content stack gap-3">
+   308→    <p class="kicker">Before · After</p>
+   309→    <h2 class="h-xl">写作流的演变</h2>
+   310→    <div class="beforeafter">
+   311→      <div class="ba-block before">
+   312→        <p class="kicker">Before · 旧</p>
+   313→        <h3 class="h-md">在 Notion 里反复修</h3>
+   314→        <ul class="body" style="margin:0; padding-left:1.2em">
+   315→          <li>开头改了 20 遍</li>
+   316→          <li>每个段落都想精雕</li>
+   317→          <li>一周才发一条</li>
+   318→        </ul>
+   319→      </div>
+   320→      <div class="ba-block">
+   321→        <p class="kicker">After · 新</p>
+   322→        <h3 class="h-md">先发版,再迭代</h3>
+   323→        <ul class="body" style="margin:0; padding-left:1.2em">
+   324→          <li>20 分钟出初稿</li>
+   325→          <li>评论区做精修</li>
+   326→          <li>一天发三条</li>
+   327→        </ul>
+   328→      </div>
+   329→    </div>
+   330→  </div>
+   331→</section>
+   332→```
+   333→
+   334→Adapt for 21:9: switch to left/right split (use `.col-2` grid). Adapt for 1:1: usually too cramped; consider M04 Pull Quote instead.
+   335→
+   336→### M16 Image-Led Cover (Full-Bleed Hero)
+   337→
+   338→Best for **lifestyle, image-heavy** content where the user has 1+ excellent photos: 旅行目的地 / 户外场景 / 自家成菜 / 家居一角 / 情感场景照. Photo fills the canvas; title rides on top with restraint. This is what M01 is **not** — M01 splits the canvas into photo + text blocks. M16 lets the photo own the canvas.
+   339→
+   340→**Reference look**: Kinfolk / Cereal / Apartamento / Monocle covers. Quiet photo, serif title, paper-cream text, generous negative space, asymmetric placement. **NOT** game key-art with heavy black gradient. **NOT** travel poster with chunky bold caption.
+   341→
+   342→**Required**: `references/image-overlay.md` Rule 1 Steps 1-4 must all pass. The first gate (photo selection) is the hardest — most photos fail it.
+   343→
+   344→### Photo qualification (gate before choosing M16)
+   345→
+   346→Run both tests on the user's photo. Both must pass, or **switch to M01** (split-layout) instead of forcing M16.
+   347→
+   348→1. **Quiet-zone test**: photo has a band of ≥30% canvas (full width × ≥30% height, or full height × ≥30% width) that is low-detail / out-of-focus / uniform. This is where the title will land.
+   349→2. **Light test**: photo carries atmospheric/restrained light — overcast, dawn fog, golden hour, forest understory, dusk silhouette, film softness. Reject high-saturation noon shots, on-camera flash, generic tourist snaps.
+   350→
+   351→If only one passes: try M01. If neither: ask user for a different photo, or use M01 with a smaller `.frame-img` slot. **Do not "fix it with a mask."**
+   352→
+   353→**Page sequence convention** (this is the "image-led" pattern):
+   354→
+   355→```
+   356→P1 (M16)               ← full-bleed photo + short title — the hook
+   357→P2 (S11 / M05 / M10)   ← ledger / checklist / mini-data — text-heavy rest stop
+   358→P3 (M02 or M16-small)  ← second photo as field-note evidence, not full-bleed
+   359→P4-N (M02 / M11)       ← more field notes or marginalia essays
+   360→P_last (M07 / M04)     ← closing note or pull quote
+   361→```
+   362→
+   363→Never run two M16 in a row. After a full-bleed photo the eye needs text. P2 must be data/text.
+   364→
+   365→**Four title-placement modes** — pick by subject map (from image-overlay.md Rule 2):
+   366→
+   367→| Mode | Subject location | Title position | Tint (only if Step 4 contrast fails) |
+   368→| ---- | ---------------- | -------------- | ------------------------------------ |
+   369→| **A · 顶压底沉** (top kicker + bottom title) | Subject in middle third (face, peak, hero object), top + bottom open | Top: kicker 0-12% y. Bottom: 1-2 line title 72-92% y. | Try no tint. If needed: bottom-only radial, image-toned, peak α ≤ 0.30 over title block. |
+   370→| **B · 侧栏立柱** (vertical column) | Subject occupies a **clean** vertical column with ≥40% width safe opposite side. Skip B if subject edge is irregular (e.g. tree canopy spilling sideways) — use A or D instead. | Opposite column (~36-40% of width), stacked: kicker → title → subtitle | Try no tint. If needed: one-sided horizontal falloff `radial-gradient(45% 60% at 18% 50%, …)`, image-toned. |
+   371→| **C · 角落徽章** (corner badge) | Subject fills most of the frame; one corner is genuinely empty | Small block in the empty corner (≤35% w × ≤25% h): kicker / short title / meta | Light vignette only in that corner — never darken the whole image |
+   372→| **D · 下沉条带** (bottom ribbon) | Wide landscape / atmospheric scene / no single subject; abundant negative space at bottom | Bottom band 78-92% y: title + meta strip; align flush-left or flush-right (not centered) | Try no tint. If needed: bottom-only radial, image-toned, peak α 0.20-0.30 |
+   373→
+   374→**Typography spec on 1080×1440 (Editorial × E-ink) — restrained, NOT chunky**:
+   375→
+   376→| Element | Mode A | Mode B | Mode C | Mode D |
+   377→| ------- | ------ | ------ | ------ | ------ |
+   378→| Kicker  | mono 20-22px, uppercase, tracking 0.18-0.22em | mono 20-22px | mono 18-20px | mono 22-24px |
+   379→| Title font | Noto Serif SC **400-500** (NOT 700-900) | same | same | same |
+   380→| Title size | **88-108px**. Default 96px for 2-line zh title. Drop to 88px if 2 lines × ≥7 chars. | **84-100px**, wrap on phrase boundary | 56-64px (NOT display) | **96-112px**, single line preferred |
+   381→| Title tracking (zh) | 0.10-0.15em | 0.10-0.15em | 0.05-0.10em | 0.12-0.18em |
+   382→| Title line-height | 1.10-1.18 | 1.10-1.18 | 1.20 | 1.05-1.10 |
+   383→| Subtitle | optional `h-sub` 28-32px italic Playfair, tracking 0 | same | omit | same |
+   384→| Issue strip | mono 18-20px bottom, uppercase, tracking 0.20-0.25em, hairline above | omit | omit | mono 20-22px, tracking 0.20-0.25em |
+   385→| Text color | `#f5f1e8` (paper-cream, NOT pure white #fff) | same | same | same |
+   386→| Hairline color | `rgba(245, 241, 232, 0.35)` (paper at 35% alpha) | same | same | same |
+   387→
+   388→**Forbidden in M16 type**:
+   389→
+   390→- Title weight 700+ inline (e.g. `font-weight: 800` to "make it pop"). M16 wants **regular-medium serif**, not bold.
+   391→- Pure white `#fff` text — too clinical, fights the photo's warmth. Always paper-cream.
+   392→- Title size > 120px on 1080-wide canvas. We are not making travel posters.
+   393→- Latin sans-serif as primary title (Helvetica / Inter for the headline) — M16 belongs to serif. Sans only as kicker / meta / mono caption.
+   394→- Centered title on D mode. Always flush-left or flush-right for asymmetric Kinfolk feel.
+   395→
+   396→**Title-length budget** (cut copy if you bust this — never shrink type below 84px):
+   397→
+   398→| Mode | Max Chinese chars | Max lines |
+   399→| ---- | ----------------- | --------- |
+   400→| A    | 12 (2 × 6) or 14 (2 × 7 at 88px)  | 2 |
+   401→| B    | 14 (2 × 7)                         | 2 |
+   402→| C    | 8                                  | 1 |
+   403→| D    | 10                                 | 1 |
+   404→
+   405→**Square (1:1, 1080×1080) and Wide (21:9, 2100×900) adaptations**:
+   406→
+   407→- **1:1**: Use Mode A or Mode D only. Mode B's column squeeze, Mode C's corner are too tight on square. Shorten title to 6-10 chars.
+   408→- **21:9**: Use Mode B (left text column + right photo bleed) or Mode D (full-width bottom band). Mode A works but the bottom title competes with the WeChat caption strip — prefer D.
+   409→
+   410→**HTML skeleton (Mode A — 顶压底沉 on 3:4, no mask)**:
+   411→
+   412→```html
+   413→<section class="poster xhs" id="cover-image-led">
+   414→  <!-- subject map (cover hero — example: Yading lake at dawn):
+   415→       primary focus: snow peak at 50% x 32% y (middle band)
+   416→       safe text zone: top band (0-12% y) low-detail sky,
+   417→                        bottom band (72-95% y) calm water reflection
+   418→       quiet-zone test: PASS — bottom 30% is uniform water
+   419→       light test: PASS — dawn overcast, soft saturation
+   420→  -->
+   421→  <div class="hero-bleed" style="background-image: url('assets/hero-yading.jpg');
+   422→                                  background-size: cover;
+   423→                                  background-position: center center;
+   424→                                  position: absolute; inset: 0;"></div>
+   425→  <!-- NO MASK — quiet zone already provides contrast.
+   426→       Add only if Step 4 contrast check fails. -->
+   427→  <div class="content" style="position: relative; height: 100%;
+   428→        color: #f5f1e8; padding: 72px 80px;
+   429→        display: flex; flex-direction: column;">
+   430→    <p class="kicker" style="color: #f5f1e8; opacity: .85;
+   431→        font-family: var(--mono); font-size: 22px;
+   432→        letter-spacing: 0.22em; text-transform: uppercase; margin: 0">
+   433→      Vol. 04 — 2026 — 户外
+   434→    </p>
+   435→    <div style="flex: 1"></div>
+   436→    <h1 style="font-family: 'Noto Serif SC', serif;
+   437→        font-weight: 500; font-size: 96px; line-height: 1.12;
+   438→        letter-spacing: 0.12em; color: #f5f1e8;
+   439→        margin: 0 0 18px 0">
+   440→      在稻城<br/>看见冬天
+   441→    </h1>
+   442→    <div style="border-top: 1px solid rgba(245,241,232,.35);
+   443→         padding-top: 14px; font-family: var(--mono); font-size: 19px;
+   444→         letter-spacing: 0.22em; text-transform: uppercase;
+   445→         color: #f5f1e8; opacity: .85">
+   446→      DAY 1-4 · 4,200 M · −18°C
+   447→    </div>
+   448→  </div>
+   449→</section>
+   450→```
+   451→
+   452→**HTML skeleton (Mode D — 下沉条带 on 21:9, for WeChat main cover)**:
+   453→
+   454→```html
+   455→<section class="poster wide" id="wechat-21x9-led">
+   456→  <!-- subject map: wide atmospheric landscape, mist over lake at dawn
+   457→       quiet-zone test: PASS — entire bottom 35% is calm water + mist -->
+   458→  <div class="hero-bleed" style="background-image: url('assets/hero-yading-wide.jpg');
+   459→        background-size: cover; background-position: center 40%;
+   460→        position: absolute; inset: 0;"></div>
+   461→  <div class="content" style="position: relative; height: 100%;
+   462→        color: #f5f1e8; padding: 0 96px 88px;
+   463→        display: flex; flex-direction: column; justify-content: flex-end;
+   464→        align-items: flex-start;">
+   465→    <h1 style="font-family: 'Noto Serif SC', serif; font-weight: 500;
+   466→         font-size: 108px; line-height: 1.05; letter-spacing: 0.14em;
+   467→         margin: 0; color: #f5f1e8">
+   468→      在稻城看见冬天
+   469→    </h1>
+   470→    <div style="margin-top: 18px; border-top: 1px solid rgba(245,241,232,.35);
+   471→         padding-top: 14px; font-family: var(--mono); font-size: 20px;
+   472→         letter-spacing: 0.24em; text-transform: uppercase">
+   473→      VOL. 04 — DAY 1-4 — 4,200 M — 35MM
+   474→    </div>
+   475→  </div>
+   476→</section>
+   477→```
+   478→
+   479→**Pitfalls**:
+   480→
+   481→- Choosing M16 when the photo fails quiet-zone or light test. The cover will look bad no matter what mask you layer on. Fall back to M01.
+   482→- Putting Mode A's bottom title across someone's torso when the subject is in the lower third — re-run subject map and switch to Mode C, or change `object-position: center 70%`.
+   483→- Mode C with a heavy backdrop plate behind the corner title — defeats the point of having a great photo. Use vignette only.
+   484→- Using Mode B on a photo where the subject's silhouette is **irregular** (trees with sideways branches, scattered objects) — the "side column" won't be wide enough to be a true safe zone. Switch to Mode A or D.
+   485→- Adding a full-canvas vertical falloff "just in case." Mask-by-default kills the editorial look. The fix is photo selection, not opacity.
+   486→- Setting title weight 700+ or pure-white text — both are anti-pattern in Editorial M16.
+   487→- Running M16 on every cover. M16 is for **image-heavy lifestyle**. Product/tech/AI release covers still belong to S01 / S03 / M01.
+   488→
+   489→## Swiss International Recipes
+   490→
+   491→These structures (accent cover / matrix / KPI tower / h-bar / numbered statement) work for **any topic** that wants an engineered, quantified pace — software releases yes, but also travel budgets, fitness logs, recipe portions, reading stats, anything where you'd rather count it than narrate it. The mode is a visual stance, not a content filter.
+   492→
+   493→### S01 Accent Cover
+   494→
+   495→Best for Rednote cover.
+   496→
+   497→Structure:
+   498→
+   499→- Full accent or off-white background.
+   500→- Big light-weight title.
+   501→- Simple abstract system block, comparison, or two-node diagram.
+   502→- Bottom metadata strip.
+   503→
+   504→Use one clear concept. No decorative blobs.
+   505→
+   506→### S02 Two Signals / Comparison
+   507→
+   508→Best for explaining two sources, two options, or two product directions.
+   509→
+   510→Structure:
+   511→
+   512→- Page title.
+   513→- Two large rectangular modules.
+   514→- One module may be ink-filled; the other paper/outlined.
+   515→- Short notes below each.
+   516→
+   517→### S03 Data Layer / File Card
+   518→
+   519→Best for Markdown, memory, source-of-truth, database, or state.
+   520→
+   521→Structure:
+   522→
+   523→- Large file-type or object block.
+   524→- List of 3-4 properties.
+   525→- Strong mono labels.
+   526→
+   527→### S04 Interface / Browser Mock
+   528→
+   529→Best for HTML, UI, presentation, interaction, or output layer.
+   530→
+   531→Structure:
+   532→
+   533→- Browser-window style frame with straight edges.
+   534→- Inside: one hero content block plus 2-3 functional modules.
+   535→- Bottom action or interaction strip.
+   536→
+   537→### S05 Trap / Warning Rows
+   538→
+   539→Best for problems, anti-patterns, and "do not do this" pages.
+   540→
+   541→Structure:
+   542→
+   543→- Big warning title.
+   544→- Three horizontal rows.
+   545→- Left mono label, right consequence.
+   546→
+   547→Safety Orange works well here if the whole package uses it.
+   548→
+   549→### S06 Pipeline / Architecture
+   550→
+   551→Best for workflows and layered systems.
+   552→
+   553→Structure:
+   554→
+   555→- Three rows or columns: source, render, share.
+   556→- Each has number, label, action, and consequence.
+   557→- Use hairline boxes and neutral grey fills.
+   558→
+   559→### S07 Takeaway Ledger
+   560→
+   561→Best for final page.
+   562→
+   563→Structure:
+   564→
+   565→- Big thesis title.
+   566→- Three ledger rows with number, phrase, and compressed explanation.
+   567→- Dark or ink background can create closure.
+   568→
+   569→### S08 Image Hero
+   570→
+   571→Best for the WeChat 21:9 main cover and the Rednote cover when you have one strong photo or product render. The image fills the page; the title sits inside an overlay block; 3 quantified stats anchor the bottom.
+   572→
+   573→Structure:
+   574→
+   575→- `.chrome-min` top single row (category + date).
+   576→- `.image-hero` grid: `.hero-img-wrap` with one `.frame-img.r-21x9` photo (or `.r-3x2` on 3:4).
+   577→- `.hero-overlay-block` sitting over the upper-left of the image with `t-cat` kicker + `h-statement` title.
+   578→- `.hero-stats` row of 3 `.stat-block`s, each with a big `num` (e.g. `132K`) and a mono `lbl`.
+   579→
+   580→HTML skeleton (21:9, the natural format for this recipe):
+   581→
+   582→```html
+   583→<section class="poster wide" id="wechat-21x9-hero" data-accent="ikb">
+   584→  <div class="content stack gap-7">
+   585→    <div class="chrome-min">
+   586→      <span class="t-cat">Release · 产品</span>
+   587→      <span class="t-meta">2026.05 · v3.0</span>
+   588→    </div>
+   589→    <div class="image-hero">
+   590→      <div class="hero-img-wrap">
+   591→        <img src="assets/hero.jpg" alt="hero">
+   592→        <div class="hero-overlay-block">
+   593→          <p class="t-cat">Cover · 主封面</p>
+   594→          <h1 class="h-statement">下一代<br>写作工作流</h1>
+   595→        </div>
+   596→      </div>
+   597→      <div class="hero-stats">
+   598→        <div class="stat-block">
+   599→          <p class="num">132K</p>
+   600→          <p class="lbl">Weekly Writers</p>
+   601→        </div>
+   602→        <div class="stat-block">
+   603→          <p class="num">3.4×</p>
+   604→          <p class="lbl">Output Speed</p>
+   605→        </div>
+   606→        <div class="stat-block">
+   607→          <p class="num">98%</p>
+   608→          <p class="lbl">Ship Rate</p>
+   609→        </div>
+   610→      </div>
+   611→    </div>
+   612→  </div>
+   613→</section>
+   614→```
+   615→
+   616→Adapt for 3:4: keep the same `.image-hero` structure but swap `.r-21x9` to `.r-3x2`, drop overlay block down to 35% height. Adapt for 1:1: drop the overlay block entirely, push title above the image, keep at most 2 stats in `hero-stats`.
+   617→
+   618→### S09 KPI Tower
+   619→
+   620→Best for product-update pages, release notes, traffic dashboards, growth posts — anywhere 3-4 numbers need to be compared at a glance.
+   621→
+   622→Structure:
+   623→
+   624→- `kicker` + `h-xl` page title.
+   625→- `.kpi-tower-row` with 4 `.tower-col`s, each containing a `num`, `lbl`, and a `.bar-tower` whose height encodes the value via `style="--h:Npx"`.
+   626→- One column may carry the `.muted` modifier to drop the bar to neutral grey (use for a comparison baseline).
+   627→
+   628→HTML skeleton (3:4 — template auto-collapses to 2 columns):
+   629→
+   630→```html
+   631→<section class="poster xhs" id="xhs-data" data-accent="lemon-yellow">
+   632→  <div class="content stack gap-7">
+   633→    <p class="t-cat">Data · 半年增长</p>
+   634→    <h2 class="h-xl">六个月,四组数字</h2>
+   635→    <div class="kpi-tower-row">
+   636→      <div class="tower-col">
+   637→        <p class="num">132K</p>
+   638→        <p class="lbl">Subscribers</p>
+   639→        <div class="bar-tower" style="--h:320px"></div>
+   640→      </div>
+   641→      <div class="tower-col">
+   642→        <p class="num">3.4M</p>
+   643→        <p class="lbl">Reads</p>
+   644→        <div class="bar-tower" style="--h:220px"></div>
+   645→      </div>
+   646→      <div class="tower-col">
+   647→        <p class="num">68%</p>
+   648→        <p class="lbl">Repeat Visits</p>
+   649→        <div class="bar-tower" style="--h:160px"></div>
+   650→      </div>
+   651→      <div class="tower-col muted">
+   652→        <p class="num">8.2%</p>
+   653→        <p class="lbl">Conversion</p>
+   654→        <div class="bar-tower" style="--h:120px"></div>
+   655→      </div>
+   656→    </div>
+   657→  </div>
+   658→</section>
+   659→```
+   660→
+   661→`--h` is a real height in px — pick values that proportionally encode the data. Do not invent numbers; if you only have 2 numbers, drop to 2 columns and use S03 File Card instead. Adapt for 21:9: keep 4 columns at the original width (it's where the layout shines). Adapt for 1:1: 2 columns max, taller bars.
+   662→
+   663→### S10 H-Bar Chart
+   664→
+   665→Best for rankings, comparisons of 5-10 items, "top N" lists, before/after pairs at scale. The bar fill encodes magnitude via `style="--w:NN%"`.
+   666→
+   667→Structure:
+   668→
+   669→- `kicker` + `h-xl` page title.
+   670→- `.h-bar-chart` grid with 5-10 `.bar-row`s.
+   671→- Each row: `.row-lbl` (Chinese item name), `.row-track` containing `.row-fill`, `.row-val` (mono number).
+   672→
+   673→HTML skeleton (3:4):
+   674→
+   675→```html
+   676→<section class="poster xhs" id="xhs-rank" data-accent="ikb">
+   677→  <div class="content stack gap-7">
+   678→    <p class="t-cat">Ranking · TOP 6</p>
+   679→    <h2 class="h-xl">本月最受欢迎的工具</h2>
+   680→    <div class="h-bar-chart">
+   681→      <div class="bar-row">
+   682→        <div class="row-lbl">Claude Code</div>
+   683→        <div class="row-track"><div class="row-fill" style="--w:94%"></div></div>
+   684→        <div class="row-val">94%</div>
+   685→      </div>
+   686→      <div class="bar-row">
+   687→        <div class="row-lbl">Cursor</div>
+   688→        <div class="row-track"><div class="row-fill" style="--w:78%"></div></div>
+   689→        <div class="row-val">78%</div>
+   690→      </div>
+   691→      <div class="bar-row">
+   692→        <div class="row-lbl">Linear</div>
+   693→        <div class="row-track"><div class="row-fill" style="--w:62%"></div></div>
+   694→        <div class="row-val">62%</div>
+   695→      </div>
+   696→      <div class="bar-row">
+   697→        <div class="row-lbl">Raycast</div>
+   698→        <div class="row-track"><div class="row-fill" style="--w:48%"></div></div>
+   699→        <div class="row-val">48%</div>
+   700→      </div>
+   701→      <div class="bar-row">
+   702→        <div class="row-lbl">Notion</div>
+   703→        <div class="row-track"><div class="row-fill" style="--w:36%"></div></div>
+   704→        <div class="row-val">36%</div>
+   705→      </div>
+   706→      <div class="bar-row">
+   707→        <div class="row-lbl">Obsidian</div>
+   708→        <div class="row-track"><div class="row-fill" style="--w:28%"></div></div>
+   709→        <div class="row-val">28%</div>
+   710→      </div>
+   711→    </div>
+   712→  </div>
+   713→</section>
+   714→```
+   715→
+   716→Hard limits: max 6 rows on 1:1, max 10 rows on 3:4, max 8 rows on 21:9. On 3:4 the template stacks `row-lbl` above the track automatically — leave it alone. Always use real percentages or normalize the largest value to 100%; never fabricate.
+   717→
+   718→### S11 Stacked Ledger
+   719→
+   720→Best for shopping lists, expense rollups, agent capability inventories, or any "big number + label + icon" row stack where each item is quantified.
+   721→
+   722→Structure:
+   723→
+   724→- `kicker` + `h-xl` page title.
+   725→- `.stacked-ledger` containing 4-6 `.ledger-row`s.
+   726→- Each row: `.ledger-num` (large mono-feel sans number), `.ledger-lbl` (Chinese label + optional `.sub` secondary line), `.ledger-icn` (Lucide icon).
+   727→
+   728→HTML skeleton (3:4):
+   729→
+   730→```html
+   731→<section class="poster xhs" id="xhs-spend" data-accent="safety-orange">
+   732→  <div class="content stack gap-7">
+   733→    <p class="t-cat">Spend · 五月账单</p>
+   734→    <h2 class="h-xl">这个月我把钱花在哪</h2>
+   735→    <div class="stacked-ledger">
+   736→      <div class="ledger-row">
+   737→        <p class="ledger-num">¥1,280</p>
+   738→        <div class="ledger-lbl">订阅 · Subscriptions
+   739→          <span class="sub">Claude · Cursor · Linear</span>
+   740→        </div>
+   741→        <i class="ledger-icn" data-lucide="square-stack"></i>
+   742→      </div>
+   743→      <div class="ledger-row">
+   744→        <p class="ledger-num">¥860</p>
+   745→        <div class="ledger-lbl">书 · Books
+   746→          <span class="sub">6 本中文 · 2 本英文</span>
+   747→        </div>
+   748→        <i class="ledger-icn" data-lucide="book-open"></i>
+   749→      </div>
+   750→      <div class="ledger-row">
+   751→        <p class="ledger-num">¥540</p>
+   752→        <div class="ledger-lbl">咖啡 · Coffee
+   753→          <span class="sub">主要在 Manner 和 Seesaw</span>
+   754→        </div>
+   755→        <i class="ledger-icn" data-lucide="coffee"></i>
+   756→      </div>
+   757→      <div class="ledger-row">
+   758→        <p class="ledger-num">¥320</p>
+   759→        <div class="ledger-lbl">硬件 · Hardware
+   760→          <span class="sub">键盘配件 · 一根 USB-C</span>
+   761→        </div>
+   762→        <i class="ledger-icn" data-lucide="keyboard"></i>
+   763→      </div>
+   764→    </div>
+   765→  </div>
+   766→</section>
+   767→```
+   768→
+   769→Hard limits: max 6 rows on 3:4, max 4 rows on 1:1, max 8 rows on 21:9. Pick angular Lucide icons (`book-open`, `coffee`, `bolt`, `square-stack`, `keyboard`) — never `heart-filled` or `smile`. If you cannot find numerical evidence, this is the wrong recipe; use S05 Trap Rows or M08 Tall Ledger.
+   770→
+   771→### S12 Matrix + Hero Stat
+   772→
+   773→Best for capability matrices, agent inventories, "this set covers X domains" pages where 8-12 small cells back a single bottom-line number.
+   774→
+   775→Structure:
+   776→
+   777→- `kicker` + `h-xl` page title.
+   778→- `.matrix-fill` grid of 8-12 `.matrix-cell`s. Each cell: `.cell-nb` (numbered mono label like `01`) and `.cell-title` (one short Chinese phrase).
+   779→- Exactly one cell may carry the `.is-accent` modifier to single out the most important capability.
+   780→- `.hero-stat-bottom` below the grid: left column with a kicker + short sentence, right column with one `num-mega` summary stat.
+   781→
+   782→HTML skeleton (3:4 — matrix collapses to 2 columns):
+   783→
+   784→```html
+   785→<section class="poster xhs" id="xhs-matrix" data-accent="lemon-green">
+   786→  <div class="content stack gap-7">
+   787→    <p class="t-cat">Capabilities · 能力清单</p>
+   788→    <h2 class="h-xl">一个 Agent,十二件事</h2>
+   789→    <div class="matrix-fill">
+   790→      <div class="matrix-cell"><p class="cell-nb">01</p><p class="cell-title">读取项目结构</p></div>
+   791→      <div class="matrix-cell"><p class="cell-nb">02</p><p class="cell-title">运行测试</p></div>
+   792→      <div class="matrix-cell is-accent"><p class="cell-nb">03</p><p class="cell-title">起草 PR 描述</p></div>
+   793→      <div class="matrix-cell"><p class="cell-nb">04</p><p class="cell-title">回滚错误改动</p></div>
+   794→      <div class="matrix-cell"><p class="cell-nb">05</p><p class="cell-title">迁移 lockfile</p></div>
+   795→      <div class="matrix-cell"><p class="cell-nb">06</p><p class="cell-title">检查类型</p></div>
+   796→      <div class="matrix-cell"><p class="cell-nb">07</p><p class="cell-title">追踪 issue</p></div>
+   797→      <div class="matrix-cell"><p class="cell-nb">08</p><p class="cell-title">阅读日志</p></div>
+   798→    </div>
+   799→    <div class="hero-stat-bottom">
+   800→      <div>
+   801→        <p class="t-cat">In total · 累计</p>
+   802→        <p class="lead">在 6 个仓库上,持续 4 周。</p>
+   803→      </div>
+   804→      <p class="num-mega">12</p>
+   805→    </div>
+   806→  </div>
+   807→</section>
+   808→```
+   809→
+   810→Hard limits: 8 cells on 3:4 (2×4), 9 cells on 1:1 (3×3), 12 cells on 21:9 (4×3). Max one `is-accent` cell — two breaks the rhythm. The `num-mega` at bottom must agree with the cell count (`12` if 12 cells, `8` if 8); never display a number unsupported by the grid.
+   811→
+   812→## WeChat Adaptation
+   813→
+   814→For 21:9:
+   815→
+   816→- Use M01/S01 as a wide composition, not a crop.
+   817→- Put title in the left or center-left safe area.
+   818→- Use the right half for photo/object/system visual.
+   819→- Enlarge title and subtitle spacing if the center feels empty.
+   820→
+   821→For 1:1:
+   822→
+   823→- Distill the long title into a simple centered title.
+   824→- If the user asks for no image, use type only.
+   825→- Avoid small subtitles and avoid photos by default.
+   826→- Keep the square readable as a thumbnail: one idea, big type, generous margins.
+   827→
+   828→For pair preview:
+   829→
+   830→- Put the `21:9` and `1:1` compositions in one HTML preview frame.
+   831→- The preview frame is for review only; do not treat it as a third required WeChat deliverable unless requested.
+   832→

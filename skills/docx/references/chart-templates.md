@@ -2,7 +2,7 @@
 
 ## Design Philosophy
 
-GLM uses **matplotlib as the primary chart engine**. Advantages:
+The model uses **matplotlib as the primary chart engine**. Advantages:
 - High chart quality, print-ready
 - Full style control, consistent with document palette
 - Supports complex chart types (heatmap, radar, box plot, etc.)

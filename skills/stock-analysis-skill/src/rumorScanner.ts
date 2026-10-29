@@ -1,15 +1,15 @@
 /**
  * rumorScanner.ts
- * 传闻与早期信号扫描（适配平台 finance skill）
- * 替换原版 Twitter bird CLI + Google News，改用 finance skill 新闻 + LLM 提取
+ * Rumor and early-signal scanner (backed by the platform finance skill)
+ * Replaces the original Twitter bird CLI + Google News with finance-skill news + LLM extraction
  *
- * 扫描范围：M&A传闻 / 内部人交易 / 分析师调整 / SEC监管动态 / 市场早期信号
+ * Scan scope: M&A rumors / insider trading / analyst actions / SEC & regulatory developments / early market signals
  */
 
-import ZAI from "z-ai-web-dev-sdk";
+import { chatCompletions, MODEL } from "./dataFetcher";
 import { RumorItem, RumorScanResult, RumorType } from "./types";
 
-// ── 评分逻辑（移植自原版 calculate_rumor_score）─────────
+// ── Scoring logic (ported from the original calculate_rumor_score) ──
 
 function calcImpactScore(
   type: RumorType,
@@ -21,61 +21,61 @@ function calcImpactScore(
 
   switch (type) {
     case "ma":
-      score += 5; reasons.push("并购/收购类传闻，市场冲击最大"); break;
+      score += 5; reasons.push("M&A / acquisition rumor — largest market impact"); break;
     case "insider":
-      score += 4; reasons.push("内部人交易信号，可能预示重大动向"); break;
+      score += 4; reasons.push("Insider trading signal — may foreshadow a major move"); break;
     case "analyst":
-      score += 3; reasons.push("分析师评级调整，影响机构定价"); break;
+      score += 3; reasons.push("Analyst rating change — affects institutional pricing"); break;
     case "regulatory":
-      score += 3; reasons.push("监管动态，直接影响经营合规性"); break;
+      score += 3; reasons.push("Regulatory development — directly affects operating compliance"); break;
     case "earnings":
-      score += 2; reasons.push("业绩预期变动"); break;
+      score += 2; reasons.push("Earnings expectation change"); break;
     default:
       score += 1;
   }
 
   if (/breaking|just in|alert|urgent/i.test(text)) {
-    score += 2; reasons.push("突发性消息");
+    score += 2; reasons.push("Breaking news");
   }
   if (hasHighEngagement) {
-    score += 2; reasons.push("市场高度关注");
+    score += 2; reasons.push("High market attention");
   }
 
-  return { score: Math.min(10, score), reason: reasons.join("，") };
+  return { score: Math.min(10, score), reason: reasons.join("; ") };
 }
 
-// ── 通过 finance skill 获取市场传闻新闻 ──────────────────
+// ── Fetch market rumor news through the finance skill ────
 
-async function fetchRumorNews(zai: any): Promise<string> {
-  const completion = await zai.chat.completions.create({
+async function fetchRumorNews(): Promise<string> {
+  const completion = await chatCompletions({
+    model: MODEL,
     messages: [{
       role: "user",
-      content: `请获取今日美股市场的以下类型最新资讯，每类最多3条：
-1. 并购传闻（merger/acquisition rumors）
-2. 内部人买卖动态（insider buying/selling activity）
-3. 分析师评级调整（analyst upgrades/downgrades）
-4. SEC调查或监管动态
-5. 重大业绩预警或上调
+      content: `Fetch today's latest US-market items of the following types, at most 3 per type:
+1. Merger/acquisition rumors
+2. Insider buying/selling activity
+3. Analyst rating changes (upgrades/downgrades)
+4. SEC investigations or regulatory developments
+5. Major earnings warnings or guidance raises
 
-以 JSON 格式返回，结构：
+Return in JSON format, structured as:
 [{
   "type": "ma|insider|analyst|regulatory|earnings",
-  "ticker": "股票代码或null",
-  "headline": "标题",
-  "source": "来源",
+  "ticker": "stock ticker or null",
+  "headline": "headline",
+  "source": "source",
   "sentiment": "positive|negative|neutral",
   "date": "YYYY-MM-DD"
 }]
-只返回 JSON，今日或近2日内的最新信息，不得捏造。`,
+Return JSON only; only the latest items from today or the last 2 days; never fabricate.`,
     }],
-    thinking: { type: "disabled" },
   });
   return completion.choices[0]?.message?.content ?? "[]";
 }
 
-// ── LLM 从新闻中提取结构化传闻 ────────────────────────────
+// ── LLM extraction of structured rumors from news ─────────
 
-async function extractRumors(zai: any, rawNews: string): Promise<RumorItem[]> {
+async function extractRumors(rawNews: string): Promise<RumorItem[]> {
   try {
     const parsed: any[] = JSON.parse(rawNews.replace(/```json|```/g, "").trim());
 
@@ -100,7 +100,7 @@ async function extractRumors(zai: any, rawNews: string): Promise<RumorItem[]> {
   }
 }
 
-// ── 汇总最受关注的股票 ────────────────────────────────────
+// ── Aggregate the most-discussed stocks ───────────────────
 
 function aggregateTopTickers(rumors: RumorItem[]): { ticker: string; count: number }[] {
   const counts: Record<string, number> = {};
@@ -115,63 +115,62 @@ function aggregateTopTickers(rumors: RumorItem[]): { ticker: string; count: numb
     .map(([ticker, count]) => ({ ticker, count }));
 }
 
-// ── 主扫描函数 ────────────────────────────────────────────
+// ── Main scan function ────────────────────────────────────
 
 export async function scanRumors(): Promise<RumorScanResult> {
-  const zai = await ZAI.create();
   const scannedAt = new Date().toISOString();
 
   let rumors: RumorItem[] = [];
 
   try {
-    const rawNews = await fetchRumorNews(zai);
-    rumors = await extractRumors(zai, rawNews);
+    const rawNews = await fetchRumorNews();
+    rumors = await extractRumors(rawNews);
   } catch (err: any) {
-    console.error("[scanRumors] 失败:", err.message);
+    console.error("[scanRumors] failed:", err.message);
   }
 
   const topTickers = aggregateTopTickers(rumors);
 
-  // 生成摘要
+  // Build summary
   const maCount = rumors.filter((r) => r.type === "ma").length;
   const insiderCount = rumors.filter((r) => r.type === "insider").length;
   const analystCount = rumors.filter((r) => r.type === "analyst").length;
 
   const summary = rumors.length === 0
-    ? "今日暂无重大传闻或早期信号。"
-    : `共扫描到 ${rumors.length} 条信号：并购传闻 ${maCount} 条，内部人动态 ${insiderCount} 条，分析师调整 ${analystCount} 条。${topTickers.length > 0 ? `最受关注：${topTickers.slice(0, 3).map((t) => `$${t.ticker}`).join("、")}。` : ""}`;
+    ? "No major rumors or early signals today."
+    : `Scanned ${rumors.length} signals: ${maCount} M&A rumors, ${insiderCount} insider moves, ${analystCount} analyst changes.${topTickers.length > 0 ? ` Most discussed: ${topTickers.slice(0, 3).map((t) => `$${t.ticker}`).join(", ")}.` : ""}`;
 
   return { scannedAt, rumors, topTickers, summary };
 }
 
-// ── 格式化输出 ────────────────────────────────────────────
+// ── Formatted output ──────────────────────────────────────
 
 export function formatRumorMarkdown(result: RumorScanResult): string {
   const typeLabel: Record<RumorType, string> = {
-    ma: "🏢 并购传闻",
-    insider: "👔 内部人动态",
-    analyst: "📊 分析师调整",
-    regulatory: "⚖️ 监管动态",
-    earnings: "📈 业绩预期",
-    general: "📰 市场信号",
+    ma: "🏢 M&A Rumors",
+    insider: "👔 Insider Moves",
+    analyst: "📊 Analyst Changes",
+    regulatory: "⚖️ Regulatory Developments",
+    earnings: "📈 Earnings Expectations",
+    general: "📰 Market Signals",
   };
 
   const sentimentEmoji: Record<string, string> = {
     positive: "🟢", negative: "🔴", neutral: "⚪",
   };
 
-  let md = `## 🔮 传闻与早期信号扫描
-**扫描时间：** ${new Date(result.scannedAt).toLocaleString("zh-CN")}
+  let md = `## 🔮 Rumor & Early-Signal Scan
+**Scan time:** ${new Date(result.scannedAt).toLocaleString("en-US")}
 **${result.summary}**
 
 `;
 
   if (result.rumors.length === 0) {
-    md += "_今日暂无重大传闻。_\n";
+    md += "_No major rumors today._\n";
     return md;
   }
 
-  // 按类型分组输出
+  // Group by type
   const grouped: Partial<Record<RumorType, RumorItem[]>> = {};
   for (const r of result.rumors) {
     if (!grouped[r.type]) grouped[r.type] = [];
@@ -181,17 +180,17 @@ export function formatRumorMarkdown(result: RumorScanResult): string {
   for (const [type, items] of Object.entries(grouped)) {
     md += `### ${typeLabel[type as RumorType] ?? type}\n\n`;
     for (const item of items!.slice(0, 3)) {
-      md += `**[冲击 ${item.impactScore}/10]** ${sentimentEmoji[item.sentiment]} ${item.headline}\n`;
-      if (item.ticker) md += `> 相关标的：$${item.ticker}\n`;
-      md += `> 来源：${item.source}　｜　${item.date}　｜　${item.impactReason}\n\n`;
+      md += `**[Impact ${item.impactScore}/10]** ${sentimentEmoji[item.sentiment]} ${item.headline}\n`;
+      if (item.ticker) md += `> Related ticker: $${item.ticker}\n`;
+      md += `> Source: ${item.source} | ${item.date} | ${item.impactReason}\n\n`;
     }
   }
 
-  // 热度排行
+  // Buzz ranking
   if (result.topTickers.length > 0) {
-    md += `### 📊 传闻热度排行\n`;
+    md += `### 📊 Rumor Buzz Ranking\n`;
     md += result.topTickers.map((t) =>
-      `- $${t.ticker}：被提及 ${t.count} 次`
+      `- $${t.ticker}: mentioned ${t.count} time(s)`
     ).join("\n");
     md += "\n";
   }

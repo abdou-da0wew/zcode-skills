@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""从学习资料生成知识点提取 prompt。
+"""Build the knowledge-point extraction prompt from study material.
 
-用法：python3 generate_from_material.py <file_path> <document_id>
+Usage: python3 generate_from_material.py <file_path> <document_id>
 
-输出：JSON 格式的 prompt（system_prompt + user_prompt），由 agent 发给 LLM 执行。
-LLM 返回知识点 JSON 后，agent 应调用 service.save_knowledge_points() 保存。
+Output: the prompt in JSON format (system_prompt + user_prompt), to be sent to
+the LLM by the agent. Once the LLM returns the knowledge points JSON, the agent
+should call service.save_knowledge_points() to save it.
 """
 from pathlib import Path
 import json

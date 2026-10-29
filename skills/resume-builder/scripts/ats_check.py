@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-ats_check.py — 简历 ATS（Applicant Tracking System）友好度检查 + 关键词覆盖率
+ats_check.py — Resume ATS (Applicant Tracking System) friendliness check + keyword coverage
 
-用法：
+Usage:
     python ats_check.py --resume resume.md --industry internet
     python ats_check.py --resume resume.md --industry tech --jd jd.txt
     python ats_check.py --resume resume.docx --industry finance --out report.md
 
-支持输入：.md / .txt / .docx（docx 走 python-docx，需要 pip install python-docx）
+Supported inputs: .md / .txt / .docx (docx uses python-docx; requires pip install python-docx)
 """
 
 from __future__ import annotations
@@ -29,20 +29,20 @@ def load_resume_text(path: Path) -> str:
             from docx import Document
         except ImportError:
             print(
-                "✗ 缺少 python-docx，请先安装：pip install python-docx --break-system-packages",
+                "✗ python-docx is missing; install it first: pip install python-docx --break-system-packages",
                 file=sys.stderr,
             )
             sys.exit(1)
         doc = Document(str(path))
         return "\n".join(p.text for p in doc.paragraphs)
-    print(f"✗ 暂不支持的格式：{suffix}", file=sys.stderr)
+    print(f"✗ Unsupported format: {suffix}", file=sys.stderr)
     sys.exit(1)
 
 
 def load_keywords(industry: str, references_dir: Path) -> list[str]:
     path = references_dir / "keywords" / f"{industry}.txt"
     if not path.exists():
-        print(f"✗ 关键词库不存在：{path}", file=sys.stderr)
+        print(f"✗ Keyword library not found: {path}", file=sys.stderr)
         sys.exit(1)
     return [
         line.strip()
@@ -55,7 +55,7 @@ def coverage(resume_text: str, keywords: list[str]) -> dict:
     text_lower = resume_text.lower()
     hits, missing = [], []
     for kw in keywords:
-        # 兼容大小写、中英混排
+        # Case-insensitive matching
         if kw.lower() in text_lower:
             hits.append(kw)
         else:
@@ -68,66 +68,68 @@ def coverage(resume_text: str, keywords: list[str]) -> dict:
 
 
 def jd_extract_keywords(jd_text: str) -> list[str]:
-    """从 JD 文本里抽取候选关键词。简易版：取常见技能/工具/动词。"""
-    # 抓中文 2~10 字、英文 2~30 字的"实词"
+    """Extract candidate keywords from JD text. Simple version: grab common skill / tool / verb tokens."""
+    # Grab content words: English tokens up to 30 chars
     candidates = re.findall(
-        r"[A-Za-z][A-Za-z0-9+/.\-_]{1,29}|[一-龥]{2,10}",
+        r"[A-Za-z][A-Za-z0-9+/.\-_]{1,29}",
         jd_text,
     )
-    # 简单去停用词
+    # Simple stop-word removal
     stop = {
-        "公司", "工作", "我们", "你将", "团队", "需要", "能够", "具备", "熟悉",
-        "了解", "良好", "优秀", "经验", "能力", "岗位", "职责", "要求", "以上",
-        "相关", "及其", "或者", "进行", "完成", "负责", "推动", "实现", "提升",
-        "并且", "包括", "以下", "根据",
+        "company", "work", "we", "you", "will", "team", "need", "needs", "able",
+        "familiar", "familiarity", "good", "excellent", "experience", "ability",
+        "role", "responsibilities", "requirements", "above", "related", "and",
+        "including", "perform", "complete", "responsible", "drive", "driving",
+        "achieve", "improve", "the", "with", "for", "of", "or", "to", "be", "as",
+        "an", "is", "are", "in", "on", "at", "by", "all", "our", "us", "your",
     }
     seen = set()
     out = []
     for c in candidates:
         key = c.lower()
-        if key in seen or c in stop:
+        if key in seen or key in stop:
             continue
         seen.add(key)
         out.append(c)
-    return out[:80]  # 取前 80 个候选
+    return out[:80]  # keep the first 80 candidates
 
 
 def ats_friendliness(text: str, source_path: Path) -> tuple[int, list[str]]:
-    """评估 ATS 友好度，返回 (分数 / 10, 警告列表)。"""
+    """Assess ATS friendliness; returns (score / 10, warning list)."""
     score = 10
     warnings = []
 
-    # 长度
+    # Length
     if len(text) < 200:
         score -= 3
-        warnings.append("⚠ 简历文本过短（< 200 字符），可能解析失败或内容不足")
+        warnings.append("⚠ Resume text is very short (< 200 characters); parsing may fail or content may be insufficient")
     elif len(text) > 6000:
         score -= 1
-        warnings.append("⚠ 简历偏长（> 6000 字符），建议精简到 1~2 页")
+        warnings.append("⚠ Resume is on the long side (> 6000 characters); consider trimming to 1-2 pages")
 
-    # 联系方式
+    # Contact info
     has_email = bool(re.search(r"[\w.\-+]+@[\w.\-]+\.\w+", text))
     has_phone = bool(re.search(r"(\+?86[-\s]?)?1[3-9]\d{9}|\d{3}[-\s]?\d{4}[-\s]?\d{4}", text))
     if not has_email:
         score -= 1
-        warnings.append("⚠ 没找到邮箱")
+        warnings.append("⚠ No email address found")
     if not has_phone:
         score -= 1
-        warnings.append("⚠ 没找到手机号")
+        warnings.append("⚠ No phone number found")
 
-    # 装饰符号
+    # Decorative symbols
     decorative = re.findall(r"[★☆●○◆◇▶▷■□▪▫♦]", text)
     if len(decorative) > 5:
         score -= 1
-        warnings.append(f"⚠ 用了 {len(decorative)} 个装饰符号（★●◆等），ATS 可能识别异常，建议精简")
+        warnings.append(f"⚠ Found {len(decorative)} decorative symbols (★●◆ etc.); ATS may misparse them — trim them")
 
     # emoji
     emojis = re.findall(r"[\U0001F300-\U0001FAFF\U0001F600-\U0001F64F]", text)
     if emojis:
         score -= 1
-        warnings.append(f"⚠ 检测到 {len(emojis)} 个 emoji，部分 ATS 会乱码，建议删掉")
+        warnings.append(f"⚠ Detected {len(emojis)} emoji; some ATS render them as garbage characters — remove them")
 
-    # 数字密度（量化结果是否充分）
+    # Number density (are results sufficiently quantified?)
     numbers = re.findall(r"\d+(?:\.\d+)?%?", text)
     bullet_count = len(re.findall(r"^\s*[-*•]\s+", text, flags=re.MULTILINE))
     if bullet_count > 0:
@@ -135,11 +137,11 @@ def ats_friendliness(text: str, source_path: Path) -> tuple[int, list[str]]:
         if density < 0.4:
             score -= 1
             warnings.append(
-                f"⚠ 量化密度低（每条 bullet 平均 {density:.2f} 个数字），"
-                f"建议在工作 / 项目经历里多加数字"
+                f"⚠ Quantification density is low (avg {density:.2f} numbers per bullet); "
+                f"add more numbers to work / project bullets"
             )
 
-    # docx 特定
+    # docx-specific checks
     if source_path.suffix.lower() == ".docx":
         try:
             from docx import Document
@@ -149,14 +151,14 @@ def ats_friendliness(text: str, source_path: Path) -> tuple[int, list[str]]:
             if tables > 1:
                 score -= 1
                 warnings.append(
-                    f"⚠ docx 里有 {tables} 个表格，部分 ATS 解析表格会丢字段，"
-                    f"建议改成正文段落"
+                    f"⚠ The docx contains {tables} tables; some ATS drop fields when parsing tables — "
+                    f"convert them to body paragraphs"
                 )
             if images > 0:
                 score -= 1
                 warnings.append(
-                    f"⚠ docx 里有 {images} 张图片（含证件照），ATS 不读图，"
-                    f"重要信息别只放在图里；证件照可保留"
+                    f"⚠ The docx contains {images} images (including the ID photo); ATS don't read images — "
+                    f"don't put important info only in images; the photo may stay"
                 )
         except Exception:
             pass
@@ -172,61 +174,61 @@ def render_report(
     ats_warnings: list[str],
 ) -> str:
     lines = [
-        "# 简历 ATS 检查报告",
+        "# Resume ATS Check Report",
         "",
-        f"## 行业关键词覆盖（{industry}）",
-        f"- 命中率：**{industry_cov['rate'] * 100:.1f}%** "
+        f"## Industry Keyword Coverage ({industry})",
+        f"- Hit rate: **{industry_cov['rate'] * 100:.1f}%** "
         f"({len(industry_cov['hits'])} / {len(industry_cov['hits']) + len(industry_cov['missing'])})",
         "",
-        "**已命中**：" + (", ".join(industry_cov["hits"]) or "（无）"),
+        "**Covered**: " + (", ".join(industry_cov["hits"]) or "(none)"),
         "",
-        "**建议补充**（前 15 个）：" + (", ".join(industry_cov["missing"][:15]) or "（无）"),
+        "**Suggested additions** (first 15): " + (", ".join(industry_cov["missing"][:15]) or "(none)"),
         "",
     ]
 
     if jd_cov is not None:
         lines += [
-            "## JD 关键词覆盖",
-            f"- 命中率：**{jd_cov['rate'] * 100:.1f}%**",
+            "## JD Keyword Coverage",
+            f"- Hit rate: **{jd_cov['rate'] * 100:.1f}%**",
             "",
-            "**已命中**：" + (", ".join(jd_cov["hits"][:30]) or "（无）"),
+            "**Covered**: " + (", ".join(jd_cov["hits"][:30]) or "(none)"),
             "",
-            "**JD 出现但简历没有**（重点补这些）：" + (", ".join(jd_cov["missing"][:20]) or "（无）"),
+            "**In the JD but missing from the resume** (prioritize these): " + (", ".join(jd_cov["missing"][:20]) or "(none)"),
             "",
         ]
 
     lines += [
-        f"## ATS 友好度评分：**{ats_score}/10**",
+        f"## ATS Friendliness Score: **{ats_score}/10**",
         "",
     ]
     if ats_warnings:
         lines += ats_warnings
     else:
-        lines.append("✅ 没有明显问题")
+        lines.append("✅ No obvious problems")
 
     lines += [
         "",
         "---",
-        "## 改进建议优先级",
+        "## Improvement Priority",
         "",
-        "1. 先补 JD 命中率 → 这是 ATS 通过率的最直接信号",
-        "2. 再补行业关键词 → 让简历能在更宽的搜索里被捞到",
-        "3. 最后调 ATS 友好度 → 移除装饰符号、emoji、表格、图片",
+        "1. First close the JD hit-rate gap → the most direct signal for ATS pass rate",
+        "2. Then add industry keywords → so the resume surfaces in broader searches",
+        "3. Finally tune ATS friendliness → remove decorative symbols, emoji, tables, images",
         "",
-        "注意：覆盖率不是越高越好，**关键词必须出现在真实的成就 bullet 里**，",
-        "不要把关键词单独列一长串当 skills，会被 HR 一眼识破。",
+        "Note: higher coverage isn't always better — **keywords must appear inside real achievement bullets**.",
+        "Don't list a long keyword string as your skills section; HR will see through it.",
     ]
     return "\n".join(lines)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--resume", required=True, help="简历文件路径 (.md/.txt/.docx)")
+    parser.add_argument("--resume", required=True, help="Resume file path (.md/.txt/.docx)")
     parser.add_argument(
-        "--industry", choices=list(INDUSTRIES), required=True, help="行业方向"
+        "--industry", choices=list(INDUSTRIES), required=True, help="Industry direction"
     )
-    parser.add_argument("--jd", help="可选：JD 文本文件，做精准对比")
-    parser.add_argument("--out", help="输出报告路径，缺省直接打印")
+    parser.add_argument("--jd", help="Optional: JD text file for precise comparison")
+    parser.add_argument("--out", help="Output report path; prints to stdout by default")
     parser.add_argument(
         "--references-dir",
         default=str(Path(__file__).resolve().parent.parent / "references"),
@@ -235,7 +237,7 @@ def main() -> None:
 
     resume_path = Path(args.resume).expanduser()
     if not resume_path.exists():
-        print(f"✗ 简历文件不存在：{resume_path}", file=sys.stderr)
+        print(f"✗ Resume file not found: {resume_path}", file=sys.stderr)
         sys.exit(1)
 
     text = load_resume_text(resume_path)
@@ -248,7 +250,7 @@ def main() -> None:
     if args.jd:
         jd_path = Path(args.jd).expanduser()
         if not jd_path.exists():
-            print(f"✗ JD 文件不存在：{jd_path}", file=sys.stderr)
+            print(f"✗ JD file not found: {jd_path}", file=sys.stderr)
             sys.exit(1)
         jd_keywords = jd_extract_keywords(jd_path.read_text(encoding="utf-8"))
         jd_cov = coverage(text, jd_keywords)
@@ -260,7 +262,7 @@ def main() -> None:
         out_path = Path(args.out).expanduser()
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(report, encoding="utf-8")
-        print(f"✓ 报告已生成：{out_path}")
+        print(f"✓ Report written to: {out_path}")
     else:
         print(report)
 

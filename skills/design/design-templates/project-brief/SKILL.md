@@ -5,14 +5,14 @@ visibility: public
 mode: template
 carrier: long-form-article
 scenario: weekly-digest
-pattern_source: 清言周报-VOL18-notebook.html
+pattern_source: weekly-digest-vol18-notebook.html
 source_priority: skill-first
 triggers:
-  - "做个 notebook 周报"
-  - "AI 团队周报"
-  - "胶带便签风周报"
-  - "笔记本拼贴报告"
-  - "活页夹周报"
+  - "make a notebook-style weekly digest"
+  - "AI team weekly digest"
+  - "tape-and-note weekly report"
+  - "notebook collage report"
+  - "binder weekly digest"
 ---
 
 # Project Brief Template
@@ -21,7 +21,7 @@ Use this template for **weekly / periodic digests** that should feel like a hand
 
 ## Use When
 
-- The artifact is a **recurring digest** (周报 / VOL.NN / Issue N) with multiple grouped entries.
+- The artifact is a **recurring digest** (weekly / VOL.NN / Issue N) with multiple grouped entries.
 - Sections include: new features, optimizations, bug fixes, links, notes — i.e. a changelog-shaped narrative.
 - The voice is product-team or editorial-team-internal, not corporate.
 - The deliverable will be exported / shared as a high-res image or PDF, not just a scrolling page.
@@ -35,7 +35,7 @@ Use this template for **weekly / periodic digests** that should feel like a hand
 
 ## Required Reading
 
-Read this `SKILL.md` first. Do **not** read `清言周报-VOL18-notebook.html` by default.
+Read this `SKILL.md` first. Do **not** read `weekly-digest-vol18-notebook.html` by default.
 
 Read the pattern only when you need concrete geometry — spiral hole spacing, tape angle and deckle, binder-clip placement, receipt-grid pattern, the 31px ruled baseline. Extract patterns; do not copy placeholder issue numbers, dates, feature names, or class names wholesale.
 
@@ -46,7 +46,7 @@ Lock the issue's spine before placing decoration:
 1. **Masthead** — logo + date strip + 1-paragraph intro.
 2. **Issue mark** — cobalt tape with VOL.NN + binder clip.
 3. **Table of contents** — three-column grid pointing to numbered sections.
-4. **Sections** — each with a kicker (uppercase Spanish / English label) + Chinese title + indexed entries.
+4. **Sections** — each with a kicker (uppercase Latin label) + localized title + indexed entries.
 5. **One "physical" highlight block** — receipt for optimizations, taped Polaroid for a feature, mint folder tab for an announcement.
 6. **Closing lockup + colophon** — QR / ticket / page-number metadata.
 
@@ -56,11 +56,11 @@ Each issue should follow the same spine — that's how a weekly builds identity 
 
 Prefer:
 
-- mixed serif (FlyFlowerSong / Noto Serif SC) + sans (Noto Sans SC) + mono (JetBrains Mono) — each carries a role
+- mixed serif (display serif / Noto Serif) + sans (Noto Sans) + mono (JetBrains Mono) — each carries a role
 - ruled baseline grid for body copy; entries align to it
 - dashed dividers between entries, not solid rules
 - one or two "physical" elements per page (tape / clip / receipt / folder tab) — not all of them at once
-- index numbers (01 / 02 / 03) on entries; uppercase Latin kickers above CJK section titles
+- index numbers (01 / 02 / 03) on entries; uppercase Latin kickers above localized section titles
 
 Avoid:
 

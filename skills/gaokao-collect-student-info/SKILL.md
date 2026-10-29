@@ -1,123 +1,143 @@
 ---
 name: gaokao-collect-student-info
 description: >-
-  高考志愿填报信息采集：以考生原生表述为准，收集省份、分数、选科等 API 必填项及兴趣、
-  家庭、就业方向等辅助信息，尽量不做改写与过度归纳，输出结构化 student.json。
-  适用于高考志愿咨询开场、考生信息登记、志愿填报前的信息收集。
+  Gaokao (college entrance exam) application info collection: takes the student's own
+  wording as the source of truth, gathers the API-required fields (province, score,
+  subject combination, etc.) plus auxiliary profile info (interests, family situation,
+  career direction), avoiding paraphrasing or over-generalization, and outputs a
+  structured student.json. Use it to open a gaokao application consultation, register
+  student info, or collect data before filling the application form.
 ---
 
-# 高考考生信息采集
+# Gaokao Student Info Collection
 
-本 Skill 是志愿推荐流水线的**第一步**，仅负责与用户对话并产出 `student.json`，不调用 API、不做推荐。
+This skill is the **first step** of the recommendation pipeline. It only talks with the
+user and produces `student.json`; it never calls the API and never makes recommendations.
 
-## 核心原则：还原原生描述
+> **Exact API string values:** the gaokao API expects Chinese string values for
+> `province`, `classify`, `subjects`, `batch`, and `gradeType`. This doc shows them as
+> JSON `\uXXXX` escapes (e.g. `"\u5c71\u4e1c"` = Shandong). Write them exactly like that
+> (or as the equivalent UTF-8 characters) into `student.json`. See
+> [reference.md](reference.md) for the full value table.
 
-**只负责收集，不负责加工。** 下游专业推荐、院校推荐依赖考生**自己怎么说**，过度改写会造成信息 gap。
+## Core principle: preserve the student's original wording
 
-| 做法 | 说明 |
-|------|------|
-| ✅ 保留原话 | `interests`、`family_situation`、`career_direction`、`notes` 等文本字段，**尽量使用考生原句或贴近原意的完整表述**，不润色、不升华、不替考生总结 |
-| ✅ 如实记录 | 考生口语、重复、模糊表述均可保留；可在 `notes` 中补充其原话，而非改写成「标准答案」 |
-| ✅ 仅做必要结构化 | `province`、`score`、`classify`、`subjects` 等 API 必填项，只做格式归一（如分数取整数、选科逗号分隔） |
-| ✅ 显式信息才入库 | `preferred_*` 仅记录考生**明确说出**的院校、城市、层次、专业类；未提及则不臆造 |
-| ❌ 禁止过度干预 | 不把「想搞代码」改写成「计算机科学与技术方向」；不替考生补充其未表达的职业规划；不在本阶段做专业/院校推荐或倾向推断 |
+**Collect only, do not process.** Downstream major/school recommendations depend on
+**how the students describe themselves**; heavy rewriting creates information gaps.
 
-向用户复述确认时，也应**引用其原话**核对，而非用你改写后的版本代替。
+| Practice | Explanation |
+|----------|-------------|
+| ✅ Keep original wording | For text fields like `interests`, `family_situation`, `career_direction`, `notes`, **use the student's own sentences or a faithful complete rendering** — no polishing, no embellishing, no summarizing on their behalf |
+| ✅ Record faithfully | Colloquialisms, repetition, and vague wording are all fine; you may quote their exact words in `notes` instead of rewriting them into a "standard answer" |
+| ✅ Only minimal structuring | For API-required fields (`province`, `score`, `classify`, `subjects`), only normalize the format (integer scores, comma-separated subjects) |
+| ✅ Explicit info only | Record `preferred_*` fields only for universities, cities, tiers, and major classes the student **explicitly mentioned**; never invent them |
+| ❌ No over-interpreting | Do not rewrite "I want to write code" into "Computer Science and Technology direction"; do not invent career plans the student never expressed; do not make major/school recommendations or infer preferences at this stage |
 
-## 上下游
+When reading back to the user for confirmation, **quote their original words** rather
+than substituting your own rewritten version.
 
-- **上游**：无
-- **下游**：[gaokao-fetch-volunteers](../gaokao-fetch-volunteers/SKILL.md) 读取本 Skill 输出，将倾向映射为 API 选填参数
+## Pipeline position
 
-## 采集清单
+- **Upstream**: none
+- **Downstream**: [gaokao-fetch-volunteers](../gaokao-fetch-volunteers/SKILL.md) reads this skill's output and maps preferences to optional API parameters
 
-### API 必填（写入 `student.json` 顶层）
+## Collection checklist
 
-| 字段 | 说明 | 示例 |
-|------|------|------|
-| `province` | 高考省份 | 山东 |
-| `classify` | 文科/理科/物理/历史/综合 | 综合 |
-| `score` | 高考成绩（整数） | 650 |
-| `batch` | 填报批次 | 本科批 |
-| `subjects` | 3+1+2：**完整三科**（首选科目+两门再选）；3+3：完整三科；老高考 `null` | `物理,化学,生物` |
-| `gradeType` | 仅北京/上海/天津：本科/专科 | 本科 |
-| `rank` | 位次，无则 `null` | 5000 |
+### API-required (written to the top level of `student.json`)
 
-### 辅助画像（原话优先，供下游分析）
+| Field | Description | Example |
+|-------|-------------|---------|
+| `province` | Gaokao province (API value = Chinese province name) | `"\u5c71\u4e1c"` = Shandong |
+| `classify` | Liberal arts / science / physics / history / comprehensive | `"\u7efc\u5408"` = comprehensive |
+| `score` | Gaokao score (integer) | 650 |
+| `batch` | Application batch | `"\u672c\u79d1\u6279"` = undergraduate batch |
+| `subjects` | 3+1+2: **all three subjects** (primary + two electives); 3+3: all three; old system: `null` | `"\u7269\u7406,\u5316\u5b66,\u751f\u7269"` = physics, chemistry, biology |
+| `gradeType` | Only Beijing/Shanghai/Tianjin: undergraduate or vocational | `"\u672c\u79d1"` = undergraduate |
+| `rank` | Provincial rank; `null` if unknown | 5000 |
 
-| 字段 | 说明 | 填写要求 |
-|------|------|----------|
-| `interests` | 兴趣爱好 | **考生原话**，逗号或自然句均可，勿概括 |
-| `family_situation` | 家庭情况 | **考生原话**，保留其表述的经济、地域、深造态度等 |
-| `career_direction` | 未来就业/发展方向 | **考生原话**，哪怕模糊也照录，不下结论 |
-| `subject_scores` | 各科分数 | 数字字段，按考生填报 |
-| `preferred_cities` | 意向城市 | 仅列考生**明确提到**的城市 |
-| `preferred_provinces` | 意向省份 | 考生明确提到则录入；否则可留空，由下游从城市推导 |
-| `preferred_universities` | 心仪院校 | 使用考生口中的**校名全称或原称**，不擅自替换简称 |
-| `preferred_tags` | 院校层次意向 | 仅录考生**亲口说过**的（如「想上 985」），勿自行推断 |
-| `preferred_major_classes` | 专业类意向 | 仅录考生**明确提到**的专业/方向，勿从兴趣推断改写 |
-| `notes` | 其他补充 | 不适合归入上述字段的**原话**、禁忌、特殊诉求 |
+### Auxiliary profile (original wording first; for downstream analysis)
 
-倾向字段的 API 映射由下游 [gaokao-fetch-volunteers](../gaokao-fetch-volunteers/SKILL.md) 处理；本阶段**不必**为凑 API 参数而改写或补全 `preferred_*`。
+| Field | Description | How to fill |
+|-------|-------------|-------------|
+| `interests` | Hobbies and interests | **The student's own words** — comma-separated or natural sentences; do not summarize |
+| `family_situation` | Family situation | **The student's own words** — keep their statements about finances, location, attitude toward further study, etc. |
+| `career_direction` | Future career / development direction | **The student's own words** — record even vague answers verbatim; do not draw conclusions |
+| `subject_scores` | Per-subject scores | Numeric fields as reported by the student |
+| `preferred_cities` | Preferred cities | Only cities the student **explicitly mentioned** |
+| `preferred_provinces` | Preferred provinces | Record if the student mentioned them; otherwise may stay empty (downstream derives them from cities) |
+| `preferred_universities` | Desired universities | Use the **full name or the exact name the student used**; never silently replace abbreviations |
+| `preferred_tags` | University tier preference | Only what the student **actually said** (e.g. "I want a 985"); do not infer on your own |
+| `preferred_major_classes` | Major-class preference | Only majors/directions the student **explicitly mentioned**; do not derive from interests |
+| `notes` | Anything else | Original words, taboos, special requests that don't fit the fields above |
 
-## 工作流程
+The mapping from preference fields to API parameters is handled downstream by
+[gaokao-fetch-volunteers](../gaokao-fetch-volunteers/SKILL.md); at this stage you do
+**not** need to rewrite or complete `preferred_*` just to satisfy API parameters.
 
-1. 用自然语言逐项询问，缺什么问什么；可分批提问。
-2. **按省份确定选科模式并填对 API 字段**（见下表与 [reference.md](reference.md)）。
-3. 将考生回答**按原意录入**对应字段；仅对 API 必填项做格式归一。
-4. 信息齐全后保存 `output/student.json`，**用考生原话复述**关键内容并请其确认。
+## Workflow
 
-### 按省份填 classify / subjects / gradeType（SOP）
+1. Ask in natural language, item by item; ask only for what's missing; batching questions is fine.
+2. **Determine the subject-combination mode by province and fill the API fields correctly**
+   (see the table below and [reference.md](reference.md)).
+3. Record the student's answers **faithfully** into the corresponding fields; format-normalize only the API-required fields.
+4. Once the info is complete, save `output/student.json`, **read back the key content in the student's own words**, and ask them to confirm.
 
-| 模式 | 省份 | classify | subjects | gradeType |
-|------|------|----------|----------|-----------|
-| 老高考 | 新疆 | 文科 **或** 理科 | `null`（不传选科） | `null` |
-| 3+1+2 | 粤苏冀鄂湘闽辽渝甘黑吉皖赣贵桂云蒙川宁晋豫陕青 | 物理 **或** 历史 | **完整三科**：`物理,化学,生物`（须含首选科目，不能只写两门再选） | `null` |
-| 3+3 | 沪京津鲁浙琼 | **综合**（不能填物理/历史） | 三科；浙江可选 `技术` | 仅京沪津：`本科`/`专科` |
+### Per-province classify / subjects / gradeType (SOP)
 
-**采集要点**：
+| Mode | Provinces | classify | subjects | gradeType |
+|------|-----------|----------|----------|-----------|
+| Old system | Xinjiang | Liberal arts **or** science | `null` (do not send subjects) | `null` |
+| 3+1+2 | Guangdong, Jiangsu, Hebei, Hubei, Hunan, Fujian, Liaoning, Chongqing, Gansu, Heilongjiang, Jilin, Anhui, Jiangxi, Guizhou, Guangxi, Yunnan, Inner Mongolia, Sichuan, Ningxia, Shanxi, Henan, Shaanxi, Qinghai | Physics **or** history | **All three subjects**: `"\u7269\u7406,\u5316\u5b66,\u751f\u7269"` (must include the primary subject; never only the two electives) | `null` |
+| 3+3 | Shanghai, Beijing, Tianjin, Shandong, Zhejiang, Hainan | **Comprehensive** (never physics/history) | Three subjects; Zhejiang may also choose technology (Generic Technology) | Only Beijing/Shanghai/Tianjin: `"\u672c\u79d1"` (undergraduate) / `"\u4e13\u79d1"` (vocational) |
 
-- 问清考生是**文科还是理科**（新疆），或**物理类还是历史类**（3+1+2），或直接记选科（3+3 填 `classify=综合`）。
-- **3+1+2 的 `subjects` 须录完整三科**（如物化生），包含与 `classify` 一致的首选科目，不能只录化学、生物两门。
-- 京沪津需确认报**本科还是专科**（专科仅语数外 450 分制）。
-- 新疆必须采集 **score**；仅有位次不够。
-- **西藏**：测试环境不支持志愿接口，采集时应告知用户。
-- `batch` 可填考生口中的「本科批」，下游 batch/list 会自动解析。
+**Collection tips**:
 
-## 输出格式
+- Clarify whether the student is **liberal arts or science** (Xinjiang), **physics or history track** (3+1+2), or simply record their three subjects (3+3 uses `classify = "\u7efc\u5408"`).
+- For **3+1+2, `subjects` must contain all three subjects** (e.g. physics-chemistry-biology), including the primary subject consistent with `classify`; never record only chemistry and biology.
+- For Beijing/Shanghai/Tianjin, confirm whether the student applies for **undergraduate or vocational** (vocational only tests Chinese/math/English, 450-point scale).
+- Xinjiang requires a **score**; a rank alone is not enough.
+- **Tibet**: the test environment does not support the volunteer API — tell the user during collection.
+- `batch` may use the student's generic phrasing such as `"\u672c\u79d1\u6279"` (undergraduate batch); downstream batch/list resolves it automatically.
 
-参考 [examples/student_template.json](examples/student_template.json)、[examples/student_shandong.json](examples/student_shandong.json)。
+## Output format
+
+See [examples/student_template.json](examples/student_template.json) and
+[examples/student_shandong.json](examples/student_shandong.json).
 
 ```json
 {
-  "province": "山东",
-  "classify": "综合",
-  "subjects": "物理,化学,生物",
+  "province": "\u5c71\u4e1c",
+  "classify": "\u7efc\u5408",
+  "subjects": "\u7269\u7406,\u5316\u5b66,\u751f\u7269",
   "score": 650,
-  "batch": "本科批",
+  "batch": "\u672c\u79d1\u6279",
   "rank": null,
   "gradeType": null,
-  "interests": "考生原话，勿改写",
-  "career_direction": "考生原话，勿改写",
-  "family_situation": "考生原话，勿改写",
-  "preferred_cities": ["北京", "上海", "深圳"],
-  "preferred_provinces": ["北京", "上海", "广东"],
-  "preferred_universities": ["北京航空航天大学"],
+  "interests": "<student's own words, do not rewrite>",
+  "career_direction": "<student's own words, do not rewrite>",
+  "family_situation": "<student's own words, do not rewrite>",
+  "preferred_cities": ["\u5317\u4eac", "\u4e0a\u6d77", "\u6df1\u5733"],
+  "preferred_provinces": ["\u5317\u4eac", "\u4e0a\u6d77", "\u5e7f\u4e1c"],
+  "preferred_universities": ["\u5317\u4eac\u822a\u7a7a\u822a\u5929\u5927\u5b66"],
   "preferred_tags": ["985", "211"],
-  "preferred_major_classes": ["计算机类", "电子信息类"],
-  "notes": "不接受偏远地区"
+  "preferred_major_classes": ["\u8ba1\u7b97\u673a\u7c7b", "\u7535\u5b50\u4fe1\u606f\u7c7b"],
+  "notes": "Not willing to consider remote regions"
 }
 ```
 
-## 注意事项
+(`\u5317\u4eac` = Beijing, `\u4e0a\u6d77` = Shanghai, `\u6df1\u5733` = Shenzhen,
+`\u5e7f\u4e1c` = Guangdong, `\u5317\u4eac\u822a\u7a7a\u822a\u5929\u5927\u5b66` = Beihang University,
+`\u8ba1\u7b97\u673a\u7c7b` = Computer Science class, `\u7535\u5b50\u4fe1\u606f\u7c7b` = Electronic Information class.)
 
-- `batch` 下游会通过 batch/list 自动解析，此处可填用户口中的「本科批」。
-- **classify 必须与省份模式一致**（最常见错误：山东填了物理）。完整踩坑见 [gaokao-fetch-volunteers/reference.md](../gaokao-fetch-volunteers/reference.md)。
-- 排斥性偏好（如不要偏远）用考生原话写入 `notes`，**不要**写入 `preferred_provinces`，也不要改写成书面语。
-- 复述确认时展示的是**考生自己的表述**，不是 Agent 润色后的版本。
-- 输出路径使用绝对路径交付用户。
+## Notes
 
-## 附加资源
+- `batch` is resolved downstream via batch/list, so the student's generic phrasing (e.g. `"\u672c\u79d1\u6279"`) is fine here.
+- **`classify` must match the province's mode** (most common mistake: sending physics for Shandong). See [gaokao-fetch-volunteers/reference.md](../gaokao-fetch-volunteers/reference.md) for the full pitfall list.
+- Exclusionary preferences (e.g. "no remote regions") go into `notes` in the student's own words — **not** into `preferred_provinces`, and do not rewrite them into formal language.
+- When reading back for confirmation, show **the student's own wording**, not a polished agent version.
+- Deliver the output path to the user as an absolute path.
 
-- [reference.md](reference.md) — 省份选科模式与 batch 对照
-- [preference_mapping.md](../gaokao-fetch-volunteers/preference_mapping.md) — 倾向 → API 参数映射
+## Additional resources
+
+- [reference.md](reference.md) — province subject-combination modes and batch quick reference
+- [preference_mapping.md](../gaokao-fetch-volunteers/preference_mapping.md) — preference → API parameter mapping

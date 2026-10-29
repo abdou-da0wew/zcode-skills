@@ -1,0 +1,1675 @@
+     1→<!DOCTYPE html>
+     2→<html lang="zh-CN">
+     3→<head>
+     4→<meta charset="UTF-8" />
+     5→<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+     6→<title>AERIA · 留白时刻的环境智能</title>
+     7→<link rel="preconnect" href="https://fonts.googleapis.com">
+     8→<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     9→<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Serif+SC:wght@300;400&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    10→<style>
+    11→  :root {
+    12→    --bg: #0a0e0a;          /* 深林夜色 */
+    13→    --bg-deep: #050805;
+    14→    --ink: #ece9df;          /* 米白墨色 */
+    15→    --ink-mute: #8a8c80;
+    16→    --line: rgba(236, 233, 223, 0.18);
+    17→    --line-soft: rgba(236, 233, 223, 0.08);
+    18→    --accent: #f5e7c4;       /* 暖金光 */
+    19→    --accent-soft: #c9b88a;
+    20→  }
+    21→  * { box-sizing: border-box; margin: 0; padding: 0; }
+    22→  html, body {
+    23→    background: var(--bg);
+    24→    color: var(--ink);
+    25→    font-family: 'Noto Sans SC', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    26→    font-weight: 300;
+    27→    height: 100%;
+    28→    overflow: hidden;
+    29→    cursor: none;
+    30→    -webkit-font-smoothing: antialiased;
+    31→    text-rendering: optimizeLegibility;
+    32→  }
+    33→  body { letter-spacing: 0; }
+    34→  a { color: inherit; text-decoration: none; }
+    35→  .serif {
+    36→    font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+    37→    font-style: italic; font-weight: 300;
+    38→  }
+    39→  .serif-cn { font-family: 'Noto Serif SC', serif; font-weight: 300; }
+    40→
+    41→  /* ---------- canvas ---------- */
+    42→  #scene {
+    43→    position: fixed; inset: 0;
+    44→    width: 100%; height: 100%;
+    45→    z-index: 1;
+    46→    transition: filter 0.9s ease, opacity 0.9s ease;
+    47→  }
+    48→  body.page-open #scene { filter: blur(14px) brightness(0.32) saturate(0.7); }
+    49→
+    50→  /* ---------- vignette / atmosphere ---------- */
+    51→  .vignette {
+    52→    position: fixed; inset: 0; z-index: 2; pointer-events: none;
+    53→    background:
+    54→      radial-gradient(ellipse at 50% 35%, transparent 30%, rgba(0,0,0,0.55) 100%),
+    55→      linear-gradient(180deg, rgba(255,238,200,0.04) 0%, transparent 30%, rgba(0,0,0,0.18) 100%);
+    56→    mix-blend-mode: multiply;
+    57→  }
+    58→  .grain {
+    59→    position: fixed; inset: 0; z-index: 3; pointer-events: none;
+    60→    opacity: 0.08; mix-blend-mode: overlay;
+    61→    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    62→  }
+    63→
+    64→  /* ---------- header ---------- */
+    65→  header {
+    66→    position: fixed; top: 0; left: 0; right: 0;
+    67→    z-index: 60;
+    68→    display: flex; align-items: center; justify-content: space-between;
+    69→    padding: 24px 36px;
+    70→  }
+    71→  .logo {
+    72→    font-family: 'Cormorant Garamond', serif;
+    73→    font-style: italic; font-size: 24px; letter-spacing: 0.02em;
+    74→    color: var(--ink);
+    75→  }
+    76→  .logo sup { font-size: 10px; vertical-align: super; opacity: 0.5; margin-left: 2px; }
+    77→  nav.main {
+    78→    display: flex; gap: 32px;
+    79→    font-size: 12px;
+    80→    color: var(--ink);
+    81→  }
+    82→  nav.main a {
+    83→    position: relative; padding: 4px 0;
+    84→    overflow: hidden; display: inline-block;
+    85→    height: 24px; line-height: 24px;
+    86→  }
+    87→  nav.main a span {
+    88→    display: block;
+    89→    height: 24px; line-height: 24px;
+    90→    transition: transform .55s cubic-bezier(.7,.05,.3,1);
+    91→    letter-spacing: 0.06em;
+    92→  }
+    93→  nav.main a span.alt {
+    94→    position: absolute; top: 100%; left: 0;
+    95→    font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+    96→    font-style: italic; font-size: 16px;
+    97→    letter-spacing: 0.04em;
+    98→    color: var(--accent);
+    99→  }
+   100→  nav.main a:hover span.regular { transform: translateY(-100%); }
+   101→  nav.main a:hover span.alt { transform: translateY(-100%); }
+   102→
+   103→  /* ---------- cursor ---------- */
+   104→  .cursor {
+   105→    position: fixed; top: 0; left: 0; z-index: 9999;
+   106→    width: 12px; height: 12px; border-radius: 50%;
+   107→    background: var(--accent);
+   108→    pointer-events: none;
+   109→    transform: translate(-50%, -50%);
+   110→    mix-blend-mode: difference;
+   111→    transition: width .25s, height .25s, background .25s, opacity .25s;
+   112→  }
+   113→  .cursor.hover {
+   114→    width: 56px; height: 56px;
+   115→    background: transparent;
+   116→    border: 1px solid var(--accent);
+   117→  }
+   118→  .cursor.click { transform: translate(-50%, -50%) scale(0.6); }
+   119→
+   120→  /* ---------- loader ---------- */
+   121→  .loader {
+   122→    position: fixed; inset: 0; z-index: 200;
+   123→    background: var(--bg);
+   124→    display: flex; align-items: center; justify-content: center;
+   125→    flex-direction: column;
+   126→    transition: opacity 1.2s ease, visibility 1.2s ease;
+   127→  }
+   128→  .loader.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+   129→  .loader__title {
+   130→    font-family: 'Cormorant Garamond', serif;
+   131→    font-style: italic; font-size: clamp(56px, 10vw, 132px);
+   132→    letter-spacing: -0.01em; line-height: 1;
+   133→    color: var(--accent);
+   134→    overflow: hidden;
+   135→    display: flex;
+   136→  }
+   137→  .loader__title span {
+   138→    display: inline-block;
+   139→    transform: translateY(110%);
+   140→    animation: rise 1.1s cubic-bezier(.2,.8,.2,1) forwards;
+   141→  }
+   142→  .loader__title span:nth-child(1){ animation-delay: 0.10s; }
+   143→  .loader__title span:nth-child(2){ animation-delay: 0.18s; }
+   144→  .loader__title span:nth-child(3){ animation-delay: 0.26s; }
+   145→  .loader__title span:nth-child(4){ animation-delay: 0.34s; }
+   146→  .loader__title span:nth-child(5){ animation-delay: 0.42s; }
+   147→  @keyframes rise { to { transform: translateY(0); } }
+   148→  .loader__sub {
+   149→    margin-top: 22px; font-size: 11px; letter-spacing: 0.4em;
+   150→    color: var(--ink-mute); opacity: 0; animation: fade 1s ease 0.9s forwards;
+   151→  }
+   152→  .loader__enter {
+   153→    margin-top: 64px;
+   154→    background: transparent; border: 1px solid var(--accent);
+   155→    color: var(--accent); padding: 16px 42px;
+   156→    font-family: 'Noto Sans SC', sans-serif; font-size: 12px; letter-spacing: 0.4em;
+   157→    cursor: none;
+   158→    opacity: 0; animation: fade 1s ease 1.4s forwards;
+   159→    transition: background 0.4s, color 0.4s;
+   160→  }
+   161→  .loader__enter:hover { background: var(--accent); color: var(--bg); }
+   162→  @keyframes fade { to { opacity: 1; } }
+   163→
+   164→  /* ---------- station overlay ---------- */
+   165→  .stations {
+   166→    position: fixed; inset: 0; z-index: 20; pointer-events: none;
+   167→  }
+   168→  .station {
+   169→    position: absolute; left: 0; right: 0;
+   170→    padding: 0 9vw;
+   171→    opacity: 0; visibility: hidden;
+   172→    transition: opacity 1.1s ease, transform 1.4s cubic-bezier(.2,.7,.3,1);
+   173→    transform: translateY(20px);
+   174→    will-change: opacity, transform;
+   175→  }
+   176→  .station.active { opacity: 1; visibility: visible; transform: translateY(0); }
+   177→
+   178→  .station--center {
+   179→    top: 50%; transform: translateY(calc(-50% + 30px));
+   180→    text-align: center;
+   181→  }
+   182→  .station--center.active { transform: translateY(-50%); }
+   183→
+   184→  .station--bottom { bottom: 12vh; }
+   185→  .station--bottom.active { transform: translateY(0); }
+   186→
+   187→  .station h1 {
+   188→    font-family: 'Noto Serif SC', serif;
+   189→    font-weight: 300;
+   190→    font-size: clamp(38px, 5.4vw, 84px);
+   191→    line-height: 1.18; letter-spacing: 0.02em;
+   192→    color: var(--ink);
+   193→  }
+   194→  .station h1 em {
+   195→    font-style: normal; font-weight: 400;
+   196→    color: var(--accent);
+   197→  }
+   198→  .station h2 {
+   199→    font-family: 'Noto Serif SC', serif;
+   200→    font-weight: 300;
+   201→    font-size: clamp(28px, 3.8vw, 56px);
+   202→    line-height: 1.25;
+   203→  }
+   204→  .station h2 em {
+   205→    font-style: normal; font-weight: 400;
+   206→    color: var(--accent);
+   207→  }
+   208→  .eyebrow {
+   209→    font-size: 11px; letter-spacing: 0.3em;
+   210→    color: var(--ink-mute); margin-bottom: 22px;
+   211→    display: inline-flex; align-items: center; gap: 8px;
+   212→  }
+   213→  .eyebrow::before {
+   214→    content: ''; width: 22px; height: 1px; background: var(--accent);
+   215→  }
+   216→  .lede {
+   217→    margin-top: 28px;
+   218→    max-width: 540px;
+   219→    font-size: 15px; line-height: 1.85;
+   220→    color: rgba(236,233,223,0.74);
+   221→  }
+   222→  .station--center .lede { margin-left: auto; margin-right: auto; }
+   223→
+   224→  /* feature grid station */
+   225→  .grid-row {
+   226→    display: flex; gap: 72px; align-items: flex-end;
+   227→    max-width: 1180px;
+   228→  }
+   229→  .grid-row > div { flex: 1; }
+   230→  .grid-num {
+   231→    font-family: 'Cormorant Garamond', serif; font-style: italic;
+   232→    font-size: 16px; color: var(--accent); margin-bottom: 14px;
+   233→  }
+   234→  .grid-title {
+   235→    font-family: 'Noto Serif SC', serif;
+   236→    font-size: 30px; line-height: 1.15; margin-bottom: 12px;
+   237→  }
+   238→  .grid-text {
+   239→    font-size: 14px; line-height: 1.85; color: rgba(236,233,223,0.72);
+   240→  }
+   241→  .grid-meta-label {
+   242→    font-size: 10px; letter-spacing: 0.3em;
+   243→    color: var(--ink-mute); margin-bottom: 10px;
+   244→  }
+   245→
+   246→  /* CTA */
+   247→  .cta {
+   248→    display: inline-flex; align-items: center; gap: 14px;
+   249→    margin-top: 42px;
+   250→    padding: 16px 32px;
+   251→    border: 1px solid rgba(245,231,196,0.45);
+   252→    border-radius: 100px;
+   253→    font-size: 12px; letter-spacing: 0.3em;
+   254→    color: var(--accent);
+   255→    pointer-events: auto;
+   256→    transition: background 0.4s, color 0.4s, border-color 0.4s;
+   257→    cursor: none;
+   258→  }
+   259→  .cta:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+   260→  .cta svg { width: 14px; height: 14px; }
+   261→
+   262→  /* hint at bottom */
+   263→  .hint {
+   264→    position: fixed;
+   265→    bottom: 26px; left: 36px;
+   266→    z-index: 50;
+   267→    font-size: 10px; letter-spacing: 0.32em;
+   268→    color: var(--ink-mute);
+   269→    display: flex; align-items: center; gap: 14px;
+   270→    transition: opacity .6s;
+   271→  }
+   272→  .hint.fade { opacity: 0.25; }
+   273→  .hint__dot {
+   274→    width: 6px; height: 6px; border-radius: 50%;
+   275→    background: var(--accent);
+   276→    animation: pulse 1.6s ease-in-out infinite;
+   277→  }
+   278→  @keyframes pulse {
+   279→    0%, 100% { opacity: 0.4; transform: scale(0.9);}
+   280→    50% { opacity: 1; transform: scale(1.2);}
+   281→  }
+   282→
+   283→  /* progress bar */
+   284→  .progress {
+   285→    position: fixed;
+   286→    bottom: 26px; right: 36px;
+   287→    z-index: 50;
+   288→    display: flex; align-items: center; gap: 14px;
+   289→    font-size: 10px; letter-spacing: 0.32em;
+   290→    color: var(--ink-mute);
+   291→  }
+   292→  .progress__bar {
+   293→    width: 140px; height: 1px;
+   294→    background: rgba(236,233,223,0.22);
+   295→    position: relative;
+   296→  }
+   297→  .progress__fill {
+   298→    position: absolute; left: 0; top: 0;
+   299→    height: 100%; width: 0%;
+   300→    background: var(--accent);
+   301→    transition: width 0.18s ease;
+   302→  }
+   303→  .progress__num { width: 32px; text-align: right; font-feature-settings: 'tnum'; }
+   304→
+   305→  /* chapter index left */
+   306→  .chapters {
+   307→    position: fixed;
+   308→    top: 50%; left: 36px;
+   309→    transform: translateY(-50%);
+   310→    z-index: 50;
+   311→    display: flex; flex-direction: column; gap: 18px;
+   312→  }
+   313→  .chapters__item {
+   314→    display: flex; align-items: center; gap: 14px;
+   315→    cursor: none; pointer-events: auto;
+   316→    color: var(--ink-mute); font-size: 11px; letter-spacing: 0.18em;
+   317→    opacity: 0.55;
+   318→    transition: opacity .4s, color .4s;
+   319→  }
+   320→  .chapters__item:hover { opacity: 1; }
+   321→  .chapters__item.active { opacity: 1; color: var(--accent); }
+   322→  .chapters__item .dash {
+   323→    width: 24px; height: 1px; background: currentColor;
+   324→    transition: width .4s;
+   325→  }
+   326→  .chapters__item.active .dash { width: 50px; }
+   327→
+   328→  /* ---------- sub pages ---------- */
+   329→  .page {
+   330→    position: fixed; inset: 0;
+   331→    z-index: 100;
+   332→    background: rgba(10,14,10,0.90);
+   333→    backdrop-filter: blur(24px);
+   334→    -webkit-backdrop-filter: blur(24px);
+   335→    overflow-y: auto; overflow-x: hidden;
+   336→    opacity: 0; visibility: hidden; pointer-events: none;
+   337→    transition: opacity .8s ease, visibility .8s ease;
+   338→  }
+   339→  .page.open { opacity: 1; visibility: visible; pointer-events: auto; }
+   340→  .page__inner {
+   341→    max-width: 1280px; margin: 0 auto;
+   342→    padding: 120px 8vw 120px;
+   343→  }
+   344→  .page__nav {
+   345→    position: sticky; top: 0;
+   346→    display: flex; align-items: center; justify-content: space-between;
+   347→    padding: 22px 0;
+   348→    margin: -120px -8vw 80px;
+   349→    padding-left: 8vw; padding-right: 8vw;
+   350→    background: linear-gradient(180deg, rgba(10,14,10,0.96), rgba(10,14,10,0));
+   351→    backdrop-filter: blur(8px);
+   352→    z-index: 5;
+   353→  }
+   354→  .page__back {
+   355→    font-size: 11px; letter-spacing: 0.3em;
+   356→    color: var(--ink-mute); cursor: none;
+   357→    display: flex; align-items: center; gap: 12px;
+   358→    transition: color .3s;
+   359→  }
+   360→  .page__back:hover { color: var(--accent); }
+   361→  .page__crumb {
+   362→    font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+   363→    font-style: italic;
+   364→    font-size: 14px; color: var(--ink-mute);
+   365→  }
+   366→  .page__hero {
+   367→    border-top: 1px solid var(--line);
+   368→    padding-top: 36px;
+   369→    margin-bottom: 80px;
+   370→  }
+   371→  .page__eyebrow {
+   372→    font-size: 11px; letter-spacing: 0.3em;
+   373→    color: var(--accent); margin-bottom: 24px;
+   374→  }
+   375→  .page__title {
+   376→    font-family: 'Noto Serif SC', serif; font-weight: 300;
+   377→    font-size: clamp(48px, 7vw, 108px);
+   378→    line-height: 1.1; letter-spacing: 0.02em;
+   379→  }
+   380→  .page__title em {
+   381→    font-style: normal; font-weight: 400;
+   382→    color: var(--accent);
+   383→  }
+   384→  .page__lede {
+   385→    margin-top: 44px;
+   386→    max-width: 660px;
+   387→    font-size: 18px; line-height: 1.7;
+   388→    color: rgba(236,233,223,0.78);
+   389→  }
+   390→
+   391→  /* features page */
+   392→  .feat-list { display: grid; gap: 0; }
+   393→  .feat-row {
+   394→    display: grid;
+   395→    grid-template-columns: 80px 1.1fr 2fr 1.4fr;
+   396→    gap: 36px;
+   397→    padding: 56px 0;
+   398→    border-top: 1px solid var(--line);
+   399→    align-items: start;
+   400→  }
+   401→  .feat-row:last-child { border-bottom: 1px solid var(--line); }
+   402→  .feat-row__num {
+   403→    font-family: 'Cormorant Garamond', serif; font-style: italic;
+   404→    font-size: 18px; color: var(--accent);
+   405→  }
+   406→  .feat-row__name {
+   407→    font-family: 'Noto Serif SC', serif;
+   408→    font-size: 38px; line-height: 1.05;
+   409→    font-weight: 300;
+   410→  }
+   411→  .feat-row__name em {
+   412→    font-family: 'Cormorant Garamond', serif;
+   413→    font-style: italic; color: var(--accent);
+   414→    margin-right: 8px;
+   415→  }
+   416→  .feat-row__desc {
+   417→    font-size: 14px; line-height: 1.85; color: rgba(236,233,223,0.78);
+   418→  }
+   419→  .feat-row__meta {
+   420→    font-size: 11px; line-height: 1.85; color: var(--ink-mute);
+   421→    letter-spacing: 0.1em;
+   422→  }
+   423→  .feat-row__meta b {
+   424→    color: var(--ink); font-weight: 400;
+   425→    display: block; margin-bottom: 4px;
+   426→    letter-spacing: 0.18em; font-size: 10px;
+   427→  }
+   428→
+   429→  /* pricing */
+   430→  .price-grid {
+   431→    display: grid; grid-template-columns: repeat(3, 1fr);
+   432→    gap: 24px;
+   433→    margin-top: 60px;
+   434→  }
+   435→  .price-card {
+   436→    border: 1px solid var(--line);
+   437→    padding: 40px 32px;
+   438→    display: flex; flex-direction: column; min-height: 500px;
+   439→    background: rgba(245, 231, 196, 0.03);
+   440→    transition: border-color .4s, background .4s, transform .4s;
+   441→  }
+   442→  .price-card:hover {
+   443→    border-color: var(--accent);
+   444→    transform: translateY(-4px);
+   445→  }
+   446→  .price-card.featured {
+   447→    border-color: var(--accent);
+   448→    background: rgba(245,231,196,0.06);
+   449→  }
+   450→  .price-card__name {
+   451→    font-family: 'Noto Serif SC', serif;
+   452→    font-size: 32px; margin-bottom: 6px; font-weight: 300;
+   453→  }
+   454→  .price-card__name em {
+   455→    font-family: 'Cormorant Garamond', serif; font-style: italic;
+   456→    color: var(--accent); margin-right: 8px;
+   457→  }
+   458→  .price-card__tag {
+   459→    font-size: 11px; letter-spacing: 0.18em;
+   460→    color: var(--ink-mute); margin-bottom: 30px;
+   461→  }
+   462→  .price-card__amt {
+   463→    font-family: 'Cormorant Garamond', serif;
+   464→    font-size: 64px; line-height: 1; margin-bottom: 6px;
+   465→    color: var(--ink);
+   466→  }
+   467→  .price-card__amt sup { font-size: 22px; vertical-align: top; opacity: 0.6; }
+   468→  .price-card__per { font-size: 12px; color: var(--ink-mute); margin-bottom: 28px; }
+   469→  .price-card__feat {
+   470→    list-style: none; flex-grow: 1;
+   471→    border-top: 1px solid var(--line);
+   472→    padding-top: 22px;
+   473→  }
+   474→  .price-card__feat li {
+   475→    padding: 10px 0; font-size: 13px;
+   476→    color: rgba(236,233,223,0.82);
+   477→    border-bottom: 1px solid var(--line-soft);
+   478→    line-height: 1.5;
+   479→  }
+   480→  .price-card__cta {
+   481→    margin-top: 28px; padding: 14px 0;
+   482→    text-align: center;
+   483→    font-size: 11px; letter-spacing: 0.3em;
+   484→    border: 1px solid var(--line); cursor: none;
+   485→    transition: background .3s, color .3s, border-color .3s;
+   486→  }
+   487→  .price-card__cta:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+   488→  .price-card.featured .price-card__cta { border-color: var(--accent); color: var(--accent); }
+   489→  .price-card.featured .price-card__cta:hover { background: var(--accent); color: var(--bg); }
+   490→
+   491→  /* story */
+   492→  .story-grid {
+   493→    display: grid; grid-template-columns: 1fr 1fr;
+   494→    gap: 80px;
+   495→    margin-bottom: 80px;
+   496→    align-items: start;
+   497→  }
+   498→  .story-img {
+   499→    width: 100%; aspect-ratio: 4/5; object-fit: cover;
+   500→    filter: grayscale(0.15) contrast(1.02) sepia(0.08);
+   501→  }
+   502→  .story-text p {
+   503→    font-size: 15px; line-height: 1.95;
+   504→    color: rgba(236,233,223,0.85);
+   505→    margin-bottom: 24px;
+   506→  }
+   507→  .story-text p.first::first-letter {
+   508→    font-family: 'Cormorant Garamond', serif; font-style: italic;
+   509→    font-size: 88px; line-height: 0.85; float: left;
+   510→    margin: 6px 18px 0 0; color: var(--accent);
+   511→  }
+   512→  .story-pull {
+   513→    font-family: 'Noto Serif SC', serif;
+   514→    font-size: 38px; line-height: 1.4; font-weight: 300;
+   515→    margin: 100px auto;
+   516→    max-width: 820px; text-align: center;
+   517→    color: var(--ink);
+   518→    position: relative;
+   519→  }
+   520→  .story-pull em {
+   521→    font-style: normal; font-weight: 400;
+   522→    color: var(--accent);
+   523→  }
+   524→  .story-pull::before, .story-pull::after {
+   525→    content: '"';
+   526→    font-family: 'Cormorant Garamond', serif;
+   527→    font-style: italic;
+   528→    font-size: 80px; line-height: 0;
+   529→    color: var(--accent); opacity: 0.4;
+   530→    position: relative; vertical-align: -0.4em;
+   531→  }
+   532→  .story-pull::after { content: '"'; }
+   533→  .credits {
+   534→    border-top: 1px solid var(--line); padding-top: 44px;
+   535→    display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
+   536→    font-size: 13px;
+   537→  }
+   538→  .credits dt {
+   539→    font-size: 10px; letter-spacing: 0.28em;
+   540→    color: var(--ink-mute); margin-bottom: 10px;
+   541→  }
+   542→  .credits dd { color: var(--ink); line-height: 1.7; }
+   543→
+   544→  /* contact */
+   545→  .contact-grid {
+   546→    display: grid; grid-template-columns: 1.1fr 1fr;
+   547→    gap: 80px;
+   548→  }
+   549→  .contact-form { display: flex; flex-direction: column; gap: 22px; }
+   550→  .contact-form input, .contact-form textarea {
+   551→    background: transparent;
+   552→    border: none; border-bottom: 1px solid var(--line);
+   553→    color: var(--ink); padding: 14px 0;
+   554→    font-family: inherit; font-size: 14px;
+   555→    outline: none; cursor: none;
+   556→    transition: border-color .3s;
+   557→  }
+   558→  .contact-form input::placeholder, .contact-form textarea::placeholder {
+   559→    color: var(--ink-mute);
+   560→  }
+   561→  .contact-form input:focus, .contact-form textarea:focus { border-color: var(--accent); }
+   562→  .contact-form textarea { resize: none; min-height: 140px; }
+   563→  .contact-form button {
+   564→    align-self: flex-start;
+   565→    margin-top: 14px; padding: 16px 38px;
+   566→    background: var(--ink); border: none; color: var(--bg);
+   567→    font-family: inherit; font-size: 11px; letter-spacing: 0.3em;
+   568→    cursor: none;
+   569→    transition: background .3s;
+   570→  }
+   571→  .contact-form button:hover { background: var(--accent); }
+   572→  .contact-info { font-size: 14px; line-height: 1.9; color: rgba(236,233,223,0.78); }
+   573→  .contact-info h4 {
+   574→    font-family: 'Noto Serif SC', serif;
+   575→    font-size: 22px; margin-bottom: 16px; color: var(--ink);
+   576→    font-weight: 300;
+   577→  }
+   578→  .contact-info h4 em {
+   579→    font-family: 'Cormorant Garamond', serif; font-style: italic;
+   580→    color: var(--accent);
+   581→  }
+   582→  .contact-info p { margin-bottom: 32px; }
+   583→  .contact-info a {
+   584→    border-bottom: 1px solid var(--line);
+   585→    padding-bottom: 2px;
+   586→    transition: border-color .3s, color .3s;
+   587→  }
+   588→  .contact-info a:hover { color: var(--accent); border-color: var(--accent); }
+   589→
+   590→  /* page footer */
+   591→  .page__foot {
+   592→    margin-top: 120px;
+   593→    padding-top: 40px;
+   594→    border-top: 1px solid var(--line);
+   595→    display: flex; justify-content: space-between; align-items: center;
+   596→    font-size: 11px; color: var(--ink-mute);
+   597→    letter-spacing: 0.18em;
+   598→  }
+   599→
+   600→  /* responsive */
+   601→  @media (max-width: 900px) {
+   602→    nav.main { display: none; }
+   603→    .chapters { display: none; }
+   604→    .progress { right: 18px; bottom: 18px; }
+   605→    .progress__bar { width: 90px; }
+   606→    .hint { left: 18px; bottom: 18px; }
+   607→    .grid-row { flex-direction: column; gap: 32px; align-items: stretch; }
+   608→    .price-grid { grid-template-columns: 1fr; }
+   609→    .story-grid { grid-template-columns: 1fr; gap: 32px; }
+   610→    .contact-grid { grid-template-columns: 1fr; gap: 32px; }
+   611→    .feat-row { grid-template-columns: 40px 1fr; }
+   612→    .feat-row__desc, .feat-row__meta { grid-column: 2; }
+   613→    .credits { grid-template-columns: 1fr 1fr; }
+   614→    .page__inner { padding: 100px 6vw 60px; }
+   615→    .station { padding: 0 6vw; }
+   616→  }
+   617→</style>
+   618→</head>
+   619→<body>
+   620→
+   621→<!-- ============== LOADER ============== -->
+   622→<div class="loader" id="loader">
+   623→  <div class="loader__title">
+   624→    <span>A</span><span>E</span><span>R</span><span>I</span><span>A</span>
+   625→  </div>
+   626→  <div class="loader__sub">环境智能 · 始于二〇二六</div>
+   627→  <button class="loader__enter" id="enter" data-hover>进入林间</button>
+   628→</div>
+   629→
+   630→<!-- ============== HEADER ============== -->
+   631→<header>
+   632→  <a href="#" class="logo" data-hover><em>Aeria</em><sup>®</sup></a>
+   633→  <nav class="main">
+   634→    <a href="#" data-route="home" data-hover><span class="regular">首页</span><span class="alt">Index</span></a>
+   635→    <a href="#features" data-route="features" data-hover><span class="regular">功能</span><span class="alt">Features</span></a>
+   636→    <a href="#story" data-route="story" data-hover><span class="regular">故事</span><span class="alt">Story</span></a>
+   637→    <a href="#pricing" data-route="pricing" data-hover><span class="regular">价格</span><span class="alt">Pricing</span></a>
+   638→    <a href="#contact" data-route="contact" data-hover><span class="regular">联系</span><span class="alt">Contact</span></a>
+   639→  </nav>
+   640→</header>
+   641→
+   642→<!-- ============== CANVAS + EFFECTS ============== -->
+   643→<canvas id="scene"></canvas>
+   644→<div class="vignette"></div>
+   645→<div class="grain"></div>
+   646→
+   647→<!-- ============== STATIONS ============== -->
+   648→<div class="stations" id="stations">
+   649→
+   650→  <!-- 0: hero -->
+   651→  <section class="station station--center" data-from="0.00" data-to="0.16">
+   652→    <div class="eyebrow">A E R I A · 第〇〇一号</div>
+   653→    <h1>一种住在<em>留白</em>里的<br/>环境<em>智能</em></h1>
+   654→    <p class="lede">一个住在你房间里的小型本地模型。它倾听房间，不倾听世界；以你自己半语的声音回写。它为语言尚未抵达的瞬间而造。</p>
+   655→  </section>
+   656→
+   657→  <!-- 1: manifesto -->
+   658→  <section class="station station--bottom" data-from="0.16" data-to="0.30">
+   659→    <div class="eyebrow">宣言</div>
+   660→    <h2>我们为<em>语言尚未到来</em>的<br/>那一刻而造。</h2>
+   661→    <p class="lede">睡前的半个念头。淋浴时未完成的一句话。星期二早晨，世界还没有变成句子之前。AERIA 是为这些时刻而生——不是为之后那场会议。</p>
+   662→  </section>
+   663→
+   664→  <!-- 2: feature 1 - Listen -->
+   665→  <section class="station station--bottom" data-from="0.30" data-to="0.46">
+   666→    <div class="grid-row">
+   667→      <div>
+   668→        <div class="grid-num">— 其一</div>
+   669→        <h2 style="font-size: clamp(36px,4.6vw,68px); line-height: 1.05;">倾听 <em style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--accent);">Listen</em></h2>
+   670→      </div>
+   671→      <div>
+   672→        <p class="grid-text">永远在线，永远本地。房间成为思考的麦克风。AERIA 与你停留在此刻——除非你主动允许，否则它不会上云。</p>
+   673→      </div>
+   674→      <div>
+   675→        <div class="grid-meta-label">运行模式</div>
+   676→        <p class="grid-text" style="font-size: 12px;">本地推理 · Whisper 级语音识别<br/>声纹识别 · 零留存 · 320MB 占用</p>
+   677→      </div>
+   678→    </div>
+   679→  </section>
+   680→
+   681→  <!-- 3: feature 2 - Reflect -->
+   682→  <section class="station station--bottom" data-from="0.46" data-to="0.62">
+   683→    <div class="grid-row">
+   684→      <div>
+   685→        <div class="grid-num">— 其二</div>
+   686→        <h2 style="font-size: clamp(36px,4.6vw,68px); line-height: 1.05;">复述 <em style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--accent);">Reflect</em></h2>
+   687→      </div>
+   688→      <div>
+   689→        <p class="grid-text">每个夜晚，AERIA 用更安静的声音读回你的一天。一封短小的口信——由一个在你心不在焉时仍在凝神的存在写下。</p>
+   690→      </div>
+   691→      <div>
+   692→        <div class="grid-meta-label">节奏</div>
+   693→        <p class="grid-text" style="font-size: 12px;">每日 90 秒口信<br/>可选每周文字汇编</p>
+   694→      </div>
+   695→    </div>
+   696→  </section>
+   697→
+   698→  <!-- 4: feature 3 - Compose -->
+   699→  <section class="station station--bottom" data-from="0.62" data-to="0.80">
+   700→    <div class="grid-row">
+   701→      <div>
+   702→        <div class="grid-num">— 其三</div>
+   703→        <h2 style="font-size: clamp(36px,4.6vw,68px); line-height: 1.05;">续写 <em style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--accent);">Compose</em></h2>
+   704→      </div>
+   705→      <div>
+   706→        <p class="grid-text">半句话变成完整的事，呢喃变成草稿。一个能从你停顿的地方继续的笔记本——以你刚才那个语气的声音，把它写完。</p>
+   707→      </div>
+   708→      <div>
+   709→        <div class="grid-meta-label">输出</div>
+   710→        <p class="grid-text" style="font-size: 12px;">Markdown · 语音备忘 · 信件<br/>本地优先导出 · 无埋点</p>
+   711→      </div>
+   712→    </div>
+   713→  </section>
+   714→
+   715→  <!-- 5: closing -->
+   716→  <section class="station station--center" data-from="0.80" data-to="1.0">
+   717→    <div class="eyebrow">走入更深</div>
+   718→    <h1>让你最<em>安静</em>的时刻<br/>终于<em>被听见</em>。</h1>
+   719→    <p class="lede">AERIA 现处于私密内测。我们每周邀请少量用户。请慢慢走进来。</p>
+   720→    <a class="cta" href="#contact" data-hover>
+   721→      申请内测
+   722→      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+   723→    </a>
+   724→  </section>
+   725→
+   726→</div>
+   727→
+   728→<!-- ============== UI: chapters / hint / progress ============== -->
+   729→<div class="chapters" id="chapters">
+   730→  <div class="chapters__item active" data-go="0.0"><span class="dash"></span><span>序章</span></div>
+   731→  <div class="chapters__item" data-go="0.20"><span class="dash"></span><span>宣言</span></div>
+   732→  <div class="chapters__item" data-go="0.38"><span class="dash"></span><span>倾听</span></div>
+   733→  <div class="chapters__item" data-go="0.54"><span class="dash"></span><span>复述</span></div>
+   734→  <div class="chapters__item" data-go="0.71"><span class="dash"></span><span>续写</span></div>
+   735→  <div class="chapters__item" data-go="0.92"><span class="dash"></span><span>步入</span></div>
+   736→</div>
+   737→
+   738→<div class="hint" id="hint">
+   739→  <span class="hint__dot"></span>
+   740→  滚动 · 走入林中
+   741→</div>
+   742→
+   743→<div class="progress">
+   744→  <span class="progress__num" id="prog-num">000</span>
+   745→  <div class="progress__bar"><div class="progress__fill" id="prog-fill"></div></div>
+   746→  <span>步程</span>
+   747→</div>
+   748→
+   749→<!-- ============== CURSOR ============== -->
+   750→<div class="cursor" id="cursor"></div>
+   751→
+   752→<!-- ============== SUB PAGES ============== -->
+   753→
+   754→<!-- FEATURES -->
+   755→<div class="page" id="page-features">
+   756→  <div class="page__inner">
+   757→    <div class="page__nav">
+   758→      <a class="page__back" href="#" data-back data-hover>
+   759→        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+   760→        返回林间
+   761→      </a>
+   762→      <span class="page__crumb">Aeria · Features</span>
+   763→    </div>
+   764→
+   765→    <div class="page__hero">
+   766→      <div class="page__eyebrow">— 它能做什么</div>
+   767→      <h1 class="page__title">一个<em>停留在</em><br/>房间里的模型</h1>
+   768→      <p class="page__lede">AERIA 是一组为"陪伴"而非"搜索"设计的小工具。每一项能力都需主动开启，没有任何一项会喧哗。</p>
+   769→    </div>
+   770→
+   771→    <div class="feat-list">
+   772→      <div class="feat-row">
+   773→        <div class="feat-row__num">I.</div>
+   774→        <div class="feat-row__name"><em>Listen</em>倾听</div>
+   775→        <div class="feat-row__desc">一层常驻的、本机运行的转写层。Whisper 级模型完整跑在你的设备上，仅在你标记"值得保留"的时候才记录片段。声纹只识别你自己。默认零留存——未被请求的片段会自然消散。</div>
+   776→        <div class="feat-row__meta"><b>模式</b>本地 · 4-bit 量化<br/>320 MB 占用<br/>iOS · macOS · Linux</div>
+   777→      </div>
+   778→      <div class="feat-row">
+   779→        <div class="feat-row__num">II.</div>
+   780→        <div class="feat-row__name"><em>Reflect</em>复述</div>
+   781→        <div class="feat-row__desc">每个夜晚被书写的一封短音频信。AERIA 将白天里被你标记的片段编织成一段 90 秒的叙事——以更慢、更安静版本的你自己的声音回放。这些信件仅存在你的设备上。</div>
+   782→        <div class="feat-row__meta"><b>节奏</b>每日 90 秒口信<br/>可选每周文字汇编<br/>授权后克隆声纹</div>
+   783→      </div>
+   784→      <div class="feat-row">
+   785→        <div class="feat-row__num">III.</div>
+   786→        <div class="feat-row__name"><em>Compose</em>续写</div>
+   787→        <div class="feat-row__desc">从你停下的地方开始的一面草稿纸。说半句话，AERIA 沿着你刚才的语气继续把它写完。适合写信、悼词、明信片、慢通信——任何想要"听起来像你、只是把它写完"的事情。</div>
+   788→        <div class="feat-row__meta"><b>输出</b>Markdown · txt · 语音备忘<br/>本地优先导出<br/>无任何分析埋点</div>
+   789→      </div>
+   790→      <div class="feat-row">
+   791→        <div class="feat-row__num">IV.</div>
+   792→        <div class="feat-row__name"><em>Drift</em>留白</div>
+   793→        <div class="feat-row__desc">为缓慢时段而设的长形态——散步、泡澡、火车上。AERIA 不再回应，只陪伴。它倾听、归档，只在你回来的时候才再开口。Drift 模式内没有任何通知。</div>
+   794→        <div class="feat-row__meta"><b>会话</b>15 分钟至 8 小时<br/>仅后台运行<br/>一键开启</div>
+   795→      </div>
+   796→      <div class="feat-row">
+   797→        <div class="feat-row__num">V.</div>
+   798→        <div class="feat-row__name"><em>Grove</em>林间</div>
+   799→        <div class="feat-row__desc">为"两个人"设计的共享模式——伴侣、合作者、共同抚养孩子的人。两台 AERIA 各自在自己的房间里倾听，并在每一天结束时交换简短的、被双方认可的口信。原始声音从不被传输，未经双向确认的内容不会共享。</div>
+   800→        <div class="feat-row__meta"><b>隐私</b>端到端摘要<br/>对称授权<br/>每条可单独撤回</div>
+   801→      </div>
+   802→    </div>
+   803→
+   804→    <div class="page__foot">
+   805→      <span>© 2026 Aeria Studio · 卑尔根 · 东京 · 上海</span>
+   806→      <span>文档 · v0.7 · 2026 年 5 月</span>
+   807→    </div>
+   808→  </div>
+   809→</div>
+   810→
+   811→<!-- STORY -->
+   812→<div class="page" id="page-story">
+   813→  <div class="page__inner">
+   814→    <div class="page__nav">
+   815→      <a class="page__back" href="#" data-back data-hover>
+   816→        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+   817→        返回林间
+   818→      </a>
+   819→      <span class="page__crumb">Aeria · Story</span>
+   820→    </div>
+   821→
+   822→    <div class="page__hero">
+   823→      <div class="page__eyebrow">— 缘起</div>
+   824→      <h1 class="page__title">一段穿过<em>某人</em><br/>沉默的<em>散步</em></h1>
+   825→    </div>
+   826→
+   827→    <div class="story-grid">
+   828→      <img class="story-img" alt="挪威清晨的桦树林" src="../assets/forest-03-birch.jpg" />
+   829→      <div class="story-text">
+   830→        <p class="first">AERIA 始于 2025 年十一月第三周，挪威 Voss 郊外一条被雾打湿的林间小径。天刚要亮。树是桦树，地面是潮的。创始人——一个过去八年都在做"会打断你"的语音助手的人——第一次在很久以来停下脚步，去听一种没有内容的声音。</p>
+   831→        <p>那一刻浮起的念头很小：<em>为什么我们做的每一个 AI 都在喊？</em></p>
+   832→        <p>过去数年里，他在斯德哥尔摩、东京、旧金山参与过的产品有一个共性——它们全部为"被询问"那个瞬间而优化。它们大声唤醒；它们按"自信度"对答案排序；它们假定使用者已经处于语言之中。</p>
+   833→        <p>但大多数思考并不发生在语言里。大多数思考发生在语言尚未抵达的长长的安静里——洗澡时、散步时、星期二清晨的半梦半醒之间。好的念头不会自己宣布到来。它们只是落下来。</p>
+   834→      </div>
+   835→    </div>
+   836→
+   837→    <p class="story-pull">我们想做一个<em>能在沉默里坐着</em>的模型——<br/>而不是一个一直忙着填补它的。</p>
+   838→
+   839→    <div class="story-grid">
+   840→      <div class="story-text">
+   841→        <p>第一版原型是 2 月在卑尔根用一个长周末搭的。一只麦克风、一个本地小模型、一条规则——模型一天只能往一个 txt 文件里回写一次，没有界面，没有实时回应，没有任何提醒。</p>
+   842→        <p>我们把它发给七个人。三个人在一周内退回了笔记本。两个人在一个月后停止使用。剩下两个人到今天连续用了九个月。两人都说了同一句话：他们多年前就停止写日记了，从这之后又开始写了。</p>
+   843→        <p>那已经够我们继续做下去了。</p>
+   844→      </div>
+   845→      <img class="story-img" alt="安静的书桌" src="../assets/forest-04-desk.jpg" />
+   846→    </div>
+   847→
+   848→    <dl class="credits">
+   849→      <div><dt>创立</dt><dd>卑尔根 · 2025 年 3 月</dd></div>
+   850→      <div><dt>团队</dt><dd>九人 · 零 KPI</dd></div>
+   851→      <div><dt>支持</dt><dd>Slowmade Ventures<br/>Hyll · 私人投资</dd></div>
+   852→      <div><dt>状态</dt><dd>私密内测<br/>2026 年 5 月</dd></div>
+   853→    </dl>
+   854→
+   855→    <div class="page__foot">
+   856→      <span>© 2026 Aeria Studio</span>
+   857→      <span>故事 · v0.4</span>
+   858→    </div>
+   859→  </div>
+   860→</div>
+   861→
+   862→<!-- PRICING -->
+   863→<div class="page" id="page-pricing">
+   864→  <div class="page__inner">
+   865→    <div class="page__nav">
+   866→      <a class="page__back" href="#" data-back data-hover>
+   867→        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+   868→        返回林间
+   869→      </a>
+   870→      <span class="page__crumb">Aeria · Pricing</span>
+   871→    </div>
+   872→
+   873→    <div class="page__hero">
+   874→      <div class="page__eyebrow">— 价格</div>
+   875→      <h1 class="page__title">通往同一片<em>林子</em><br/>的<em>三扇门</em></h1>
+   876→      <p class="page__lede">三种方案运行的是同一个本地模型。区别在于节奏、声音，以及你愿意把这片林子分享给多少人。</p>
+   877→    </div>
+   878→
+   879→    <div class="price-grid">
+   880→      <div class="price-card">
+   881→        <div class="price-card__name"><em>Resident</em>居者</div>
+   882→        <div class="price-card__tag">为独自倾听的人</div>
+   883→        <div class="price-card__amt"><sup>¥</sup>0</div>
+   884→        <div class="price-card__per">永久免费 · 单台设备</div>
+   885→        <ul class="price-card__feat">
+   886→          <li>· 本地 Listen 模式</li>
+   887→          <li>· 每日 Reflect 口信</li>
+   888→          <li>· Markdown 导出</li>
+   889→          <li>· 单设备 · 单声纹</li>
+   890→          <li>· 无云端 · 无遥测</li>
+   891→        </ul>
+   892→        <div class="price-card__cta" data-hover>静静开始</div>
+   893→      </div>
+   894→
+   895→      <div class="price-card featured">
+   896→        <div class="price-card__name"><em>Forest</em>森者</div>
+   897→        <div class="price-card__tag">最多人选择</div>
+   898→        <div class="price-card__amt"><sup>¥</sup>108</div>
+   899→        <div class="price-card__per">每月 · 至多三台设备</div>
+   900→        <ul class="price-card__feat">
+   901→          <li>· 包含居者全部</li>
+   902→          <li>· 无限 Compose 草稿</li>
+   903→          <li>· 授权后声纹克隆</li>
+   904→          <li>· Drift 留白长会话</li>
+   905→          <li>· 语音备忘 · 有声书导出</li>
+   906→          <li>· 可选加密备份</li>
+   907→        </ul>
+   908→        <div class="price-card__cta" data-hover>走进来</div>
+   909→      </div>
+   910→
+   911→      <div class="price-card">
+   912→        <div class="price-card__name"><em>Grove</em>林者</div>
+   913→        <div class="price-card__tag">为工作室 / 伴侣共享</div>
+   914→        <div class="price-card__amt"><sup>¥</sup>288</div>
+   915→        <div class="price-card__per">每月 · 至多八个声纹</div>
+   916→        <ul class="price-card__feat">
+   917→          <li>· 包含森者全部</li>
+   918→          <li>· 共享 Grove 口信</li>
+   919→          <li>· 单声纹授权账本</li>
+   920→          <li>· 工作室级留存策略</li>
+   921→          <li>· 现场欢迎仪式</li>
+   922→          <li>· 直通创作团队</li>
+   923→        </ul>
+   924→        <div class="price-card__cta" data-hover>谈一谈</div>
+   925→      </div>
+   926→    </div>
+   927→
+   928→    <p style="margin-top: 80px; font-size: 13px; color: var(--ink-mute); max-width: 680px; line-height: 1.85;">
+   929→      我们按"声纹"计费，从不按"次"。没有用量上限。没有 enterprise 版本。如果你需要超出 Grove 的安排，写信给我们，我们一起想。
+   930→    </p>
+   931→
+   932→    <div class="page__foot">
+   933→      <span>© 2026 Aeria Studio · 增值税号 NO 928 411 552</span>
+   934→      <span>价格 · 2026 年 5 月</span>
+   935→    </div>
+   936→  </div>
+   937→</div>
+   938→
+   939→<!-- CONTACT -->
+   940→<div class="page" id="page-contact">
+   941→  <div class="page__inner">
+   942→    <div class="page__nav">
+   943→      <a class="page__back" href="#" data-back data-hover>
+   944→        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+   945→        返回林间
+   946→      </a>
+   947→      <span class="page__crumb">Aeria · Contact</span>
+   948→    </div>
+   949→
+   950→    <div class="page__hero">
+   951→      <div class="page__eyebrow">— 轻声说话</div>
+   952→      <h1 class="page__title">写信给我们<br/>我们<em>一定</em>回</h1>
+   953→      <p class="page__lede">内测申请、合作、媒体邀约，或一封你早就想寄给陌生人的长信。我们三人会读完所有来信。</p>
+   954→    </div>
+   955→
+   956→    <div class="contact-grid">
+   957→      <form class="contact-form" id="contact-form">
+   958→        <input type="text" placeholder="您的名字" required data-hover />
+   959→        <input type="email" placeholder="可以回信的邮箱" required data-hover />
+   960→        <input type="text" placeholder="主题（可选）" data-hover />
+   961→        <textarea placeholder="想对我们说些什么？" required data-hover></textarea>
+   962→        <button type="submit" data-hover>寄出这封信</button>
+   963→      </form>
+   964→
+   965→      <div class="contact-info">
+   966→        <h4><em>Studio</em>工作室</h4>
+   967→        <p>
+   968→          Aeria Studio AS<br/>
+   969→          Bryggen 41 · 5003 Bergen<br/>
+   970→          挪威
+   971→        </p>
+   972→
+   973→        <h4><em>Direct</em>直接写信</h4>
+   974→        <p>
+   975→          <a href="mailto:hello@aeria.studio" data-hover>hello@aeria.studio</a><br/>
+   976→          <a href="mailto:press@aeria.studio" data-hover>press@aeria.studio</a><br/>
+   977→          <a href="mailto:beta@aeria.studio" data-hover>beta@aeria.studio</a>
+   978→        </p>
+   979→
+   980→        <h4><em>Hours</em>工作时段</h4>
+   981→        <p>我们在中欧时区周二至周五 09:00–16:00 之间回信。<br/>星期一用来散步。</p>
+   982→      </div>
+   983→    </div>
+   984→
+   985→    <div class="page__foot">
+   986→      <span>© 2026 Aeria Studio</span>
+   987→      <span>所有来信 · 必复</span>
+   988→    </div>
+   989→  </div>
+   990→</div>
+   991→
+   992→<!-- ============== THREE.JS ============== -->
+   993→<script type="importmap">
+   994→{
+   995→  "imports": {
+   996→    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+   997→  }
+   998→}
+   999→</script>
+  1000→
+  1001→<script type="module">
+  1002→import * as THREE from 'three';
+  1003→
+  1004→/* ---------- renderer / scene ---------- */
+  1005→const canvas = document.getElementById('scene');
+  1006→const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  1007→renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  1008→renderer.outputColorSpace = THREE.SRGBColorSpace;
+  1009→renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  1010→renderer.toneMappingExposure = 1.35;
+  1011→
+  1012→const scene = new THREE.Scene();
+  1013→const fogColor = new THREE.Color(0x2a2a20);  // 暖灰雾，不是死黑
+  1014→scene.background = fogColor;
+  1015→scene.fog = new THREE.FogExp2(fogColor.getHex(), 0.0028);
+  1016→
+  1017→const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 3000);
+  1018→camera.position.set(0, 4.6, 60);
+  1019→camera.rotation.order = 'YXZ';
+  1020→
+  1021→/* ---------- gradient sky dome ---------- */
+  1022→let skyDome;
+  1023→{
+  1024→  const skyGeo = new THREE.SphereGeometry(2400, 32, 24);
+  1025→  const skyMat = new THREE.MeshBasicMaterial({ side: THREE.BackSide, fog: false, vertexColors: true });
+  1026→  const top    = new THREE.Color(0x141a18);
+  1027→  const upper  = new THREE.Color(0x2a2c22);
+  1028→  const horiz  = new THREE.Color(0x5a4a30);  // 暖橙水平线
+  1029→  const lower  = new THREE.Color(0x1c1e16);
+  1030→  const cols = [];
+  1031→  const pos = skyGeo.attributes.position;
+  1032→  for (let i = 0; i < pos.count; i++) {
+  1033→    const y = pos.getY(i) / 2400;  // -1..1
+  1034→    let c;
+  1035→    if (y > 0.4)        c = top.clone().lerp(upper, (1 - y)/0.6);
+  1036→    else if (y > 0.0)   c = upper.clone().lerp(horiz, 1 - y/0.4);
+  1037→    else if (y > -0.3)  c = horiz.clone().lerp(lower, -y/0.3);
+  1038→    else                c = lower.clone();
+  1039→    cols.push(c.r, c.g, c.b);
+  1040→  }
+  1041→  skyGeo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+  1042→  skyDome = new THREE.Mesh(skyGeo, skyMat);
+  1043→  scene.add(skyDome);
+  1044→}
+  1045→
+  1046→/* ---------- lights ---------- */
+  1047→scene.add(new THREE.HemisphereLight(0xd6e0bd, 0x1a1812, 0.95));
+  1048→const sun = new THREE.DirectionalLight(0xffe2b0, 1.95);
+  1049→sun.position.set(140, 220, -180);
+  1050→scene.add(sun);
+  1051→
+  1052→const fill = new THREE.DirectionalLight(0x6da6ff, 0.30);
+  1053→fill.position.set(-120, 100, 80);
+  1054→scene.add(fill);
+  1055→
+  1056→const rim = new THREE.DirectionalLight(0xffd896, 0.85);
+  1057→rim.position.set(0, 30, -300);
+  1058→scene.add(rim);
+  1059→
+  1060→/* ---------- ground ---------- */
+  1061→const groundCanvas = (() => {
+  1062→  const c = document.createElement('canvas');
+  1063→  c.width = c.height = 512;
+  1064→  const ctx = c.getContext('2d');
+  1065→  // base
+  1066→  ctx.fillStyle = '#161c14';
+  1067→  ctx.fillRect(0,0,512,512);
+  1068→  // soft mossy patches (slightly lighter dark green)
+  1069→  for (let i = 0; i < 1400; i++) {
+  1070→    const x = Math.random()*512, y = Math.random()*512;
+  1071→    const r = Math.random()*8 + 1;
+  1072→    const a = Math.random()*0.22;
+  1073→    ctx.fillStyle = `rgba(${30+Math.random()*50|0},${50+Math.random()*40|0},${30+Math.random()*30|0},${a})`;
+  1074→    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  1075→  }
+  1076→  // darker undertones (depth)
+  1077→  for (let i = 0; i < 200; i++) {
+  1078→    const x = Math.random()*512, y = Math.random()*512;
+  1079→    const r = Math.random()*40 + 10;
+  1080→    const grd = ctx.createRadialGradient(x,y,1,x,y,r);
+  1081→    grd.addColorStop(0, 'rgba(0,0,0,0.35)');
+  1082→    grd.addColorStop(1, 'rgba(0,0,0,0)');
+  1083→    ctx.fillStyle = grd;
+  1084→    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  1085→  }
+  1086→  // subtle warm flecks (fallen leaves)
+  1087→  for (let i = 0; i < 80; i++) {
+  1088→    const x = Math.random()*512, y = Math.random()*512;
+  1089→    const r = Math.random()*1.5 + 0.5;
+  1090→    ctx.fillStyle = `rgba(${130+Math.random()*40|0},${90+Math.random()*30|0},${50+Math.random()*20|0},0.45)`;
+  1091→    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  1092→  }
+  1093→  return c;
+  1094→})();
+  1095→const groundTex = new THREE.CanvasTexture(groundCanvas);
+  1096→groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping;
+  1097→groundTex.repeat.set(40, 40);
+  1098→groundTex.colorSpace = THREE.SRGBColorSpace;
+  1099→groundTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  1100→
+  1101→const ground = new THREE.Mesh(
+  1102→  new THREE.PlaneGeometry(4000, 4000, 1, 1),
+  1103→  new THREE.MeshStandardMaterial({
+  1104→    color: 0x1a2018, map: groundTex, roughness: 1, metalness: 0
+  1105→  })
+  1106→);
+  1107→ground.rotation.x = -Math.PI / 2;
+  1108→scene.add(ground);
+  1109→
+  1110→/* ---------- bark texture (procedural canvas — birch-like) ---------- */
+  1111→const barkCanvas = (() => {
+  1112→  const c = document.createElement('canvas');
+  1113→  c.width = 128; c.height = 512;
+  1114→  const ctx = c.getContext('2d');
+  1115→  // light cream base (birch-like)
+  1116→  ctx.fillStyle = '#d8cdb4';
+  1117→  ctx.fillRect(0,0,128,512);
+  1118→  // soft vertical streaks (lighter)
+  1119→  for (let i = 0; i < 60; i++) {
+  1120→    const x = Math.random()*128;
+  1121→    const w = 0.5 + Math.random()*1.8;
+  1122→    const a = 0.06 + Math.random()*0.12;
+  1123→    ctx.fillStyle = `rgba(255,245,220,${a})`;
+  1124→    ctx.fillRect(x, 0, w, 512);
+  1125→  }
+  1126→  // horizontal scars — iconic birch dark stripes
+  1127→  for (let i = 0; i < 36; i++) {
+  1128→    const y = Math.random()*512;
+  1129→    const h = 0.6 + Math.random()*2.2;
+  1130→    const a = 0.45 + Math.random()*0.35;
+  1131→    ctx.fillStyle = `rgba(30,22,15,${a})`;
+  1132→    ctx.fillRect(0, y, 128, h);
+  1133→  }
+  1134→  // dark scar dots (knots)
+  1135→  for (let i = 0; i < 14; i++) {
+  1136→    const x = Math.random()*128, y = Math.random()*512;
+  1137→    const r = 1 + Math.random()*3;
+  1138→    ctx.fillStyle = `rgba(30,22,15,${0.55+Math.random()*0.3})`;
+  1139→    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  1140→  }
+  1141→  // subtle vertical shadow on edges (rounding)
+  1142→  const grd = ctx.createLinearGradient(0,0,128,0);
+  1143→  grd.addColorStop(0, 'rgba(40,30,20,0.35)');
+  1144→  grd.addColorStop(0.5, 'rgba(40,30,20,0)');
+  1145→  grd.addColorStop(1, 'rgba(40,30,20,0.35)');
+  1146→  ctx.fillStyle = grd;
+  1147→  ctx.fillRect(0,0,128,512);
+  1148→  return c;
+  1149→})();
+  1150→const barkTex = new THREE.CanvasTexture(barkCanvas);
+  1151→barkTex.wrapS = THREE.RepeatWrapping;
+  1152→barkTex.wrapT = THREE.RepeatWrapping;
+  1153→barkTex.colorSpace = THREE.SRGBColorSpace;
+  1154→
+  1155→/* ---------- forest (instanced trunks) ---------- */
+  1156→const TRUNK_COUNT = 620;
+  1157→const trunkGeo = new THREE.CylinderGeometry(0.16, 0.28, 24, 8, 1, false);
+  1158→trunkGeo.translate(0, 12, 0);
+  1159→const trunkMat = new THREE.MeshStandardMaterial({
+  1160→  color: 0xffffff,
+  1161→  map: barkTex,
+  1162→  roughness: 0.94, metalness: 0
+  1163→});
+  1164→const trunks = new THREE.InstancedMesh(trunkGeo, trunkMat, TRUNK_COUNT);
+  1165→trunks.instanceMatrix.setUsage(THREE.StaticDrawUsage);
+  1166→
+  1167→const dummy = new THREE.Object3D();
+  1168→const PATH_LENGTH = 2400;
+  1169→function rand(seed) { return Math.abs(Math.sin(seed*9301+49297)) % 1; }
+  1170→
+  1171→const colorOpts = [
+  1172→  new THREE.Color(0xddd4be),
+  1173→  new THREE.Color(0xc8bca0),
+  1174→  new THREE.Color(0xe5dcc6),
+  1175→  new THREE.Color(0xb8a888),
+  1176→  new THREE.Color(0xd0c4a8),
+  1177→];
+  1178→
+  1179→for (let i = 0; i < TRUNK_COUNT; i++) {
+  1180→  const t = i / TRUNK_COUNT;
+  1181→  const z = -t * PATH_LENGTH - rand(i)*10;
+  1182→  const curve = Math.sin(z * 0.0018) * 6;
+  1183→  let x = (rand(i+9)*2-1) * 90 + curve;
+  1184→  if (Math.abs(x - curve) < 5.5) {
+  1185→    x = curve + (x > curve ? 6 + rand(i+22)*5 : -6 - rand(i+22)*5);
+  1186→  }
+  1187→  dummy.position.set(x, 0, z);
+  1188→  dummy.rotation.set((rand(i+3)-0.5)*0.06, rand(i+7)*Math.PI*2, (rand(i+11)-0.5)*0.06);
+  1189→  const sx = 0.55 + rand(i+5)*1.4;
+  1190→  const sy = 0.6 + rand(i+13)*1.6;
+  1191→  dummy.scale.set(sx, sy, sx);
+  1192→  dummy.updateMatrix();
+  1193→  trunks.setMatrixAt(i, dummy.matrix);
+  1194→  trunks.setColorAt(i, colorOpts[i % colorOpts.length].clone().multiplyScalar(0.85 + rand(i+33)*0.4));
+  1195→}
+  1196→trunks.instanceMatrix.needsUpdate = true;
+  1197→if (trunks.instanceColor) trunks.instanceColor.needsUpdate = true;
+  1198→scene.add(trunks);
+  1199→
+  1200→/* ---------- canopy (dark blobs above for ceiling feel) ---------- */
+  1201→const canopyMat = new THREE.MeshStandardMaterial({
+  1202→  color: 0x0e160e, roughness: 1, metalness: 0,
+  1203→  transparent: true, opacity: 0.95
+  1204→});
+  1205→const canopyGeo = new THREE.IcosahedronGeometry(14, 1);
+  1206→const CANOPY_COUNT = 70;
+  1207→const canopy = new THREE.InstancedMesh(canopyGeo, canopyMat, CANOPY_COUNT);
+  1208→for (let i = 0; i < CANOPY_COUNT; i++) {
+  1209→  dummy.position.set(
+  1210→    (rand(i+101)*2-1)*70,
+  1211→    26 + rand(i+103)*10,
+  1212→    -i * (PATH_LENGTH / CANOPY_COUNT) - rand(i+105)*40
+  1213→  );
+  1214→  const s = 1.8 + rand(i+107)*2.2;
+  1215→  dummy.scale.set(s*1.5, s*0.7, s*1.5);
+  1216→  dummy.rotation.set(rand(i)*Math.PI, rand(i+5)*Math.PI, rand(i+9)*Math.PI);
+  1217→  dummy.updateMatrix();
+  1218→  canopy.setMatrixAt(i, dummy.matrix);
+  1219→}
+  1220→scene.add(canopy);
+  1221→
+  1222→/* ---------- ferns / undergrowth (lighter green dots) ---------- */
+  1223→const fernCount = 1800;
+  1224→const fernGeo = new THREE.BufferGeometry();
+  1225→const fernPos = new Float32Array(fernCount*3);
+  1226→const fernCol = new Float32Array(fernCount*3);
+  1227→for (let i = 0; i < fernCount; i++) {
+  1228→  fernPos[i*3]   = (rand(i+200)*2-1)*70 + Math.sin(-i*4*0.0018)*6;
+  1229→  fernPos[i*3+1] = 0.25 + rand(i+201)*0.8;
+  1230→  fernPos[i*3+2] = -rand(i+202)*PATH_LENGTH;
+  1231→  const g = 0.42 + rand(i+205)*0.28;
+  1232→  fernCol[i*3]   = 0.28 + rand(i+206)*0.18;
+  1233→  fernCol[i*3+1] = g;
+  1234→  fernCol[i*3+2] = 0.20;
+  1235→}
+  1236→fernGeo.setAttribute('position', new THREE.BufferAttribute(fernPos, 3));
+  1237→fernGeo.setAttribute('color', new THREE.BufferAttribute(fernCol, 3));
+  1238→const fernMat = new THREE.PointsMaterial({
+  1239→  size: 0.55, sizeAttenuation: true,
+  1240→  vertexColors: true,
+  1241→  transparent: true, opacity: 0.95
+  1242→});
+  1243→scene.add(new THREE.Points(fernGeo, fernMat));
+  1244→
+  1245→/* ---------- rocks scattered along path ---------- */
+  1246→const rockGeo = new THREE.DodecahedronGeometry(1, 0);
+  1247→const rockMat = new THREE.MeshStandardMaterial({
+  1248→  color: 0x6c6553, roughness: 0.95, metalness: 0
+  1249→});
+  1250→const ROCK_COUNT = 90;
+  1251→const rocks = new THREE.InstancedMesh(rockGeo, rockMat, ROCK_COUNT);
+  1252→for (let i = 0; i < ROCK_COUNT; i++) {
+  1253→  const z = -rand(i+401)*PATH_LENGTH;
+  1254→  const curve = Math.sin(z * 0.0018) * 6;
+  1255→  let x = (rand(i+402)*2-1) * 50 + curve;
+  1256→  if (Math.abs(x - curve) < 4) x += (x > curve ? 6 : -6);
+  1257→  const sx = 0.6 + rand(i+403)*1.6;
+  1258→  dummy.position.set(x, sx*0.4, z);
+  1259→  dummy.rotation.set(rand(i)*Math.PI, rand(i+1)*Math.PI, rand(i+2)*Math.PI);
+  1260→  dummy.scale.set(sx, sx*0.7, sx*1.1);
+  1261→  dummy.updateMatrix();
+  1262→  rocks.setMatrixAt(i, dummy.matrix);
+  1263→  const tone = 0.7 + rand(i+404)*0.6;
+  1264→  rocks.setColorAt(i, new THREE.Color(0x7a7261).multiplyScalar(tone));
+  1265→}
+  1266→if (rocks.instanceColor) rocks.instanceColor.needsUpdate = true;
+  1267→scene.add(rocks);
+  1268→
+  1269→/* ---------- fallen logs ---------- */
+  1270→const logGeo = new THREE.CylinderGeometry(0.5, 0.55, 6, 8);
+  1271→const logMat = new THREE.MeshStandardMaterial({
+  1272→  color: 0x5a4a36, map: barkTex, roughness: 0.95, metalness: 0
+  1273→});
+  1274→const LOG_COUNT = 14;
+  1275→const logs = new THREE.InstancedMesh(logGeo, logMat, LOG_COUNT);
+  1276→for (let i = 0; i < LOG_COUNT; i++) {
+  1277→  const z = -200 - rand(i+501) * (PATH_LENGTH-300);
+  1278→  const curve = Math.sin(z * 0.0018) * 6;
+  1279→  let x = (rand(i+502)*2-1) * 28 + curve;
+  1280→  if (Math.abs(x - curve) < 6) x += (x > curve ? 8 : -8);
+  1281→  dummy.position.set(x, 0.5, z);
+  1282→  dummy.rotation.set(0, rand(i+503)*Math.PI*2, Math.PI/2);
+  1283→  const sl = 0.7 + rand(i+504)*1.2;
+  1284→  dummy.scale.set(sl*0.9, sl, sl*0.9);
+  1285→  dummy.updateMatrix();
+  1286→  logs.setMatrixAt(i, dummy.matrix);
+  1287→}
+  1288→scene.add(logs);
+  1289→
+  1290→/* ---------- distant tree silhouettes (cheap depth layer) ---------- */
+  1291→const sillGeo = new THREE.PlaneGeometry(1, 1);
+  1292→const sillTex = (() => {
+  1293→  const c = document.createElement('canvas');
+  1294→  c.width = 256; c.height = 256;
+  1295→  const ctx = c.getContext('2d');
+  1296→  ctx.clearRect(0,0,256,256);
+  1297→  // draw silhouette tree
+  1298→  ctx.fillStyle = '#000';
+  1299→  // trunk
+  1300→  ctx.fillRect(120, 130, 16, 126);
+  1301→  // foliage layers
+  1302→  ctx.beginPath();
+  1303→  ctx.moveTo(128, 10);
+  1304→  ctx.lineTo(60, 140);
+  1305→  ctx.lineTo(196, 140);
+  1306→  ctx.closePath(); ctx.fill();
+  1307→  ctx.beginPath();
+  1308→  ctx.moveTo(128, 50);
+  1309→  ctx.lineTo(40, 180);
+  1310→  ctx.lineTo(216, 180);
+  1311→  ctx.closePath(); ctx.fill();
+  1312→  ctx.beginPath();
+  1313→  ctx.moveTo(128, 90);
+  1314→  ctx.lineTo(20, 220);
+  1315→  ctx.lineTo(236, 220);
+  1316→  ctx.closePath(); ctx.fill();
+  1317→  const t = new THREE.CanvasTexture(c);
+  1318→  t.colorSpace = THREE.SRGBColorSpace;
+  1319→  return t;
+  1320→})();
+  1321→const sillMat = new THREE.MeshBasicMaterial({
+  1322→  map: sillTex, transparent: true, color: 0x121613, depthWrite: false
+  1323→});
+  1324→const SILL_COUNT = 40;
+  1325→for (let i = 0; i < SILL_COUNT; i++) {
+  1326→  const m = new THREE.Mesh(sillGeo, sillMat);
+  1327→  const z = -600 - i * ((PATH_LENGTH-300)/SILL_COUNT) - rand(i+601)*40;
+  1328→  m.position.set(
+  1329→    (rand(i+602)*2-1) * 160,
+  1330→    18,
+  1331→    z
+  1332→  );
+  1333→  const s = 36 + rand(i+603)*36;
+  1334→  m.scale.set(s*0.8, s, 1);
+  1335→  scene.add(m);
+  1336→}
+  1337→
+  1338→/* ---------- fireflies (warm glowing points) ---------- */
+  1339→const FIRE = 80;
+  1340→const fireGeo = new THREE.BufferGeometry();
+  1341→const firePos = new Float32Array(FIRE*3);
+  1342→const fireBase = [];
+  1343→for (let i = 0; i < FIRE; i++) {
+  1344→  const z = -100 - rand(i+701)*PATH_LENGTH;
+  1345→  const curve = Math.sin(z * 0.0018) * 6;
+  1346→  firePos[i*3]   = (rand(i+702)*2-1)*30 + curve;
+  1347→  firePos[i*3+1] = 1 + rand(i+703)*5;
+  1348→  firePos[i*3+2] = z;
+  1349→  fireBase.push({ y: firePos[i*3+1], phase: rand(i+704)*Math.PI*2 });
+  1350→}
+  1351→fireGeo.setAttribute('position', new THREE.BufferAttribute(firePos, 3));
+  1352→const fireMat = new THREE.PointsMaterial({
+  1353→  color: 0xffd66b, size: 0.55, sizeAttenuation: true,
+  1354→  transparent: true, opacity: 0.85,
+  1355→  blending: THREE.AdditiveBlending, depthWrite: false
+  1356→});
+  1357→const fireflies = new THREE.Points(fireGeo, fireMat);
+  1358→scene.add(fireflies);
+  1359→
+  1360→/* ---------- floating dust / pollen (warm bright) ---------- */
+  1361→const DUST = 2400;
+  1362→const dustGeo = new THREE.BufferGeometry();
+  1363→const dustPos = new Float32Array(DUST*3);
+  1364→for (let i = 0; i < DUST; i++) {
+  1365→  dustPos[i*3]   = (Math.random()-0.5)*200;
+  1366→  dustPos[i*3+1] = Math.random()*32;
+  1367→  dustPos[i*3+2] = -Math.random()*PATH_LENGTH;
+  1368→}
+  1369→dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+  1370→const dustMat = new THREE.PointsMaterial({
+  1371→  color: 0xffe8b8, size: 0.16, sizeAttenuation: true,
+  1372→  transparent: true, opacity: 0.55,
+  1373→  blending: THREE.AdditiveBlending, depthWrite: false
+  1374→});
+  1375→const dust = new THREE.Points(dustGeo, dustMat);
+  1376→scene.add(dust);
+  1377→
+  1378→/* ---------- god rays (additive planes) ---------- */
+  1379→const rayGroup = new THREE.Group();
+  1380→const rayTex = (() => {
+  1381→  const c = document.createElement('canvas');
+  1382→  c.width = 64; c.height = 256;
+  1383→  const ctx = c.getContext('2d');
+  1384→  const g = ctx.createLinearGradient(0,0,0,256);
+  1385→  g.addColorStop(0, 'rgba(255,238,190,1)');
+  1386→  g.addColorStop(0.45, 'rgba(255,228,170,0.28)');
+  1387→  g.addColorStop(1, 'rgba(255,228,170,0)');
+  1388→  ctx.fillStyle = g; ctx.fillRect(0,0,64,256);
+  1389→  const h = ctx.createLinearGradient(0,0,64,0);
+  1390→  h.addColorStop(0, 'rgba(0,0,0,1)');
+  1391→  h.addColorStop(0.5, 'rgba(0,0,0,0)');
+  1392→  h.addColorStop(1, 'rgba(0,0,0,1)');
+  1393→  ctx.globalCompositeOperation = 'destination-out';
+  1394→  ctx.fillStyle = h;
+  1395→  ctx.fillRect(0,0,64,256);
+  1396→  const tex = new THREE.CanvasTexture(c);
+  1397→  tex.colorSpace = THREE.SRGBColorSpace;
+  1398→  return tex;
+  1399→})();
+  1400→for (let i = 0; i < 30; i++) {
+  1401→  const m = new THREE.Mesh(
+  1402→    new THREE.PlaneGeometry(20, 110),
+  1403→    new THREE.MeshBasicMaterial({
+  1404→      map: rayTex,
+  1405→      transparent: true,
+  1406→      blending: THREE.AdditiveBlending,
+  1407→      depthWrite: false,
+  1408→      opacity: 0.32 + Math.random()*0.30,
+  1409→      side: THREE.DoubleSide,
+  1410→      fog: false
+  1411→    })
+  1412→  );
+  1413→  m.position.set(
+  1414→    (Math.random()-0.5)*80,
+  1415→    36,
+  1416→    -100 - i * 80 + Math.random()*60
+  1417→  );
+  1418→  m.rotation.z = (Math.random()-0.5)*0.55;
+  1419→  m.rotation.y = (Math.random()-0.5)*0.35;
+  1420→  rayGroup.add(m);
+  1421→}
+  1422→scene.add(rayGroup);
+  1423→
+  1424→/* ---------- distant glow (sun behind trees) ---------- */
+  1425→const glow = new THREE.Mesh(
+  1426→  new THREE.PlaneGeometry(900, 900),
+  1427→  new THREE.MeshBasicMaterial({
+  1428→    map: (() => {
+  1429→      const c = document.createElement('canvas');
+  1430→      c.width = c.height = 256;
+  1431→      const g = c.getContext('2d').createRadialGradient(128,128,4,128,128,128);
+  1432→      g.addColorStop(0, 'rgba(255,240,200,1)');
+  1433→      g.addColorStop(0.35, 'rgba(255,212,160,0.5)');
+  1434→      g.addColorStop(1, 'rgba(0,0,0,0)');
+  1435→      const ctx = c.getContext('2d');
+  1436→      ctx.fillStyle = g; ctx.fillRect(0,0,256,256);
+  1437→      const t = new THREE.CanvasTexture(c);
+  1438→      t.colorSpace = THREE.SRGBColorSpace;
+  1439→      return t;
+  1440→    })(),
+  1441→    transparent: true, depthWrite: false,
+  1442→    blending: THREE.AdditiveBlending
+  1443→  })
+  1444→);
+  1445→glow.position.set(60, 100, -PATH_LENGTH - 200);
+  1446→scene.add(glow);
+  1447→
+  1448→/* ---------- resize ---------- */
+  1449→function resize() {
+  1450→  const w = window.innerWidth, h = window.innerHeight;
+  1451→  renderer.setSize(w, h, false);
+  1452→  camera.aspect = w/h;
+  1453→  camera.updateProjectionMatrix();
+  1454→}
+  1455→window.addEventListener('resize', resize);
+  1456→resize();
+  1457→
+  1458→/* ---------- input ---------- */
+  1459→let progress = 0, progressTarget = 0;
+  1460→let mouseX = 0, mouseY = 0;
+  1461→let yaw = 0, pitch = 0;
+  1462→let yawT = 0, pitchT = 0;
+  1463→let interacted = false;
+  1464→
+  1465→window.addEventListener('mousemove', (e) => {
+  1466→  mouseX = (e.clientX / window.innerWidth - 0.5);
+  1467→  mouseY = (e.clientY / window.innerHeight - 0.5);
+  1468→});
+  1469→
+  1470→const SCROLL_GAIN = 0.00026;     // 比之前慢 60%
+  1471→const TOUCH_GAIN  = 0.00075;
+  1472→const KEY_STEP    = 0.035;
+  1473→const SMOOTH      = 0.038;       // 相机插值系数（更慢更顺）
+  1474→
+  1475→window.addEventListener('wheel', (e) => {
+  1476→  if (document.body.classList.contains('page-open')) return;
+  1477→  progressTarget = Math.max(0, Math.min(1, progressTarget + e.deltaY * SCROLL_GAIN));
+  1478→  interacted = true;
+  1479→}, { passive: true });
+  1480→
+  1481→let touchStart = null;
+  1482→window.addEventListener('touchstart', (e) => {
+  1483→  if (document.body.classList.contains('page-open')) return;
+  1484→  touchStart = e.touches[0].clientY;
+  1485→}, { passive: true });
+  1486→window.addEventListener('touchmove', (e) => {
+  1487→  if (touchStart === null || document.body.classList.contains('page-open')) return;
+  1488→  const dy = touchStart - e.touches[0].clientY;
+  1489→  progressTarget = Math.max(0, Math.min(1, progressTarget + dy * TOUCH_GAIN));
+  1490→  touchStart = e.touches[0].clientY;
+  1491→  interacted = true;
+  1492→}, { passive: true });
+  1493→window.addEventListener('touchend', () => { touchStart = null; });
+  1494→
+  1495→window.addEventListener('keydown', (e) => {
+  1496→  if (document.body.classList.contains('page-open')) return;
+  1497→  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+  1498→    progressTarget = Math.min(1, progressTarget + KEY_STEP);
+  1499→    interacted = true;
+  1500→  }
+  1501→  if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+  1502→    progressTarget = Math.max(0, progressTarget - KEY_STEP);
+  1503→    interacted = true;
+  1504→  }
+  1505→});
+  1506→
+  1507→/* ---------- station show/hide ---------- */
+  1508→const stationEls = Array.from(document.querySelectorAll('.station'));
+  1509→function updateStations() {
+  1510→  stationEls.forEach((el) => {
+  1511→    const from = parseFloat(el.dataset.from);
+  1512→    const to   = parseFloat(el.dataset.to);
+  1513→    el.classList.toggle('active', progress >= from && progress < to);
+  1514→  });
+  1515→}
+  1516→
+  1517→/* ---------- chapter dots ---------- */
+  1518→const chapterEls = Array.from(document.querySelectorAll('.chapters__item'));
+  1519→chapterEls.forEach((el) => {
+  1520→  el.addEventListener('click', () => {
+  1521→    progressTarget = parseFloat(el.dataset.go);
+  1522→    interacted = true;
+  1523→  });
+  1524→});
+  1525→function updateChapters() {
+  1526→  let activeIdx = 0;
+  1527→  for (let i = 0; i < chapterEls.length; i++) {
+  1528→    if (progress >= parseFloat(chapterEls[i].dataset.go) - 0.05) activeIdx = i;
+  1529→  }
+  1530→  chapterEls.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+  1531→}
+  1532→
+  1533→/* ---------- progress UI ---------- */
+  1534→const progFill = document.getElementById('prog-fill');
+  1535→const progNum = document.getElementById('prog-num');
+  1536→const hint = document.getElementById('hint');
+  1537→
+  1538→/* ---------- camera path ---------- */
+  1539→const startZ = 60, endZ = -PATH_LENGTH + 240;
+  1540→function tick() {
+  1541→  // smoothing
+  1542→  progress += (progressTarget - progress) * SMOOTH;
+  1543→  yawT = -mouseX * 0.38;
+  1544→  pitchT = -mouseY * 0.20;
+  1545→  yaw += (yawT - yaw) * 0.06;
+  1546→  pitch += (pitchT - pitch) * 0.06;
+  1547→
+  1548→  const z = startZ + (endZ - startZ) * progress;
+  1549→  camera.position.z = z;
+  1550→  camera.position.x = Math.sin(z * 0.0018) * 6 * -1;
+  1551→  camera.position.y = 4.6 + Math.sin(progress * Math.PI * 2.0) * 0.4;
+  1552→
+  1553→  camera.rotation.y = yaw;
+  1554→  camera.rotation.x = pitch;
+  1555→
+  1556→  // sky dome follows camera so the gradient is always around the viewer
+  1557→  skyDome.position.set(camera.position.x, 0, camera.position.z);
+  1558→
+  1559→  // dust drift
+  1560→  const t = performance.now() * 0.0001;
+  1561→  dust.rotation.y = t * 0.3;
+  1562→  dust.position.y = Math.sin(t*5) * 0.4;
+  1563→
+  1564→  // fireflies bob
+  1565→  const fp = fireflies.geometry.attributes.position;
+  1566→  for (let i = 0; i < fireBase.length; i++) {
+  1567→    fp.array[i*3+1] = fireBase[i].y + Math.sin(t*40 + fireBase[i].phase) * 0.6;
+  1568→  }
+  1569→  fp.needsUpdate = true;
+  1570→  fireflies.material.opacity = 0.65 + Math.sin(t*30) * 0.2;
+  1571→
+  1572→  // ray sway
+  1573→  rayGroup.children.forEach((r, i) => {
+  1574→    r.rotation.z = Math.sin(t * 5 + i) * 0.08 + (i*0.05-0.5);
+  1575→    r.material.opacity = 0.30 + Math.sin(t*4 + i*1.3) * 0.12;
+  1576→  });
+  1577→
+  1578→  // UI
+  1579→  updateStations();
+  1580→  updateChapters();
+  1581→  const pct = Math.round(progress*1000);
+  1582→  progFill.style.width = (progress*100) + '%';
+  1583→  progNum.textContent = String(pct).padStart(3, '0');
+  1584→
+  1585→  if (interacted) hint.classList.add('fade');
+  1586→
+  1587→  renderer.render(scene, camera);
+  1588→  requestAnimationFrame(tick);
+  1589→}
+  1590→tick();
+  1591→
+  1592→/* ============== UI: cursor ============== */
+  1593→const cursor = document.getElementById('cursor');
+  1594→let cx = 0, cy = 0, tcx = 0, tcy = 0;
+  1595→window.addEventListener('mousemove', (e) => { tcx = e.clientX; tcy = e.clientY; });
+  1596→function cursorTick() {
+  1597→  cx += (tcx - cx) * 0.22;
+  1598→  cy += (tcy - cy) * 0.22;
+  1599→  cursor.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+  1600→  requestAnimationFrame(cursorTick);
+  1601→}
+  1602→cursorTick();
+  1603→
+  1604→document.querySelectorAll('[data-hover]').forEach(el => {
+  1605→  el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+  1606→  el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  1607→});
+  1608→window.addEventListener('mousedown', () => cursor.classList.add('click'));
+  1609→window.addEventListener('mouseup', () => cursor.classList.remove('click'));
+  1610→
+  1611→/* ============== loader ============== */
+  1612→const loader = document.getElementById('loader');
+  1613→document.getElementById('enter').addEventListener('click', () => {
+  1614→  loader.classList.add('gone');
+  1615→});
+  1616→setTimeout(() => loader.classList.add('gone'), 8000);
+  1617→
+  1618→/* ============== sub-page routing ============== */
+  1619→const pages = {
+  1620→  features: document.getElementById('page-features'),
+  1621→  story:    document.getElementById('page-story'),
+  1622→  pricing:  document.getElementById('page-pricing'),
+  1623→  contact:  document.getElementById('page-contact')
+  1624→};
+  1625→
+  1626→function openPage(name) {
+  1627→  Object.values(pages).forEach(p => p.classList.remove('open'));
+  1628→  if (pages[name]) {
+  1629→    pages[name].classList.add('open');
+  1630→    pages[name].scrollTop = 0;
+  1631→    document.body.classList.add('page-open');
+  1632→  } else {
+  1633→    document.body.classList.remove('page-open');
+  1634→  }
+  1635→}
+  1636→
+  1637→function readHash() {
+  1638→  const h = (location.hash || '').replace('#', '').trim();
+  1639→  openPage(h);
+  1640→}
+  1641→window.addEventListener('hashchange', readHash);
+  1642→readHash();
+  1643→
+  1644→document.querySelectorAll('[data-back]').forEach(el => {
+  1645→  el.addEventListener('click', (e) => {
+  1646→    e.preventDefault();
+  1647→    history.pushState(null, '', '#');
+  1648→    openPage('');
+  1649→  });
+  1650→});
+  1651→
+  1652→document.querySelectorAll('.cta[href^="#"]').forEach(el => {
+  1653→  el.addEventListener('click', (e) => {
+  1654→    e.preventDefault();
+  1655→    const target = el.getAttribute('href');
+  1656→    history.pushState(null, '', target);
+  1657→    readHash();
+  1658→  });
+  1659→});
+  1660→
+  1661→/* ============== contact form ============== */
+  1662→const form = document.getElementById('contact-form');
+  1663→if (form) {
+  1664→  form.addEventListener('submit', (e) => {
+  1665→    e.preventDefault();
+  1666→    const btn = form.querySelector('button');
+  1667→    btn.textContent = '已寄出 · 我们会回信';
+  1668→    btn.disabled = true;
+  1669→    btn.style.opacity = '0.6';
+  1670→  });
+  1671→}
+  1672→</script>
+  1673→</body>
+  1674→</html>
+  1675→

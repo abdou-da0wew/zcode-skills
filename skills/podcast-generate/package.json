@@ -1,7 +1,7 @@
 {
   "name": "podcast-generate-online",
   "version": "1.0.0",
-  "description": "Generate podcast audio from text using z-ai LLM and TTS",
+  "description": "Generate podcast audio from text using any OpenAI-compatible LLM and TTS server",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -13,12 +13,9 @@
     "podcast",
     "tts",
     "llm",
-    "z-ai"
+    "openai-compatible"
   ],
   "license": "MIT",
-  "dependencies": {
-    "z-ai-web-dev-sdk": "*"
-  },
   "devDependencies": {
     "@types/node": "^20",
     "tsx": "^4.7.0",

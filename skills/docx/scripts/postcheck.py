@@ -417,8 +417,8 @@ def check_font_fallback(root: ET.Element) -> CheckResult:
     """Check whether potentially missing fonts are used"""
     SAFE_FONTS = {
         # Chinese
-        "宋体", "SimSun", "黑体", "SimHei", "微软雅黑", "Microsoft YaHei",
-        "仿宋", "FangSong", "FangSong_GB2312", "楷体", "KaiTi",
+        "\u5b8b\u4f53", "SimSun", "\u9ed1\u4f53", "SimHei", "\u5fae\u8f6f\u96c5\u9ed1", "Microsoft YaHei",
+        "\u4eff\u5b8b", "FangSong", "FangSong_GB2312", "\u6977\u4f53", "KaiTi",
         # English
         "Times New Roman", "Arial", "Calibri", "Helvetica",
         "Courier New", "Georgia", "Verdana", "Tahoma",
@@ -558,9 +558,9 @@ def check_toc(root: ET.Element, docx_path: str = "") -> CheckResult:
 
     issues = []
 
-    # Check 1: Document has a "目录" / "目  录" / "Table of Contents" title but no TOC field
+    # Check 1: Document has a TOC title (CJK or English variants) but no TOC field
     has_toc_title = False
-    toc_title_pattern = re.compile(r'^(?:目\s*录|table\s+of\s+contents|contents)$', re.IGNORECASE)
+    toc_title_pattern = re.compile(r'^(?:\u76ee\s*\u5f55|table\s+of\s+contents|contents)$', re.IGNORECASE)
     for p in paragraphs:
         if p.tag != f"{{{w_ns}}}p":
             continue

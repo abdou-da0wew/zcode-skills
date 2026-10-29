@@ -1,344 +1,342 @@
-# 文本排印细节 Text Typesetting Details
+# Text Typesetting Details
 
-「最基础的美学，易忽略的细节与阅读」——很多看似高级的版面，其实只是把这些"小事"全做对了。
+"The most fundamental aesthetics: easily ignored details and reading" — many layouts that look premium simply get all of these "small things" right.
 
-> **本文专注**：字号 / 字重 / 字距 / 行距 / 段落 / 灰度 / 中英混排 / 孤行孤字 / Ruby 注音。
-> **标点专题**（避头尾 / 破折号 / 4 种风格 / 加法减法模式 / 挤压拉伸优先级）见 `punctuation.md`。
-> **断行专题**（标题断句 / 不可分离禁则）见 `title-and-breaking.md`。
+> **This file covers**: font size / weight / tracking / line spacing / paragraphs / gray / Chinese-English mixing / widows and orphans / Ruby annotation.
+> **Punctuation deep dive** (kinsoku / em dash / 4 styles / additive-subtractive models / squeeze-stretch priority): see `punctuation.md`.
+> **Line-breaking deep dive** (title breaking / inseparable pairs): see `title-and-breaking.md`.
 
-## 一、版心（Type area）：决定阅读心理压力
+## 1. Type area: decides the reader's psychological pressure
 
-版心位置和页边距对比强烈到能"潜移默化影响读者审美"。
+The contrast between type-area position and margins is strong enough to "subtly shape the reader's taste".
 
-- **太满**（每行 48 字、每页 30 行、四周边距小）→ 文字"扑面而来"，回行困难，疲劳
-- **舒展**（每行 17–25 字、页边距按比例递增）→ 优美、轻松、愉悦
+- **Too full** (48 characters per line, 30 lines per page, small margins all around) → text "rushes at the reader", returning to the next line start is hard, fatiguing
+- **Relaxed** (17–25 characters per line, margins increasing in proportion) → graceful, easy, pleasant
 
-每行字数太多的版面，会让读者阅读时心理压力较大，回行时不易找到下一行的起头，增加视觉疲劳。
+A layout with too many characters per line puts the reader under real psychological pressure: when wrapping, the eye struggles to find the next line's start, adding visual fatigue.
 
-### 横排页边距三大法则
-1. **内紧外松**：订口（书脊）< 切口（外）。视觉重心向外。
-2. **上紧下松**：天头 < 地脚。视觉重心略往上。
-3. **比例递增**：常用 **2 : 3 : 5 : 8** 或 **3 : 5 : 8 : 13**（费氏数列）
+### Three laws of horizontal margins
+1. **Tight inside, loose outside**: gutter (spine) < fore-edge (outer). Visual weight shifts outward.
+2. **Tight top, loose bottom**: head < foot. Visual weight sits slightly high.
+3. **Proportional increase**: commonly **2 : 3 : 5 : 8** or **3 : 5 : 8 : 13** (Fibonacci)
 
-最常用配比（横排书籍）：
+Most common ratio (horizontal books):
 ```
-订口 : 切口 : 天头 : 地脚 = 3 : 5 : 8 : 13
-即 L3 + R5 + O8 + U13 （字数）
+gutter : fore-edge : head : foot = 3 : 5 : 8 : 13
+i.e. L3 + R5 + O8 + U13 (in characters)
 ```
 
-### Web/H5 边距换算
-设计稿 375px 宽 H5：
-- 屏宽 375，左右各 20–24px，正文版心 327–335px
-- 上 24–32px，下 32–48px
-- 模块间距用 16/24/32（4 的倍数）
+### Web/H5 margin conversion
+375px-wide H5 design canvas:
+- Screen width 375; 20–24px left/right each; body type area 327–335px
+- Top 24–32px, bottom 32–48px
+- Module gaps use 16/24/32 (multiples of 4)
 
-## 二、字间距 字距
+## 2. Letter spacing
 
-**核心法则：正文密排，不动字距。**
+**Core law: set body text solid; do not touch tracking.**
 
-### 字面率（Face ratio）
-字符在方框内实际占多少。现代字体：
-- 汉仪玄宋：92%
-- 方正雅宋：94%
-- 汉仪书宋：~96%
-- 方正书宋：96%
-- 思源黑体：~95%
+### Face ratio
+How much of the em square the glyph actually fills. Modern fonts:
+- HYXuanSong: 92%
+- Founder YaSong: 94%
+- HYShuSong: ~96%
+- Founder ShuSong: 96%
+- Source Han Sans: ~95%
 
-字面率 < 100% 意味着**两个字紧贴排版时已经天然有间距**，不需要再额外加字距。
+A face ratio < 100% means **two glyphs set flush together already have natural spacing** — no extra tracking needed.
 
-### 字距规则
-- **正文**：letter-spacing 0，密排
-- **标题**（≥ 24pt）：可加 0.05–0.1em 增加从容感
-- **超大字号**（≥ 40pt 海报）：可加 0.1–0.2em
-- **Logo / 单字装饰**：字距按设计意图
+### Tracking rules
+- **Body**: letter-spacing 0, solid
+- **Titles** (≥ 24pt): may add 0.05–0.1em for composure
+- **Display sizes** (≥ 40pt posters): may add 0.1–0.2em
+- **Logos / single-glyph ornament**: tracking per design intent
 
-### 4 种字距模式（W3C 术语）
+### The 4 tracking modes (W3C terms)
 
-| 模式 | 字距 | 用途 |
+| Mode | Tracking | Use |
 |---|---|---|
-| **密排** | 0 | 默认正文 |
-| **疏排** | 1/4 em / 1/3 em / 1/2 em / 1 em | 标题求平衡、图说短文求平衡、短诗词、儿童读物 |
-| **均排** | 由算法均摊 | 禁则处理后凑齐行长；列表中并列项目求体例一致 |
-| **紧排** | 负值 | 杂志标题、广告文案多字时凑一行（**不适用于书籍标题与正文**）|
+| **Solid** | 0 | Default body |
+| **Loose** | 1/4 em / 1/3 em / 1/2 em / 1 em | Balancing titles, balancing short captions, short poetry, children's books |
+| **Evened** | Distributed by algorithm | Filling line length after kinsoku; uniform look for parallel list items |
+| **Tight** | Negative | Magazine titles, ad copy with many characters squeezed into one line (**never for book titles or body**) |
 
-CSS 注意：
+CSS notes:
 ```css
-/* 正文区，不要碰 */
+/* Body area — don't touch */
 .body { letter-spacing: 0; }
 
-/* 大标题可以稍加 */
+/* Large titles may add a little */
 .headline { letter-spacing: 0.05em; }
 
-/* 不要这样 */
-.body-bad { letter-spacing: 1px; } /* 破坏字号节奏 */
+/* Not like this */
+.body-bad { letter-spacing: 1px; } /* breaks the size rhythm */
 ```
 
-## 三、行间距 行距
+## 3. Line spacing
 
-### 比例区间
-| 比例（字号:行距） | 体感 | 用途 |
+### Ratio ranges
+| Ratio (size:spacing) | Feel | Use |
 |---|---|---|
-| 1 : 1.0 | 密排、铅字时代标准 | 字典、报纸（每行字少时） |
-| 1 : 1.33 | 紧凑 | 杂志、新闻 |
-| **1 : 1.5** | **现代标准** | **网页正文、商务文档** |
-| 1 : 1.7 | 舒适 | 长文阅读、技术文档 |
-| 1 : 2.0 | 疏朗 | 文学、诗歌、画册说明 |
-| 1 : 2.5+ | 飘散，章节断裂感 | 避免 |
+| 1 : 1.0 | Solid; metal-type-era standard | Dictionaries, newspapers (when lines are short) |
+| 1 : 1.33 | Compact | Magazines, news |
+| **1 : 1.5** | **Modern standard** | **Web body, business documents** |
+| 1 : 1.7 | Comfortable | Long-form reading, technical documents |
+| 1 : 2.0 | Airy | Literature, poetry, art-book captions |
+| 1 : 2.5+ | Drifting; sections feel disconnected | Avoid |
 
-W3C 规定：**行距（行间空白）= 字号的 50%–100%**；对应行高（含字本身）= 字号的 1.5–2 倍。超出 100% 不增易读性。
+W3C rule: **line spacing (inter-line gap) = 50%–100% of font size**; corresponding line height (including the glyph) = 1.5–2× the size. Beyond 100% adds no readability.
 
-铅活字时代的优美版面（如 1918 年前后的期刊正文），字号 : 行距比约在 **1:1 ~ 4:3** 之间，是经典优美范例。
+Beautiful metal-type-era layouts (e.g. periodical body around 1918) ran a size:spacing ratio between **1:1 and 4:3** — classic graceful examples.
 
-### 实操值
-- 印刷正文 9pt → 行距 12–18pt（默认 18pt = 1:2 雍容）
-- 印刷正文 10.5pt → 行距 14–18pt
-- 屏幕 16px → line-height 1.5–1.7（= 24–27px）
-- 屏幕 14px → line-height 1.6–1.8
+### Practical values
+- Print body 9pt → line spacing 12–18pt (default 18pt = 1:2, stately)
+- Print body 10.5pt → line spacing 14–18pt
+- Screen 16px → line-height 1.5–1.7 (= 24–27px)
+- Screen 14px → line-height 1.6–1.8
 
-**所有行距必须是模数整数倍。** 否则跨语种/跨字号无法行对齐。
+**All line spacing must be an integer multiple of the modulus.** Otherwise lines cannot align across languages or sizes.
 
-### 行间标点行距加成（W3C）
-- 行间有专名号（﹏）、甲式书名号（﹏）、着重号时：
-  - **单面装行距 ≥ 1/2 字号**
-  - **双面装行距 ≥ 5/8 字号**
-- 直排带注音时：行距 ≥ 1.5 × 基字
+### Interline punctuation spacing bonus (W3C)
+- When proper-name wavy marks (U+FE4F), style-A book-title wavy marks, or emphasis dots sit between lines:
+  - **Single-sided binding: line spacing ≥ 1/2 font size**
+  - **Double-sided binding: line spacing ≥ 5/8 font size**
+- Vertical text with ruby: line spacing ≥ 1.5 × base glyph
 
-## 四、字重与字号
+## 4. Weight and size
 
-### 字重与对比度的关系
-- 字重塑造文字与载体（纸/屏）的对比度
-- **小字 + 重字重** > 小字 + 轻字重（小字更需对比度）
-- **大字 + 轻字重** 可显优雅，大字也禁得起轻字重
+### Weight vs contrast
+- Weight shapes the contrast between text and its carrier (paper/screen)
+- **Small text + heavier weight** > small text + light weight (small text needs contrast more)
+- **Large text + light weight** can look elegant; large type can afford light weights
 
-实例：薄而透的纸张上用大字重宋体作正文，文字的黑与纸张的白构成易于阅读的对比关系，大字重还能反向突出纸张的"透"。
+Example: on thin, translucent paper, set body text in a heavier Song weight — the black of the glyphs against the white of the paper forms an easy-reading contrast, and the heavier weight conversely highlights the paper's translucency.
 
-### 字重选用矩阵
-| 字号 | 屏幕 | 印刷 | 推荐字重 |
+### Weight selection matrix
+| Size | Screen | Print | Recommended weight |
 |---|---|---|---|
-| 极小 | < 12px | < 6pt | Medium / Bold（55S–65S） |
-| 小 | 12–14px | 6–7.5pt | Regular / Medium（45S–55S） |
-| 中 | 14–18px | 8–10pt | Regular（45S–55S） |
-| 大 | 18–24px | 10–14pt | Regular / Light（35S–45S） |
-| 极大 | > 24px | > 14pt | Light / Thin 可选（25S–45S） |
+| Tiny | < 12px | < 6pt | Medium / Bold (55S–65S) |
+| Small | 12–14px | 6–7.5pt | Regular / Medium (45S–55S) |
+| Medium | 14–18px | 8–10pt | Regular (45S–55S) |
+| Large | 18–24px | 10–14pt | Regular / Light (35S–45S) |
+| Huge | > 24px | > 14pt | Light / Thin optional (25S–45S) |
 
-### 层级用字重不用字体
-不同字号 × 不同字重，常常会形成灰度近似的面，从而拉开与其他元素的空间关系。例如：大字号正文用较细字重，小字号辅文用中等字重，它们灰度接近，但通过字号自然分出层级。
+### Hierarchy via weight, not typeface changes
+Different sizes × different weights often form fields of near-identical gray, which then pull apart the spatial relation to other elements. Example: large body text in a lighter weight, small auxiliary text in a medium weight — their grays are close, yet hierarchy emerges naturally through size.
 
-层级关系优先级：**字号 > 字重 > 颜色 > 字体**。前两个搞不定再考虑后两个。
+Hierarchy priority: **size > weight > color > typeface**. Only reach for the latter two when the former two can't resolve it.
 
-## 五、段落与体例
+## 5. Paragraphs and conventions
 
-### 段落组织：不要把 2 字缩进当成通用默认
-- 书籍、古典文本、公文、长篇正式印刷物：可以采用首行缩进，常见为 2 字；短栏可减弱为 1 字
-- 网页、H5、小红书、Dashboard、PPT、卡片：通常不使用首行缩进，优先用段间距、分组、标题层级来组织文本
-- 引文可使用整段缩进或边线/底色/卡片区分；不要机械套 4 字缩进
-- 列表项无需首行缩进
-- 同一作品只选择一种段落组织方式，不要“首行缩进 + 大段间距”同时堆叠
+### Paragraph organization: do not treat 2-character indent as a universal default
+- Books, classical texts, official documents, long formal print: first-line indent is fine, commonly 2 characters; short columns may reduce it to 1
+- Web, H5, Xiaohongshu, dashboards, PPT, cards: usually no first-line indent; organize with paragraph spacing, grouping, and heading levels instead
+- Quotes may use block indent or rule/background/card treatment; don't mechanically apply a 4-character indent
+- List items need no first-line indent
+- One work uses one paragraph convention; never stack "first-line indent + large paragraph gaps" together
 
-### 段落 4 种缩排模式（W3C CLReq §6.2.1）
+### The 4 paragraph indent modes (W3C CLReq §6.2.1)
 
-| 模式 | 做法 | 适用 |
+| Mode | Method | Applies to |
 |---|---|---|
-| **1. 全部段落首行缩排** | 所有段落首行空 2 字 | 书籍、古典文本、公文、正式印刷物 |
-| **2. 首段不缩排，其余缩排** | 首段顶格，其余段缩 2 字 | 长篇文章、英译中、跨文化项目 |
-| **3. 所有段落不缩排 + 段间距** | 段首顶格，段间空一定行距 | 现代网页、技术文档、H5、PPT、卡片、Markdown 渲染 |
-| **4. 语气未完段断行不缩排** | 段断而语气未完时，下一段顶格 | 散文、诗、剧本 |
+| **1. Indent every paragraph's first line** | All paragraphs start 2 characters in | Books, classical texts, official documents, formal print |
+| **2. No indent on the first paragraph; indent the rest** | First paragraph flush, others 2 characters in | Long-form articles, EN→ZH translations, cross-cultural projects |
+| **3. No indents anywhere + paragraph spacing** | Flush starts, blank line between paragraphs | Modern web, technical docs, H5, PPT, cards, Markdown rendering |
+| **4. No indent when a sentence continues** | When a paragraph breaks mid-thought, the next paragraph stays flush | Essays, poetry, scripts |
 
-### 凸排（Hanging Indent）
-
-首行不缩、次行起缩。用于：
-- 剧本对白
-- Q&A 问答
-- 法条
-- 词典词条
-- 人名列表（花名册）
+### Hanging indent
+First line flush, following lines indented. Used for:
+- Script dialogue
+- Q&A
+- Legal clauses
+- Dictionary entries
+- Name rosters
 
 ```
-李白：床前明月光，
-      疑是地上霜。
-杜甫：好雨知时节，
-      当春乃发生。
+Libai:  chuang qian ming yue guang,
+        yi shi di shang shuang.
+Dufu:   hao yu zhi shi jie,
+        dang chun nai fa sheng.
 ```
 
-CSS：
+CSS:
 ```css
 .hanging {
-  text-indent: -4em;       /* 首行向左凸 4 字 */
-  padding-left: 4em;        /* 整段左缩 4 字 */
+  text-indent: -4em;       /* first line protrudes 4 characters left */
+  padding-left: 4em;        /* whole block indented 4 characters */
 }
 ```
 
-### 段落缩排（Block Indent）
-
-行首侧统一缩进，用于引文、诗词、副标题。字号同正文，可换字体或加段间距，段间距应为正文行的整数倍。
+### Block indent
+Uniform indent on the line-start side; for quotes, poetry, subtitles. Same size as body; may change typeface or add paragraph spacing; the gap must be an integer multiple of the body line.
 
 ```css
 blockquote {
-  margin: 1em 4em 1em 4em;     /* 左右各缩 4 字 */
-  font-style: normal;          /* 中文不要斜体 */
+  margin: 1em 4em 1em 4em;     /* 4 characters in on each side */
+  font-style: normal;          /* never italicize Chinese */
 }
 ```
 
-### 小标题处理
-经典示范：用同一字体同一字号，仅用空字格区分体例。
-- 引文：段首不空格，用整段缩进、边线、底色或卡片区分；具体缩进量由版式决定
-- 小标题：段首空 6 字（向右推），与正文不空行
-- 正文：按所选段落组织方式处理；书籍/公文可首行缩进，网页/卡片/UI 通常顶格并用段间距分组
+### Subheading treatment
+Classic demonstration: same typeface, same size; distinguish conventions with space alone.
+- Quotes: no leading space; distinguish via block indent, side rule, background, or card; the indent amount is decided by the layout
+- Subheads: push 6 characters in from the paragraph start, with no blank line to the body
+- Body: per the chosen paragraph convention; books/official documents may indent first lines, web/cards/UI usually stay flush and group with spacing
 
-这种"用空间代替字号"的处理，是高级排版的标志——**信息层级不靠强对比，靠空间秩序**。
+This "space instead of size" treatment marks advanced typesetting — **information hierarchy without strong contrast; spatial order instead**.
 
-### 单行对齐 4 种（W3C）
-- **居中**：标题、署名、独立元素
-- **行首**：列表项（左对齐于行首）
-- **行尾**：日期、署名、价格（右对齐于行尾）
-- **均排**：禁则处理后凑齐 / 列表并列项体例一致；**段落末行 / 段落只有一行时不用均排**
+### The 4 single-line alignments (W3C)
+- **Centered**: titles, signatures, standalone elements
+- **Line start**: list items (left-aligned to line start)
+- **Line end**: dates, signatures, prices (right-aligned to line end)
+- **Evened**: filling after kinsoku / consistent look for parallel list items; **never even the last line of a paragraph, or a one-line paragraph**
 
-## 六、文本灰度均匀
+## 6. Even text gray
 
-排版的至高理想：**文字在版心内形成极致均匀的灰**，使塑造文本的型变得容易。
+Typography's highest ideal: **text forms an extremely even gray inside the type area**, making the text's shape easy to sculpt.
 
-灰度均匀的敌人：
-1. 标点未挤压 → 局部白块
-2. 中英文混排无字距 → 字宽不均
-3. 多字重混用 → 黑白对比跳跃
-4. 行末参差不齐（左对齐）→ 右侧灰度断
-5. 大量繁体字夹杂简体 → 局部更黑
+Enemies of even gray:
+1. Unsqueezed punctuation → local white blocks
+2. No spacing in Chinese-English mixing → uneven glyph widths
+3. Mixed weights → jumpy black-white contrast
+4. Ragged line ends (left-aligned) → gray breaks on the right
+5. Traditional characters mixed into Simplified → locally darker
 
-灰度均匀的盟友：
-1. 启用两端对齐（justify）
-2. 启用中英文混排自动间距
-3. 同段内字重统一
-4. 标点挤压 + 避头尾
-5. 行距足够稳定
+Allies of even gray:
+1. Justified alignment (justify)
+2. Automatic spacing for Chinese-English mixing
+3. Uniform weight within a paragraph
+4. Punctuation squeezing + kinsoku
+5. Stable line spacing
 
-### CSS 实现
+### CSS implementation
 ```css
 .body {
   text-align: justify;
-  text-justify: inter-character;   /* 中文字间分布 */
+  text-justify: inter-character;   /* distribute spacing between Chinese characters */
   text-spacing-trim: space-all;
   line-break: strict;
 }
 ```
 
-## 七、中英文混排
+## 7. Chinese-English mixing
 
-- 中英文之间**自动加 1/4 字宽空隙**（盘古之白）
-  - Web: `<span>中文</span> <span>english</span>` 之间留半个空格；或用 `text-autospace`（IE 老规范）/CSS Text Module Level 4 的 `text-spacing`
-  - Markdown 写作：手工在中英之间空格
-- 西文标点（半角）和中文字符之间也要加空格
-- 数字与中文之间同样要加：`第 3 章`，不要 `第3章`
-- 单位与数字之间不空：`30px` `9pt`，不要 `30 px`
+- **Automatically add a 1/4-character gap between Chinese and English** (the "Pangu's space")
+  - Web: keep a half space between `<span>...</span>` runs; or use `text-autospace` (old IE spec) / CSS Text Module Level 4's `text-spacing`
+  - Markdown writing: type the space manually between Chinese and English
+- Halfwidth Western punctuation also takes a space next to Chinese characters
+- Digits adjacent to Chinese also take a space: "di 3 zhang" (chapter 3) with a space, never "di3zhang"
+- Units stay tight to numbers: `30px`, `9pt`, never `30 px`
 
-### 间距 W3C 规则
+### Spacing per W3C
 
-- 横排西文字母用比例字体；数字用比例或等宽字体
-- 汉字与西文字母/数字间空隙 **≤ 1/4 em**（默认 1/4 em，最小 1/8 em，最大 1/2 em）
-- 西文/数字在行首行尾时**不加空白**
-- 中文点号前后、中文开始夹注符号之后、结束夹注符号之前的西文/数字**不调整字距、不加空白**
+- Horizontal Western letters use proportional fonts; digits use proportional or monospace fonts
+- Gap between Han glyphs and Western letters/digits **≤ 1/4 em** (default 1/4 em, minimum 1/8 em, maximum 1/2 em)
+- **No extra whitespace** when Western text/digits sit at line start/end
+- Around Chinese pause punctuation, and after opening / before closing interlinear marks, do **not** adjust tracking or add whitespace around adjacent Western text/digits
 
-## 八、孤行孤字（Widow & Orphan）救济
+## 8. Widow & orphan relief
 
-排版的"末页综合症"。详见 `title-and-breaking.md` §五。
+Typesetting's "last-page syndrome". See `title-and-breaking.md` §5.
 
-### 孤字不成行（Orphan）
-段落最后一行只有 1 字 + 1 标点。
+### An orphan character must not form a line
+A paragraph's last line holds only 1 character + 1 punctuation mark.
 
-救济顺序：
-1. **挤进上行**（首选）：标点宽度调整、中西间距压缩、字距均压
-2. **删字回前行**：与作者商议删 1–2 字
-3. **加字补足**：补 1 字让末行≥3 字
-4. **均排末行**（次选）：仅适用于诗歌对联
+Relief order:
+1. **Squeeze into the previous line** (first choice): punctuation width adjustment, compressed Chinese-Western gaps, evened tracking
+2. **Delete a character back into the previous line**: agree with the author to cut 1–2 characters
+3. **Add a character**: pad so the last line holds ≥ 3 characters
+4. **Even out the last line** (second choice): only for poetry and couplets
 
-### 孤行不成页（Widow）
-页首是前段的最后一行。
+### A widow line must not open a page
+The page starts with the previous paragraph's final line.
 
-救济顺序：
-1. **孤行回前页**：超出版心 1 行接前段
-2. **前页末段取 1 行**：修改前段提前结束
-3. **删字**：删本段开头让孤行不孤
-4. **加字**：补 1 行字数
+Relief order:
+1. **Return the widow to the previous page**: let the type area take 1 more line to join the previous paragraph
+2. **Take 1 line from the previous page's last paragraph**: revise the previous paragraph to end earlier
+3. **Delete characters**: trim this paragraph's opening so the widow isn't alone
+4. **Add characters**: pad a full line's worth
 
-CSS：
+CSS:
 ```css
 p {
-  orphans: 2;       /* 段末至少留 2 行 */
-  widows: 2;        /* 段首至少留 2 行 */
+  orphans: 2;       /* keep at least 2 lines at a paragraph's end */
+  widows: 2;        /* keep at least 2 lines at a paragraph's start */
 }
 ```
 
-## 九、Ruby 注音 / 拼音（W3C CLReq §5.5）
+## 9. Ruby annotation / pinyin (W3C CLReq §5.5)
 
-### 注音符号（Bopomofo，台湾用）
-- 横排 / 直排原则上都置基字**右侧**
-- 注文字号 : 基字 = **3 : 10**
-- 调号同字号；轻声符 = 1 : 15
-- 声调位置：
-  - 平上去入声：标在末符号**右上方**
-  - 入声：右下方
-  - 轻声：标在前方
-- 直排向上回返半个符号位、横排向右突出半个符号位
+### Bopomofo (Taiwan)
+- Placed to the **right** of the base glyph in both horizontal and vertical, in principle
+- Annotation size : base glyph = **3 : 10**
+- Tone marks share the annotation size; neutral-tone mark = 1 : 15
+- Tone positions:
+  - Level/rising/departing/entering tones: to the **upper right** of the last symbol
+  - Entering tone: lower right
+  - Neutral tone: in front
+- In vertical writing it returns half a symbol position upward; in horizontal it protrudes half a position rightward
 
-### 汉语拼音
-- **仅横排**
-- 常放在基字**上方**（部分场景下方）
-- 注文字号 = 基字字号的 **1/2**
-- 相邻注文间距 ≥ 西文词间空格 ≈ 1/4 字宽
-- 字形：用 a / g 单层、二声调下粗上细的**无衬线体**（出版/教育界惯例，无国标）
+### Hanyu Pinyin
+- **Horizontal only**
+- Usually above the base glyph (below in some contexts)
+- Annotation size = **1/2** of the base glyph size
+- Gap between adjacent annotations ≥ Western word space ≈ 1/4 character width
+- Letterforms: single-story a / g, sans-serif with thick-lower/thin-upper second-tone strokes (publishing/education convention; no national standard)
 
-**两种用法**：
-1. **单字标音**：注文总在上方、汉字间字距大、全小写
-2. **分词连写标音**：注文常在下方、词间约 1/2 字宽空、句首/专名大写、标点跟左侧注文
+**Two usages**:
+1. **Per-glyph annotation**: annotation always above, wide tracking between glyphs, all lowercase
+2. **Word-grouped annotation**: annotation usually below, ~1/2-character gaps between words, capitalized sentence starts/proper nouns, punctuation follows the left annotation
 
 ### HTML5 Ruby
 
 ```html
-<!-- 单字标音 -->
+<!-- per-glyph annotation (base tokens are placeholders; put your Han glyphs in production) -->
 <ruby>
-  汉<rt>hàn</rt>语<rt>yǔ</rt>拼<rt>pīn</rt>音<rt>yīn</rt>
+  han<rt>hàn</rt>yu<rt>yǔ</rt>pin<rt>pīn</rt>yin<rt>yīn</rt>
 </ruby>
 
-<!-- 整词标音 -->
+<!-- whole-word annotation -->
 <ruby>
-  汉语拼音<rt>Hànyǔ Pīnyīn</rt>
+  hanyu pinyin<rt>Hànyǔ Pīnyīn</rt>
 </ruby>
 
-<!-- 含括号回退 -->
+<!-- with parenthesized fallback -->
 <ruby>
-  汉<rp>(</rp><rt>hàn</rt><rp>)</rp>
+  han<rp>(</rp><rt>hàn</rt><rp>)</rp>
 </ruby>
 ```
 
-CSS：
+CSS:
 ```css
 ruby {
-  ruby-position: over;            /* 注文在上 */
-  /* ruby-position: under;        // 注文在下（分词连写法）*/
+  ruby-position: over;            /* annotation above */
+  /* ruby-position: under;        // annotation below (word-grouped style) */
 }
 
 rt {
-  font-size: 0.5em;               /* 拼音 = 基字 1/2 */
+  font-size: 0.5em;               /* pinyin = 1/2 of the base glyph */
   font-family: "Source Sans Pro", "Inter", sans-serif;
   line-height: 1;
 }
 ```
 
-### 注意：CSS Ruby 各浏览器支持不一致；Apple Books 字体选择较全。Web 上稳定方案是手动用 `<sup>` 模拟。
+### Note: CSS Ruby support differs across browsers; Apple Books has the most complete font choices. The stable web approach is simulating with manual `<sup>`.
 
-## 十、检查清单（排印完成前必过）
+## 10. Checklist (must pass before finalizing)
 
-- [ ] 正文行长 17–40 字（最多 48 横排 / 55 直排）？
-- [ ] 行距是字号 1.5–2 倍？
-- [ ] 行距是模数整数倍？
-- [ ] 所有字号都在模数体系内？
-- [ ] 内 < 外 < 上 < 下 的页边距？
-- [ ] 正文 letter-spacing 是 0？
-- [ ] 段落组织方式是否符合媒介（网页/卡片不机械使用首行缩进，书籍/公文再按模板设置）？
-- [ ] 一段内字重统一？
-- [ ] 中英文之间有 1/4 字宽空格？
-- [ ] 段末是否有"孤字 + 标点"？
-- [ ] 页首是否有"孤行"？
-- [ ] 整页放远看文本灰度均匀？
-- [ ] 段落是否选定 4 种缩排模式中的一种并贯穿全文？
+- [ ] Body line length 17–40 characters (max 48 horizontal / 55 vertical)?
+- [ ] Line spacing 1.5–2× font size?
+- [ ] Line spacing an integer multiple of the modulus?
+- [ ] All font sizes within the modulus system?
+- [ ] Margins ordered inner < outer < top < bottom?
+- [ ] Body letter-spacing is 0?
+- [ ] Does paragraph treatment match the medium (web/cards don't mechanically indent; books/official documents indent per template)?
+- [ ] Uniform weight within each paragraph?
+- [ ] A 1/4-character gap between Chinese and English?
+- [ ] Any "orphan character + punctuation" at a paragraph end?
+- [ ] Any widow line at a page top?
+- [ ] Does the page hold up to even gray when viewed from a distance?
+- [ ] Is one of the 4 indent modes chosen and carried through the whole document?
 
-任何一项不过关，先修这一项再说"美学"。
+If any item fails, fix that item before talking about "aesthetics".

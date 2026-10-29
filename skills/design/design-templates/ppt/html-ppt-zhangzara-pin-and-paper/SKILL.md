@@ -1,6 +1,6 @@
 ---
 name: html-ppt-zhangzara-pin-and-paper
-description: Pin & Paper — 黄色纸面 + 安全别针插图 + 墨蓝手写 Caveat + 纸纹理。任何应该感觉手作 / 温暖 / 文学的 deck：定性研究发现 / 创始人反思 / 长篇品牌故事 / workshop 复盘。
+description: Pin & Paper — yellow paper + safety-pin illustrations + ink-blue handwritten Caveat + paper texture. Any deck that should feel hand-made / warm / literary: qualitative research findings / founder reflections / longform brand stories / workshop debriefs.
 visibility: public
 mode: template
 carrier: deck
@@ -8,9 +8,9 @@ scenario: marketing
 pattern_source: pattern.html
 source_priority: skill-first
 triggers:
-  - "做个手作风 PPT"
-  - "做个研究分享 deck"
-  - "做个创始人反思 deck"
+  - "make a hand-crafted deck"
+  - "make a research-sharing deck"
+  - "make a founder-reflection deck"
   - "pin-and-paper"
   - "zhangzara-pin-and-paper"
   - "Pin & Paper"

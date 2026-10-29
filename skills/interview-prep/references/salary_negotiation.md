@@ -1,99 +1,99 @@
-# 薪资谈判脚本
+# Salary Negotiation Script
 
-## 心法
+## Core Mindset
 
-- 永远不要先开口给一个数（让对方先报）
-- 给数字时给 range，下限略高于你的最低接受
-- 谈判全程保持"希望加入" + "理性 base on 市场" 的语气
-- 不要 disclose 你的当前 / 历史薪资（除非法律 / 当地惯例要求）
-- 多个 offer 是最大筹码，但不要明示要"涨多少"，让对方主动提
+- Never name a number first (make them quote first)
+- When you do quote, quote a range with the lower bound slightly above your true minimum
+- Maintain a "I want to join" + "rationally grounded in the market" tone throughout
+- Don't disclose your current / past salary (unless the law / local convention requires it)
+- Multiple offers is your biggest lever, but don't announce how big a raise you want — let them bring it up
 
-## 阶段 1：HR 初次问期望薪资
+## Stage 1: HR First Asks Your Expected Salary
 
-**HR**："你期望的薪资是多少？"
+**HR**: "What are your salary expectations?"
 
-**你（首选）**：
-"贵司这个岗位的薪资带是多少？我希望对齐市场和岗位职级。"
+**You (preferred)**:
+"What is the salary band for this role at your company? I'd like to align with the market and the role's level first."
 
-**HR（如果说不告诉你）**：
-"我们想先听你的期望，再做匹配。"
+**HR (if they refuse to share)**:
+"We'd like to hear your expectation first, then see how it matches."
 
-**你**：
-"基于市场行情和我的 ___ 年经验，我希望的范围是 X~Y k × ___ 月，最终可以基于贵司的整体 package 综合谈。"
+**You**:
+"Based on market rates and my ___ years of experience, I'm looking at X-Y k × ___ months, and the final number can be discussed holistically as part of your total package."
 
-X 的算法：（当前年包 ÷ 12 ÷ 月数）× 1.3~1.5，向上取整到 5k。
-Y 的算法：X × 1.2。
+How to compute X: (current annual package ÷ 12 ÷ months) × 1.3-1.5, rounded up to the nearest 5k.
+How to compute Y: X × 1.2.
 
-例：当前 30 × 16 = 480k 年包。月薪 = 480/14 ≈ 34k。期望 X = 34 × 1.3 = 44k → 给 45~55k × 14。
+Example: current 30 × 16 = 480k annual. Monthly = 480/14 ≈ 34k. Expected X = 34 × 1.3 = 44k → quote 45-55k × 14.
 
-## 阶段 2：HR 给口头 offer
+## Stage 2: HR Gives a Verbal Offer
 
-**HR**："我们能给你 50k × 14，年包 700k。"
+**HR**: "We can offer 50k × 14, 700k annual."
 
-**你（不要立刻接）**：
-"感谢，让我先了解下整体 package 的细节，包括签字费、股票 / RSU、年终奖结构、五险一金基数、加班 / 出差补贴。"
+**You (don't accept on the spot)**:
+"Thank you. Let me first understand the details of the full package — signing bonus, equity / RSU, year-end bonus structure, social insurance & housing fund contribution base, overtime / travel allowances."
 
-收到详细信息后：
-- 如果**整体满意**：可以表达"基本符合预期，让我和家人商量 1~2 天"
-- 如果**期望更高**：进入阶段 3 谈判
+After receiving the details:
+- If **overall satisfied**: you can say "this basically meets my expectations; let me discuss it with my family for 1-2 days"
+- If **you want more**: move to Stage 3 negotiation
 
-## 阶段 3：谈高 offer
+## Stage 3: Negotiating the Offer Up
 
-**你**：
-"非常感谢您的 offer，我对岗位和团队都很认可。基于我目前正在 finalize 的 X 公司类似岗位的 offer / 我的当前 package + 跳槽涨幅期望，我希望能在月薪 / 签字费 / RSU 上有进一步空间，具体是 ___。"
+**You**:
+"Thank you so much for the offer — I genuinely like the role and the team. Based on the similar offer I'm finalizing with Company X / my current package plus the expected raise for a move, I'm hoping for additional room on monthly salary / signing bonus / RSU — specifically, ___. "
 
-要点：
-- **永远给具体数字**（不要说"再高一点")
-- **给一个 reason**（其他 offer / 当前涨幅 / 市场行情）
-- **只谈 1~2 个核心要素**（不要每项都谈）
-- **不要威胁**（不要说"否则我去 X 公司"）
+Key points:
+- **Always give concrete numbers** (not "a bit higher")
+- **Give a reason** (other offers / expected raise / market rates)
+- **Negotiate only 1-2 core elements** (not every line item)
+- **No threats** (never say "otherwise I'll go to Company X")
 
-## 阶段 4：HR 拒绝再加
+## Stage 4: HR Refuses to Move
 
-**HR**："这个数字已经是我们的 maximum，无法再加。"
+**HR**: "This number is our maximum; we can't go higher."
 
-**你**：
-- 如果 base 已经能接受：尝试争取签字费 / 多一档股票 / 多 5 天年假 / 入职时间调整
-- 如果整体不能接受：感谢 + 说"我需要时间考虑"，不要当场拒绝
+**You**:
+- If base is acceptable: try for a signing bonus / one more equity band / 5 more vacation days / an adjusted start date
+- If the whole package is unacceptable: thank them + say "I need some time to think" — don't reject on the spot
 
-## 阶段 5：手握多个 offer
+## Stage 5: Holding Multiple Offers
 
-最理想：3 个 offer 在手，且各家都知道你在考虑其他
+Ideal setup: 3 offers in hand, and each company knows you're weighing others
 
-**与 A 公司**："X 公司给了 50k × 14 + 100k 签字 + 200k RSU/年，我个人更倾向贵司 / 这个岗位，但希望整体 package 至少 match。"
+**With Company A**: "Company X offered 50k × 14 + 100k signing + 200k RSU/year. I personally prefer your company / this role, but I'd need the total package to at least match."
 
-**与 B 公司**：同上但换数字
+**With Company B**: same script, different numbers
 
-⚠️ 不要伪造 offer（HR 圈子小，可能被发现）
+⚠️ Never fabricate offers (HR circles are small — it can be discovered)
 
-## 应届生薪资谈判
+## Negotiating as a New Graduate
 
-应届生议价空间小，但仍有：
-- 不同 offer 互比
-- 签字费可以争（很多公司有 flex）
-- 入职时间可以争（毕业延后）
-- 工作地点 / base 转换 可以争
+New graduates have little leverage, but some levers remain:
+- Comparing offers against each other
+- Signing bonus is negotiable (many companies have flexibility)
+- Start date is negotiable (postponed graduation)
+- Work location / base transfer is negotiable
 
-应届生**不要**：因为期望太高拒掉所有 offer。第一份工作的"平台 + 业务 + leader"比薪资重要。
+New graduates should **not**: reject every offer over high expectations. For your first job, "platform + business + manager" matters more than salary.
 
-## 常见雷区
+## Common Landmines
 
-- "我愿意降薪过来" → 永远不要主动说，HR 会觉得你"贱卖" + "需求被低估"
-- "我对薪资不敏感" → HR 听了真的会少给
-- "你们随便给个数" → 把决定权交给 HR，等于自杀
-- "如果不到 X 我就拒" → 太 hardcore，谈崩
-- 把家里 / 房贷 / 个人困难当谈判筹码 → 不专业
+- "I'm willing to take a pay cut to join" → never say this; HR will read "undervaluing yourself" + "low demand"
+- "I'm not sensitive about salary" → HR will genuinely offer less
+- "Just give me whatever you think is fair" → handing the decision to HR is self-sabotage
+- "If it's below X I'll decline" → too hardcore; the talks collapse
+- Using family / mortgage / personal hardship as leverage → unprofessional
 
-## 收到 offer 之后的 checklist
+## Post-Offer Checklist
 
-- [ ] 确认 base 月薪 + 月数
-- [ ] 确认签字费 / 一次性奖金
-- [ ] 确认股票 / RSU / 期权（数量、归属期、估值方式）
-- [ ] 确认年终奖结构（保底 / 固定 / 浮动）
-- [ ] 确认五险一金基数（很多公司低基数缴费，影响实际收入）
-- [ ] 确认补充医疗 / 商业保险
-- [ ] 确认年假 / 调休 / 带薪病假
-- [ ] 确认加班 / 出差补贴
-- [ ] 确认背景调查范围
-- [ ] 确认 offer letter 书面文件
-- [ ] 入职时间（30 天交接 + 1 周休息）
+- [ ] Confirm base monthly salary × months
+- [ ] Confirm signing bonus / one-time bonus
+- [ ] Confirm equity / RSU / options (quantity, vesting schedule, valuation method)
+- [ ] Confirm year-end bonus structure (guaranteed / fixed / floating)
+- [ ] Confirm social insurance & housing fund contribution base (many companies under-contribute, which cuts real income)
+- [ ] Confirm supplemental medical / commercial insurance
+- [ ] Confirm annual leave / comp time / paid sick leave
+- [ ] Confirm overtime / travel allowances
+- [ ] Confirm the scope of the background check
+- [ ] Confirm the written offer letter
+- [ ] Start date (30-day handover + 1 week to rest)

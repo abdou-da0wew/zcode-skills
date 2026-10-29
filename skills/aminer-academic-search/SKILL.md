@@ -225,7 +225,7 @@ Patent info / Patent details
 
 > Full parameter docs: read `references/api-catalog.md`
 
-| # | Title | Method | Price | API Path (Base: publicapi.chatglm.cn/chatglm_public/skill/aminer) |
+| # | Title | Method | Price | API Path (Base: $AMINER_API_BASE_URL) |
 |---|------|------|------|------|
 | 1 | Paper QA Search Pro | POST | ¥0.70 | `/api/v3/paper/qa/searchPro` |
 | 2 | Paper QA Search (legacy) | POST | ¥0.05 | `/api/paper/qa/search` |

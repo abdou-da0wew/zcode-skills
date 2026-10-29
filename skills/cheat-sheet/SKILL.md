@@ -1,210 +1,210 @@
 ---
 name: cheat-sheet
-description: 将 PDF/Word/Markdown 学习资料转化为精炼的知识浓缩卡文档。支持三种风格（知识点速查卡/思维导图式/Q&A式），输出双栏小字 PDF。当用户说"生成知识浓缩卡"、"生成 Cheatsheet"、"帮我做个速查表"、"把这个资料整理成一页纸"、"做个知识卡片"时触发。**不处理**：基于材料出题（→ quiz-mastery）、长期学习项目（→ study-buddy）。
+description: Condense PDF/Word/Markdown study material into a distilled knowledge-cheatsheet document. Supports three styles (quick-reference cards / mind-map style / Q&A style) and outputs a two-column, small-font PDF. Trigger when the user says "generate a knowledge cheatsheet", "generate a cheatsheet", "make me a quick-reference sheet", "condense this material onto one page", "make a knowledge card". **Does NOT handle**: generating quizzes from material (→ quiz-mastery) or long-term study projects (→ study-buddy).
 ---
 
-# Cheatsheet 生成器
+# Cheatsheet Generator
 
-## 你做什么
+## What You Do
 
-把用户的学习资料（PDF/Word/Markdown/文本）压缩成一份**双栏、小字、信息密度高**的 Cheatsheet 文档（PDF 格式）。
+Compress the user's study material (PDF/Word/Markdown/text) into a **two-column, small-font, information-dense** Cheatsheet document (PDF format).
 
-**核心原则：只保留干货，砍掉废话。**
-
----
-
-## ⚠️ 铁律：避免重复创建
-
-生成 Cheatsheet 前，**先扫描输出目录**检查是否已有同主题文件：
-- **已存在** → 问用户"已经有一份 [文件名] 了，覆盖 / 新建一份 / 跳过？" 等用户回复再动手
-- **不存在** → 直接生成
-- **绝不**未经询问直接覆盖
+**Core principle: keep only the substance, cut the fluff.**
 
 ---
 
-## 工作流程
+## ⚠️ Iron Rule: Avoid Duplicate Creation
 
-### 步骤 1：接收资料
+Before generating a Cheatsheet, **scan the output directory first** to check whether a file on the same topic already exists:
+- **Exists** → ask the user "There's already a [file name] — overwrite / create new / skip?" and wait for the reply before acting
+- **Does not exist** → generate directly
+- **Never** overwrite without asking
 
-用户提供学习资料文件，支持格式：
-- `.pdf` — 调 PDF skill 的 process 路线提取文本
-- `.docx` — 调 PDF skill 的 process 路线提取文本
-- `.md` / `.txt` — 直接读取
+---
 
-**提取文本命令：**
+## Workflow
+
+### Step 1: Receive the material
+
+The user provides study material files. Supported formats:
+- `.pdf` — use the PDF skill's process route to extract text
+- `.docx` — use the PDF skill's process route to extract text
+- `.md` / `.txt` — read directly
+
+**Text extraction commands:**
 ```bash
-# PDF 提取文本
+# Extract text from PDF
 python3 "$PDF_SCRIPTS/pdf.py" extract.text <file_path>
 
-# Word 转 PDF 后提取（如需要）
+# Convert Word to PDF first, then extract (if needed)
 python3 "$PDF_SCRIPTS/pdf.py" convert.office <file_path>
 ```
 
-其中 `$PDF_SCRIPTS` 为 PDF skill 的 scripts 目录路径，需从 PDF skill 的 SKILL.md 位置推导。
+where `$PDF_SCRIPTS` is the scripts directory path of the PDF skill, derived from the location of the PDF skill's SKILL.md.
 
-如果用户没有提供文件而是直接贴了文本内容，跳过提取步骤，直接用文本。
-
----
-
-### 步骤 2：选择风格
-
-**必须询问用户**想要哪种风格（不要自己替用户选）：
-
-向用户展示以下选项：
-1. 📋 **知识点速查卡** — 核心概念 + 定义 + 关键公式/要点，一眼扫到，适合考前突击
-2. 🌳 **思维导图式** — 按层级结构组织（大标题→子标题→要点），有大纲感，适合梳理体系
-3. ❓ **Q&A 式** — 把知识点变成"问题→答案"对，适合自测复习
-
-用户选择后进入步骤 3。
+If the user didn't provide a file but pasted text content directly, skip the extraction step and use the text as-is.
 
 ---
 
-### 步骤 3：LLM 提炼内容
+### Step 2: Choose a style
 
-根据用户选择的风格，构建不同的 prompt 让 LLM 从原文中提炼 cheatsheet 内容。
+**You must ask the user** which style they want (do not choose for them):
 
-#### 风格 1：知识点速查卡
+Present these options:
+1. 📋 **Quick-reference cards** — core concepts + definitions + key formulas/points at a glance; ideal for last-minute exam prep
+2. 🌳 **Mind-map style** — organized hierarchically (heading → subheading → points) with an outline feel; ideal for structuring a subject
+3. ❓ **Q&A style** — turns knowledge points into "question → answer" pairs; ideal for self-testing review
 
-提炼规则：
-- 提取所有核心概念、定义、公式、关键数据
-- 每个知识点用 **术语：一句话解释** 的格式
-- 相关知识点分组，每组有小标题
-- 重要公式/代码片段原样保留
-- 砍掉所有举例、过渡句、背景铺垫
+After the user chooses, proceed to Step 3.
 
-输出结构：
+---
+
+### Step 3: LLM distills the content
+
+Based on the chosen style, construct different prompts so the LLM distills cheatsheet content from the source text.
+
+#### Style 1: Quick-reference cards
+
+Distillation rules:
+- Extract all core concepts, definitions, formulas, and key data
+- Format each knowledge point as **term: one-sentence explanation**
+- Group related knowledge points, each group with a small heading
+- Keep important formulas/code snippets verbatim
+- Cut all examples, transition sentences, and background filler
+
+Output structure:
 ```
-## [分组标题]
-- **术语A**：一句话定义
-- **术语B**：一句话定义
-- 📐 公式：`公式内容`
+## [Group heading]
+- **Term A**: one-sentence definition
+- **Term B**: one-sentence definition
+- 📐 Formula: `formula content`
 
-## [分组标题]
+## [Group heading]
 ...
 ```
 
-#### 风格 2：思维导图式
+#### Style 2: Mind-map style
 
-提炼规则：
-- 提取文档的层级结构（章→节→要点）
-- 每个节点用最简短的语言概括
-- 最多 3 级深度（再深就塞不进一页了）
-- 用缩进和符号表达层级关系
+Distillation rules:
+- Extract the document's hierarchical structure (chapter → section → points)
+- Summarize each node in the fewest possible words
+- At most 3 levels deep (anything deeper won't fit on one page)
+- Use indentation and symbols to express hierarchy
 
-输出结构：
+Output structure:
 ```
-# 主题
+# Topic
 
-## 一级分支
-  ├─ 二级要点
-  │   ├─ 细节 1
-  │   └─ 细节 2
-  └─ 二级要点
-      └─ 细节
+## Level-1 branch
+  ├─ Level-2 point
+  │   ├─ Detail 1
+  │   └─ Detail 2
+  └─ Level-2 point
+      └─ Detail
 ```
 
-#### 风格 3：Q&A 式
+#### Style 3: Q&A style
 
-提炼规则：
-- 把每个知识点转化成一个问题
-- 答案控制在 1-3 句话
-- 问题从基础到进阶排列
-- 易混淆的概念出辨析题
+Distillation rules:
+- Convert each knowledge point into a question
+- Keep answers to 1-3 sentences
+- Order questions from basic to advanced
+- Create discrimination questions for easily confused concepts
 
-输出结构：
+Output structure:
 ```
-## [主题分组]
+## [Topic group]
 
-**Q：什么是 XXX？**
-A：一句话回答。
+**Q: What is XXX?**
+A: One-sentence answer.
 
-**Q：XXX 和 YYY 的区别？**
-A：简短对比。
+**Q: Difference between XXX and YYY?**
+A: Brief comparison.
 ```
 
 ---
 
-### 步骤 4：用户确认与调整
+### Step 4: User confirmation and adjustment
 
-LLM 生成内容后，**先以文本形式展示给用户**，询问：
+After the LLM generates the content, **show it to the user as text first** and ask:
 
-> "内容整理好了，你看看有没有要调整的？比如：
-> - 某些部分要加重点标记？
-> - 某些内容要删掉或补充？
-> - 排版上有什么偏好？（比如字号再小一点、分区颜色区分等）"
+> "The content is organized — anything you'd like to adjust? For example:
+> - Should any sections be highlighted?
+> - Should anything be removed or added?
+> - Any layout preferences? (e.g. smaller font size, color-coded sections, etc.)"
 
-用户确认"可以"后，进入步骤 5。
-用户提出修改 → 调整内容 → 再次展示 → 等待确认。
+After the user confirms it's OK, proceed to Step 5.
+If the user requests changes → adjust → show again → wait for confirmation.
 
 ---
 
-### 步骤 5：生成 PDF
+### Step 5: Generate the PDF
 
-调用 PDF skill 的 **Report 路线（ReportLab）** 生成双栏 PDF。
+Call the PDF skill's **Report route (ReportLab)** to generate the two-column PDF.
 
-**排版规格（默认值）：**
+**Layout spec (defaults):**
 
-| 参数 | 默认值 | 说明 |
+| Parameter | Default | Notes |
 |------|--------|------|
-| 页面大小 | A4 | 可按用户要求调整 |
-| 栏数 | 双栏 | 默认双栏，用户可选单栏 |
-| 正文字号 | 8pt | 信息密度优先，可按用户要求调整 |
-| 标题字号 | 10pt（一级）/ 9pt（二级） | |
-| 行距 | 1.2 | 紧凑但可读 |
-| 页边距 | 上下左右各 12mm | 最大化内容区域 |
-| 字体 | 中文用 UniSong/UniHei，英文用 Helvetica | |
+| Page size | A4 | Adjustable on request |
+| Columns | Two | Two-column by default; single column optional |
+| Body font size | 8pt | Information density first; adjustable on request |
+| Heading font size | 10pt (level 1) / 9pt (level 2) | |
+| Line spacing | 1.2 | Compact but readable |
+| Margins | 12mm on all sides | Maximizes content area |
+| Fonts | UniSong/UniHei for CJK text, Helvetica for Latin | |
 
-**生成流程：**
+**Generation flow:**
 
-1. 将 LLM 提炼的 Markdown 内容转换为 ReportLab 排版指令
-2. 调 PDF skill 的 report 路线生成 PDF
-3. 生成文件路径告知用户
+1. Convert the LLM-distilled Markdown content into ReportLab layout instructions
+2. Call the PDF skill's report route to generate the PDF
+3. Tell the user the generated file path
 
-**调用 PDF skill 时遵循其 SKILL.md 中的所有规则**，包括：
-- CJK 字体检查
-- 表格溢出防护
-- 页面填充率检查
-- 元数据设置
-
----
-
-### 步骤 6：交付
-
-输出给用户：
-- 📄 PDF 文件路径
-- 文件大小、页数
-- 提示用户可以继续调整
+**When calling the PDF skill, follow all rules in its SKILL.md**, including:
+- CJK font checks
+- Table overflow protection
+- Page fill-rate checks
+- Metadata settings
 
 ---
 
-## 注意事项
+### Step 6: Deliver
 
-### 内容质量
-- **不编造内容**：所有知识点必须来自原文，不能自由发挥
-- **不遗漏关键内容**：核心概念、公式、定义必须保留
-- **术语保持原文用词**：不要擅自替换专业术语
-
-### 文件操作
-- 生成的 PDF 默认保存到工作区根目录，文件名格式：`知识浓缩卡_[主题]_[日期].pdf`
-- 查重见上方"⚠️ 铁律：避免重复创建"
+Output to the user:
+- 📄 The PDF file path
+- File size and page count
+- A note that they can keep adjusting
 
 ---
 
-## 与其他 Skill 的关系
+## Notes
 
-| Skill | 关系 |
+### Content quality
+- **Never fabricate content**: every knowledge point must come from the source text; no free-styling
+- **Never omit key content**: core concepts, formulas, and definitions must be preserved
+- **Keep original terminology**: do not substitute technical terms on your own
+
+### File operations
+- Generated PDFs are saved to the workspace root by default, named `cheatsheet_[topic]_[date].pdf`
+- Duplicate checking: see "⚠️ Iron Rule: Avoid Duplicate Creation" above
+
+---
+
+## Relationship to Other Skills
+
+| Skill | Relationship |
 |-------|------|
-| PDF skill | 调用其 process 路线提取文本，调用其 report 路线生成 PDF |
-| study-buddy | study-buddy 可在用户完成学习项目后推荐生成 cheatsheet |
-| quiz-mastery | 无直接关系，但 cheatsheet 内容可作为出题的知识点来源 |
+| PDF skill | Its process route extracts text; its report route generates the PDF |
+| study-buddy | study-buddy may recommend generating a cheatsheet after the user completes a study project |
+| quiz-mastery | No direct relationship, but cheatsheet content can serve as a source of knowledge points for quiz generation |
 
 ---
 
-## 文件结构
+## File Structure
 
 ```
 skills/cheat-sheet/
-├── SKILL.md              ← 当前文件
+├── SKILL.md              ← current file
 ```
 
-本 skill 是纯流程指引，不包含独立脚本。所有文件操作和 PDF 生成通过调用 PDF skill 完成。
+This skill is a pure workflow guide and contains no standalone scripts. All file operations and PDF generation are done by calling the PDF skill.

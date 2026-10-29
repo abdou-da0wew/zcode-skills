@@ -246,9 +246,11 @@ else
 fi
 echo ""
 
-# ── Step 2i: Font Installation (from CDN) ──
+# ── Step 2i: Font Installation (from font mirror) ──
 echo "--- [9/10] Font Installation ---"
-FONT_CDN_BASE="https://z-cdn.chatglm.cn/office-skill/fonts"
+# Point PDF_FONT_MIRROR_URL at any static HTTP server mirroring the /usr/share/fonts tree
+# (self-host the open-source fonts from their official upstream projects — see env_setup/setup.md).
+FONT_CDN_BASE="${PDF_FONT_MIRROR_URL:-}"
 FONT_LIST="$SCRIPT_DIR/font_list.txt"
 
 if [ "$PLATFORM" = "mac" ]; then
@@ -266,11 +268,15 @@ else
         fail "Font list not found: $FONT_LIST"
         ERRORS=$((ERRORS + 1))
     else
+        if [ -z "$FONT_CDN_BASE" ]; then
+            warn "PDF_FONT_MIRROR_URL is not set; skipping font downloads."
+            warn "Set it to a mirror of the font tree (see env_setup/setup.md), or install fonts manually."
+        fi
         TOTAL=$(wc -l < "$FONT_LIST" | tr -d ' ')
         INSTALLED=0
         SKIPPED=0
         FAILED=0
-        info "Downloading $TOTAL fonts from CDN..."
+        info "Downloading $TOTAL fonts from font mirror..."
         
         while IFS= read -r rel_path || [ -n "$rel_path" ]; do
             [ -z "$rel_path" ] && continue

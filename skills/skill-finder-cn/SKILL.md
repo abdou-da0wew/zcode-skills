@@ -1,7 +1,7 @@
 ---
 name: skill-finder-cn
-description: "Skill 查找器 | Skill Finder. 帮助发现和安装 ClawHub Skills | Discover and install ClawHub Skills. 回答'有什么技能可以X'、'找一个技能' | Answers 'what skill can X', 'find a skill'. 触发词：找 skill、find skill、搜索 skill."
-author: 赚钱小能手
+description: "Skill Finder | Helps discover and install ClawHub Skills. Answers 'what skill can X', 'find a skill'. Trigger words: find skill, find skill, search skill."
+author: DiveeOI
 metadata:
   openclaw:
     emoji: 🔍
@@ -9,58 +9,58 @@ metadata:
       bins: [clawhub]
 ---
 
-# Skill 查找器
+# Skill Finder
 
-帮助用户发现和安装 ClawHub 上的 Skills。
+Help users discover and install Skills from ClawHub (https://clawhub.com).
 
-## 功能
+## Purpose
 
-当用户问：
-- "有什么 skill 可以帮我...？"
-- "找一个能做 X 的 skill"
-- "有没有 skill 可以..."
-- "我需要一个能...的 skill"
+When the user asks:
+- "Is there a skill that can help me with...?"
+- "Find a skill that can do X"
+- "Is there a skill that can..."
+- "I need a skill that can..."
 
-这个 Skill 会帮助搜索 ClawHub 并推荐相关的 Skills。
+This Skill searches ClawHub and recommends relevant Skills.
 
-## 使用方法
+## Usage
 
-### 1. 搜索 Skills
+### 1. Search Skills
 
 ```bash
-clawhub search "<用户需求>"
+clawhub search "<user requirement>"
 ```
 
-### 2. 查看详情
+### 2. View Details
 
 ```bash
 clawhub inspect <skill-name>
 ```
 
-### 3. 安装 Skill
+### 3. Install a Skill
 
 ```bash
 clawhub install <skill-name>
 ```
 
-## 工作流程
+## Workflow
 
 ```
-1. 理解用户需求
-2. 提取关键词
-3. 搜索 ClawHub
-4. 列出相关 Skills
-5. 提供安装建议
+1. Understand the user's requirement
+2. Extract keywords
+3. Search ClawHub
+4. List relevant Skills
+5. Suggest which ones to install
 ```
 
-## 示例
+## Example
 
-**用户**: "有什么 skill 可以帮我监控加密货币价格？"
+**User**: "Is there a skill that can help me monitor cryptocurrency prices?"
 
-**搜索**: `clawhub search "crypto price monitor"`
+**Search**: `clawhub search "crypto price monitor"`
 
-**返回**: 相关的 Skills 列表
+**Result**: a list of relevant Skills
 
 ---
 
-*帮助用户发现需要的 Skills 🔍*
+*Helping users discover the Skills they need 🔍*

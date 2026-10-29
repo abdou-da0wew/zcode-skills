@@ -1,6 +1,6 @@
 name: quiz_html
 version: 0.1.0
-description: 把题目 JSON 注入模板生成单文件 HTML 练习网页
+description: Injects a question JSON array into a template to generate a single-file HTML practice page
 
 entrypoints:
   build: scripts/build_quiz_html.py
@@ -17,21 +17,21 @@ features:
   - mobile_responsive
 
 depends_on:
-  - quiz-mastery  # 上游：题目数据来源
+  - quiz-mastery  # upstream: source of question data
 
 triggers:
-  # 直接关键词
-  - "生成网页"
-  - "做成网页"
-  - "做个HTML"
-  - "网页版"
-  - "在浏览器练"
-  - "导出HTML"
-  - "在网页做练习"
+  # Direct keywords
+  - "generate a web page"
+  - "make it a web page"
+  - "make an HTML page"
+  - "web version"
+  - "practice in the browser"
+  - "export as HTML"
+  - "do the practice on a web page"
 
-  # quiz-mastery 完成后的链式触发
-  - quiz_generated  # 出题完成事件
-  - quiz_imported   # 题目导入完成事件
+  # Chained triggers after quiz-mastery finishes
+  - quiz_generated  # question generation finished event
+  - quiz_imported   # question import finished event
 
 io:
   input:
@@ -54,4 +54,4 @@ io:
   output:
     type: file
     format: html
-    self_contained: true  # 单文件，无外部依赖
+    self_contained: true  # single file, no external dependencies

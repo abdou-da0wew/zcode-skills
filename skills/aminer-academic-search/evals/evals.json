@@ -91,14 +91,14 @@
     },
     {
       "id": 8,
-      "prompt": "帮我查一下唐杰的学术信息，我的 token 是 <YOUR_TOKEN>",
-      "expected_output": "Handle Chinese input: search for the scholar by Chinese name, return profile information with AMiner URLs.",
+      "prompt": "Look up academic information about Jie Tang, my token is <YOUR_TOKEN>",
+      "expected_output": "Handle the lookup: search for the scholar by name, return profile information with AMiner URLs.",
       "files": [],
       "expectations": [
-        "Called the Scholar Search API (person_search) with a Chinese name",
+        "Called the Scholar Search API (person_search) with the scholar's name",
         "Successfully returned scholar results (name, org, interests)",
         "Output contains the scholar's AMiner profile URL",
-        "Response is presented clearly despite Chinese input"
+        "Response is presented clearly"
       ]
     },
     {

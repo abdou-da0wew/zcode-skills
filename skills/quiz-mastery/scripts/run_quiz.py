@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
-"""生成出题 prompt。
+"""Generate the question prompt for a quiz.
 
-用法：python3 run_quiz.py <user_id> <document_id>
+Usage: python3 run_quiz.py <user_id> <document_id>
 
-根据已保存的知识点和用户掌握度记录，自动决定出题难度。
-- 从 mastery_records 读取每个知识点的 current_level
-- 首次出题的知识点强制 level=1
-- 输出 JSON 格式的 prompt（system_prompt + user_prompt），由 agent 发给 LLM 生成题目
+Automatically decides the quiz difficulty from the saved knowledge points and
+the user's mastery records.
+- Reads each knowledge point's current_level from mastery_records
+- Knowledge points quizzed for the first time are forced to level=1
+- Outputs the prompt in JSON format (system_prompt + user_prompt), to be sent
+  to the LLM by the agent to generate questions
 
-也支持指定知识点和难度：
+Also supports specifying knowledge points and a difficulty level:
   python3 run_quiz.py <user_id> <document_id> [level] [kp_id1,kp_id2,...]
 """
 from pathlib import Path

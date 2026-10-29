@@ -1,100 +1,100 @@
-# 技术面题库
+# Technical Interview Question Bank
 
-适用：研发 / 算法 / 数据 / DevOps 岗位的 1~2 面（技术轮）。
+Applies to: rounds 1-2 (technical rounds) for engineering / algorithm / data / DevOps roles.
 
-按职级分层：
-- **初级（0-3 年）**：基础八股 + 简单算法 + 项目细节
-- **中级（3-5 年）**：系统设计 + 复杂场景题 + 项目深度追问
-- **高级（5+ 年）**：架构权衡 + 跨团队问题 + 业务理解
+Tiered by seniority:
+- **Junior (0-3 years)**: fundamentals + simple algorithms + project details
+- **Mid-level (3-5 years)**: system design + complex scenario questions + deep project probing
+- **Senior (5+ years)**: architecture trade-offs + cross-team problems + business understanding
 
-## 一、后端 / 服务端
+## I. Backend / Server-Side
 
-### 基础八股（每家都问）
-1. HTTP / HTTPS / TLS 流程，session vs cookie vs token
-2. TCP 三握四挥，为什么是 4 次挥手
-3. MySQL 索引底层（B+ 树）、何时失效、最左前缀
-4. MySQL 事务隔离级别 + 各自解决什么问题
-5. Redis 持久化（RDB / AOF）+ 主从 + 哨兵 + 集群
-6. Redis 缓存击穿 / 穿透 / 雪崩 怎么解
-7. 分布式锁 3 种实现（Redis / Zookeeper / 数据库）+ 各自坑
-8. Kafka 怎么保证消息不丢、不重复、有序
-9. JVM 内存模型 + GC（Java 岗）/ Goroutine 调度（Go 岗）
-10. 一致性哈希、CAP、BASE、Raft / Paxos 简述
+### Fundamentals (every company asks)
+1. HTTP / HTTPS / TLS flow; session vs. cookie vs. token
+2. TCP three-way handshake / four-way teardown — why 4 steps to close
+3. MySQL index internals (B+ trees), when indexes fail, leftmost-prefix rule
+4. MySQL transaction isolation levels + what problem each solves
+5. Redis persistence (RDB / AOF) + replication + Sentinel + Cluster
+6. Solving Redis cache breakdown / penetration / avalanche
+7. Three implementations of distributed locks (Redis / ZooKeeper / database) + pitfalls of each
+8. How Kafka guarantees no message loss, no duplication, and ordering
+9. JVM memory model + GC (Java roles) / Goroutine scheduling (Go roles)
+10. Consistent hashing, CAP, BASE, and a brief tour of Raft / Paxos
 
-### 系统设计高频
-- 设计一个秒杀系统（QPS 10w）
-- 设计一个短链服务（生成 / 重定向 / 统计）
-- 设计一个分布式 ID 生成器
-- 设计微博 feed 流（推 / 拉 / 推拉结合）
-- 设计一个限流器（令牌桶 / 漏桶 / 滑动窗口）
+### High-Frequency System Design
+- Design a flash-sale system (100k QPS)
+- Design a URL shortener (creation / redirect / analytics)
+- Design a distributed ID generator
+- Design a Twitter/Weibo-style feed (push / pull / hybrid)
+- Design a rate limiter (token bucket / leaky bucket / sliding window)
 
-### 系统设计回答框架
+### System Design Answer Framework
 ```
-1. 澄清需求（问清 QPS、读写比、数据量、SLA）
-2. 估容量（QPS × 平均请求大小 = 带宽；数据量 × 时间 = 存储）
-3. 高层架构（接入层 → 业务层 → 存储层 → 数据流）
-4. 关键模块深挖（讲清楚选型为什么）
-5. 扩展性 / 高可用 / 容灾
-6. 主动指出 trade-off
+1. Clarify requirements (ask about QPS, read/write ratio, data volume, SLA)
+2. Estimate capacity (QPS × average request size = bandwidth; data volume × time = storage)
+3. High-level architecture (access layer → business layer → storage layer → data flow)
+4. Deep-dive key modules (explain why each choice was made)
+5. Scalability / high availability / disaster recovery
+6. Proactively call out trade-offs
 ```
 
-## 二、前端
+## II. Frontend
 
-1. 浏览器渲染流程（DNS → TCP → TLS → HTTP → HTML 解析 → 布局 → 绘制）
-2. 事件循环 + 微任务 / 宏任务
-3. 闭包、原型链、this 绑定
-4. React / Vue 响应式原理
-5. 性能优化（FCP / LCP / CLS 指标 + 实操）
-6. SSR vs CSR vs SSG，何时用哪个
-7. 跨域方案（CORS / JSONP / 反向代理）
-8. webpack / vite 区别 + 原理
+1. Browser rendering pipeline (DNS → TCP → TLS → HTTP → HTML parsing → layout → paint)
+2. Event loop + microtasks / macrotasks
+3. Closures, prototype chain, `this` binding
+4. React / Vue reactivity internals
+5. Performance optimization (FCP / LCP / CLS metrics + hands-on tactics)
+6. SSR vs. CSR vs. SSG — when to use which
+7. Cross-origin solutions (CORS / JSONP / reverse proxy)
+8. webpack vs. vite — differences and internals
 
-## 三、算法 / 机器学习
+## III. Algorithms / Machine Learning
 
-### 基础
-1. 偏差 / 方差，过拟合怎么解
-2. L1 / L2 正则的区别
-3. 随机森林 vs GBDT vs XGBoost
-4. 梯度消失 / 爆炸 + 解决（BatchNorm / 残差 / 激活函数）
-5. Attention 机制讲清，Transformer 与 RNN 对比
-6. 样本不平衡处理（采样 / 类权重 / Focal Loss）
-7. 模型评估：准确率、精确率、召回率、AUC、F1，何时用哪个
+### Fundamentals
+1. Bias / variance; how to fix overfitting
+2. L1 vs. L2 regularization
+3. Random forest vs. GBDT vs. XGBoost
+4. Vanishing / exploding gradients + fixes (BatchNorm / residuals / activation functions)
+5. Explain the attention mechanism; Transformer vs. RNN
+6. Handling imbalanced data (sampling / class weights / Focal Loss)
+7. Model evaluation: accuracy, precision, recall, AUC, F1 — when to use which
 
-### LLM / GenAI 方向（2024+ 热门）
-1. SFT vs RLHF vs DPO，原理 + 何时用
-2. RAG 完整 pipeline：分块策略、Embedding 选型、检索融合、Reranker
-3. Agent 的 tool use / planning / memory，与单 LLM 的区别
-4. 长上下文（YARN / RoPE 缩放、Context window 扩展）
-5. 推理优化：KV cache、speculative decoding、量化
-6. 大模型评估：benchmark、人工评估、LLM-as-Judge 各自坑
+### LLM / GenAI Direction (hot since 2024)
+1. SFT vs. RLHF vs. DPO — principles + when to use
+2. Full RAG pipeline: chunking strategy, embedding choice, retrieval fusion, reranker
+3. Agent tool use / planning / memory, vs. a single LLM
+4. Long context (YaRN / RoPE scaling, context-window extension)
+5. Inference optimization: KV cache, speculative decoding, quantization
+6. Evaluating LLMs: benchmarks, human eval, LLM-as-Judge — pitfalls of each
 
-### 项目深挖（每个面试官必问）
-- 你这个模型为什么选 ___ 而不是 ___
-- 数据是怎么标注 / 清洗的，量级
-- 训练用了什么硬件、跑了多久、超参怎么调
-- 上线后效果怎么评估，与基线对比
-- 失败 / bug 的 case，怎么 debug
+### Project Deep-Dives (every interviewer asks)
+- Why did you choose ___ for this model instead of ___?
+- How was the data labeled / cleaned, and at what scale?
+- What hardware did training use, how long did it run, how were hyperparameters tuned?
+- How did you evaluate production performance against baseline?
+- Failure / bug cases — how did you debug them?
 
-## 四、数据 / 数仓 / 分析
+## IV. Data / Data Warehouse / Analytics
 
-### SQL（必考）
-- 行转列 / 列转行 / 透视
-- 窗口函数（rank / dense_rank / lead / lag）
-- 计算 7 日 / 30 日活跃用户
-- 同 user 连续登录天数
-- 留存率 / 漏斗 / 同期群分析
-- 性能优化（索引、explain、分区、避免子查询）
+### SQL (guaranteed)
+- Pivot rows to columns / columns to rows
+- Window functions (rank / dense_rank / lead / lag)
+- Computing 7-day / 30-day active users
+- Consecutive login days per user
+- Retention / funnel / cohort analysis
+- Performance tuning (indexes, explain, partitioning, avoiding subqueries)
 
-### 业务题
-- 给你一个业务场景，让你设计指标体系
-- DAU 跌了 5%，怎么排查
-- 设计一个 A/B 测试（样本量计算、显著性、停损）
-- 用户分层模型（RFM / 生命周期）
+### Business Questions
+- Given a business scenario, design a metrics system
+- DAU dropped 5% — how do you investigate?
+- Design an A/B test (sample size, significance, stopping rules)
+- User segmentation models (RFM / lifecycle)
 
-## 五、技术面回答原则
+## V. Technical Interview Answering Principles
 
-1. **澄清问题再答**：模糊的题先问 1~2 个澄清问题
-2. **结构化输出**：分点 / 分模块讲，不要意识流
-3. **trade-off 思维**：选 A 而不选 B 时，主动说"因为 ___"
-4. **诚实**：不会的题说"这个我没研究过，但根据我对 X 的理解，可能可以这样想 ___"
-5. **画图 / 写代码**：白板题写代码先讲思路，再写，最后跑测试用例
+1. **Clarify before answering**: for vague questions, ask 1-2 clarifying questions first
+2. **Structured output**: answer in points / modules, not a stream of consciousness
+3. **Trade-off thinking**: when choosing A over B, proactively say "because ___"
+4. **Honesty**: for questions you can't answer, say "I haven't studied this, but based on my understanding of X, I might approach it as ___"
+5. **Draw / write code**: for whiteboard coding, explain the approach first, then write, then walk through test cases

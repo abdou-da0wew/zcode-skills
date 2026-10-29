@@ -26,19 +26,19 @@ default_for:
   - process map
   - user journey map
   - relationship diagram
-  - 独立流程图
-  - 架构图
-  - 系统关系图
-  - 业务流程图
-  - 用户旅程图
-  - 交互式报告
-  - 数据故事
-  - 可交互讲解
-  - 可视化解释
-  - 可筛选资料
-  - 交互式信息
-  - 互动信息图
-  - 交互式时间线
+  - standalone flowchart
+  - architecture diagram (zh)
+  - system relationship map
+  - business process diagram
+  - user journey map (zh)
+  - interactive report (zh)
+  - data story (zh)
+  - interactive walkthrough
+  - visual explanation (zh)
+  - filterable resources
+  - interactive information
+  - interactive infographic (zh)
+  - interactive timeline (zh)
 fidelity: high
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: html-ppt-zhangzara-biennale-yellow
-description: Biennale Yellow — 暖羊皮纸上的太阳黄 + 靛蓝衬线 + 阳光晕染渐变。任何应该感觉像艺术双年展海报或美术馆年度方案的 deck：展览 deck / 艺术机构公告 / 设计大会手册 / 策展提案 / 文学出版物 / 工作室回顾。
+description: Biennale Yellow — solar yellow on warm parchment + indigo serif + sun-glow gradients. Any deck that should feel like an art-biennale poster or a museum's annual programme: exhibition decks / arts-institution announcements / design conference brochures / curatorial pitches / literary publications / studio retrospectives.
 visibility: public
 mode: template
 carrier: deck
@@ -8,9 +8,9 @@ scenario: marketing
 pattern_source: pattern.html
 source_priority: skill-first
 triggers:
-  - "做个双年展 deck"
-  - "做个艺术机构方案"
-  - "做个策展提案"
+  - "make a biennale deck"
+  - "make an arts-institution proposal"
+  - "make a curatorial pitch"
   - "biennale-yellow"
   - "zhangzara-biennale-yellow"
   - "Biennale Yellow"

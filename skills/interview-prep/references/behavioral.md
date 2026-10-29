@@ -1,94 +1,94 @@
-# 行为面题库（Behavioral Interview）
+# Behavioral Interview Question Bank
 
-行为面问题考察"过去如何"来预测"未来如何"。所有行为题用 STAR 答。
+Behavioral questions examine "how you acted in the past" to predict "how you will act in the future". Answer every behavioral question with STAR.
 
-## 高频题 Top 20（中外企通用）
+## Top 20 High-Frequency Questions (works for domestic and foreign companies)
 
-### 自我类
-1. 自我介绍 / 简单介绍一下你自己
-2. 介绍你最有成就感的一个项目
-3. 介绍你失败 / 挫折最大的一次经历
-4. 你最大的优点 / 缺点是什么
-5. 你五年后的职业规划
+### About Yourself
+1. Self-introduction / "tell me about yourself"
+2. Describe the project you're most proud of
+3. Describe your biggest failure / setback
+4. What are your greatest strengths / weaknesses?
+5. Your 5-year career plan
 
-### 协作 / 影响力
-6. 讲一个你跨部门 / 跨团队推动事情的例子
-7. 讲一次你和同事意见不合，最后怎么解决的
-8. 讲一次你说服别人改变想法的经历
-9. 讲一次你帮 / 带新人成长的经历
-10. 你怎么处理一个不配合的合作方
+### Collaboration / Influence
+6. Describe a time you drove an initiative across departments / teams
+7. Describe a time you disagreed with a colleague and how you resolved it
+8. Describe a time you persuaded someone to change their mind
+9. Describe a time you mentored / helped a new team member grow
+10. How do you handle a counterpart who won't cooperate?
 
-### 推动 / 执行
-11. 讲一次你在资源 / 时间不足的情况下完成目标
-12. 讲一次你主动推动一件事（没人要求你做）
-13. 讲一次你做了一个艰难决策的经历
-14. 讲一次你 ownership 体现得最好的一次
-15. 讲一次你打破常规 / 创新的经历
+### Drive / Execution
+11. Describe a time you delivered a goal with insufficient resources / time
+12. Describe a time you proactively drove something (nobody asked you to)
+13. Describe a time you made a difficult decision
+14. Describe the moment you demonstrated ownership best
+15. Describe a time you broke convention / innovated
 
-### 失败 / 挫折
-16. 讲一次你犯过的最大错误及怎么处理
-17. 讲一次你接到负面反馈，怎么应对
-18. 讲一次你的项目失败 / 没达成目标，怎么复盘
-19. 讲一次你被 reject / 被否决的经历
+### Failure / Setbacks
+16. Describe your biggest mistake and how you handled it
+17. Describe a time you received negative feedback and how you responded
+18. Describe a time your project failed / missed its goal, and your retrospective
+19. Describe a time you were rejected / overruled
 
-### 学习 / 适应
-20. 讲一次你快速学会一个全新领域的经历
+### Learning / Adaptation
+20. Describe a time you quickly learned a completely new domain
 
-## STAR 回答模板
+## STAR Answer Template
 
 ```
-S - Situation（背景，30 秒以内）
-- 时间 / 地点 / 项目背景
-- 当时的关键约束（资源 / 时间 / 复杂度 / 干系人）
+S - Situation (background, within 30 seconds)
+- Time / place / project context
+- The key constraints at the time (resources / time / complexity / stakeholders)
 
-T - Task（你的任务）
-- 你具体要解决什么问题 / 达成什么目标
-- 一句话讲清"我的角色 + 我的目标"
+T - Task (your task)
+- What specific problem you had to solve / goal to achieve
+- One sentence making clear "my role + my goal"
 
-A - Action（你的具体动作，重点，60% 时长）
-- 分 2~4 个步骤讲，每步有动词 + 决策依据
-- 强调"我做的"而不是"我们做的"
-- 关键决策点要解释"为什么这么做"
+A - Action (your specific actions, the highlight, 60% of the time)
+- Tell it in 2-4 steps, each with a verb + the reasoning behind the decision
+- Emphasize "what I did", not "what we did"
+- At key decision points, explain "why I did it that way"
 
-R - Result（结果 + 反思，30 秒）
-- 量化结果（数字 / 百分比 / 排名）
-- 1 句反思：你学到了什么 / 如果再做一次会怎么改
+R - Result (result + reflection, 30 seconds)
+- Quantified results (numbers / percentages / rankings)
+- 1 sentence of reflection: what you learned / what you'd change if you did it again
 ```
 
-## 高频题的"考察点"参考
+## "What It Tests" Reference for High-Frequency Questions
 
-| 题目 | 考察点 |
+| Question | What it tests |
 |------|-------|
-| 自我介绍 | 表达能力、对岗位匹配度的自我认知 |
-| 最成功的项目 | ownership、量化思维、复盘能力 |
-| 最失败的项目 | 抗挫折、自我反思、成长型心态 |
-| 优缺点 | 自我认知、坦诚、成长意识（缺点别答得像优点） |
-| 跨部门推动 | 影响力、沟通、利益对齐能力 |
-| 意见不合 | 同理心、说服力、底线思维 |
-| 资源不足 | 创造力、优先级管理、边界谈判 |
-| 主动推动 | ownership、商业 sense、推动力 |
-| 接到负反馈 | 情商、成长型心态、改进行动 |
-| 五年规划 | 职业稳定性、自驱力、与公司路径的契合度 |
+| Self-introduction | Communication, self-awareness of role fit |
+| Most successful project | Ownership, quantified thinking, retrospective ability |
+| Most failed project | Resilience, self-reflection, growth mindset |
+| Strengths / weaknesses | Self-awareness, honesty, growth awareness (don't dress a weakness up as a strength) |
+| Cross-department drive | Influence, communication, stakeholder alignment |
+| Disagreement | Empathy, persuasion, knowing your bottom line |
+| Scarce resources | Creativity, prioritization, boundary negotiation |
+| Proactive drive | Ownership, business sense, drive |
+| Negative feedback | Emotional intelligence, growth mindset, corrective action |
+| 5-year plan | Career stability, self-motivation, fit with the company's path |
 
-## 常见反模式（用户会答错的）
+## Common Anti-patterns (where users go wrong)
 
-- 答"优点"答得像招聘广告（"勤奋、责任心强、抗压"）→ 应该挑 1 个，配 1 个故事
-- 答"缺点"答得像反向夸自己（"太追求完美""工作太投入"）→ 必须真实，加上正在做的改进
-- "失败经历" 不敢说真失败 → HR 一眼识破，反而扣分
-- 答"五年规划" 直接说"做你们的总监" → 太 ambitious 不真诚；要结合公司业务和个人能力路径
-- 用大量"我们"代替"我" → 听不出你做了什么
-- 一个故事讲 5 分钟 → 控制在 2~3 分钟，留追问空间
+- Answering "strengths" like a job ad ("hardworking, responsible, resilient") → pick 1 and pair it with 1 story
+- Answering "weaknesses" as reverse bragging ("I'm too much of a perfectionist", "I'm too dedicated to work") → must be real, plus the improvement in progress
+- Not daring to share a genuine failure → HR sees through it instantly, and it costs you points
+- Answering "5-year plan" with "become your director" → too ambitious, insincere; tie it to the company's business and your own capability path
+- Overusing "we" instead of "I" → the interviewer can't tell what you actually did
+- Telling one story for 5 minutes → keep it to 2-3 minutes and leave room for follow-ups
 
-## 故事矩阵（提前准备）
+## Story Matrix (prepare in advance)
 
-让用户准备一个"故事矩阵"，3~5 个故事可以回答 80% 的行为题：
+Have the user build a "story matrix": 3-5 stories can cover 80% of behavioral questions:
 
-| 故事编号 | 项目名 | 主要展示能力 | 可以回答哪些题 |
+| Story # | Project | Primary capability shown | Which questions it answers |
 |---------|------|------------|-------------|
-| 故事 1 | XX 项目 | ownership + 推动力 | 最成功项目 / 主动推动 / 跨部门 |
-| 故事 2 | XX 项目 | 数据驱动 + 决策 | 艰难决策 / 数据驱动 / 创新 |
-| 故事 3 | XX 项目 | 失败 + 复盘 | 最失败 / 负反馈 / 学习 |
-| 故事 4 | XX 项目 | 沟通 + 说服 | 意见不合 / 说服别人 |
-| 故事 5 | XX 项目 | 跨界 / 学习 | 快速学习 / 跨界 |
+| Story 1 | Project XX | ownership + drive | Most successful project / proactive drive / cross-department |
+| Story 2 | Project XX | data-driven + decision-making | Difficult decision / data-driven / innovation |
+| Story 3 | Project XX | failure + retrospective | Biggest failure / negative feedback / learning |
+| Story 4 | Project XX | communication + persuasion | Disagreement / persuading others |
+| Story 5 | Project XX | cross-domain / learning | Rapid learning / cross-domain |
 
-每个故事提前打磨"S 30s + T 30s + A 90s + R 30s"四段，面试时按题目灵活组合。
+Polish each story in advance across the four segments "S 30s + T 30s + A 90s + R 30s", and mix-and-match during the interview depending on the question.

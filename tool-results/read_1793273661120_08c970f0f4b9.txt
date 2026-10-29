@@ -1,0 +1,959 @@
+     1→<!DOCTYPE html>
+     2→<html lang="zh-CN">
+     3→<head>
+     4→<meta charset="UTF-8">
+     5→<meta name="viewport" content="width=device-width, initial-scale=1">
+     6→<title>墨思 — 智能思维编织工作台</title>
+     7→<style>
+     8→:root{
+     9→  --bg:#05060f;
+    10→  --fg:#e6e8ff;
+    11→  --dim:#7a7fa8;
+    12→  --accent:#8be9ff;
+    13→  --accent2:#ff6ad5;
+    14→  --accent3:#c792ea;
+    15→  --line:#1a1d3a;
+    16→  --hl:#0d1024;
+    17→  --paper:#0a0c1f;
+    18→}
+    19→*{margin:0;padding:0;box-sizing:border-box}
+    20→html,body{background:var(--bg);color:var(--fg);font-family:"Songti SC","STSong","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;font-size:14px;line-height:1.8;-webkit-font-smoothing:antialiased}
+    21→/* 中文段落均使用宋体 */
+    22→:lang(zh),.intro-text,.showcase-text p,.showcase-text h3,.info-big,.hero-title,.card-title,.price .desc,.cell{font-family:"Songti SC","STSong","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif}
+    23→/* 数字 / 拉丁字母仍保持等宽，但中文遇到等宽会 fallback 回宋体 */
+    24→.header-logo,.nav a,.hero-meta,.hero-sub,.sec-head,.scroll-cue,.tag,.card-num,.card-tags,.spec-row b,.price h4,.price .num,.platforms,.footer,.here{font-family:"SF Mono","Menlo","Consolas","Songti SC","STSong","SimSun",serif}
+    25→a{color:inherit;text-decoration:none;cursor:pointer}
+    26→::selection{background:var(--accent);color:var(--bg)}
+    27→
+    28→/* HEADER */
+    29→.header{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:18px 28px;z-index:100;color:var(--fg);background:rgba(5,6,15,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    30→.header-logo{font-weight:600;letter-spacing:0.18em;font-size:13px}
+    31→.header-logo span{color:var(--accent)}
+    32→.nav ul{display:flex;gap:26px;list-style:none}
+    33→.nav a{font-size:12px;letter-spacing:0.2em;position:relative;padding:4px 0;transition:color .3s}
+    34→.nav a:hover{color:var(--accent)}
+    35→.nav a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:0;background:var(--accent);transition:width .3s}
+    36→.nav a:hover::after{width:100%}
+    37→
+    38→/* HEY */
+    39→.here{position:fixed;right:32px;bottom:28px;font-size:12px;letter-spacing:0.2em;z-index:90;text-align:right;color:var(--dim)}
+    40→.here .blink{display:inline-block;animation:blink 1.2s infinite}
+    41→@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+    42→
+    43→/* HERO ASCII */
+    44→.hero{height:100vh;width:100%;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid var(--line);background:radial-gradient(ellipse at 30% 20%, #1a0a2e 0%, #05060f 55%, #000 100%)}
+    45→.ascii-layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;line-height:12px;letter-spacing:0;white-space:pre;font-family:"SF Mono",monospace;pointer-events:none;font-weight:600;margin:0}
+    46→#ascii-nebula{color:#a87bd6;opacity:.55;text-shadow:0 0 8px rgba(168,123,214,.45);mix-blend-mode:screen}
+    47→#ascii-stars{color:#cfe6ff;opacity:.85;text-shadow:0 0 4px rgba(207,230,255,.5)}
+    48→#ascii-planet{color:var(--accent);opacity:.95;text-shadow:0 0 6px rgba(139,233,255,.45)}
+    49→#ascii-asteroids{color:#f5b971;opacity:.92;text-shadow:0 0 6px rgba(245,185,113,.45)}
+    50→#ascii-comets{color:#ff8fd2;opacity:.95;text-shadow:0 0 8px rgba(255,143,210,.55)}
+    51→.hero-overlay{position:relative;z-index:2;text-align:center;padding:0 24px;color:var(--fg)}
+    52→.hero-title{font-size:clamp(40px,7vw,98px);font-weight:300;letter-spacing:0.04em;line-height:1;margin-bottom:18px}
+    53→.hero-title .em{font-style:italic;color:var(--accent)}
+    54→.hero-sub{font-size:14px;letter-spacing:0.3em;color:var(--dim);margin-bottom:36px}
+    55→
+    56→/* ASCII 大标题 */
+    57→.ascii-title{font-family:"SF Mono","Menlo","Consolas",monospace;color:var(--accent);white-space:pre;display:inline-block;text-align:left;line-height:1;font-weight:700;margin:0 auto;letter-spacing:0;text-shadow:0 0 12px rgba(139,233,255,.5),0 0 2px rgba(199,146,234,.4)}
+    58→.ascii-title.lg{font-size:clamp(8px,1.25vw,14px);line-height:1.05}
+    59→.ascii-title.md{font-size:clamp(6px,.85vw,10px);color:var(--fg)}
+    60→.ascii-title.sm{font-size:clamp(5px,.55vw,7px);color:var(--accent);opacity:.85}
+    61→.brand-wrap-outer{text-align:center}
+    62→.brand-cn-sub{font-family:"Songti SC","STSong","SimSun",serif;font-size:clamp(28px,3.6vw,46px);font-weight:400;letter-spacing:0.5em;color:var(--fg);margin:24px 0 0;padding-left:0.5em}
+    63→.ascii-cn{display:none}
+    64→.sec-ascii{display:block;color:var(--accent);white-space:pre;font-family:"SF Mono",monospace;font-size:14px;line-height:1;margin-bottom:10px;opacity:.85;letter-spacing:0.4em}
+    65→
+    66→/* 中文真字宋体大标题 + ASCII 网点背景 */
+    67→.brand-block{text-align:center;line-height:1;display:inline-block;padding:36px 64px;position:relative}
+    68→.brand-block::before{
+    69→  content:"";position:absolute;inset:0;
+    70→  background-image:radial-gradient(circle, rgba(139,233,255,.22) 1px, transparent 1.4px);
+    71→  background-size:7px 7px;
+    72→  pointer-events:none;
+    73→  opacity:.85;
+    74→  z-index:0;
+    75→  /* 中间淡四角浓的渐隐遮罩，像深空尘埃 */
+    76→  -webkit-mask-image:radial-gradient(ellipse at center, transparent 30%, #000 90%);
+    77→          mask-image:radial-gradient(ellipse at center, transparent 30%, #000 90%);
+    78→}
+    79→.brand-deco-top,.brand-deco-bot{font-family:"SF Mono","Menlo",monospace;color:var(--accent);font-size:clamp(12px,1.4vw,18px);letter-spacing:0.6em;opacity:.85;margin:0 0 18px;position:relative;z-index:1}
+    80→.brand-deco-bot{margin:18px 0 0}
+    81→.brand-title-cn{
+    82→  font-family:"Songti SC","STSong","Source Han Serif SC","SimSun",serif;
+    83→  font-weight:700;
+    84→  font-size:clamp(140px,20vw,240px);
+    85→  line-height:1;
+    86→  letter-spacing:0.32em;
+    87→  display:inline-block;
+    88→  position:relative;
+    89→  z-index:1;
+    90→
+    91→  /* 字内填充：星云网点，模拟字符画/星尘 */
+    92→  background-image:
+    93→    radial-gradient(circle, var(--accent) 0.95px, transparent 1.3px),
+    94→    radial-gradient(circle, var(--accent2) 0.45px, transparent 0.85px);
+    95→  background-size: 5px 5px, 3px 3px;
+    96→  background-position: 0 0, 1.5px 1.5px;
+    97→  -webkit-background-clip:text;
+    98→          background-clip:text;
+    99→  color:transparent;
+   100→  -webkit-text-fill-color:transparent;
+   101→
+   102→  /* 极细描边 */
+   103→  -webkit-text-stroke:0.4px rgba(139,233,255,.55);
+   104→  text-shadow:0 0 8px rgba(139,233,255,.3);
+   105→}
+   106→.brand-title-cn .gap{display:inline-block;width:.2em}
+   107→.brand-wrap-outer{text-align:center}
+   108→.sec-head h2{font-size:18px;font-weight:400;letter-spacing:0.4em;color:var(--fg);display:flex;flex-direction:column;gap:6px;font-family:"Songti SC","STSong","SimSun",serif}
+   109→.hero-meta{display:flex;gap:32px;justify-content:center;font-size:11px;letter-spacing:0.16em;color:var(--dim);flex-wrap:wrap}
+   110→.hero-meta span b{color:var(--fg);font-weight:400}
+   111→
+   112→.scroll-cue{position:absolute;left:50%;bottom:32px;transform:translateX(-50%);font-size:11px;letter-spacing:0.3em;color:var(--dim);z-index:3;animation:bob 2.4s ease-in-out infinite}
+   113→@keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+   114→
+   115→/* SECTION */
+   116→.sec{padding:96px 48px;border-bottom:1px solid var(--line);position:relative}
+   117→.sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;font-size:11px;letter-spacing:0.24em;color:var(--dim);border-bottom:1px solid var(--line);padding-bottom:18px}
+   118→.sec-head .idx{font-family:monospace}
+   119→
+   120→/* INTRO */
+   121→.intro{max-width:980px;margin:0 auto}
+   122→.intro-text{font-size:clamp(20px,2.4vw,30px);line-height:1.55;font-weight:300;letter-spacing:0.02em}
+   123→.intro-text .pt{display:inline;cursor:default;transition:color .2s}
+   124→.intro-text .pt:hover{color:var(--accent)}
+   125→.intro-text .pt.scrambling{color:var(--accent)}
+   126→.intro-text .em{color:var(--accent);font-style:italic}
+   127→.intro-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;margin-top:64px;padding-top:48px;border-top:1px dashed var(--line)}
+   128→.intro-grid .cell{font-size:12px;color:var(--dim);line-height:1.7}
+   129→.intro-grid .cell b{display:block;color:var(--fg);font-weight:400;margin-bottom:8px;letter-spacing:0.16em;font-size:11px}
+   130→
+   131→/* TAGS */
+   132→.filter{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:36px}
+   133→.tag{padding:6px 14px;border:1px solid var(--line);font-size:11px;letter-spacing:0.16em;color:var(--dim);transition:all .25s;cursor:pointer;user-select:none}
+   134→.tag:hover{color:var(--fg);border-color:var(--dim)}
+   135→.tag.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+   136→.tag .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:8px;vertical-align:middle;opacity:.6}
+   137→
+   138→/* GRID */
+   139→.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+   140→.card{border:1px solid var(--line);background:var(--paper);transition:all .3s;position:relative;overflow:hidden;display:flex;flex-direction:column}
+   141→.card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 12px 32px -16px rgba(139,233,255,.5)}
+   142→.card-img{aspect-ratio:4/3;background:#0d1024;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+   143→.card-img img{width:100%;height:100%;object-fit:cover;transition:transform .8s ease,filter .4s;filter:hue-rotate(200deg) saturate(.9) contrast(1.1) brightness(.6)}
+   144→.card:hover .card-img img{transform:scale(1.06);filter:hue-rotate(220deg) saturate(1.1) contrast(1.05) brightness(.75)}
+   145→.card-img .ascii-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;line-height:9px;color:var(--accent);white-space:pre;opacity:.75;pointer-events:none;mix-blend-mode:screen;text-shadow:0 0 4px rgba(139,233,255,.6)}
+   146→.card-meta{padding:18px 20px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+   147→.card-title{font-size:14px;letter-spacing:0.04em;font-weight:400}
+   148→.card-title .pt{cursor:default}
+   149→.card-title small{display:block;color:var(--dim);font-size:11px;margin-top:6px;letter-spacing:0.12em}
+   150→.card-num{color:var(--dim);font-size:10px;font-family:monospace;letter-spacing:0.1em}
+   151→.card-tags{display:flex;gap:6px;padding:0 20px 18px;flex-wrap:wrap}
+   152→.card-tags span{font-size:10px;letter-spacing:0.16em;color:var(--dim);padding:2px 8px;border:1px solid var(--line);text-transform:uppercase}
+   153→.card.hidden{display:none}
+   154→
+   155→/* SHOWCASE / UI 截图 */
+   156→.showcase{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center;margin-top:24px}
+   157→.showcase-shot{border:1px solid var(--line);background:var(--paper);padding:14px;position:relative;box-shadow:0 8px 28px -16px rgba(139,233,255,.3)}
+   158→.showcase-shot .bar{display:flex;gap:6px;margin-bottom:10px}
+   159→.showcase-shot .bar i{display:block;width:10px;height:10px;border-radius:50%;background:#3a3f6a}
+   160→.showcase-shot img{width:100%;height:auto;display:block;filter:hue-rotate(200deg) saturate(.85) contrast(1.05) brightness(.7);border:1px solid var(--line)}
+   161→.showcase-text h3{font-size:clamp(24px,3vw,36px);font-weight:300;line-height:1.3;margin-bottom:18px;letter-spacing:0.02em;color:var(--fg)}
+   162→.showcase-text h3 .em{color:var(--accent);font-style:italic}
+   163→.showcase-text .mini-ascii{font-family:"SF Mono",monospace;color:var(--accent);font-size:10px;line-height:1;white-space:pre;display:block;margin-bottom:18px;opacity:.85}
+   164→.showcase-text p{color:var(--dim);font-size:13px;line-height:1.8;margin-bottom:14px}
+   165→.showcase-text p .pt:hover{color:var(--accent)}
+   166→
+   167→/* SPEC */
+   168→.spec-wrap{display:grid;grid-template-columns:1.3fr 1fr;gap:64px;align-items:start}
+   169→.spec-visual{position:relative;aspect-ratio:4/5;background:var(--paper);border:1px solid var(--line);overflow:hidden}
+   170→.spec-visual img{width:100%;height:100%;object-fit:cover;filter:hue-rotate(220deg) saturate(.9) contrast(1.05) brightness(.7)}
+   171→.spec-visual::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,6,15,0) 50%,rgba(5,6,15,.85) 100%);z-index:2}
+   172→.spec-visual .label{position:absolute;left:20px;bottom:18px;z-index:3;font-size:11px;letter-spacing:0.2em;color:var(--accent)}
+   173→.spec-table{width:100%}
+   174→.spec-row{display:grid;grid-template-columns:140px 1fr;padding:14px 0;border-bottom:1px dashed var(--line);font-size:12px;align-items:baseline}
+   175→.spec-row b{color:var(--dim);font-weight:400;letter-spacing:0.16em;font-size:11px}
+   176→.spec-row span{color:var(--fg)}
+   177→.spec-row .pt{cursor:default}
+   178→
+   179→/* PRICING */
+   180→.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+   181→.price{border:1px solid var(--line);padding:32px 26px;background:var(--paper);transition:.3s;display:flex;flex-direction:column}
+   182→.price:hover{border-color:var(--accent);box-shadow:0 12px 32px -16px rgba(139,233,255,.4)}
+   183→.price.featured{border-color:var(--accent);background:#0f1233;border-width:1px;box-shadow:0 0 0 1px var(--accent) inset, 0 0 32px -8px rgba(139,233,255,.3)}
+   184→.price h4{font-size:13px;letter-spacing:0.2em;color:var(--dim);margin-bottom:18px;font-weight:400}
+   185→.price .num{font-size:42px;font-weight:300;letter-spacing:0.02em;margin-bottom:6px;color:var(--fg)}
+   186→.price .num small{font-size:13px;color:var(--dim);letter-spacing:0.1em;margin-left:6px}
+   187→.price .desc{color:var(--dim);font-size:12px;margin-bottom:24px;line-height:1.6}
+   188→.price ul{list-style:none;font-size:12px;color:var(--fg);line-height:2;margin-bottom:28px;flex:1}
+   189→.price ul li::before{content:"+ ";color:var(--accent);margin-right:4px}
+   190→.price .btn{display:block;text-align:center;padding:12px;border:1px solid var(--fg);font-size:11px;letter-spacing:0.2em;transition:.25s;color:var(--fg)}
+   191→.price .btn:hover{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+   192→.price.featured .btn{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+   193→.price.featured .btn:hover{background:var(--accent2);border-color:var(--accent2);color:var(--bg)}
+   194→
+   195→/* INFO */
+   196→.info{text-align:center;padding:120px 24px}
+   197→.info-big{font-size:clamp(36px,6vw,76px);font-weight:300;line-height:1.1;letter-spacing:0.02em;margin-bottom:36px}
+   198→.info-big .em{font-style:italic;color:var(--accent)}
+   199→.info-links{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-top:28px;font-size:12px;letter-spacing:0.2em}
+   200→.info-links a{padding:14px 28px;border:1px solid var(--fg);transition:all .25s;color:var(--fg)}
+   201→.info-links a:hover{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+   202→.info-orbit{margin:0 auto 48px;width:280px;height:280px;position:relative;color:var(--dim);font-size:9px;line-height:9px;white-space:pre;font-family:monospace;display:flex;align-items:center;justify-content:center}
+   203→#info-ascii{color:var(--accent);opacity:1;font-weight:700}
+   204→
+   205→/* PLATFORMS */
+   206→.platforms{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px;font-size:11px;letter-spacing:0.18em;color:var(--dim)}
+   207→.platforms span{padding:6px 14px;border:1px solid var(--line)}
+   208→
+   209→/* FOOTER */
+   210→.footer{padding:24px 32px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:0.18em;color:var(--dim);border-top:1px solid var(--line);flex-wrap:wrap;gap:12px;background:var(--paper)}
+   211→
+   212→/* HERO 后景柔光遮罩，仅在中心给标题留出可读区，四周让 ASCII 充分显现 */
+   213→.hero::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(82vw,1100px);height:min(58vh,520px);background:radial-gradient(ellipse at center,rgba(5,6,15,.85) 0%,rgba(5,6,15,.6) 40%,rgba(5,6,15,0) 80%);pointer-events:none;z-index:1;border-radius:50%}
+   214→
+   215→@media(max-width:900px){
+   216→  .grid{grid-template-columns:1fr 1fr}
+   217→  .intro-grid{grid-template-columns:1fr}
+   218→  .spec-wrap,.showcase{grid-template-columns:1fr;gap:32px}
+   219→  .price-grid{grid-template-columns:1fr}
+   220→  .sec{padding:64px 24px}
+   221→  .header{padding:14px 18px}
+   222→}
+   223→@media(max-width:560px){
+   224→  .grid{grid-template-columns:1fr}
+   225→  #ascii-stage{font-size:7px;line-height:7px}
+   226→}
+   227→</style>
+   228→</head>
+   229→<body>
+   230→
+   231→<!-- HEADER -->
+   232→<div class="header">
+   233→  <div class="header-logo"><a href="#top">墨思</a></div>
+   234→  <nav class="nav">
+   235→    <ul>
+   236→      <li><a href="#features">功能</a></li>
+   237→      <li><a href="#showcase">界面</a></li>
+   238→      <li><a href="#spec">规格</a></li>
+   239→      <li><a href="#price">订阅</a></li>
+   240→      <li><a href="#info">关于</a></li>
+   241→    </ul>
+   242→  </nav>
+   243→</div>
+   244→
+   245→<!-- HEY -->
+   246→<div class="here">你好<br><span class="blink">▮</span> 现在是 凌晨 03:14</div>
+   247→
+   248→<!-- HERO -->
+   249→<section class="hero" id="top">
+   250→  <pre id="ascii-nebula" class="ascii-layer"></pre>
+   251→  <pre id="ascii-stars" class="ascii-layer"></pre>
+   252→  <pre id="ascii-planet" class="ascii-layer"></pre>
+   253→  <pre id="ascii-asteroids" class="ascii-layer"></pre>
+   254→  <pre id="ascii-comets" class="ascii-layer"></pre>
+   255→  <div class="hero-overlay">
+   256→    <div class="brand-wrap-outer">
+   257→<pre class="ascii-title lg">
+   258→██╗███╗   ██╗██╗  ██╗██╗    ██╗███████╗ █████╗ ██╗   ██╗███████╗
+   259→██║████╗  ██║██║ ██╔╝██║    ██║██╔════╝██╔══██╗██║   ██║██╔════╝
+   260→██║██╔██╗ ██║█████╔╝ ██║ █╗ ██║█████╗  ███████║██║   ██║█████╗
+   261→██║██║╚██╗██║██╔═██╗ ██║███╗██║██╔══╝  ██╔══██║╚██╗ ██╔╝██╔══╝
+   262→██║██║ ╚██╗██║██║  ██╗╚███╔███╔╝███████╗██║  ██║ ╚████╔╝ ███████╗
+   263→╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝
+   264→</pre>
+   265→      <div class="brand-cn-sub">墨　思</div>
+   266→    </div>
+   267→    <div class="hero-sub" style="margin-top:28px">让 散 落 的 想 法，自 己 长 出 经 纬</div>
+   268→    <div class="hero-meta">
+   269→      <span>版本 <b>v3.2 / 2026.05</b></span>
+   270→      <span>类型 <b>本地智能笔记 / 知识星图</b></span>
+   271→      <span>平台 <b>桌面 / 移动 / 网页</b></span>
+   272→    </div>
+   273→  </div>
+   274→  <div class="scroll-cue">↓ 向 下 滚 动 探 索 ↓</div>
+   275→</section>
+   276→
+   277→<!-- INTRO -->
+   278→<section class="sec">
+   279→  <div class="sec-head"><h2><pre class="sec-ascii">═══ ❖ ═══</pre>关于</h2><div class="idx">[ 01 / 05 ]</div></div>
+   280→  <div class="intro">
+   281→    <p class="intro-text">
+   282→      <span class="pt" data-text="墨思">墨思</span> 是一款 <span class="em">本地优先</span> 的智能思维工作台。
+   283→      它会在你写字时，悄悄读懂上下文，
+   284→      把你过去 <span class="pt" data-text="三年">三年</span> 写过的 <span class="pt" data-text="所有笔记、网页摘录、文献批注">所有笔记、网页摘录、文献批注</span>
+   285→      自动织成一张 <span class="em">双向链接图谱</span>。
+   286→      所有推理 <span class="pt" data-text="完全在你的电脑上运行">完全在你的电脑上运行</span>，
+   287→      你的想法 <span class="em">永远不离开本机</span>。
+   288→    </p>
+   289→    <div class="intro-grid">
+   290→      <div class="cell"><b>✦ 本地优先</b>内置量化大模型，主流芯片可全程离线运行，不依赖任何云端接口。</div>
+   291→      <div class="cell"><b>✦ 双链图谱</b>每一个想法都是一颗节点，智能模型自动发现它们之间的潜在引用，让旧笔记重新被点亮。</div>
+   292→      <div class="cell"><b>✦ 端到端加密</b>多端同步走点对点链路，密钥只在你的设备里，连我们也读不到。</div>
+   293→    </div>
+   294→  </div>
+   295→</section>
+   296→
+   297→<!-- FEATURES GRID -->
+   298→<section class="sec" id="features">
+   299→  <div class="sec-head"><h2><pre class="sec-ascii">═══ ❍ ═══</pre>核心功能</h2><div class="idx">[ 02 / 05 ]</div></div>
+   300→  <div class="filter">
+   301→    <a class="tag active" data-cat="all"><span class="dot"></span>全部</a>
+   302→    <a class="tag" data-cat="ai"><span class="dot"></span>智能协作</a>
+   303→    <a class="tag" data-cat="write"><span class="dot"></span>写作</a>
+   304→    <a class="tag" data-cat="graph"><span class="dot"></span>图谱</a>
+   305→    <a class="tag" data-cat="sync"><span class="dot"></span>同步</a>
+   306→  </div>
+   307→  <div class="grid" id="grid">
+   308→
+   309→    <div class="card" data-cat="ai write">
+   310→      <div class="card-img">
+   311→        <img src="../assets/ai-01-search.jpg" alt="AI 续写">
+   312→        <pre class="ascii-overlay">▌ AI ▍▎▏
+   313→  ╭─────╮
+   314→  │ ... │
+   315→  ╰──→──╯</pre>
+   316→      </div>
+   317→      <div class="card-meta">
+   318→        <div class="card-title"><span class="pt" data-text="智能续写">智能续写</span><small>本机模型</small></div>
+   319→        <div class="card-num">/01</div>
+   320→      </div>
+   321→      <div class="card-tags"><span>智能</span><span>写作</span></div>
+   322→    </div>
+   323→
+   324→    <div class="card" data-cat="graph">
+   325→      <div class="card-img">
+   326→        <img src="../assets/ai-02-document.jpg" alt="知识图谱">
+   327→        <pre class="ascii-overlay">  ●─●─●
+   328→  │\ │ /│
+   329→  ● ●─● ●
+   330→  │/ │ \│
+   331→  ●─●─●</pre>
+   332→      </div>
+   333→      <div class="card-meta">
+   334→        <div class="card-title"><span class="pt" data-text="思维双链图谱">思维双链图谱</span><small>反向链接</small></div>
+   335→        <div class="card-num">/02</div>
+   336→      </div>
+   337→      <div class="card-tags"><span>图谱</span></div>
+   338→    </div>
+   339→
+   340→    <div class="card" data-cat="ai">
+   341→      <div class="card-img">
+   342→        <img src="../assets/ai-03-video.jpg" alt="语义搜索">
+   343→        <pre class="ascii-overlay">┌─────────┐
+   344→│ ⌕ 找到 │
+   345→│  3 处   │
+   346→│  相似   │
+   347→└─────────┘</pre>
+   348→      </div>
+   349→      <div class="card-meta">
+   350→        <div class="card-title"><span class="pt" data-text="语义搜索">语义搜索</span><small>向量检索</small></div>
+   351→        <div class="card-num">/03</div>
+   352→      </div>
+   353→      <div class="card-tags"><span>智能</span><span>搜索</span></div>
+   354→    </div>
+   355→
+   356→    <div class="card" data-cat="write">
+   357→      <div class="card-img">
+   358→        <img src="../assets/ai-04-orchestration.jpg" alt="Markdown 编辑">
+   359→        <pre class="ascii-overlay"># Heading
+   360→- list
+   361→  - item
+   362→> quote
+   363→**bold**</pre>
+   364→      </div>
+   365→      <div class="card-meta">
+   366→        <div class="card-title"><span class="pt" data-text="纯文本写作">纯文本写作</span><small>原生标记</small></div>
+   367→        <div class="card-num">/04</div>
+   368→      </div>
+   369→      <div class="card-tags"><span>写作</span></div>
+   370→    </div>
+   371→
+   372→    <div class="card" data-cat="sync">
+   373→      <div class="card-img">
+   374→        <img src="../assets/ai-05-voice.jpg" alt="多端同步">
+   375→        <pre class="ascii-overlay"> ▣ ⇄ ▢
+   376→  ╲   ╱
+   377→   ⇅
+   378→  ╱   ╲
+   379→ ▤ ⇄ ▥</pre>
+   380→      </div>
+   381→      <div class="card-meta">
+   382→        <div class="card-title"><span class="pt" data-text="端到端同步">端到端同步</span><small>全程加密</small></div>
+   383→        <div class="card-num">/05</div>
+   384→      </div>
+   385→      <div class="card-tags"><span>同步</span><span>加密</span></div>
+   386→    </div>
+   387→
+   388→    <div class="card" data-cat="ai graph">
+   389→      <div class="card-img">
+   390→        <img src="../assets/ai-06-integration.jpg" alt="时光回溯">
+   391→        <pre class="ascii-overlay">←─◆─◆─◆─◆─→
+   392→  2023 24 25 26
+   393→  ░░▒▒▓▓██</pre>
+   394→      </div>
+   395→      <div class="card-meta">
+   396→        <div class="card-title"><span class="pt" data-text="时间线回溯">时间线回溯</span><small>变迁追踪</small></div>
+   397→        <div class="card-num">/06</div>
+   398→      </div>
+   399→      <div class="card-tags"><span>图谱</span><span>智能</span></div>
+   400→    </div>
+   401→
+   402→  </div>
+   403→</section>
+   404→
+   405→<!-- SHOWCASE -->
+   406→<section class="sec" id="showcase">
+   407→  <div class="sec-head"><h2><pre class="sec-ascii">═══ ◈ ═══</pre>界面预览</h2><div class="idx">[ 03 / 05 ]</div></div>
+   408→
+   409→  <div class="showcase">
+   410→    <div class="showcase-shot">
+   411→      <div class="bar"><i></i><i></i><i></i></div>
+   412→      <img src="../assets/ai-07-hero.jpg" alt="编辑器界面">
+   413→    </div>
+   414→    <div class="showcase-text">
+   415→<pre class="mini-ascii">┌──────────────────────┐
+   416→│ ▓▓░░░░░░░░░░░░░░░░░  │
+   417→└──────────────────────┘</pre>
+   418→      <h3>一个 <span class="em">极克制</span> 的写作环境，<br>但每一行都被静静听见。</h3>
+   419→      <p><span class="pt" data-text="左侧">左侧</span> 是无限层级的笔记本，
+   420→        <span class="pt" data-text="中间">中间</span> 是纯净的写作区域，
+   421→        <span class="pt" data-text="右侧">右侧</span> 折叠面板里，正在为你浮现三条相关旧笔记。</p>
+   422→      <p>没有花里胡哨的图标，没有打扰你的弹窗。所有的智能，<span class="pt" data-text="都安静地待在角落">都安静地待在角落</span>，等你召唤。</p>
+   423→    </div>
+   424→  </div>
+   425→
+   426→  <div class="showcase" style="margin-top:64px">
+   427→    <div class="showcase-text">
+   428→<pre class="mini-ascii">  ●─●─●─●
+   429→  │╲│╱│╲│
+   430→  ●─●─●─●
+   431→  │╱│╲│╱│
+   432→  ●─●─●─●</pre>
+   433→      <h3>用 <span class="em">图谱视图</span>，<br>看见你思考的<span class="em">形状</span>。</h3>
+   434→      <p>每一个 <span class="pt" data-text="双向链接">双向链接</span> 都会变成一条引力线。后台持续计算笔记之间的语义距离，让相关的想法在画布上相互靠近。</p>
+   435→      <p>支持 <span class="pt" data-text="立体力导向布局、自由排布、时间线视图">立体力导向布局、自由排布、时间线视图</span>，鼠标滚轮缩放穿越十万个节点也不卡顿。</p>
+   436→    </div>
+   437→    <div class="showcase-shot">
+   438→      <div class="bar"><i></i><i></i><i></i></div>
+   439→      <img src="../assets/ai-08-architecture.jpg" alt="图谱视图">
+   440→    </div>
+   441→  </div>
+   442→</section>
+   443→
+   444→<!-- SPEC -->
+   445→<section class="sec" id="spec">
+   446→  <div class="sec-head"><h2><pre class="sec-ascii">═══ ✦ ═══</pre>技术规格</h2><div class="idx">[ 04 / 05 ]</div></div>
+   447→  <div class="spec-wrap">
+   448→    <div class="spec-visual">
+   449→      <img src="../assets/ai-01-search.jpg" alt="技术架构">
+   450→      <div class="label">✦ 本地推理 / 跨平台 / 开源核心</div>
+   451→    </div>
+   452→    <div class="spec-table">
+   453→      <div class="spec-row"><b>软件版本</b><span class="pt" data-text="墨思 v3.2.1，构建 26513">墨思 v3.2.1，构建 26513</span></div>
+   454→      <div class="spec-row"><b>支持平台</b><span class="pt" data-text="桌面三端 / 手机平板 / 网页">桌面三端 / 手机平板 / 网页</span></div>
+   455→      <div class="spec-row"><b>本机模型</b><span class="pt" data-text="千问 7B / 羊驼 8B 量化">千问 7B / 羊驼 8B 量化</span></div>
+   456→      <div class="spec-row"><b>云端模型</b><span class="pt" data-text="可选接入主流大模型，或自托管">可选接入主流大模型，或自托管</span></div>
+   457→      <div class="spec-row"><b>数据格式</b><span class="pt" data-text="纯文本标记 + 本地索引数据库">纯文本标记 + 本地索引数据库</span></div>
+   458→      <div class="spec-row"><b>同步协议</b><span class="pt" data-text="冲突自由 / 点对点 / 端到端加密">冲突自由 / 点对点 / 端到端加密</span></div>
+   459→      <div class="spec-row"><b>插件系统</b><span class="pt" data-text="脚本 + 沙盒，已有 280 余款插件">脚本 + 沙盒，已有 280 余款插件</span></div>
+   460→      <div class="spec-row"><b>导入导出</b><span class="pt" data-text="兼容主流笔记软件迁移">兼容主流笔记软件迁移</span></div>
+   461→      <div class="spec-row"><b>离线能力</b><span class="pt" data-text="完全可用，同步可选，无需账号">完全可用，同步可选，无需账号</span></div>
+   462→      <div class="spec-row"><b>开源情况</b><span class="pt" data-text="核心引擎开源，星标超 25k">核心引擎开源，星标超 25k</span></div>
+   463→    </div>
+   464→  </div>
+   465→</section>
+   466→
+   467→<!-- PRICING -->
+   468→<section class="sec" id="price">
+   469→  <div class="sec-head"><h2><pre class="sec-ascii">═══ ❑ ═══</pre>订阅方案</h2><div class="idx">[ 05 / 05 ]</div></div>
+   470→  <div class="price-grid">
+   471→
+   472→    <div class="price">
+   473→      <h4>个人版</h4>
+   474→      <div class="num">¥0<small>/ 永久免费</small></div>
+   475→      <p class="desc">适合个人写作者、学生、研究者</p>
+   476→      <ul>
+   477→        <li>所有本地功能 不限笔记数</li>
+   478→        <li>本机智能模型</li>
+   479→        <li>两台设备局域网同步</li>
+   480→        <li>社区插件 主题</li>
+   481→        <li>核心代码开源 可自托管</li>
+   482→      </ul>
+   483→      <a class="btn pt" data-text="立即下载 ↓">立即下载 ↓</a>
+   484→    </div>
+   485→
+   486→    <div class="price featured">
+   487→      <h4>★ 专业版</h4>
+   488→      <div class="num">¥38<small>/ 月，年付 ¥328</small></div>
+   489→      <p class="desc">为创作者提供云同步与高级智能</p>
+   490→      <ul>
+   491→        <li>包含个人版全部功能</li>
+   492→        <li>无限设备 端到端加密同步</li>
+   493→        <li>云端大模型接入</li>
+   494→        <li>语义搜索 自动双链建议</li>
+   495→        <li>高级图谱视图 主题市场</li>
+   496→        <li>优先邮件支持</li>
+   497→      </ul>
+   498→      <a class="btn pt" data-text="开始 14 天试用 →">开始 14 天试用 →</a>
+   499→    </div>
+   500→
+   501→    <div class="price">
+   502→      <h4>团队版</h4>
+   503→      <div class="num">¥98<small>/ 人 / 月</small></div>
+   504→      <p class="desc">适合 5–50 人的研究 创作团队</p>
+   505→      <ul>
+   506→        <li>包含专业版全部功能</li>
+   507→        <li>共享工作区 多人协作编辑</li>
+   508→        <li>权限分级 审计日志</li>
+   509→        <li>统一身份认证</li>
+   510→        <li>私有部署 内网托管</li>
+   511→        <li>专属客户成功经理</li>
+   512→      </ul>
+   513→      <a class="btn pt" data-text="联系销售 ✉">联系销售 ✉</a>
+   514→    </div>
+   515→
+   516→  </div>
+   517→</section>
+   518→
+   519→<!-- INFO / CTA -->
+   520→<section class="sec info" id="info">
+   521→  <div class="info-orbit"><pre id="info-ascii"></pre></div>
+   522→  <div class="info-big">让你的 <span class="em">想法</span>，<br>开始彼此对话。</div>
+   523→  <div class="hero-sub">v3.2 已上线 / 桌面、移动、网页全平台</div>
+   524→  <div class="info-links">
+   525→    <a class="pt" data-text="下载墨思 ↓">下载墨思 ↓</a>
+   526→    <a class="pt" data-text="网页版打开 →">网页版打开 →</a>
+   527→    <a class="pt" data-text="开发者文档 ✦">开发者文档 ✦</a>
+   528→  </div>
+   529→  <div class="platforms">
+   530→    <span>★ 苹果电脑</span><span>★ 视窗系统</span><span>★ 开源系统</span><span>★ 苹果手机</span><span>★ 平板</span><span>★ 安卓</span><span>★ 网页</span>
+   531→  </div>
+   532→</section>
+   533→
+   534→<div class="footer">
+   535→  <span>© 2026 墨思工作室，版权所有</span>
+   536→  <span>以 ASCII 与 茶 写就于 凌晨三点</span>
+   537→</div>
+   538→
+   539→<script>
+   540→/* ============================================================
+   541→   1. HERO ASCII ：旋转球体 + 行星轨道 + 星点场
+   542→   ============================================================ */
+   543→(function(){
+   544→  const elNeb = document.getElementById('ascii-nebula');
+   545→  const elStar = document.getElementById('ascii-stars');
+   546→  const elPlanet = document.getElementById('ascii-planet');
+   547→  const elAst = document.getElementById('ascii-asteroids');
+   548→  const elComet = document.getElementById('ascii-comets');
+   549→  if(!elPlanet) return;
+   550→  let cols, rows, t = 0;
+   551→  let stars = [];
+   552→  let asteroids = [];
+   553→  let comets = [];
+   554→  let nebulae = [];
+   555→
+   556→  // 不规则小行星形状（多种轮廓 + 表面陨石坑）
+   557→  const ASTEROID_SHAPES = [
+   558→    [
+   559→      "  .-~~-. ",
+   560→      " ( o..o )",
+   561→      "  `-~~-' "
+   562→    ],
+   563→    [
+   564→      "  _.--._  ",
+   565→      " /  .o  \\ ",
+   566→      " \\ o.   / ",
+   567→      "  `~--~'  "
+   568→    ],
+   569→    [
+   570→      "  .-=-.   ",
+   571→      " /,o o.\\  ",
+   572→      " \\ `-' /  ",
+   573→      "  `~~-'   "
+   574→    ],
+   575→    [
+   576→      " _.+~+._ ",
+   577→      "/ .  o  \\",
+   578→      "\\  o . o/",
+   579→      " `~--~~' "
+   580→    ],
+   581→    [
+   582→      "  .o0o.  ",
+   583→      " 0o..oO  ",
+   584→      "  `OoO'  "
+   585→    ],
+   586→    [
+   587→      " ,-~^~-. ",
+   588→      "( :*. * )",
+   589→      " `-,_,-' "
+   590→    ]
+   591→  ];
+   592→
+   593→  function reseed(){
+   594→    cols = Math.floor(window.innerWidth / 7);
+   595→    rows = Math.floor(window.innerHeight / 11);
+   596→    stars = [];
+   597→    const n = Math.floor(cols*rows*0.05);
+   598→    for(let i=0;i<n;i++){
+   599→      stars.push({
+   600→        x: Math.random()*cols,
+   601→        y: Math.random()*rows,
+   602→        z: Math.random()*0.9+0.1,
+   603→        c: Math.random()<.04?'★':(Math.random()<.15?'✦':(Math.random()<.5?'.':'∙'))
+   604→      });
+   605→    }
+   606→    asteroids = [];
+   607→    const aN = Math.max(4, Math.floor(Math.min(cols,rows)/14));
+   608→    for(let i=0;i<aN;i++){
+   609→      asteroids.push({
+   610→        x: Math.random()*cols,
+   611→        y: Math.random()*rows,
+   612→        vx: (Math.random()-0.5)*0.08,
+   613→        vy: (Math.random()-0.5)*0.04,
+   614→        shape: ASTEROID_SHAPES[Math.floor(Math.random()*ASTEROID_SHAPES.length)],
+   615→        rot: Math.random()*Math.PI*2,
+   616→        rs: (Math.random()-0.5)*0.01
+   617→      });
+   618→    }
+   619→    comets = [];
+   620→    for(let i=0;i<2;i++){
+   621→      comets.push({
+   622→        x: Math.random()*cols,
+   623→        y: Math.random()*rows*0.6,
+   624→        vx: 0.35 + Math.random()*0.25,
+   625→        vy: 0.12 + Math.random()*0.1,
+   626→        life: Math.random()*200
+   627→      });
+   628→    }
+   629→    nebulae = [];
+   630→    for(let i=0;i<3;i++){
+   631→      nebulae.push({
+   632→        x: Math.random()*cols,
+   633→        y: Math.random()*rows,
+   634→        r: 9 + Math.random()*15,
+   635→        seed: Math.random()*100
+   636→      });
+   637→    }
+   638→  }
+   639→  reseed();
+   640→  window.addEventListener('resize', reseed);
+   641→
+   642→  function newBuf(){
+   643→    const b = new Array(rows);
+   644→    for(let y=0;y<rows;y++) b[y] = new Array(cols).fill(' ');
+   645→    return b;
+   646→  }
+   647→  function flush(buf){ return buf.map(r=>r.join('')).join('\n'); }
+   648→
+   649→  function drawAsteroid(buf, ax, ay, shape){
+   650→    for(let i=0;i<shape.length;i++){
+   651→      const line = shape[i];
+   652→      const yy = Math.floor(ay) + i - Math.floor(shape.length/2);
+   653→      if(yy<0||yy>=rows) continue;
+   654→      for(let j=0;j<line.length;j++){
+   655→        const ch = line[j];
+   656→        if(ch===' ') continue;
+   657→        const xx = Math.floor(ax) + j - Math.floor(line.length/2);
+   658→        if(xx<0||xx>=cols) continue;
+   659→        buf[yy][xx] = ch;
+   660→      }
+   661→    }
+   662→  }
+   663→
+   664→  const chars = " .,:;-~+*=%#@█";
+   665→  const nebChars = "·∙∶⋮⋯░▒";
+   666→  function render(){
+   667→    t += 0.012;
+   668→    const bufNeb = newBuf();
+   669→    const bufStar = newBuf();
+   670→    const bufPlanet = newBuf();
+   671→    const bufAst = newBuf();
+   672→    const bufComet = newBuf();
+   673→
+   674→    // 星云气体
+   675→    for(const n of nebulae){
+   676→      const cx = n.x + Math.sin(t*0.2 + n.seed)*3;
+   677→      const cy = n.y + Math.cos(t*0.15 + n.seed)*2;
+   678→      for(let dy=-n.r; dy<=n.r; dy++){
+   679→        for(let dx=-n.r*1.6; dx<=n.r*1.6; dx++){
+   680→          const xx = Math.floor(cx+dx);
+   681→          const yy = Math.floor(cy+dy);
+   682→          if(xx<0||xx>=cols||yy<0||yy>=rows) continue;
+   683→          const d = Math.sqrt((dx/1.6)*(dx/1.6) + dy*dy);
+   684→          if(d > n.r) continue;
+   685→          const noise = Math.sin(xx*0.3 + n.seed)*Math.cos(yy*0.4 - n.seed*0.7) + Math.sin(t*0.5+n.seed);
+   686→          const intensity = (1 - d/n.r) * (0.5 + 0.5*noise);
+   687→          if(intensity > 0.55){
+   688→            const ci = Math.min(nebChars.length-1, Math.floor(intensity * nebChars.length));
+   689→            bufNeb[yy][xx] = nebChars[ci];
+   690→          }
+   691→        }
+   692→      }
+   693→    }
+   694→
+   695→    // 闪烁星点
+   696→    for(const s of stars){
+   697→      const xi = Math.floor((s.x + Math.sin(t*0.3 + s.y)*0.3 + cols)%cols);
+   698→      const yi = Math.floor(s.y);
+   699→      if(yi>=0 && yi<rows){
+   700→        const tw = (Math.sin(t*2 + s.x*0.7 + s.y*0.3)+1)*0.5;
+   701→        if(tw>0.55 || s.c==='★' || s.c==='✦') bufStar[yi][xi] = s.c;
+   702→      }
+   703→    }
+   704→
+   705→    // 旋转行星
+   706→    const cx = cols/2, cy = rows/2;
+   707→    const R = Math.min(cols,rows*2)*0.18;
+   708→    const aspect = 0.5;
+   709→    for(let phi=0; phi<Math.PI; phi+=0.06){
+   710→      for(let theta=0; theta<2*Math.PI; theta+=0.04){
+   711→        const x3 = R*Math.sin(phi)*Math.cos(theta + t);
+   712→        const y3 = R*Math.cos(phi);
+   713→        const z3 = R*Math.sin(phi)*Math.sin(theta + t);
+   714→        const lx = Math.cos(t*0.6), ly = -0.3, lz = Math.sin(t*0.6);
+   715→        const nx = Math.sin(phi)*Math.cos(theta + t);
+   716→        const ny = Math.cos(phi);
+   717→        const nz = Math.sin(phi)*Math.sin(theta + t);
+   718→        const lum = nx*lx + ny*ly + nz*lz;
+   719→        if(z3 < 0) continue;
+   720→        const sx = Math.floor(cx + x3/aspect);
+   721→        const sy = Math.floor(cy + y3);
+   722→        if(sx<0||sx>=cols||sy<0||sy>=rows) continue;
+   723→        const idx = Math.max(0, Math.min(chars.length-1, Math.floor((lum+0.2)*chars.length*0.9)));
+   724→        bufPlanet[sy][sx] = chars[idx];
+   725→      }
+   726→    }
+   727→
+   728→    // 行星轨道与卫星
+   729→    for(let i=0; i<3; i++){
+   730→      const orbR = R*(1.6 + i*0.5);
+   731→      const tilt = 0.35 + i*0.1;
+   732→      for(let a=0; a<2*Math.PI; a+=0.04){
+   733→        const ox = orbR*Math.cos(a + t*(0.4-i*0.1));
+   734→        const oy = orbR*Math.sin(a + t*(0.4-i*0.1))*tilt;
+   735→        const sx = Math.floor(cx + ox/aspect);
+   736→        const sy = Math.floor(cy + oy);
+   737→        if(sx<0||sx>=cols||sy<0||sy>=rows) continue;
+   738→        if(bufPlanet[sy][sx]===' ') bufPlanet[sy][sx] = (i===0?'.':(i===1?'∙':'•'));
+   739→      }
+   740→      const a = t*(0.7-i*0.18);
+   741→      const ox = orbR*Math.cos(a);
+   742→      const oy = orbR*Math.sin(a)*tilt;
+   743→      const sx = Math.floor(cx + ox/aspect);
+   744→      const sy = Math.floor(cy + oy);
+   745→      if(sx>=0&&sx<cols&&sy>=0&&sy<rows) bufPlanet[sy][sx] = (i===0?'◉':(i===1?'◎':'○'));
+   746→    }
+   747→
+   748→    // 彗星拖尾
+   749→    for(const c of comets){
+   750→      c.x += c.vx; c.y += c.vy; c.life++;
+   751→      if(c.x>cols+10 || c.y>rows+5){
+   752→        c.x = -10; c.y = Math.random()*rows*0.5;
+   753→        c.life = 0;
+   754→      }
+   755→      const tail = 16;
+   756→      for(let k=0;k<tail;k++){
+   757→        const tx = Math.floor(c.x - k*c.vx*1.5);
+   758→        const ty = Math.floor(c.y - k*c.vy*1.5);
+   759→        if(tx<0||tx>=cols||ty<0||ty>=rows) continue;
+   760→        const tch = k===0?'☄':(k<3?'*':(k<7?'∙':(k<12?'·':'.')));
+   761→        bufComet[ty][tx] = tch;
+   762→      }
+   763→    }
+   764→
+   765→    // 漂浮的小行星
+   766→    for(const a of asteroids){
+   767→      a.x += a.vx; a.y += a.vy; a.rot += a.rs;
+   768→      if(a.x<-6) a.x = cols+6;
+   769→      if(a.x>cols+6) a.x = -6;
+   770→      if(a.y<-4) a.y = rows+4;
+   771→      if(a.y>rows+4) a.y = -4;
+   772→      const wob = Math.sin(t*0.8 + a.rot)*0.6;
+   773→      drawAsteroid(bufAst, a.x + wob, a.y + Math.cos(t*0.6+a.rot)*0.4, a.shape);
+   774→    }
+   775→
+   776→    elNeb.textContent = flush(bufNeb);
+   777→    elStar.textContent = flush(bufStar);
+   778→    elPlanet.textContent = flush(bufPlanet);
+   779→    elAst.textContent = flush(bufAst);
+   780→    elComet.textContent = flush(bufComet);
+   781→    requestAnimationFrame(render);
+   782→  }
+   783→  render();
+   784→})();
+   785→
+   786→/* ============================================================
+   787→   2. INFO 区小型轨道
+   788→   ============================================================ */
+   789→(function(){
+   790→  const el = document.getElementById('info-ascii');
+   791→  if(!el) return;
+   792→  const W=44, H=22;
+   793→  let t=0;
+   794→  // 小行星带的随机位置
+   795→  const belt = [];
+   796→  for(let i=0;i<14;i++){
+   797→    belt.push({
+   798→      a: Math.random()*Math.PI*2,
+   799→      r: 8.5 + Math.random()*1.6,
+   800→      sp: 0.5 + Math.random()*0.4,
+   801→      ch: '✦◆◈*·•'[Math.floor(Math.random()*6)]
+   802→    });
+   803→  }
+   804→  function tick(){
+   805→    t+=0.04;
+   806→    const buf = Array.from({length:H},()=>new Array(W).fill(' '));
+   807→    const cx=W/2, cy=H/2;
+   808→
+   809→    // 散落的星点背景
+   810→    for(let i=0;i<24;i++){
+   811→      const x = Math.floor((Math.sin(i*7.3)+1)*W/2);
+   812→      const y = Math.floor((Math.cos(i*5.1)+1)*H/2);
+   813→      const tw = (Math.sin(t*1.5 + i)+1)*0.5;
+   814→      if(x>=0&&x<W&&y>=0&&y<H && tw>0.6) buf[y][x]='.';
+   815→    }
+   816→
+   817→    // 行星轨道
+   818→    for(let i=0;i<4;i++){
+   819→      const r = 3+i*2.6;
+   820→      for(let a=0;a<Math.PI*2;a+=0.18){
+   821→        const x = Math.floor(cx + r*Math.cos(a)*1.0);
+   822→        const y = Math.floor(cy + r*Math.sin(a)*0.5);
+   823→        if(x>=0&&x<W&&y>=0&&y<H && buf[y][x]===' ') buf[y][x]='.';
+   824→      }
+   825→      const a = t*(1-i*0.18);
+   826→      const x = Math.floor(cx + r*Math.cos(a));
+   827→      const y = Math.floor(cy + r*Math.sin(a)*0.5);
+   828→      if(x>=0&&x<W&&y>=0&&y<H) buf[y][x]='★';
+   829→    }
+   830→
+   831→    // 外侧小行星带
+   832→    for(const b of belt){
+   833→      const ang = b.a + t*b.sp*0.3;
+   834→      const x = Math.floor(cx + b.r*Math.cos(ang));
+   835→      const y = Math.floor(cy + b.r*Math.sin(ang)*0.5);
+   836→      if(x>=0&&x<W&&y>=0&&y<H) buf[y][x]=b.ch;
+   837→    }
+   838→
+   839→    // 中心恒星与日冕
+   840→    if(buf[Math.floor(cy)]) buf[Math.floor(cy)][Math.floor(cx)]='◉';
+   841→    const halo = [[-1,0,'-'],[1,0,'-'],[0,-1,'|'],[0,1,'|']];
+   842→    for(const [dx,dy,ch] of halo){
+   843→      const x = Math.floor(cx)+dx, y = Math.floor(cy)+dy;
+   844→      if(x>=0&&x<W&&y>=0&&y<H && buf[y][x]===' ') buf[y][x]=ch;
+   845→    }
+   846→
+   847→    el.textContent = buf.map(r=>r.join('')).join('\n');
+   848→    requestAnimationFrame(tick);
+   849→  }
+   850→  tick();
+   851→})();
+   852→
+   853→/* ============================================================
+   854→   3. PROTEXT ：文本乱码-解码效果
+   855→   悬停或进入视口时，文字先打乱再逐字"解密"显现
+   856→   ============================================================ */
+   857→(function(){
+   858→  const glyphs = "★☆✶✦✧◉◎○●∙•~≈≋▁▂▃▄▅▆▇█ABCDEFGHJKLMNPQRSTUVWXYZ0123456789@#%&*";
+   859→  const RAND = ()=> glyphs[Math.floor(Math.random()*glyphs.length)];
+   860→
+   861→  function scramble(el){
+   862→    if(el.dataset.scrLock==='1') return;
+   863→    el.dataset.scrLock='1';
+   864→    el.classList.add('scrambling');
+   865→    const target = el.dataset.text || el.textContent;
+   866→    const chars = [...target];
+   867→    const len = chars.length;
+   868→    let frame = 0;
+   869→    const total = 16;
+   870→    const step = ()=>{
+   871→      frame++;
+   872→      const out = chars.map((ch,i)=>{
+   873→        if(ch===' '||ch==='\n') return ch;
+   874→        const reveal = Math.floor((frame/total)*len*1.2);
+   875→        if(i < reveal) return ch;
+   876→        return RAND();
+   877→      }).join('');
+   878→      el.textContent = out;
+   879→      if(frame < total){
+   880→        setTimeout(step, 40);
+   881→      } else {
+   882→        el.textContent = target;
+   883→        el.classList.remove('scrambling');
+   884→        el.dataset.scrLock='0';
+   885→      }
+   886→    };
+   887→    step();
+   888→  }
+   889→
+   890→  document.querySelectorAll('.pt').forEach(el=>{
+   891→    if(!el.dataset.text) el.dataset.text = el.textContent.trim();
+   892→    el.addEventListener('mouseenter', ()=>scramble(el));
+   893→  });
+   894→
+   895→  const io = new IntersectionObserver((entries)=>{
+   896→    entries.forEach(e=>{
+   897→      if(e.isIntersecting){
+   898→        scramble(e.target);
+   899→        io.unobserve(e.target);
+   900→      }
+   901→    });
+   902→  },{threshold:0.3});
+   903→  document.querySelectorAll('.intro-text .pt, .spec-row .pt, .showcase-text .pt').forEach(el=>io.observe(el));
+   904→})();
+   905→
+   906→/* ============================================================
+   907→   4. 标签筛选
+   908→   ============================================================ */
+   909→(function(){
+   910→  const tags = document.querySelectorAll('.tag');
+   911→  const cards = document.querySelectorAll('#grid .card');
+   912→  tags.forEach(tag=>{
+   913→    tag.addEventListener('click', ()=>{
+   914→      tags.forEach(t=>t.classList.remove('active'));
+   915→      tag.classList.add('active');
+   916→      const cat = tag.dataset.cat;
+   917→      cards.forEach(c=>{
+   918→        if(cat==='all' || c.dataset.cat.split(' ').includes(cat)){
+   919→          c.classList.remove('hidden');
+   920→        } else {
+   921→          c.classList.add('hidden');
+   922→        }
+   923→      });
+   924→    });
+   925→  });
+   926→})();
+   927→
+   928→/* ============================================================
+   929→   5. 平滑滚动
+   930→   ============================================================ */
+   931→document.querySelectorAll('a[href^="#"]').forEach(a=>{
+   932→  a.addEventListener('click', e=>{
+   933→    const id = a.getAttribute('href');
+   934→    if(id.length>1){
+   935→      const tgt = document.querySelector(id);
+   936→      if(tgt){ e.preventDefault(); tgt.scrollIntoView({behavior:'smooth',block:'start'}); }
+   937→    }
+   938→  });
+   939→});
+   940→
+   941→/* ============================================================
+   942→   6. 实时时钟
+   943→   ============================================================ */
+   944→(function(){
+   945→  const el = document.querySelector('.here');
+   946→  if(!el) return;
+   947→  function fmt(n){return n<10?'0'+n:n}
+   948→  function tick(){
+   949→    const d = new Date();
+   950→    el.innerHTML = '你好<br><span class="blink">▮</span> 现在是 ' + fmt(d.getHours())+':'+fmt(d.getMinutes())+':'+fmt(d.getSeconds());
+   951→    setTimeout(tick, 1000);
+   952→  }
+   953→  tick();
+   954→})();
+   955→</script>
+   956→
+   957→</body>
+   958→</html>
+   959→

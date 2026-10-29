@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>克制之物 — 北欧工业典藏 1948—1988</title>
+<title>Restrained Objects — A Nordic Industrial Archive 1948-1988</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
-  /* ===================== design tokens — 冷调钢蓝工业 ===================== */
+  /* ===================== design tokens — cold steel-blue industrial ===================== */
   :root{
-    --bg:        #e6e9ee;   /* 冷灰白 */
+    --bg:        #e6e9ee;   /* cold gray-white */
     --bg-soft:   #f1f3f6;
     --paper:     #c9cfd6;
-    --ink:       #0c0f14;   /* 接近黑，微带冷调 */
+    --ink:       #0c0f14;   /* near-black with a cold cast */
     --ink-soft:  #535963;
     --line:      #aab0b8;
     --line-soft: #c4c9d0;
-    --steel:     #3a4a5a;   /* 强调色 · 氧化钢蓝 */
+    --steel:     #3a4a5a;   /* accent · oxidized steel blue */
     --steel-dim: #6a7684;
 
     --serif: 'Cormorant Garamond', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
@@ -220,15 +220,15 @@
   /* ===================== viewport (cover) ===================== */
   .viewport{
     position: relative;
-    overflow: visible;          /* 允许卡片在翻转时探出画框 → AR 感 */
-    background: #0a0c11;        /* 黑色画框，参考图同款 */
+    overflow: visible;          /* let the card poke out of the frame while flipping → AR feel */
+    background: #0a0c11;        /* black picture frame, same as the reference shot */
     cursor: pointer;
-    z-index: 10;                /* 高于相邻栅格，溢出时不被 sidebar/meta 挡 */
+    z-index: 10;                /* above neighboring grid cells so overflow is not hidden by sidebar/meta */
     box-shadow:
       inset 0 0 0 1px rgba(170,176,184,0.22),
       0 30px 60px -28px rgba(12,15,20,0.45);
   }
-  /* 画框装饰图层放最底（z 1-2），保证 viewport 内的层级是：
+  /* Decorative frame layers sit at the bottom (z 1-2) so the stacking inside the viewport is:
      bg(0) → vignette(1) → noise(2) → mask/cover(20) → caption(30) → bracket(40) → enter-cue(40) */
   .viewport::before{
     content: ""; position: absolute; inset: 0; z-index: 1;
@@ -242,18 +242,18 @@
     mix-blend-mode: screen;
   }
   .viewport-mask{
-    position: absolute; inset: 0; z-index: 20;   /* 卡片图层高于 vignette/noise */
+    position: absolute; inset: 0; z-index: 20;   /* card layer above vignette/noise */
     overflow: hidden;
   }
   .viewport.switching .viewport-mask{ overflow: visible; }
 
-  /* — 单卡片双面翻转：正面=当前展品，背面=下一展品 — */
+  /* — Single two-sided flip card: front = current exhibit, back = next exhibit — */
   .cover-stage{
     position: absolute; inset: 0;
-    perspective: 600px;          /* 强透视 → 翻转过程中近端边缘自然探出画框 */
+    perspective: 600px;          /* strong perspective → near edge pokes out of the frame while flipping */
     perspective-origin: 50% 50%;
     transform-style: preserve-3d;
-    /* z-index 由父级 .viewport-mask (z:20) 决定 — 卡片在 vignette/noise 之上 */
+    /* z-index comes from parent .viewport-mask (z:20) — card sits above vignette/noise */
   }
   .cover-flipper{
     position: absolute; inset: 0;
@@ -267,15 +267,15 @@
     position: absolute; inset: 0;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    background-color: #b0b6be;     /* 深一档的工业灰 — 与页面浅灰背景明确区分 */
+    background-color: #b0b6be;     /* one step darker industrial gray — clearly distinct from the page background */
     background-image: linear-gradient(180deg, #bcc2ca 0%, #a4abb4 100%);
     overflow: hidden;
     opacity: 1;
-    isolation: isolate;            /* 隔绝外层 mix-blend-mode 渗透 */
+    isolation: isolate;            /* block mix-blend-mode bleed-through from outer layers */
     box-shadow:
       inset 0 0 0 1px rgba(12,15,20,0.32),
       inset 0 -60px 80px -40px rgba(12,15,20,0.22),
-      0 28px 60px -22px rgba(12,15,20,0.55);   /* 外阴影 → 卡片像悬空的实体面板 */
+      0 28px 60px -22px rgba(12,15,20,0.55);   /* outer shadow → card reads as a suspended physical panel */
   }
   .cover-face.front{ transform: rotateY(0deg); }
   .cover-face.back { transform: rotateY(180deg); }
@@ -287,7 +287,7 @@
 
   .cover-caption{
     position: absolute; left: 24px; bottom: 24px; right: 24px;
-    z-index: 30;                  /* 文字在卡片之上 */
+    z-index: 30;                  /* text above the card */
     color: var(--bg-soft);
     display:flex; justify-content: space-between; align-items: flex-end;
     gap: 24px;
@@ -429,8 +429,8 @@
     font-size: 19px; line-height: 1.5; color: var(--ink);
     letter-spacing: 0.01em;
   }
-  .intro-quote::before{ content:"〝 "; color: var(--steel); }
-  .intro-quote::after{ content:" 〞"; color: var(--steel); }
+  .intro-quote::before{ content:"“ "; color: var(--steel); }
+  .intro-quote::after{ content:" ”"; color: var(--steel); }
   .intro-attr{
     margin-top: 14px; font-family: var(--mono); font-size: 10.5px;
     letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft);
@@ -654,15 +654,15 @@
   <div class="intro-content">
     <div class="intro-tag">
       <span class="ln"></span>
-      <span>北欧工业典藏 · Vol.01</span>
+      <span>Nordic Industrial Archive · Vol.01</span>
       <span class="ln"></span>
     </div>
-    <h1 class="intro-title">克制<span class="accent">·</span>之物</h1>
+    <h1 class="intro-title">Restrained<span class="accent">·</span>Objects</h1>
     <p class="intro-sub">Restrained Objects — A Nordic Industrial Archive 1948 — 1988</p>
-    <p class="intro-quote">器物不为讨好而生，它们只为承担一件具体的事而存在。当那件事被它做得足够好时，它就成为了器物本身。</p>
-    <p class="intro-attr">— 策展前言 / Curatorial Note</p>
+    <p class="intro-quote">Objects are not born to please. They exist to carry one concrete task. When that task is done well enough, the object becomes itself.</p>
+    <p class="intro-attr">— Curatorial Preface / Curatorial Note</p>
     <button class="intro-cta" id="intro-enter">
-      <span>进入展厅</span>
+      <span>Enter the gallery</span>
       <span>—→</span>
     </button>
   </div>
@@ -672,22 +672,22 @@
 <main class="stage">
   <div class="g1c1 head-mark">
     <span class="glyph">Æ</span>
-    <span class="label">克制之物 / 编号 N°01—04</span>
+    <span class="label">Restrained Objects / No. N°01—04</span>
   </div>
 
   <div class="g1c2 head-center">
-    <span class="label label--ink">北欧工业典藏 · 1948 — 1988</span>
+    <span class="label label--ink">Nordic Industrial Archive · 1948 — 1988</span>
     <span class="label">Restrained Objects · Curated Volume One</span>
   </div>
 
   <div class="g1c3 head-right">
-    <span class="label">2026 / 05 · 上海</span>
+    <span class="label">2026 / 05 · Shanghai</span>
     <span class="label">31.23°N 121.47°E</span>
   </div>
 
   <aside class="g2c1 sidebar">
     <div class="sidebar-head">
-      <span class="label">展品目录</span>
+      <span class="label">Exhibit Index</span>
       <div class="rule"></div>
       <span class="label" style="margin-top:8px;display:block">SELECTED OBJECTS</span>
     </div>
@@ -695,19 +695,19 @@
       <div class="indicator" id="indicator"></div>
       <li data-idx="0" class="active">
         <span class="num">N°01</span>
-        <span class="ttl"><span class="ch" style="--i:0">铸</span><span class="ch" style="--i:1">铁</span><span class="ch" style="--i:2">壶</span></span>
+        <span class="ttl"><span class="ch" style="--i:0">I</span><span class="ch" style="--i:1">R</span><span class="ch" style="--i:2">O</span><span class="ch" style="--i:3">N</span></span>
       </li>
       <li data-idx="1">
         <span class="num">N°02</span>
-        <span class="ttl"><span class="ch" style="--i:0">轴</span><span class="ch" style="--i:1">承</span><span class="ch" style="--i:2">灯</span></span>
+        <span class="ttl"><span class="ch" style="--i:0">L</span><span class="ch" style="--i:1">A</span><span class="ch" style="--i:2">M</span><span class="ch" style="--i:3">P</span></span>
       </li>
       <li data-idx="2">
         <span class="num">N°03</span>
-        <span class="ttl"><span class="ch" style="--i:0">桦</span><span class="ch" style="--i:1">木</span><span class="ch" style="--i:2">椅</span></span>
+        <span class="ttl"><span class="ch" style="--i:0">C</span><span class="ch" style="--i:1">H</span><span class="ch" style="--i:2">A</span><span class="ch" style="--i:3">I</span><span class="ch" style="--i:4">R</span></span>
       </li>
       <li data-idx="3">
         <span class="num">N°04</span>
-        <span class="ttl"><span class="ch" style="--i:0">测</span><span class="ch" style="--i:1">距</span><span class="ch" style="--i:2">仪</span></span>
+        <span class="ttl"><span class="ch" style="--i:0">F</span><span class="ch" style="--i:1">I</span><span class="ch" style="--i:2">N</span><span class="ch" style="--i:3">D</span><span class="ch" style="--i:4">E</span><span class="ch" style="--i:5">R</span></span>
       </li>
     </ol>
   </aside>
@@ -719,7 +719,7 @@
     <span class="bracket bracket--br"></span>
 
     <button class="enter-cue" id="enter-cue">
-      <span>查看展品</span>
+      <span>View exhibit</span>
       <span>→</span>
     </button>
 
@@ -734,7 +734,7 @@
 
     <div class="cover-caption" id="cover-caption">
       <div class="lhs">
-        <div class="ch" id="cover-ch">铸铁壶</div>
+        <div class="ch" id="cover-ch">IRON KETTLE</div>
         <div class="en" id="cover-en">N°01 · IRON KETTLE · 1958</div>
       </div>
       <div class="rhs" id="cover-rhs"></div>
@@ -743,19 +743,19 @@
 
   <aside class="g2c3 meta-col" id="meta-col">
     <div class="meta-block">
-      <span class="label">材料 / MATERIAL</span>
+      <span class="label">MATERIAL</span>
       <div class="value" id="meta-material"></div>
     </div>
     <div class="meta-block">
-      <span class="label">产地 / ORIGIN</span>
+      <span class="label">ORIGIN</span>
       <div class="value" id="meta-origin"></div>
     </div>
     <div class="meta-block">
-      <span class="label">年代 / YEAR</span>
+      <span class="label">YEAR</span>
       <div class="value" id="meta-year"></div>
     </div>
     <div class="meta-block">
-      <span class="label">尺寸 / DIMENSION</span>
+      <span class="label">DIMENSION</span>
       <div class="value" id="meta-dim"></div>
     </div>
   </aside>
@@ -763,26 +763,26 @@
   <div class="g3c1">
     <div class="foot-count" id="foot-count">
       <span class="now" id="cur-num">01</span>
-      <span class="of">/ 04 件展品</span>
+      <span class="of">/ 04 exhibits</span>
     </div>
     <div class="progress-track" id="progress-track" style="--p:25%"></div>
   </div>
 
   <div class="g3c2" style="display:flex; justify-content:space-between; align-items:flex-end; gap:24px;">
     <button class="nav-btn" id="btn-prev">
-      <span class="arr">←</span><span class="txt">上一件</span>
+      <span class="arr">←</span><span class="txt">Prev</span>
     </button>
     <button class="foot-cta" id="btn-enter">
-      <span>进入展品 / VIEW EXHIBIT</span><span>—→</span>
+      <span>VIEW EXHIBIT</span><span>—→</span>
     </button>
     <button class="nav-btn" id="btn-next">
-      <span class="txt">下一件</span><span class="arr">→</span>
+      <span class="txt">Next</span><span class="arr">→</span>
     </button>
   </div>
 
   <div class="g3c3 foot-right-stack">
-    <span class="label">策展 / CURATED BY</span>
-    <span class="serif-tag">青林 · 沉积研究室</span>
+    <span class="label">CURATED BY</span>
+    <span class="serif-tag">Qinglin · Sediment Research Studio</span>
     <span class="label" style="margin-top:6px"><a href="mailto:archive@chenji.studio">archive@chenji.studio</a></span>
   </div>
 </main>
@@ -793,28 +793,28 @@
 <div class="detail" id="detail" aria-hidden="true">
   <div class="detail-bar">
     <div class="crumbs">
-      <span>北欧工业典藏</span><span class="sep">/</span>
-      <span>第一卷 · 克制之物</span><span class="sep">/</span>
+      <span>Nordic Industrial Archive</span><span class="sep">/</span>
+      <span>Volume One · Restrained Objects</span><span class="sep">/</span>
       <span class="cur" id="crumb-cur"></span>
     </div>
     <button class="detail-close" id="detail-close">
-      <span>←</span><span>返回展厅</span>
+      <span>←</span><span>Back to gallery</span>
     </button>
   </div>
   <div class="detail-inner" id="detail-inner"></div>
 </div>
 
-<!-- ===================== SVG defs (复用) ===================== -->
+<!-- ===================== SVG defs (reusable) ===================== -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <!-- 通用背景图案 -->
+    <!-- shared background patterns -->
     <pattern id="grid-fine" width="36" height="36" patternUnits="userSpaceOnUse">
       <path d="M 36 0 L 0 0 0 36" fill="none" stroke="rgba(83,89,99,0.16)" stroke-width="0.6"/>
     </pattern>
     <pattern id="grid-major" width="180" height="180" patternUnits="userSpaceOnUse">
       <path d="M 180 0 L 0 0 0 180" fill="none" stroke="rgba(83,89,99,0.28)" stroke-width="0.6"/>
     </pattern>
-    <!-- 渐变 -->
+    <!-- gradients -->
     <linearGradient id="iron-grad" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#1d222a"/>
       <stop offset="50%" stop-color="#0c0f14"/>
@@ -843,137 +843,137 @@
   {
     "slug": "iron-kettle",
     "num": "N°01",
-    "title": "铸铁壶",
+    "title": "Iron Kettle",
     "en": "IRON KETTLE",
     "year": "1958",
-    "place": "丹麦 · 哥本哈根",
-    "maker": "Carl Hansen Værksted / 卡尔·汉森工坊",
-    "material": "灰口铸铁 · 山毛榉木柄<br/>黑釉烧结涂层",
-    "origin": "丹麦 · 哥本哈根<br/>Carl Hansen Værksted",
-    "dim": "高 18 cm · 容 1.2 L<br/>底径 14 cm",
-    "tagline": "FORGED ESSENTIAL / 锻造的必需品",
-    "lead": "一只为<em>沉默与水的低温</em>而设计的容器——壶身的厚度，是为了让热停留得久一点，而不是更快地变热。",
+    "place": "Copenhagen, Denmark",
+    "maker": "Carl Hansen Værksted / Carl Hansen Workshop",
+    "material": "gray cast iron · beech handle<br/>black glaze coating",
+    "origin": "Copenhagen, Denmark<br/>Carl Hansen Værksted",
+    "dim": "H 18 cm · 1.2 L<br/>base Ø 14 cm",
+    "tagline": "FORGED ESSENTIAL / the forged essential",
+    "lead": "A vessel designed for <em>silence and the low temperature of water</em> — the thickness of the body exists so heat lingers a little longer, not so it heats faster.",
     "spec": [
-      ["编号", "1958 · K-04"],
-      ["材料", "灰口铸铁 + 山毛榉"],
-      ["工艺", "砂模铸造 / 黑釉烧结"],
-      ["重量", "1.86 kg"],
-      ["产量", "限量 240 件 · 现存 31"]
+      ["Catalog no.", "1958 · K-04"],
+      ["Material", "gray cast iron + beech"],
+      ["Process", "sand casting / black glaze firing"],
+      ["Weight", "1.86 kg"],
+      ["Production", "limited to 240 · 31 extant"]
     ],
     "prose": [
-      "在汉森工坊 1958 年的目录里，这只壶被简单地记作「K-04」。没有名字，没有花体签名，只有一个砂模编号和一个粗体的「DK」。",
-      "壶身用灰口铸铁砂模一次成型，壶嘴的弧线在出模之后由两位工匠用锉刀手工修整——他们的差异至今仍能从同一批次的几只壶里被识别出来。",
-      "把手是山毛榉，浸过两遍亚麻籽油。表面那层不均匀的黑色，并非涂装，而是壶在第一次烧水之后留下的氧化薄膜——一种被工坊郑重写进说明书的「自然完成」。"
+      "In the Hansen workshop’s 1958 catalog this kettle is simply recorded as “K-04”. No name, no flourished signature — just a sand-mold number and a bold “DK”.",
+      "The body was cast in one pour of gray cast iron in a sand mold; the spout’s curve was hand-filed after demolding by two craftsmen — their differences can still be told apart among kettles from the same batch.",
+      "The handle is beech, soaked twice in linseed oil. The uneven black on the surface is not paint but the oxide film left after the kettle’s first boil — a “natural finish” the workshop solemnly wrote into the manual."
     ],
     "gallery": [
-      ["f-3", "壶身正立面"],
-      ["f-2", "山毛榉木柄"],
-      ["f-2", "壶嘴细部"],
-      ["f-2", "底部砂模印"],
-      ["f-4", "工坊蓝图"],
-      ["f-6", "陈列剖面"]
+      ["f-3", "front elevation of the body"],
+      ["f-2", "beech handle"],
+      ["f-2", "spout detail"],
+      ["f-2", "sand-mold imprint on the base"],
+      ["f-4", "workshop blueprint"],
+      ["f-6", "display cross-section"]
     ]
   },
   {
     "slug": "bearing-lamp",
     "num": "N°02",
-    "title": "轴承灯",
+    "title": "Bearing Lamp",
     "en": "BEARING LAMP",
     "year": "1974",
-    "place": "芬兰 · 坦佩雷",
-    "maker": "Aalto Industrial Lab / 阿尔托工业研究所",
-    "material": "黄铜外圈 · 钢制滚珠轴承<br/>磨砂硼硅玻璃灯罩",
-    "origin": "芬兰 · 坦佩雷<br/>Aalto Industrial Lab",
-    "dim": "悬挑 42 cm · 灯罩 Ø 22 cm<br/>整体重 1.4 kg",
-    "tagline": "PIVOT & LIGHT / 旋转与光",
-    "lead": "把<em>工业用的滚珠轴承</em>，从机器的内部，请到一盏吊灯的关节里。它转动得几乎没有声音。",
+    "place": "Tampere, Finland",
+    "maker": "Aalto Industrial Lab / Aalto Industrial Institute",
+    "material": "brass outer ring · steel ball bearing<br/>frosted borosilicate shade",
+    "origin": "Tampere, Finland<br/>Aalto Industrial Lab",
+    "dim": "42 cm cantilever · Ø 22 cm shade<br/>1.4 kg overall",
+    "tagline": "PIVOT & LIGHT / pivot and light",
+    "lead": "Take the <em>industrial ball bearing</em> from inside a machine and invite it into the joint of a pendant lamp. It turns with almost no sound.",
     "spec": [
-      ["编号", "1974 · A-Lab 17"],
-      ["关节", "SKF 6204 滚珠轴承"],
-      ["灯罩", "磨砂硼硅玻璃"],
-      ["光源", "原配 25W 钨丝灯泡"],
-      ["产量", "实验批次 80 件"]
+      ["Catalog no.", "1974 · A-Lab 17"],
+      ["Joint", "SKF 6204 ball bearing"],
+      ["Shade", "frosted borosilicate glass"],
+      ["Light source", "original 25W tungsten bulb"],
+      ["Production", "experimental batch of 80"]
     ],
     "prose": [
-      "1974 年，阿尔托工业研究所做了一个为期半年的「废料计划」：从坦佩雷周边的造纸机械厂回收一批 SKF 6204 型号的滚珠轴承——它们因为内圈轻微氧化而被判废，但旋转精度仍在 5 微米以内。",
-      "研究所的 Niiranen 教授把其中 80 只装进了一组吊灯的连接件。轴承的精密旋转让灯罩可以绕水平轴自由偏转 270°，并且在任何角度都能停住。",
-      "工厂原本以为这是设计师的浪漫，但目录上写得很冷静：「废品的精度，仍是合格的精度」。"
+      "In 1974 the Aalto Industrial Institute ran a six-month “scrap program”: recovering a batch of SKF 6204 ball bearings from paper-mill machinery around Tampere — they had been condemned for slight oxidation of the inner ring, yet their rotation tolerance was still within 5 microns.",
+      "Professor Niiranen of the institute fitted 80 of them into the connectors of a set of pendant lamps. The bearings’ precise rotation lets the shade tilt freely 270° around the horizontal axis and stop at any angle.",
+      "The factory first assumed this was a designer’s romance, but the catalog states it coolly: “the precision of scrap is still valid precision.”"
     ],
     "gallery": [
-      ["f-3", "悬挑全貌"],
-      ["f-2", "黄铜外圈"],
-      ["f-2", "轴承剖面"],
-      ["f-2", "灯罩正视"],
-      ["f-4", "节点装配图"],
-      ["f-6", "研究所现场"]
+      ["f-3", "full cantilever"],
+      ["f-2", "brass outer ring"],
+      ["f-2", "bearing cross-section"],
+      ["f-2", "shade front view"],
+      ["f-4", "joint assembly drawing"],
+      ["f-6", "institute site"]
     ]
   },
   {
     "slug": "birch-chair",
     "num": "N°03",
-    "title": "桦木椅",
+    "title": "Birch Chair",
     "en": "BIRCH CHAIR",
     "year": "1962",
-    "place": "瑞典 · 胡尔特斯弗雷德",
-    "maker": "Hultsfreds Stolfabrik / 胡尔特斯弗雷德椅厂",
-    "material": "瑞典桦木 · 冷弯钢条<br/>亚麻籽油处理",
-    "origin": "瑞典 · 胡尔特斯弗雷德<br/>Hultsfreds Stolfabrik",
-    "dim": "座高 44 cm · 总高 78 cm<br/>整椅重 4.2 kg",
-    "tagline": "FOUR LEGS, NO MORE / 四只脚，仅此而已",
-    "lead": "椅子的全部任务，是稳定地承载一个人的体重——这把椅子拒绝完成<em>多于这件事的任何事</em>。",
+    "place": "Hultsfred, Sweden",
+    "maker": "Hultsfreds Stolfabrik / Hultsfred Chair Works",
+    "material": "Swedish birch · cold-bent steel strip<br/>linseed-oil finish",
+    "origin": "Hultsfred, Sweden<br/>Hultsfreds Stolfabrik",
+    "dim": "seat H 44 cm · total H 78 cm<br/>4.2 kg overall",
+    "tagline": "FOUR LEGS, NO MORE / four legs, no more",
+    "lead": "A chair’s whole task is to carry a person’s weight steadily — this chair refuses to do <em>anything beyond that</em>.",
     "spec": [
-      ["编号", "1962 · HF-S2"],
-      ["木材", "瑞典中部桦木"],
-      ["结构", "桦木框架 + 冷弯钢加固"],
-      ["处理", "亚麻籽油 · 两遍手刷"],
-      ["产量", "1962—1971 量产约 8 600 把"]
+      ["Catalog no.", "1962 · HF-S2"],
+      ["Wood", "central Swedish birch"],
+      ["Structure", "birch frame + cold-bent steel reinforcement"],
+      ["Finish", "linseed oil · two hand-brushed coats"],
+      ["Production", "c. 8,600 made 1962-1971"]
     ],
     "prose": [
-      "1962 年的胡尔特斯弗雷德椅厂正面临一次成本审查。设计师 Lindgren 提交的方案，是把上一代椅子上一切非承重的木料全部拿掉——靠背的横档减到一根，扶手取消，椅腿的截面从 32 mm 收窄到 24 mm。",
-      "审计师起初以为这是为了省料，直到工厂的工程师把他请到测试间：减重 36% 之后，承载强度仅下降了 8%——因为剩下的木料正好沿应力方向布置。",
-      "这把椅子的目录页上印着一句话：「这不是设计极简，这是结构正好。」"
+      "In 1962 the Hultsfred chair works faced a cost audit. Designer Lindgren’s proposal removed every piece of non-load-bearing wood from the previous chair — the back reduced to one slat, armrests deleted, leg cross-section narrowed from 32 mm to 24 mm.",
+      "The auditor first assumed it was to save material, until the plant’s engineer took him to the test room: after a 36% weight reduction, load strength dropped only 8% — because the remaining wood is oriented exactly along the stress lines.",
+      "The chair’s catalog page carries one sentence: “This is not design minimalism. This is structure being exactly enough.”"
     ],
     "gallery": [
-      ["f-2", "正立面"],
-      ["f-3", "椅背节点"],
-      ["f-2", "椅腿截面"],
-      ["f-2", "亚麻籽油表面"],
-      ["f-4", "桦木拼接"],
-      ["f-6", "工厂量产线"]
+      ["f-2", "front elevation"],
+      ["f-3", "backrest joint"],
+      ["f-2", "leg cross-section"],
+      ["f-2", "linseed-oil surface"],
+      ["f-4", "birch joinery"],
+      ["f-6", "factory production line"]
     ]
   },
   {
     "slug": "rangefinder",
     "num": "N°04",
-    "title": "测距仪",
+    "title": "Rangefinder",
     "en": "RANGEFINDER",
     "year": "1948",
-    "place": "挪威 · 卑尔根",
-    "maker": "Bergen Marine Instruments / 卑尔根海事仪器",
-    "material": "海军级黄铜 · 光学玻璃<br/>硬橡胶护套",
-    "origin": "挪威 · 卑尔根<br/>Bergen Marine Instruments",
-    "dim": "长 28 cm · 重 1.1 kg<br/>测程 50—2 000 m",
-    "tagline": "MEASURED HORIZON / 被丈量的地平线",
-    "lead": "战后第三年的卑尔根，一只为<em>渔船而不是军舰</em>设计的双筒测距仪——它把军用光学的精度，归还给民用海岸。",
+    "place": "Bergen, Norway",
+    "maker": "Bergen Marine Instruments / Bergen Maritime Instruments",
+    "material": "naval brass · optical glass<br/>hard-rubber jacket",
+    "origin": "Bergen, Norway<br/>Bergen Marine Instruments",
+    "dim": "L 28 cm · 1.1 kg<br/>range 50-2,000 m",
+    "tagline": "MEASURED HORIZON / the measured horizon",
+    "lead": "Bergen, third year after the war: a binocular rangefinder designed for <em>fishing boats, not warships</em> — returning military-optical precision to the civilian coast.",
     "spec": [
-      ["编号", "1948 · BM-R 04"],
-      ["镜组", "对称式双筒 · 60 mm 基线"],
-      ["精度", "±2% @ 500 m"],
-      ["材料", "海军级黄铜 · 硬橡胶护套"],
-      ["产量", "1948—1953 制造 1 240 件"]
+      ["Catalog no.", "1948 · BM-R 04"],
+      ["Optics", "symmetric binocular · 60 mm baseline"],
+      ["Accuracy", "±2% @ 500 m"],
+      ["Material", "naval brass · hard-rubber jacket"],
+      ["Production", "1,240 made 1948-1953"]
     ],
     "prose": [
-      "1948 年，卑尔根海事仪器厂用一批从被遣散的德军海防站回收的潜望镜光学组，做了一款民用测距仪——双筒、对称式、基线 60 mm。",
-      "它的精度在 500 米距离上误差不超过 ±2%，足以让一艘小渔船在能见度不佳的清晨判断离岩礁的距离。仪器的橡胶护套，是为了让它能从甲板掉到水里再被捞起来。",
-      "这种仪器在 1953 年被雷达淘汰，今天的卑尔根海岸博物馆里还存着 6 件——它们仍然能用。"
+      "In 1948 the Bergen marine instrument works built a civilian rangefinder from periscope optics recovered from decommissioned German coastal stations — binocular, symmetric, 60 mm baseline.",
+      "At 500 meters its error stays within ±2% — enough for a small fishing boat to judge its distance from reef rocks on a foggy morning. The rubber jacket exists so the instrument can fall from the deck into the sea and be fished back out.",
+      "Radar made this instrument obsolete in 1953; the Bergen coastal museum still keeps 6 of them today — and they still work."
     ],
     "gallery": [
-      ["f-6", "双筒整体"],
-      ["f-2", "左目镜"],
-      ["f-2", "调焦旋钮"],
-      ["f-2", "右目镜"],
-      ["f-3", "刻度盘"],
-      ["f-3", "硬橡胶护套"]
+      ["f-6", "binocular assembly"],
+      ["f-2", "left eyepiece"],
+      ["f-2", "focusing knob"],
+      ["f-2", "right eyepiece"],
+      ["f-3", "scale dial"],
+      ["f-3", "hard-rubber jacket"]
     ]
   }
 ]
@@ -1300,7 +1300,7 @@ faceFront.innerHTML = SVG_FUNCS[DATA[0].slug]('hero');
 // ticker
 const tickerText = DATA.map(d =>
   `<span><span class="dot">●</span> ${d.num} · ${d.title} / ${d.en} · ${d.year} · ${d.place}</span>`
-).join('') + '<span>— 北欧工业典藏 · 第一卷 · 克制之物 · 2026 — RESTRAINED OBJECTS / NORDIC INDUSTRIAL ARCHIVE</span>';
+).join('') + '<span>— NORDIC INDUSTRIAL ARCHIVE · VOLUME ONE · RESTRAINED OBJECTS · 2026 — RESTRAINED OBJECTS / NORDIC INDUSTRIAL ARCHIVE</span>';
 tickerTrack.innerHTML = tickerText + tickerText;
 
 function applyMeta(d, idx){
@@ -1312,7 +1312,7 @@ function applyMeta(d, idx){
   setTimeout(() => {
     coverCh.textContent = d.title;
     coverEn.textContent = `${d.num} · ${d.en} · ${d.year}`;
-    coverRhs.innerHTML = `编号 / ${d.num}<br/>${d.place}<br/>${d.maker.split('/')[0].trim()}`;
+    coverRhs.innerHTML = `No. / ${d.num}<br/>${d.place}<br/>${d.maker.split('/')[0].trim()}`;
     metaMat.innerHTML = d.material;
     metaOrigin.innerHTML = d.origin;
     metaYear.innerHTML = d.year;
@@ -1337,17 +1337,17 @@ function applyMeta(d, idx){
   }
 }
 
-/* — 单卡片双面翻转：把下一展品 SVG 写到背面，flipper 整体旋转 ±180° — */
+/* — Single two-sided flip card: write the next exhibit’s SVG to the back, rotate flipper ±180° — */
 function setCover(idx, direction='next'){
-  // 当前面朝相机的对立面就是"背面" → 把新内容写在那里
+  // the side currently facing away from the camera is "the back" → write new content there
   const incomingFace = currentFace === 'front' ? faceBack : faceFront;
   incomingFace.innerHTML = SVG_FUNCS[DATA[idx].slug]('hero');
 
-  // 累加 ±180° 让 flipper 平滑转过去（CSS transition 自动从当前角度插值到目标）
+  // accumulate ±180° so the flipper turns smoothly (CSS transition interpolates from current angle to target)
   flipperRotation += (direction === 'next' ? -180 : 180);
   flipper.style.transform = `translateZ(0) rotateY(${flipperRotation}deg)`;
 
-  // 翻转完成后，记录新的"正面"（其实是物理上的另一面，但现在朝向相机）
+  // after the flip, record the new "front" (physically the other side, now facing the camera)
   currentFace = currentFace === 'front' ? 'back' : 'front';
 }
 
@@ -1361,14 +1361,14 @@ function go(idx){
     (target > cur ? 'next' : 'prev');
   switching = true;
   cur = target;
-  // 打开画框遮罩，让卡片在翻转中可以探出 → AR 感
+  // open the frame mask so the card can poke out while flipping → AR feel
   const vp = document.getElementById('viewport');
   vp.classList.add('switching');
   setCover(target, direction);
   applyMeta(DATA[target], target);
   setTimeout(() => {
     switching = false;
-    vp.classList.remove('switching');   // 关闭遮罩，回到画框内
+    vp.classList.remove('switching');   // close the mask; back inside the frame
   }, 1050);
 }
 
@@ -1422,16 +1422,16 @@ function renderDetail(idx){
 
     <div class="detail-hero-img">
       ${svgFn('hero')}
-      <span class="caption">${d.num} · 主图 / Cover plate</span>
+      <span class="caption">${d.num} · cover plate</span>
     </div>
 
     <section class="detail-body">
       <div class="left">
-        <h4>制作者 / MAKER</h4>
+        <h4>MAKER</h4>
         <p>${d.maker}</p>
-        <h4 style="margin-top:32px">藏品序号 / CAT.</h4>
+        <h4 style="margin-top:32px">CAT.</h4>
         <p>${d.year} · ${d.num.replace('N°','')}</p>
-        <h4 style="margin-top:32px">现存 / EXTANT</h4>
+        <h4 style="margin-top:32px">EXTANT</h4>
         <p>${d.spec[d.spec.length - 1][1]}</p>
       </div>
       <div class="right">
@@ -1442,19 +1442,19 @@ function renderDetail(idx){
 
     <section class="detail-gallery">
       <div class="detail-gallery-head">
-        <h3>陈列细节 / Gallery</h3>
-        <span class="count">${d.gallery.length} 帧 · ${d.num}</span>
+        <h3>Gallery</h3>
+        <span class="count">${d.gallery.length} frames · ${d.num}</span>
       </div>
       <div class="grid-figs">${figs}</div>
     </section>
 
     <nav class="detail-nav">
       <a data-go="${DATA.indexOf(prev)}" href="#">
-        <span class="nav-lbl">← 上一件 / PREV</span>
+        <span class="nav-lbl">← PREV</span>
         <span class="nav-title">${prev.num} · ${prev.title}</span>
       </a>
       <a class="next" data-go="${DATA.indexOf(next)}" href="#">
-        <span class="nav-lbl">下一件 / NEXT →</span>
+        <span class="nav-lbl">NEXT →</span>
         <span class="nav-title">${next.num} · ${next.title}</span>
       </a>
     </nav>
@@ -1523,7 +1523,7 @@ window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
     });
   });
 
-// === 微视差：仅偏移整个 3D 场景的视点（不直接动卡片） ===
+// === Micro-parallax: shift only the 3D scene viewpoint (never move the card directly) ===
 const viewportEl = document.getElementById('viewport');
 let tiltTargetX = 0, tiltTargetY = 0, tiltX = 0, tiltY = 0;
 let tiltActive = false;
@@ -1542,7 +1542,7 @@ viewportEl.addEventListener('mouseleave', () => {
   tiltX += (tiltTargetX - tiltX) * 0.06;
   tiltY += (tiltTargetY - tiltY) * 0.06;
   if(tiltActive || Math.abs(tiltX) > 0.005 || Math.abs(tiltY) > 0.005){
-    // 只移动 perspective-origin → 整个 3D 场景的相机微动，卡片自身不变形
+    // move only perspective-origin → the whole 3D scene’s camera drifts slightly; the card itself does not deform
     coverStage.style.perspectiveOrigin = `${50 + tiltY * 8}% ${50 + tiltX * 5}%`;
   }
   requestAnimationFrame(tiltLoop);

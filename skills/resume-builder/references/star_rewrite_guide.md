@@ -1,83 +1,83 @@
-# STAR 改写指南
+# STAR Rewrite Guide
 
-## 核心心法
+## Core Idea
 
-STAR = Situation（情境）+ Task（任务）+ Action（动作）+ Result（结果）
+STAR = Situation + Task + Action + Result
 
-但**写在简历里的 bullet，不是把 STAR 四段都堆进去**，而是浓缩成一句话，里面隐含 STAR 信号：
+But **a bullet in a resume is not the four STAR sections stacked up** — it's one condensed sentence with the STAR signals built in:
 
 ```
-[动作动词] + [对象 / 范围] + [方法 / 工具] + [量化结果]
+[Action verb] + [object / scope] + [method / tool] + [quantified result]
 ```
 
-举例：
+Examples:
 
-❌ 弱：参与了 XX 系统的开发
-✅ 强：主导设计并落地 XX 订单系统的库存模块，引入 Redis 分布式锁解决超卖，支撑日均 80 万订单，P99 延迟从 320ms 降至 95ms
+❌ Weak: participated in developing the XX system
+✅ Strong: Led design and delivery of the inventory module for the XX order system, introduced Redis distributed locking to prevent oversell, supporting 800k orders per day, and cut P99 latency from 320ms to 95ms
 
-❌ 弱：负责活动运营
-✅ 强：策划"618 老客回流"活动，覆盖 30 万沉默用户，通过分层 push + 优惠券组合，回流率 11.4%（基线 4.2%），ROI 3.8
+❌ Weak: responsible for campaign operations
+✅ Strong: Planned the "618 win-back" campaign reaching 300k dormant users; through segmented push + coupon bundles achieved an 11.4% reactivation rate (baseline 4.2%) and ROI of 3.8
 
-## 改写流程
+## Rewriting Process
 
-1. **找到原 bullet 的 STAR 短板**
-   - 没有动作动词？补
-   - 没有量化结果？追问用户
-   - 动作太空泛（"参与/协助/配合/支持"）？换成实做动词
-   - 没有方法 / 工具？补
+1. **Find the original bullet's STAR gaps**
+   - No action verb? Add one
+   - No quantified result? Follow up with the user
+   - Action too vague ("participated / assisted / supported")? Swap in concrete verbs
+   - No method / tool? Add it
 
-2. **应用动词库**（见下文）
+2. **Apply the verb library** (see below)
 
-3. **加量化**（数字 / 百分比 / 排名 / 时间 / 规模 任选）
+3. **Add quantification** (number / percentage / ranking / time / scale — any)
 
-4. **控制长度**：单条 bullet ≤ 2 行
+4. **Control length**: each bullet ≤ 2 lines
 
-## 强动作动词库（按职能分）
+## Strong Action Verb Library (by function)
 
-### 通用
-主导、负责、推动、发起、设计、搭建、优化、复盘、孵化、闭环
+### General
+Led, owned, drove, initiated, designed, built, optimized, ran retrospectives on, incubated, closed the loop on
 
-### 产品 / 运营
-规划、迭代、调研、定义（功能）、灰度、A/B 测试、数据归因、上线、回滚
+### Product / Operations
+Planned, iterated, researched, defined (features), gray-released, A/B tested, attributed, launched, rolled back
 
-### 技术
-重构、架构设计、调优、解耦、抽象、模块化、自动化、监控、容灾、降级
+### Engineering
+Refactored, architected, tuned, decoupled, abstracted, modularized, automated, monitored, hardened, degraded gracefully
 
-### 数据
-建模、清洗、归因、可视化、回归、聚类、特征工程、训练、上线
+### Data
+Modeled, cleaned, attributed, visualized, regressed, clustered, feature-engineered, trained, deployed
 
-### 销售 / BD
-开拓、签约、续约、回款、谈判、漏斗管理、客户分层
+### Sales / BD
+Prospected, signed, renewed, collected, negotiated, managed the funnel, segmented accounts
 
-### 管理
-组建（团队）、培养、绩效管理、目标拆解、跨部门协调
+### Management
+Built (teams), coached, managed performance, decomposed goals, coordinated across departments
 
-## 弱词替换表
+## Weak-Word Replacement Table
 
-| 弱词 | 推荐替换 |
+| Weak word | Suggested replacement |
 |------|---------|
-| 参与了 | 主导 / 负责模块 ___（写明边界） |
-| 协助 | 与 ___ 协作完成 ___（写明合作方和成果） |
-| 配合 | 同上 |
-| 跟进 | 推动 / 督办 / drive |
-| 帮助 | 通过 ___ 帮 ___ 实现 ___ |
-| 学习了 | 掌握并应用 ___ 完成 ___ |
-| 接触过 | 删掉，要么改成具体项目 |
-| 熟悉 / 了解 | 删掉抽象词，写具体项目 |
+| Participated in | Led / owned module ___ (state the boundary) |
+| Assisted with | Collaborated with ___ to deliver ___ (name the partner and the result) |
+| Supported | Same as above |
+| Followed up on | Drove / pushed / expedited |
+| Helped | Used ___ to help ___ achieve ___ |
+| Learned | Mastered and applied ___ to complete ___ |
+| Was exposed to | Delete it, or replace with a concrete project |
+| Familiar with / aware of | Delete the abstraction; write a concrete project |
 
-## 量化暗示库
+## Soft-Quantification Library
 
-如果用户实在给不出数字，可以用以下"软量化"先占位，标注 `[待补]`：
+If the user truly can't produce numbers, you can place these "soft quantities" first, marked `[TODO]`:
 
-- 用户 / 客户规模：万级 / 百万级 / 千万级
-- 团队规模：3 人 / 10 人 / 跨部门
-- 项目周期：2 周 / 1 个季度 / 半年
-- 业务影响：核心 / 关键 / 试点
-- 同行对比：行业首个 / 公司第一个 / Tier 1 客户
+- User / customer scale: tens of thousands / millions / tens of millions
+- Team size: 3 people / 10 people / cross-department
+- Project duration: 2 weeks / 1 quarter / half a year
+- Business impact: core / critical / pilot
+- Peer comparison: industry first / company first / Tier 1 customer
 
-## 自检：每条 bullet 问自己
+## Self-Check: Ask Yourself for Every Bullet
 
-- 用动词开头了吗？
-- 有 1 个以上的数字 / 量级吗？
-- 删掉这条，简历会损失什么？如果答案是"不会"，就删
-- 这条让 HR 联想到什么具体能力？
+- Does it start with a verb?
+- Does it contain at least 1 number / magnitude?
+- If you deleted this bullet, what would the resume lose? If the answer is "nothing", delete it
+- What concrete capability does this bullet make HR think of?

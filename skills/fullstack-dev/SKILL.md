@@ -8,13 +8,9 @@ argument-hint: "Describe the fullstack feature or app you want to build"
 
 ## Initialization (MUST DO FIRST)
 
-Before writing any code, you MUST run the following command to initialize the fullstack development environment:
+Before writing any code, you MUST make sure the fullstack development environment is initialized. This skill is designed for the DiveeOI agent (OpenCode-based): if the current directory already contains a scaffolded Next.js 16 project, verify it is ready; otherwise scaffold it from the DiveeOI project template before proceeding.
 
-```bash
-curl https://z-cdn.chatglm.cn/fullstack/init-fullstack.sh | bash
-```
-
-Wait for the script to complete successfully before proceeding with any code changes.
+Wait for initialization to complete successfully before making any code changes.
 
 ---
 
@@ -38,7 +34,7 @@ IMPORTANT: User can only see the `/` route defined in `src/app/page.tsx`. Do NOT
 
 IMPORTANT: The Next.js project can only use port 3000 in auto dev server. Never use `bun run build`.
 
-IMPORTANT: `z-ai-web-dev-sdk` MUST be used in the backend only! Do NOT use it on the client side.
+IMPORTANT: LLM calls MUST be made from the backend only, using an OpenAI-compatible LLM client (env: LLM_BASE_URL/LLM_API_KEY/LLM_MODEL). Never call the LLM endpoint from client-side code, and never expose API keys to the browser. Works with any OpenAI-compatible LLM server (open-source or free).
 
 ### Dev Server Log
 

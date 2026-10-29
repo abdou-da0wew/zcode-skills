@@ -233,7 +233,7 @@ const palette = { primary:"#28201C", body:"#000000", secondary:"#6E6560", accent
 - Party information (black)
 - Signature block text (black)
 
-**The only exception** is red-header official documents (红头文件), which follow their own GB/T 9704 color rules. For standard contracts, NO colored text is permitted — no red, no accent color, no dark-blue-grey.
+**The only exception** is red-header official documents (the "hongtou" official-document style), which follow their own GB/T 9704 color rules. For standard contracts, NO colored text is permitted — no red, no accent color, no dark-blue-grey.
 
 ```js
 // ✅ Contract title — always pure black
@@ -307,14 +307,14 @@ Article 2  Price and Payment
 Party A and Party B information MUST be laid out using a **borderless table** so that labels align vertically. Never use plain paragraphs with indentation — this causes misalignment between parties.
 
 ```js
-// ✅ Correct — borderless table ensures "统一社会信用代码：", "地址：", "法定代表人：" align
+// ✅ Correct — borderless table ensures the "Unified Social Credit Code:", "Address:", "Legal Representative:" labels align
 function partyInfoBlock(partyLabel, partyName, fields) {
   // fields: [["Unified Social Credit Code", value], ["Address", value], ["Legal Representative", value]]
   const NB = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
   const noBorders = { top: NB, bottom: NB, left: NB, right: NB };
 
   const headerPara = new Paragraph({ spacing: { before: 200, after: 120 },
-    children: [new TextRun({ text: `${partyLabel}: ${safeText(partyName, "【Company full name】")}`,
+    children: [new TextRun({ text: `${partyLabel}: ${safeText(partyName, "[Company full name]")}`,
       size: 24, font: { eastAsia: "SimSun", ascii: "Times New Roman" } })]
   });
 
@@ -336,7 +336,7 @@ function partyInfoBlock(partyLabel, partyName, fields) {
           borders: noBorders,
           margins: { top: 40, bottom: 40, left: 60, right: 120 },
           children: [new Paragraph({
-            children: [new TextRun({ text: safeText(value, `【Please fill in: ${label}】`), size: 24,
+            children: [new TextRun({ text: safeText(value, `[Please fill in: ${label}]`), size: 24,
               font: { eastAsia: "SimSun", ascii: "Times New Roman" } })],
           })],
         }),
@@ -348,17 +348,17 @@ function partyInfoBlock(partyLabel, partyName, fields) {
 }
 
 // Usage:
-const partyAChildren = partyInfoBlock("Party A (甲方)", config.partyA?.name, [
-  ["Unified Social Credit Code (统一社会信用代码)", config.partyA?.creditCode],
-  ["Address (地址)", config.partyA?.address],
-  ["Legal Representative (法定代表人/负责人)", config.partyA?.legalRep],
+const partyAChildren = partyInfoBlock("Party A (\u7532\u65b9, "Party A")", config.partyA?.name, [
+  ["Unified Social Credit Code (\u7edf\u4e00\u793e\u4f1a\u4fe1\u7528\u4ee3\u7801)", config.partyA?.creditCode],
+  ["Address (\u5730\u5740)", config.partyA?.address],
+  ["Legal Representative (\u6cd5\u5b9a\u4ee3\u8868\u4eba/\u8d1f\u8d23\u4eba)", config.partyA?.legalRep],
 ]);
 ```
 
 **Rules:**
 1. Party A and Party B info blocks must use the **same table column widths** — labels align across both blocks
 2. Use `safeText()` for all field values — never output `undefined`
-3. Label column width should accommodate the longest label (e.g., "统一社会信用代码")
+3. Label column width should accommodate the longest label (e.g., "Unified Social Credit Code")
 4. The indent (`margins.left: 420`) simulates sub-level nesting under the party name
 
 ---
@@ -373,9 +373,9 @@ Required fields for each party:
 - Contact person
 - Contact information
 - Signing location
-- Date: 【____/____/____】
+- Date: [____/____/____]
 
-Use a borderless 2-column table for symmetry. **Every field value must use `safeText()`** — never output `undefined` or empty string. If a field is not provided, use the appropriate `【Please fill in】` placeholder.
+Use a borderless 2-column table for symmetry. **Every field value must use `safeText()`** — never output `undefined` or empty string. If a field is not provided, use the appropriate `[Please fill in]` placeholder.
 
 ```js
 // ✅ Correct signature block — safeText for all values
@@ -388,10 +388,10 @@ function buildSignatureBlock(partyA, partyB) {
     width: { size: 100, type: WidthType.PERCENTAGE },
     borders: { top: NB, bottom: NB, left: NB, right: NB, insideHorizontal: NB, insideVertical: NB },
     rows: fields.map((label, i) => {
-      const aVal = i === fields.length - 1 ? "【____/____/____】" : safeText(partyA?.[i], "");
-      const bVal = i === fields.length - 1 ? "【____/____/____】" : safeText(partyB?.[i], "");
-      const displayA = i === 0 ? `Party A (甲方): ${aVal}` : `${label}: ${aVal}`;
-      const displayB = i === 0 ? `Party B (乙方): ${bVal}` : `${label}: ${bVal}`;
+      const aVal = i === fields.length - 1 ? "[____/____/____]" : safeText(partyA?.[i], "");
+      const bVal = i === fields.length - 1 ? "[____/____/____]" : safeText(partyB?.[i], "");
+      const displayA = i === 0 ? `Party A (\u7532\u65b9): ${aVal}` : `${label}: ${aVal}`;
+      const displayB = i === 0 ? `Party B (\u4e59\u65b9): ${bVal}` : `${label}: ${bVal}`;
       return new TableRow({
         children: [
           new TableCell({ width: { size: 50, type: WidthType.PERCENTAGE }, borders: noBorders,
@@ -447,7 +447,7 @@ In addition to universal checks (see `references/common-rules.md`):
 - [ ] Transaction closure complete (subject → consideration → performance → acceptance → breach → dispute)
 - [ ] Breach liability corresponds to main obligations
 - [ ] Dispute resolution explicitly stated (or placeholder for confirmation)
-- [ ] All unconfirmed variables use `【】` placeholders consistently
+- [ ] All unconfirmed variables use `[ ]` placeholders consistently
 - [ ] Language is formal, restrained, subjects are explicit
 - [ ] No fabricated statute numbers or overreaching legal conclusions
 - [ ] High-risk clauses include manual review notes

@@ -1,290 +1,290 @@
-# 汉字网格系统 详解
+# Han Glyph Grid System, Explained
 
-中文出版物"模数 → 网格 → 版心"方法论的完整展开。
+The complete unfolding of the "modulus → grid → type area" methodology for Chinese publications.
 
-## 一、核心概念
+## 1. Core concepts
 
-### 模数（Modulus / 倍率 / 系数）
-一个数值，所有版面元素都是它的整数倍。让页面所有空间要素纳入统一比例。
+### Modulus (multiplier / coefficient)
+One value of which every layout element is an integer multiple. It brings all spatial elements of the page into one proportional system.
 
-- **默认推荐：1.5pt**（正文 9pt 体系）
-  - 正文 9pt = 6 × 1.5pt
-  - 图注 6pt = 4 × 1.5pt
-  - 小标题 12pt = 8 × 1.5pt
-  - 行距 18pt = 12 × 1.5pt
-  - 页边距以 9pt = 1 字 为单位
-- **学术/严谨：1pt**（步进更细）
-- **古典精装 / 多体例对齐：0.5pt**（极精细）
-- **不要用 1.618pt / φ 比例做模数**——汉字定宽方格，小数位会让单元格宽算不齐
+- **Default recommendation: 1.5pt** (a 9pt body system)
+  - Body 9pt = 6 × 1.5pt
+  - Captions 6pt = 4 × 1.5pt
+  - Subheads 12pt = 8 × 1.5pt
+  - Line spacing 18pt = 12 × 1.5pt
+  - Margins measured in 9pt = 1 character units
+- **Academic / rigorous: 1pt** (finer steps)
+- **Classical hardcover / multi-template alignment: 0.5pt** (extremely fine)
+- **Never use 1.618pt / the φ ratio as the modulus** — Han glyphs are fixed-width squares; decimal fractions make cell widths impossible to reconcile
 
-模数选择原则：**正文字号能被模数整除**，且模数能产生足够的字号梯度（不超过 12 级）。
+Modulus selection principle: **the body font size must divide evenly by the modulus**, and the modulus must produce a sufficient size gradient (no more than 12 levels).
 
-### 字号体系
-一个项目里所有字号都从同一个表里选。典型 9pt 模数 1.5pt 体系：
+### Font-size system
+All sizes in a project come from one table. A typical 9pt / 1.5pt-modulus system:
 
-| 用途 | 字号 (pt) | 是模数的 ? 倍 |
+| Use | Size (pt) | Modulus multiple |
 |---|---|---|
-| 主标题 / 章首字 | 18–24 | 12–16× |
-| 章标题 | 15 | 10× |
-| 节标题 | 12 | 8× |
-| 正文 | 9 | 6× |
-| 引文 / 副文 | 7.5 | 5× |
-| 注释 / 图注 | 6 | 4× |
-| 页眉 / 页码 | 6 | 4× |
+| Main title / chapter opener | 18–24 | 12–16× |
+| Chapter title | 15 | 10× |
+| Section title | 12 | 8× |
+| Body | 9 | 6× |
+| Quote / secondary text | 7.5 | 5× |
+| Footnote / caption | 6 | 4× |
+| Running head / page number | 6 | 4× |
 
-字号之间的"跳跃"不应小于 1.5×（小于这个差视觉上分不出来）。
+The "jump" between sizes should be at least 1.5× (below that, the difference is visually indistinguishable).
 
-### 中国传统字号体系（号 / 级 / 点对照）
+### Traditional Chinese type-size names (hao / pt / mm correspondence)
 
-| 号 | pt | mm | 用途 |
+| Hao | pt | mm | Use |
 |---|---|---|---|
-| 初号 | 42 | 14.8 | 章首大字、大标题 |
-| 一号 | 27.5–28 | 9.7–9.9 | 海报大标题 |
-| 小一 | 24 | 8.5 | 大标题 |
-| 二号 | 21–22 | 7.4–7.8 | 标题 |
-| 小二 | 18 | 6.3 | 中标 |
-| 三号 | 15.75–16 | 5.6 | **公文正文（GB/T 9704-2012：三号仿宋）** |
-| 四号 | 13.75–14 | 4.9 | 副标题 |
-| 小四 | 12 | 4.2 | 副文 |
-| **五号** | **10.5** | **3.7** | **书籍正文（最常用）** |
-| 小五 | 9 | 3.2 | 报刊正文 / 新五号 |
-| 六号 | 7.875 | 2.8 | 图注 / **正文字号下限** |
-| 七号 | 5.25 | 1.9 | 极小辅助文字 |
+| Chu (initial) | 42 | 14.8 | Chapter-opener display, big titles |
+| No. 1 | 27.5–28 | 9.7–9.9 | Poster display titles |
+| Small 1 | 24 | 8.5 | Display titles |
+| No. 2 | 21–22 | 7.4–7.8 | Titles |
+| Small 2 | 18 | 6.3 | Medium titles |
+| No. 3 | 15.75–16 | 5.6 | **Official document body (GB/T 9704-2012: No. 3 FangSong)** |
+| No. 4 | 13.75–14 | 4.9 | Subtitles |
+| Small 4 | 12 | 4.2 | Secondary text |
+| **No. 5** | **10.5** | **3.7** | **Book body (most common)** |
+| Small 5 | 9 | 3.2 | Newspaper/periodical body ("new small 5") |
+| No. 6 | 7.875 | 2.8 | Captions / **body-size floor** |
+| No. 7 | 5.25 | 1.9 | Tiny auxiliary text |
 
-### 页面与版心
+### Page and type area
 
-**核心公式：开本 = 正文字号 × 整数**
+**Core formula: page format = body font size × integers**
 
-- 例：60 字宽 × 90 字高 × 9pt = **540 × 810pt = 190.5 × 285.75mm**
-- 横纵比 = 2:3（费氏数列里的优美比）
-- 印装预留：横宽各 +6pt，纵高上下各 +9pt → 成品 552 × 828pt
+- Example: 60 chars wide × 90 chars high × 9pt = **540 × 810pt = 190.5 × 285.75mm**
+- Aspect ratio = 2:3 (a graceful Fibonacci ratio)
+- Print/trim allowance: +6pt on width each side, +9pt on height top and bottom → trimmed size 552 × 828pt
 
-其他常用比：1:1 / 2:3 / 3:5 / 5:8 / 8:13（费氏数列）
+Other common ratios: 1:1 / 2:3 / 3:5 / 5:8 / 8:13 (Fibonacci)
 
-## 二、版心标记法
+## 2. Type-area notation
 
-这套记号让任意排版方案能被一行字精确描述。**学会这套记号能让你像建筑师一样思考版面。**
+This notation lets any typesetting scheme be described precisely in one line. **Learning it lets you think about layout like an architect.**
 
-### 横排版心
+### Horizontal type area
 
 ```
 L3 + [ W(9pt × 56) ] + R1 / O2 + { H(9pt × 83) } + U5
 ```
 
-含义：
-| 符号 | 含义 | 单位 |
+Meaning:
+| Symbol | Meaning | Unit |
 |---|---|---|
-| **L** | 订口（内侧）页边距 Left/back margin | 9pt 字数 |
-| **R** | 切口（外侧）页边距 Right/fore-edge | 9pt 字数 |
-| **O** | 天头（顶部）页边距 Top margin | 9pt 字数 |
-| **U** | 地脚（底部）页边距 Bottom margin | 9pt 字数 |
-| **W( )** | 版心宽 Width of type area，方括号 `[ ]` 包裹 | pt × 字数 |
-| **H{ }** | 版心高 Height of type area，花括号 `{ }` 包裹 | pt × 字数 |
+| **L** | Gutter (inner) margin | in 9pt characters |
+| **R** | Fore-edge (outer) margin | in 9pt characters |
+| **O** | Head (top) margin | in 9pt characters |
+| **U** | Foot (bottom) margin | in 9pt characters |
+| **W( )** | Type-area width, wrapped in square brackets `[ ]` | pt × characters |
+| **H{ }** | Type-area height, wrapped in braces `{ }` | pt × characters |
 
-读法：订口空 3 个字、切口空 1 个字、天头空 2 个字、地脚空 5 个字；版心是 9pt × 56 字宽、9pt × 83 行高。
+Reading: gutter 3 characters, fore-edge 1, head 2, foot 5; type area is 9pt × 56 characters wide and 9pt × 83 lines high.
 
-### 直排版心（标记略有不同）
+### Vertical type area (notation differs slightly)
 
-直排时"宽" = 行数 × 字号、"高" = 每行字数 × 字号；订口在**右侧**（左页则在左侧）。
+In vertical writing, "width" = line count × font size and "height" = characters per line × font size; the gutter is on the **right** (left side on left pages).
 
 ```
 O5 + { H(10.5pt × 40) } + U8 / R3 + [ W(10.5pt × 25) ] + L13
                                   ↑                       ↑
-                            订口（右页右侧）         切口（左侧）
+                            gutter (right of right page)     fore-edge (left)
 ```
 
-注意：直排时 L/R 角色调换 —— **L 仍指订口**（左页的左侧、右页的右侧），**R 仍指切口**。
+Note: in vertical writing the L/R roles swap sides — **L still means gutter** (left side of left pages, right side of right pages), **R still means fore-edge**.
 
-### 典型版心方案（34 例精选）
+### Representative type-area schemes (6 selected examples)
 
-页面均为 540×810pt（60×90 字）。
+All pages 540×810pt (60×90 characters).
 
-| 例 | 标记 | 用途 |
+| Ex. | Notation | Use |
 |---|---|---|
-| V_1 | `L3+[W(9×56)]+R1 / O2+{H(9×83)}+U5` | 极致填满，工具书/字典 |
-| V_12 | `L2+[W(9×53)]+R5 / O3+{H(9×79)}+U8` | 文学小说 |
-| V_22 | `L5+[W(9×42)]+R13 / O8+{H(9×61)}+U21` | 大切口、可批注（教材/笔记书） |
-| V_26 | `L5+[W(9×50)]+R5 / O13+{H(9×69)}+U8` | 顶天/对称，画册 |
-| V_31 | `L3+[W(9×54)]+R3 / O5+{H(9×77)}+U8` | 通用学术，最常用 |
-| V_32 | `L3+[W(9×54)]+R3 / O5+{H(9×77)}+U8` | 同上，配多体例 |
+| V_1 | `L3+[W(9×56)]+R1 / O2+{H(9×83)}+U5` | Maximum fill; reference books/dictionaries |
+| V_12 | `L2+[W(9×53)]+R5 / O3+{H(9×79)}+U8` | Literary fiction |
+| V_22 | `L5+[W(9×42)]+R13 / O8+{H(9×61)}+U21` | Wide fore-edge for annotation (textbooks/note-taking books) |
+| V_26 | `L5+[W(9×50)]+R5 / O13+{H(9×69)}+U8` | Full-bleed top / symmetric; art books |
+| V_31 | `L3+[W(9×54)]+R3 / O5+{H(9×77)}+U8` | General academic; the most common |
+| V_32 | `L3+[W(9×54)]+R3 / O5+{H(9×77)}+U8` | Same as above, for multi-template alignment |
 
-**规律**：
-- 几乎都是 L < R 或 L+R 比 O+U 小（视觉重心略偏上）
-- 边距数值都是费氏数列邻项（1, 2, 3, 5, 8, 13, 21）
+**Patterns**:
+- Nearly always L < R, or L+R smaller than O+U (visual center of gravity slightly high)
+- Margin values are neighboring Fibonacci numbers (1, 2, 3, 5, 8, 13, 21)
 
-## 三、分栏（Column）
+## 3. Columns
 
-版心内可再分栏。栏宽和栏间距都是模数整数倍。
+The type area can be subdivided into columns. Column width and column gap are both modulus multiples.
 
-- 1 栏：文学、散文
-- 2 栏：杂志、学术论文、教材
-- 3+ 栏：辞书、目录、新闻、数据手册
-- 栏间距：**2 字宽**（如 9pt × 2 = 18pt）最常用，也可 1 字宽
+- 1 column: literature, essays
+- 2 columns: magazines, academic papers, textbooks
+- 3+ columns: dictionaries, catalogs, news, data handbooks
+- Column gap: **2 characters wide** (e.g. 9pt × 2 = 18pt) is most common; 1 character also works
 
-每栏字数：
-- 1 栏页面：17–40 字（W3C 推荐 17–40，硬上限 48）
-- 2 栏页面：15–22 字
-- 3 栏页面：12–18 字
+Characters per column:
+- 1-column page: 17–40 characters (W3C recommends 17–40, hard cap 48)
+- 2-column page: 15–22 characters
+- 3-column page: 12–18 characters
 
-## 四、为不同媒介换算模数
+## 4. Converting the modulus across media
 
-### 屏幕 / 网页
-- 正文 16px → 模数 4px（16/4=4，太粗时取 2px）
-- 字号梯度：12 / 14 / 16 / 20 / 24 / 32 / 48 / 64 px（都是 4 的倍数 + 偶数和谐）
-- max-width：`30em` ≈ 480px @ 16px
-- line-height：1.5–1.7
+### Screen / web
+- Body 16px → modulus 4px (16/4=4; use 2px if too coarse)
+- Size gradient: 12 / 14 / 16 / 20 / 24 / 32 / 48 / 64 px (all multiples of 4 + even-number harmony)
+- max-width: `30em` ≈ 480px @ 16px
+- line-height: 1.5–1.7
 
 ### PowerPoint / Keynote
-- 4:3 画布 1024×768 → 用 64px 模数，16×12 格
-- 16:9 画布 1920×1080 → 用 60px 模数，32×18 格
-- 标题 40–60pt，正文 24–32pt，注释 14–18pt
+- 4:3 canvas 1024×768 → 64px modulus, 16×12 grid
+- 16:9 canvas 1920×1080 → 60px modulus, 32×18 grid
+- Titles 40–60pt, body 24–32pt, notes 14–18pt
 
-### H5 / 移动 (375pt 设计稿)
-- 模数 4pt，正文 14–16pt
-- 行长建议 ≤ 18 字（375pt 宽减边距后 ~ 311pt / 18pt 字宽 = 17 字）
+### H5 / mobile (375pt design canvas)
+- Modulus 4pt, body 14–16pt
+- Line length ≤ 18 characters recommended (375pt minus margins ≈ 311pt / 18pt glyph width = 17 characters)
 
-### 印刷书籍
-- 32 开 (140×210mm) → 正文 9–10pt
-- 16 开 (185×260mm) → 正文 9.5–11pt
-- 8 开/画册 → 正文可 10–12pt（视距更远）
+### Printed books
+- 32mo (140×210mm) → body 9–10pt
+- 16mo (185×260mm) → body 9.5–11pt
+- 8mo / art books → body may go 10–12pt (longer viewing distance)
 
-## 五、网格七要点
+## 5. The seven essentials of the grid
 
-整套方法论最精炼的归纳：
+The most condensed summary of the methodology:
 
-1. **从哪里开始？** 从一个字开始，更确切是从组成这个字的模数开始。"汉字一字即一格"，1:1 是费氏数列黄金比第一项。
-2. **页面尺寸 = 正文字号的整数倍**。如 60 字 × 90 字。
-3. **页面尺寸 = 模数字号的整数倍**。1.5pt 模数下 540×810pt = 194,400 个单元格。
-4. **由 1 到 ∞**：5400 个单元格可以选 1 字、2 字、N 字组合出页边距和版心；天头/订口/地脚/切口可按费氏比例（1:2:3:5）任选。
-5. **感觉是设计的核心**：网格作为工具不能在感觉上提供帮助。"美比严格按网格排列重要"。
-6. **用相同模数设计不同字号**：不同字号之间的比例关系来自共同模数。
-7. **用模数设计行间距**：行间距必须是模数整数倍。同模数下，不同字号、不同行距的文本能行对齐（多语种对照、多体例对照）。
+1. **Where to start?** Start from one character — more precisely, from the modulus that composes it. "One Han glyph = one cell"; 1:1 is the first term of the Fibonacci golden sequence.
+2. **Page size = integer multiple of body font size.** E.g. 60 × 90 characters.
+3. **Page size = integer multiple of the modulus size.** Under a 1.5pt modulus, 540×810pt = 194,400 cells.
+4. **From 1 to ∞**: 5,400 cells can be grouped into 1-char, 2-char, or N-char combinations for margins and type area; head/gutter/foot/fore-edge can follow Fibonacci ratios (1:2:3:5) freely.
+5. **Feel is the core of design**: the grid, as a tool, cannot supply feel. "Beauty matters more than strictly obeying the grid."
+6. **Design different sizes with the same modulus**: the proportional relations between sizes come from the shared modulus.
+7. **Design line spacing with the modulus**: line spacing must be a modulus multiple. Under one modulus, text with different sizes and line spacings can still align line to line (multilingual or multi-template facing).
 
-## 六、网格的实操规则（中文特有）
+## 6. Practical grid rules (specific to Chinese)
 
-中文网格不只是"框文本"，必须细到行内字格；用 `em`/`rem` 表达一切尺寸，不用 px/mm。
+A Chinese grid is not just "a frame around text" — it must go down to in-line character cells; express every dimension in `em`/`rem`, not px/mm.
 
-### 6.1 工作流：先字号定版心，再余出边距
+### 6.1 Workflow: fix the type area from font size first, then derive margins
 
-中文工作流是"先版心、后边距"，**不是西式"先边距、再版心"**：
+The Chinese workflow is "type area first, margins after", **not the Western "margins first, type area is what's left"**:
 
 ```
-1. 定字号（如 9pt）
-2. 定每行字数（如 30 字）
-3. 行长 = 字号 × 字数（9 × 30 = 270pt）
-4. 定每页行数（如 28 行）
-5. 定行距（如 18pt）
-6. 版心高 = (28-1) × 18 + 9 = 495pt
-7. 开本尺寸 - 版心 = 余白
-8. 按 3:5:8:13 分配 L/R/O/U（左/右/外/内）
+1. Fix the font size (e.g. 9pt)
+2. Fix characters per line (e.g. 30)
+3. Line length = font size × characters (9 × 30 = 270pt)
+4. Fix lines per page (e.g. 28)
+5. Fix line spacing (e.g. 18pt)
+6. Type-area height = (28-1) × 18 + 9 = 495pt
+7. Page size − type area = whitespace
+8. Allocate L/R/O/U by 3:5:8:13 (left/right/outer/inner)
 ```
 
-### 6.2 一切以"占字/占行"度量
+### 6.2 Measure everything in "characters occupied / lines occupied"
 
-| 元素 | 度量方式 |
+| Element | Measurement |
 |---|---|
-| 首行缩进（书籍/公文/古典长文） | `text-indent: 2em` |
-| 网页/卡片/UI 段落 | 通常不用首行缩进，顶格 |
-| 栏间距 | 占 2 个字宽 |
-| 一级标题占行 | 4–5 行（正文行高倍数） |
-| 二级标题占行 | 2–3 行 |
-| 三级标题占行 | 1–2 行 |
-| 双行题目占行 | 3 行 |
-| 人名/花名册 | 每名占 3 格，2 字名后补 1 格空 |
+| First-line indent (books/official documents/classical long-form) | `text-indent: 2em` |
+| Web/card/UI paragraphs | Usually no first-line indent; flush left |
+| Column gap | 2 characters wide |
+| Level-1 title line occupation | 4–5 lines (multiples of body line height) |
+| Level-2 title | 2–3 lines |
+| Level-3 title | 1–2 lines |
+| Two-part title | 3 lines |
+| Name lists | Each name takes 3 cells; 2-character names get 1 trailing blank cell |
 
-所有标题占行**必须是正文行高的整数倍**——这是"对行"的基本要求。
+Every title's line occupation **must be an integer multiple of the body line height** — this is the basic requirement of "lining up to lines".
 
-### 6.3 行内字格也要管
+### 6.3 Manage in-line character cells too
 
-奇数个对开（半宽）标点产生半格余量时，两种做法（无绝对对错，但要清楚妥协方向）：
+When an odd number of half-width punctuation marks leaves a half-cell remainder, two approaches (no absolute right or wrong, but know which compromise you chose):
 
-- **活字做法**：把半格余量加给那个标点 → 标点变全宽，行仍对齐网格
-- **数码常用**：把半格均摊到全行字距 → 标点不变但整行偏离网格
+- **Metal-type approach**: give the half-cell remainder to that punctuation mark → the mark becomes fullwidth, the line stays grid-aligned
+- **Digital default**: distribute the half cell across the whole line's tracking → the mark is unchanged but the whole line drifts off the grid
 
-### 6.4 严格网格之外允许"破格"
+### 6.4 "Breaking the grid" is allowed beyond the strict grid
 
-在网格内偶尔破格能让作品有上限突破，但**先有下限再谈上限**：
+Occasionally breaking the grid can lift work past its ceiling, but **establish the floor before discussing the ceiling**:
 
-- 一张大图越出版心
-- 一行标题挑出栏
-- 段落里有意留出局部空白
-- 用同字号的空行/缩进区分体例（不靠加粗或换字体）
+- One large image crossing out of the type area
+- One title line reaching out of its column
+- Deliberate local whitespace inside a paragraph
+- Distinguishing templates with blank lines/indents at the same size (not via bold or font changes)
 
-### 6.5 优先级：先功能，再形式对齐
+### 6.5 Priority: function first, formal alignment second
 
-"全标点全宽 + 不避头尾 + 数字字母全角"虽能纵横绝对对齐，但牺牲易读性。**先做完下面这些，再考虑形式对齐**：
+"Fullwidth everything + no kinsoku + fullwidth digits/letters" achieves absolute alignment both ways but sacrifices readability. **Do all of the following first; consider formal alignment after**:
 
-- 标点宽度调整（见 `punctuation.md`）
-- 避头尾（见 `punctuation.md § 四`）
-- 换行控制（见 `title-and-breaking.md`）
-- 正字法选择（汉字数字 vs 阿拉伯数字、中西混排策略）
+- Punctuation width adjustment (see `punctuation.md`)
+- Kinsoku (see `punctuation.md §4`)
+- Line-break control (see `title-and-breaking.md`)
+- Orthography choices (Chinese numerals vs Arabic numerals; Chinese-Western mixing strategy)
 
-"为形式牺牲功能"是错。
+"Sacrificing function for form" is wrong.
 
-## 七、W3C CLReq 关键数值速查表
+## 7. W3C CLReq key-value quick reference
 
-把 W3C《中文排版需求》里散落的硬数值集中在一起，方便查。
+The hard numbers scattered through the W3C "Requirements for Chinese Text Layout", gathered for lookup.
 
-### 字号 / 行长 / 行距
+### Font size / line length / line spacing
 
-| 项目 | 最小 | 推荐 | 最大 |
+| Item | Minimum | Recommended | Maximum |
 |---|---|---|---|
-| 正文字号 | 6 号 (7.875pt ≈ 2.8mm) | 五号 10.5pt / 小五 9pt | — |
-| 行长（每行字数）| ≥ 10 字 | 17–40 字 | 横排 ≤ 48 字 / 直排 ≤ 55 字 |
-| 行距（字号比例）| 50% 字号 | 50–100% 字号 | 100% 字号（超出不增易读性）|
-| 行高（含字本身）| 1.5 × 字号 | 1.5–2 × 字号 | 2 × 字号 |
-| 段首缩进 | — | 仅在书籍/公文/古典长文等模板指定时使用；常见 2em，短栏可 1em | — |
-| 直排带注音行距 | ≥ 1.5 × 基字 | — | — |
-| 行间标点单面装行距 | ≥ 1/2 字号 | — | — |
-| 行间标点双面装行距 | ≥ 5/8 字号 | — | — |
+| Body font size | No. 6 (7.875pt ≈ 2.8mm) | No. 5 10.5pt / Small-5 9pt | — |
+| Line length (characters per line) | ≥ 10 | 17–40 | Horizontal ≤ 48 / vertical ≤ 55 |
+| Line spacing (as font-size ratio) | 50% of size | 50–100% | 100% (beyond adds no readability) |
+| Line height (including the glyph) | 1.5 × size | 1.5–2 × size | 2 × size |
+| First-line indent | — | Only when a template like books/official documents/classical long-form specifies it; commonly 2em, short columns 1em | — |
+| Vertical line spacing with ruby | ≥ 1.5 × base glyph | — | — |
+| Interline punctuation, single-sided binding | ≥ 1/2 font size | — | — |
+| Interline punctuation, double-sided binding | ≥ 5/8 font size | — | — |
 
-### 中西混排间距
+### Chinese-Western mixing spacing
 
-| 间距 | 最小 | 默认 | 最大 |
+| Spacing | Minimum | Default | Maximum |
 |---|---|---|---|
-| 中西文之间 | 1/8 em | 1/4 em | 1/2 em |
-| 西文词距 | 1/4 em | 1/3 em | 1/2 em |
-| 行末标点 | 半字宽 | 半字宽 | 半字宽（固定） |
+| Between Chinese and Western | 1/8 em | 1/4 em | 1/2 em |
+| Western word spacing | 1/4 em | 1/3 em | 1/2 em |
+| End-of-line punctuation | Half character width | Half | Half (fixed) |
 
-### 注音与拼音字号比例
+### Ruby/annotation size ratios
 
-| 注法 | 注文字号 | 行距加成 |
+| Method | Annotation size | Line-spacing bonus |
 |---|---|---|
-| 注音符号（Bopomofo） | 基字的 30% | 行距 ≥ 1.5 × 基字 |
-| 汉语拼音 | 基字的 50% | 同上 |
-| 轻声符（注音） | 基字的 1/15 | — |
+| Bopomofo | 30% of base glyph | line spacing ≥ 1.5 × base glyph |
+| Hanyu Pinyin | 50% of base glyph | Same as above |
+| Neutral-tone mark (Bopomofo) | 1/15 of base glyph | — |
 
-### 标题占行
+### Title line occupation
 
-| 标题层级 | 占行 | 字号（正文 9pt 时） |
+| Title level | Lines | Size (with 9pt body) |
 |---|---|---|
-| 大标题（章首） | 4–5 行 | 18–24pt |
-| 中标题（节首） | 2–3 行 | 12–15pt |
-| 小标题 | 1–2 行 | 10–12pt |
-| 双行标题 | 3 行 | 主 12pt + 副 9pt |
-| 同行标题 | 1 行（接续正文）| 9pt 加粗 |
+| Major title (chapter opener) | 4–5 | 18–24pt |
+| Medium title (section opener) | 2–3 | 12–15pt |
+| Minor title | 1–2 | 10–12pt |
+| Two-part title | 3 | Main 12pt + sub 9pt |
+| Run-in title | 1 line (continues into body) | 9pt bold |
 
-### 连续标点宽度
+### Consecutive punctuation width
 
-| 状态 | 宽度 |
+| State | Width |
 |---|---|
-| 任意两个相邻标点共 | 2 字（未挤压） |
-| 应缩到 | **1.5 字宽** |
-| 可进一步缩到 | 1 字宽 |
+| Any two adjacent punctuation marks together | 2 characters (unsqueezed) |
+| Should shrink to | **1.5 characters** |
+| Can further shrink to | 1 character |
 
-## 八、横排 / 直排版心的方向差异
+## 8. Horizontal / vertical type-area orientation differences
 
-不同方向下版心的"行 / 列"含义对调：
+Under different directions, the "row / column" meanings of the type area swap:
 
-| 概念 | 横排 | 直排 |
+| Concept | Horizontal | Vertical |
 |---|---|---|
-| 一行 | 水平一行字 | 垂直一行字 |
-| 行长 | 水平宽度 | 垂直高度 |
-| 每页行数 | 垂直堆叠多少行 | 水平排列多少行 |
-| 行间距 | 上下两行之间 | 左右两行之间 |
-| 版心宽 W | 横向尺寸 | 横向尺寸（= 行数 × 字号）|
-| 版心高 H | 纵向尺寸 | 纵向尺寸（= 每行字数 × 字号）|
-| 订口 L | 左侧（右页）/ 右侧（左页）| 右侧（右页）/ 左侧（左页）|
-| 切口 R | 右侧（右页）/ 左侧（左页）| 左侧（右页）/ 右侧（左页）|
+| One line | A horizontal run of characters | A vertical run of characters |
+| Line length | Horizontal width | Vertical height |
+| Lines per page | How many lines stack vertically | How many lines array horizontally |
+| Line spacing | Between two lines above/below | Between two lines left/right |
+| Type-area width W | Horizontal dimension | Horizontal dimension (= line count × font size) |
+| Type-area height H | Vertical dimension | Vertical dimension (= characters per line × font size) |
+| Gutter L | Left (right page) / right (left page) | Right (right page) / left (left page) |
+| Fore-edge R | Right (right page) / left (left page) | Left (right page) / right (left page) |
 
-详见 `directions.md`。
+See `directions.md` for details.

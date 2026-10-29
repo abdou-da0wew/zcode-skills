@@ -1,131 +1,131 @@
 ---
 name: interview-prep
-description: 帮用户准备面试。基于目标 JD、公司、岗位方向，生成"高频面试题 + 参考回答 + 行为面 / 技术面 / Case 面分类题库"，并产出可打印的『面试备战手册』。当用户说"帮我准备面试""明天有面试 / 后天面试""面试题""面经""模拟面试""我要面 X 公司 Y 岗位""帮我准备 STAR 故事""怎么回答这道面试题""自我介绍 / 离职原因 / 优缺点 怎么答"，必须触发本 skill。请勿用本 skill 改简历（去 jd-resume-tailor / resume-builder）或推荐方向（去 job-intent-tracker）。
+description: Helps the user prepare for interviews. Based on the target JD, company, and role direction, generates "high-frequency interview questions + reference answers + a question bank categorized into behavioral / technical / case / role-specific", and produces a printable "Interview Prep Handbook". Trigger this skill whenever the user says "help me prepare for an interview", "I have an interview tomorrow / the day after", "interview questions", "interview experiences", "mock interview", "I'm interviewing at company X for role Y", "help me build my STAR stories", "how do I answer this interview question", or "how should I introduce myself / explain why I'm leaving / talk about strengths and weaknesses". Do NOT use this skill to edit resumes (use jd-resume-tailor / resume-builder) or to recommend career directions (use job-intent-tracker).
 ---
 
-# Interview Prep（面试准备）
+# Interview Prep
 
-干 4 件事：
+It does 4 things:
 
-1. **拆解面试场景**：明确目标公司 / 岗位 / 面试轮次（一面 / 二面 / 终面 / HR 面）
-2. **生成题库**：从 4 类题库（行为面、技术面、Case 面、岗位特定）中按需取题
-3. **生成参考回答**：用 STAR / SCQA / MECE 等框架，结合用户简历事实
-4. **产出"备战手册"**：一份可打印的 .md / .docx / .pdf，含题目 + 参考思路 + 自检清单
-
----
-
-## 何时触发
-
-强信号：
-- "帮我准备面试 / 模拟面试 / 模面"
-- "明天 / 下周面试"
-- 提到了具体公司 + 岗位
-- "高频面试题 / 经典面试题"
-- "怎么回答 ___ 这个问题"
-- "自我介绍怎么说 / 离职原因怎么答 / 期望薪资怎么谈"
-
-弱信号（先确认）：
-- 只说"想了解一下面试" → 问是哪个方向 / 什么轮次
+1. **Break down the interview scenario**: identify the target company / role / interview round (first round / second round / final round / HR round)
+2. **Generate a question bank**: pull questions on demand from 4 categories (behavioral, technical, case, role-specific)
+3. **Generate reference answers**: use frameworks such as STAR / SCQA / MECE, grounded in the facts from the user's resume
+4. **Produce a "prep handbook"**: a printable .md / .docx / .pdf containing questions + reference approaches + a self-check list
 
 ---
 
-## 工作流
+## When to Trigger
 
-### Step 1: 锁定面试场景
+Strong signals:
+- "Help me prepare for an interview / mock interview"
+- "Interview tomorrow / next week"
+- Mentions a specific company + role
+- "High-frequency interview questions / classic interview questions"
+- "How do I answer ___?"
+- "How should I introduce myself / explain why I'm leaving / negotiate expected salary?"
 
-用 AskUserQuestion 收集：
-- 目标公司（具体名字 / 大厂 vs 创业 vs 外资 / 公司类型）
-- 目标岗位（精确到方向，如"用户增长 PM"而不是"产品经理"）
-- 面试轮次（一面 / 二面 / 终面 / HR 面 / 全流程演练）
-- 时间紧迫度（明天 / 这周 / 下周以上）—— 影响"广度 vs 深度"
-- 用户已有材料（JD / 简历 / 公司公开信息 / 已知面试官背景）
+Weak signals (confirm first):
+- Only says "I want to learn about interviewing" → ask which direction / which round
 
-如果用户给了 JD 和简历，**先调用 jd-resume-tailor 的 parse_jd.py** 抽出岗位关键信息，避免重复拆。
+---
 
-### Step 2: 选题策略
+## Workflow
 
-按"轮次 + 方向 + 时间"决定题库结构。读取对应文件：
+### Step 1: Lock Down the Interview Scenario
 
-- 行为面（任何轮次都会问）→ `references/behavioral.md`
-- 技术面（技术 / 数据岗主战场）→ `references/technical.md`
-- Case 面（咨询 / 战略 / 高级 PM）→ `references/case.md`
-- HR 面（任何岗位的最后一公里）→ `references/hr_round.md`
-- 岗位特定题库：
-  - 互联网产品 / 运营 / PM → `references/role_internet.md`
-  - 技术 / 研发 / 数据 → `references/role_tech.md`
-  - 金融 / 咨询 / 商科 → `references/role_finance.md`
+Use AskUserQuestion to collect:
+- Target company (specific name / big tech vs. startup vs. foreign company / company type)
+- Target role (precise to the direction, e.g. "user-growth PM" rather than "product manager")
+- Interview round (first / second / final / HR round / full-loop rehearsal)
+- Time pressure (tomorrow / this week / next week or later) — affects "breadth vs. depth"
+- Materials the user already has (JD / resume / public company info / known interviewer background)
 
-题量推荐：
-- **明天就面**：每类 5~8 题，重点高频题
-- **3~7 天**：每类 10~15 题
-- **>1 周**：完整覆盖 + 模拟轮次
+If the user provided a JD and a resume, **call jd-resume-tailor's parse_jd.py first** to extract the key job requirements and avoid parsing them twice.
 
-### Step 3: 生成参考回答
+### Step 2: Question Selection Strategy
 
-**关键原则：参考回答必须基于用户简历里的真实经历，不是泛答。**
+Decide the question-bank structure by "round + direction + time available". Read the corresponding files:
 
-调用 `scripts/star_story_builder.py`（如果有简历）：
+- Behavioral (asked in every round) → `references/behavioral.md`
+- Technical (main battlefield for engineering / data roles) → `references/technical.md`
+- Case (consulting / strategy / senior PM) → `references/case.md`
+- HR round (the last mile for any role) → `references/hr_round.md`
+- Role-specific question banks:
+  - Internet product / operations / PM → `references/role_internet.md`
+  - Engineering / R&D / data → `references/role_tech.md`
+  - Finance / consulting / business → `references/role_finance.md`
+
+Recommended question volume:
+- **Interviewing tomorrow**: 5-8 questions per category, focused on high-frequency ones
+- **3-7 days out**: 10-15 questions per category
+- **More than 1 week**: full coverage + mock rounds
+
+### Step 3: Generate Reference Answers
+
+**Key principle: reference answers must be based on the user's real experiences from the resume, not generic boilerplate.**
+
+Call `scripts/star_story_builder.py` (if a resume is available):
 
 ```bash
 python scripts/star_story_builder.py --resume resume.md \
     --questions questions.json --out answers.md
 ```
 
-或者，如果没有简历，用通用回答框架（从 references/answer_frameworks.md 读取）作为模板，让用户填空。
+Or, if there is no resume, use the generic answer frameworks (read from references/answer_frameworks.md) as templates and let the user fill in the blanks.
 
-参考回答的格式：
+Format of a reference answer:
 ```
-【题目】___
-【考察点】HR / 面试官想看你的什么能力
-【回答框架】STAR / SCQA / MECE / 5W1H 之一
-【建议长度】X 分钟（一般 1.5~3 分钟）
-【参考回答 (基于你简历里的 ___ 经历)】
-  S: 当时的背景 / 问题
-  T: 你的任务 / 目标
-  A: 你的具体动作（重点，要细节）
-  R: 量化结果 + reflect
-【可能的追问】1. ___ 2. ___ 3. ___
-```
-
-### Step 4: 产出"备战手册"
-
-调用 docx skill 生成一份完整的 `interview_prep_<公司>_<岗位>.docx`，结构：
-
-```
-封面：公司 + 岗位 + 面试日期 + 倒计时
-1. 公司 / 岗位 速览（1 页）
-2. 自我介绍（中 + 英两版，针对该岗位定制）
-3. 行为面题库（X 题）+ 参考回答
-4. 技术面 / Case 面 题库（X 题）+ 参考思路
-5. 反向提问清单（你向面试官问什么）
-6. 薪资谈判脚本
-7. 面试当天 Checklist（路线 / 着装 / 物品 / 心态）
+[Question] ___
+[What It Tests] What ability the HR / interviewer is looking for
+[Answer Framework] One of STAR / SCQA / MECE / 5W1H
+[Suggested Length] X minutes (usually 1.5-3 minutes)
+[Reference Answer (based on your ___ experience in the resume)]
+  S: The context / problem at the time
+  T: Your task / goal
+  A: Your specific actions (the highlight — include details)
+  R: Quantified results + reflection
+[Likely Follow-ups] 1. ___ 2. ___ 3. ___
 ```
 
-**同时输出一份精简版 .md**，方便用户在地铁里 / 路上 review。
+### Step 4: Produce the "Prep Handbook"
 
-### Step 5: 模拟面试（可选 - 用户主动要才做）
+Call the docx skill to generate a complete `interview_prep_<company>_<role>.docx` with this structure:
 
-如果用户说"模拟一下"，进入互动模式：
-- 一次问 1 题
-- 等用户回答（语音 / 文字）
-- 给反馈：内容 / 结构 / 表达 三维度
-- 如果用户说"换一题"或"再来一道难的"，继续
+```
+Cover: company + role + interview date + countdown
+1. Company / role quick brief (1 page)
+2. Self-introduction (both Chinese and English versions, tailored to the role)
+3. Behavioral question bank (X questions) + reference answers
+4. Technical / Case question bank (X questions) + reference approaches
+5. Questions-to-ask list (what you ask the interviewer)
+6. Salary negotiation script
+7. Interview-day checklist (route / dress / items / mindset)
+```
 
-模拟时**保持面试官人设**：用真实面试官的口吻、追问方式、压力点（但不要变成 attacker，要 constructive）。
+**Also output a condensed .md version** so the user can review it on the subway / on the way.
+
+### Step 5: Mock Interview (optional - only when the user explicitly asks)
+
+If the user says "let's do a mock", enter interactive mode:
+- Ask 1 question at a time
+- Wait for the user's answer (voice / text)
+- Give feedback across 3 dimensions: content / structure / delivery
+- If the user says "next question" or "give me a harder one", continue
+
+During the mock, **stay in the interviewer persona**: use a real interviewer's tone, follow-up style, and pressure points (but do not become an attacker — stay constructive).
 
 ---
 
-## 反模式（不要做）
+## Anti-patterns (do not do)
 
-- ❌ 给一份"通用 50 题"应付了事 → 必须按公司 / 岗位定制
-- ❌ 参考回答全是"我具有出色的沟通能力"这种空话 → 必须用具体故事
-- ❌ 不让用户自己练，全程"我替你答" → 错过模拟价值
-- ❌ 编造用户没有的经历做 STAR 故事 → 用户面试时会穿帮
-- ❌ HR 面问题答得太"训练痕迹重"（机械化） → 要给"3 个不同风格的版本"让用户选
+- ❌ Handing over a generic "50 questions" list to get it over with → must customize by company / role
+- ❌ Reference answers full of empty phrases like "I have excellent communication skills" → must use concrete stories
+- ❌ Never letting the user practice, answering everything for them → misses the value of rehearsal
+- ❌ Fabricating experiences the user doesn't have for STAR stories → the user will get exposed in the interview
+- ❌ HR-round answers that sound too "coached" (mechanical) → provide "3 versions in different styles" for the user to choose from
 
-## 与其他 skill 的协作
+## Collaboration with Other Skills
 
-- 用户说"我简历不够强，先改简历再来面试" → 转 `jd-resume-tailor` 或 `resume-builder`
-- 用户说"我还在犹豫要不要投" → 转 `job-intent-tracker`
-- 面试结束后用户说"我想复盘一下" → 留在本 skill，进入"面试复盘模式"，问表现、卡点、追问，帮用户为下一轮做准备
+- User says "my resume isn't strong enough, fix the resume first" → hand off to `jd-resume-tailor` or `resume-builder`
+- User says "I'm still unsure whether to apply" → hand off to `job-intent-tracker`
+- After the interview the user says "I want to review how it went" → stay in this skill, enter "interview debrief mode": ask about performance, sticking points, follow-ups, and help the user prepare for the next round

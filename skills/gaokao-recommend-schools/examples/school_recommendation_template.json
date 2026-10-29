@@ -1,12 +1,12 @@
 {
-  "school_strategy": "院校布局策略：冲/稳/保如何分配、重点院校举例（可用 <strong>）",
+  "school_strategy": "University-tier layout strategy: how reach/match/safety are allocated, with example key universities (may use <strong>)",
   "recommended_schools": [
     {
-      "university_name": "必须与 parsed.json 完全一致",
-      "university_code": "必须与 parsed.json 完全一致",
+      "university_name": "must exactly match parsed.json",
+      "university_code": "must exactly match parsed.json",
       "modal": {
-        "title": "学校推荐原因：院校名称",
-        "body": "<h4>推荐原因</h4><ul><li><strong>地域优势：</strong>...</li><li><strong>院校层次：</strong>...</li><li><strong>专业契合：</strong>与 major_recommendation 的关联</li><li><strong>录取性价比：</strong>...</li></ul>"
+        "title": "Why this university is recommended: <university name>",
+        "body": "<h4>Reasons for recommendation</h4><ul><li><strong>Location advantage:</strong>...</li><li><strong>University tier:</strong>...</li><li><strong>Major fit:</strong>the connection with major_recommendation</li><li><strong>Admission value:</strong>...</li></ul>"
       }
     }
   ]

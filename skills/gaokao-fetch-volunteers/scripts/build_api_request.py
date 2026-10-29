@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""从 student.json 构建 API 请求体，将考生倾向映射到选填参数。"""
+"""Build the API request body from student.json, mapping student preferences to
+optional API parameters.
+
+NOTE: city/province/tag/major-class values below are the gaokao API's Chinese string
+values, written as \\uXXXX escapes (Python decodes them identically) so this source
+stays ASCII.
+"""
 
 from __future__ import annotations
 
@@ -9,48 +15,59 @@ import sys
 from pathlib import Path
 from typing import Any
 
-# 意向城市 → API provinces（省份意向）
+# Preferred city -> API provinces value (province preference). Keys and values are the
+# API's Chinese names, unicode-escaped. Romanized: Beijing->Beijing (municipality),
+# Shanghai->Shanghai, Tianjin->Tianjin, Chongqing->Chongqing, Shenzhen->Guangdong,
+# Guangzhou->Guangdong, Dongguan->Guangdong, Foshan->Guangdong, Wuhan->Hubei,
+# Chengdu->Sichuan, Hangzhou->Zhejiang, Ningbo->Zhejiang, Nanjing->Jiangsu,
+# Suzhou->Jiangsu, Wuxi->Jiangsu, Xi'an->Shaanxi, Changsha->Hunan, Zhengzhou->Henan,
+# Jinan->Shandong, Qingdao->Shandong, Hefei->Anhui, Xiamen->Fujian, Fuzhou->Fujian,
+# Dalian->Liaoning, Shenyang->Liaoning, Harbin->Heilongjiang, Changchun->Jilin,
+# Kunming->Yunnan, Nanning->Guangxi, Haikou->Hainan, Shijiazhuang->Hebei,
+# Taiyuan->Shanxi, Nanchang->Jiangxi, Lanzhou->Gansu, Guiyang->Guizhou,
+# Hohhot->Inner Mongolia, Urumqi->Xinjiang, Yinchuan->Ningxia, Xining->Qinghai,
+# Lhasa->Tibet.
 CITY_TO_PROVINCE: dict[str, str] = {
-    "北京": "北京",
-    "上海": "上海",
-    "天津": "天津",
-    "重庆": "重庆",
-    "深圳": "广东",
-    "广州": "广东",
-    "东莞": "广东",
-    "佛山": "广东",
-    "武汉": "湖北",
-    "成都": "四川",
-    "杭州": "浙江",
-    "宁波": "浙江",
-    "南京": "江苏",
-    "苏州": "江苏",
-    "无锡": "江苏",
-    "西安": "陕西",
-    "长沙": "湖南",
-    "郑州": "河南",
-    "济南": "山东",
-    "青岛": "山东",
-    "合肥": "安徽",
-    "厦门": "福建",
-    "福州": "福建",
-    "大连": "辽宁",
-    "沈阳": "辽宁",
-    "哈尔滨": "黑龙江",
-    "长春": "吉林",
-    "昆明": "云南",
-    "南宁": "广西",
-    "海口": "海南",
-    "石家庄": "河北",
-    "太原": "山西",
-    "南昌": "江西",
-    "兰州": "甘肃",
-    "贵阳": "贵州",
-    "呼和浩特": "内蒙古",
-    "乌鲁木齐": "新疆",
-    "银川": "宁夏",
-    "西宁": "青海",
-    "拉萨": "西藏",
+    "\u5317\u4eac": "\u5317\u4eac",  # Beijing
+    "\u4e0a\u6d77": "\u4e0a\u6d77",  # Shanghai
+    "\u5929\u6d25": "\u5929\u6d25",  # Tianjin
+    "\u91cd\u5e86": "\u91cd\u5e86",  # Chongqing
+    "\u6df1\u5733": "\u5e7f\u4e1c",  # Shenzhen -> Guangdong
+    "\u5e7f\u5dde": "\u5e7f\u4e1c",  # Guangzhou -> Guangdong
+    "\u4e1c\u839e": "\u5e7f\u4e1c",  # Dongguan -> Guangdong
+    "\u4f5b\u5c71": "\u5e7f\u4e1c",  # Foshan -> Guangdong
+    "\u6b66\u6c49": "\u6e56\u5317",  # Wuhan -> Hubei
+    "\u6210\u90fd": "\u56db\u5ddd",  # Chengdu -> Sichuan
+    "\u676d\u5dde": "\u6d59\u6c5f",  # Hangzhou -> Zhejiang
+    "\u5b81\u6ce2": "\u6d59\u6c5f",  # Ningbo -> Zhejiang
+    "\u5357\u4eac": "\u6c5f\u82cf",  # Nanjing -> Jiangsu
+    "\u82cf\u5dde": "\u6c5f\u82cf",  # Suzhou -> Jiangsu
+    "\u65e0\u9521": "\u6c5f\u82cf",  # Wuxi -> Jiangsu
+    "\u897f\u5b89": "\u9655\u897f",  # Xi'an -> Shaanxi
+    "\u957f\u6c99": "\u6e56\u5357",  # Changsha -> Hunan
+    "\u90d1\u5dde": "\u6cb3\u5357",  # Zhengzhou -> Henan
+    "\u6d4e\u5357": "\u5c71\u4e1c",  # Jinan -> Shandong
+    "\u9752\u5c9b": "\u5c71\u4e1c",  # Qingdao -> Shandong
+    "\u5408\u80a5": "\u5b89\u5fbd",  # Hefei -> Anhui
+    "\u53a6\u95e8": "\u798f\u5efa",  # Xiamen -> Fujian
+    "\u798f\u5dde": "\u798f\u5efa",  # Fuzhou -> Fujian
+    "\u5927\u8fde": "\u8fbd\u5b81",  # Dalian -> Liaoning
+    "\u6c88\u9633": "\u8fbd\u5b81",  # Shenyang -> Liaoning
+    "\u54c8\u5c14\u6ee8": "\u9ed1\u9f99\u6c5f",  # Harbin -> Heilongjiang
+    "\u957f\u6625": "\u5409\u6797",  # Changchun -> Jilin
+    "\u6606\u660e": "\u4e91\u5357",  # Kunming -> Yunnan
+    "\u5357\u5b81": "\u5e7f\u897f",  # Nanning -> Guangxi
+    "\u6d77\u53e3": "\u6d77\u5357",  # Haikou -> Hainan
+    "\u77f3\u5bb6\u5e84": "\u6cb3\u5317",  # Shijiazhuang -> Hebei
+    "\u592a\u539f": "\u5c71\u897f",  # Taiyuan -> Shanxi
+    "\u5357\u660c": "\u6c5f\u897f",  # Nanchang -> Jiangxi
+    "\u5170\u5dde": "\u7518\u8083",  # Lanzhou -> Gansu
+    "\u8d35\u9633": "\u8d35\u5dde",  # Guiyang -> Guizhou
+    "\u547c\u548c\u6d69\u7279": "\u5185\u8499\u53e4",  # Hohhot -> Inner Mongolia
+    "\u4e4c\u9c81\u6728\u9f50": "\u65b0\u7586",  # Urumqi -> Xinjiang
+    "\u94f6\u5ddd": "\u5b81\u590f",  # Yinchuan -> Ningxia
+    "\u897f\u5b81": "\u9752\u6d77",  # Xining -> Qinghai
+    "\u62c9\u8428": "\u897f\u85cf",  # Lhasa -> Tibet
 }
 
 DEFAULT_API_OPTIONS: dict[str, Any] = {
@@ -71,13 +88,14 @@ def _join_csv(values: list[str] | None) -> str | None:
 
 
 def cities_to_provinces(cities: list[str] | None) -> list[str]:
-    """意向城市去重映射为省份列表。"""
+    """Map preferred cities (deduplicated) to the list of API province values."""
     if not cities:
         return []
     provinces: list[str] = []
     seen: set[str] = set()
     for city in cities:
-        key = str(city).strip().replace("市", "").replace("省", "")
+        # Strip the Chinese suffixes for "city" and "province" (unicode-escaped).
+        key = str(city).strip().replace("\u5e02", "").replace("\u7701", "")
         if not key:
             continue
         province = CITY_TO_PROVINCE.get(key, key)
@@ -88,7 +106,7 @@ def cities_to_provinces(cities: list[str] | None) -> list[str]:
 
 
 def student_to_api_payload(student: dict[str, Any]) -> dict[str, Any]:
-    """将 student.json 转为 API 请求体。"""
+    """Convert student.json into the API request body."""
     preferred_provinces = student.get("preferred_provinces") or []
     if not preferred_provinces:
         preferred_provinces = cities_to_provinces(student.get("preferred_cities"))
@@ -117,7 +135,7 @@ def student_to_api_payload(student: dict[str, Any]) -> dict[str, Any]:
 
 
 def summarize_preferences(student: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any]:
-    """返回倾向映射摘要，便于 Agent 向用户说明。"""
+    """Return a preference-mapping summary so the agent can explain it to the user."""
     return {
         "universitys": payload.get("universitys"),
         "provinces": payload.get("provinces"),
@@ -134,20 +152,20 @@ def summarize_preferences(student: dict[str, Any], payload: dict[str, Any]) -> d
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="从 student.json 构建 API 请求 JSON")
-    parser.add_argument("-i", "--input", type=Path, required=True, help="student.json 路径")
-    parser.add_argument("-o", "--output", type=Path, required=True, help="输出 api_request.json")
+    parser = argparse.ArgumentParser(description="Build the API request JSON from student.json")
+    parser.add_argument("-i", "--input", type=Path, required=True, help="path to student.json")
+    parser.add_argument("-o", "--output", type=Path, required=True, help="output api_request.json")
     parser.add_argument(
         "--summary",
         type=Path,
-        help="可选：输出倾向映射摘要 JSON（供 Agent 核对）",
+        help="optional: output a preference-mapping summary JSON (for the agent to verify)",
     )
     args = parser.parse_args()
 
     try:
         student = json.loads(args.input.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
-        print(f"错误: 无法读取 student.json — {e}", file=sys.stderr)
+        print(f"Error: cannot read student.json - {e}", file=sys.stderr)
         return 1
 
     payload = student_to_api_payload(student)
@@ -157,23 +175,23 @@ def main() -> int:
         validate_classify(str(payload.get("province", "")), payload.get("classify"))
         validate_subjects_for_volunteer_api(payload)
     except ValueError as e:
-        print(f"错误: {e}", file=sys.stderr)
+        print(f"Error: {e}", file=sys.stderr)
         return 1
 
     required = ["province", "classify", "score"]
     missing = [k for k in required if not payload.get(k)]
     if missing:
-        print(f"错误: student.json 缺少 API 必填字段 {missing}", file=sys.stderr)
+        print(f"Error: student.json is missing API-required fields {missing}", file=sys.stderr)
         return 1
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"已生成 API 请求: {args.output}")
+    print(f"API request written: {args.output}")
 
     if args.summary:
         summary = summarize_preferences(student, payload)
         args.summary.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(f"已生成倾向映射摘要: {args.summary}")
+        print(f"Preference-mapping summary written: {args.summary}")
 
     return 0
 

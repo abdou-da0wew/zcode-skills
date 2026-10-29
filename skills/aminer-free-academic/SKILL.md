@@ -109,12 +109,12 @@ Use this skill when the user asks for:
 
 Trigger phrases include:
 
-- “先用免费接口”
-- “不要走收费接口”
-- “先帮我筛一下”
-- “先看看值不值得深挖”
-- “找几个候选”
-- “做一个轻量版 skill”
+- "use the free APIs first"
+- "don't use the paid APIs"
+- "help me screen first"
+- "check whether it's worth digging deeper"
+- "find a few candidates"
+- "make a lightweight version of this skill"
 
 ## Free Workflows
 
@@ -248,7 +248,7 @@ Return a short cross-entity summary, not a deep report.
 
 ```bash
 curl -X GET \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/search?page=1&size=5&title=Attention%20Is%20All%20You%20Need' \
+  '${AMINER_API_BASE_URL}/api/paper/search?page=1&size=5&title=Attention%20Is%20All%20You%20Need' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw'
 ```
@@ -257,7 +257,7 @@ Then enrich with `paper_info`:
 
 ```bash
 curl -X POST \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/paper/info' \
+  '${AMINER_API_BASE_URL}/api/paper/info' \
   -H 'Content-Type: application/json;charset=utf-8' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw' \
@@ -268,7 +268,7 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/person/search' \
+  '${AMINER_API_BASE_URL}/api/person/search' \
   -H 'Content-Type: application/json;charset=utf-8' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw' \
@@ -279,7 +279,7 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/organization/search' \
+  '${AMINER_API_BASE_URL}/api/organization/search' \
   -H 'Content-Type: application/json;charset=utf-8' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw' \
@@ -290,7 +290,7 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/venue/search' \
+  '${AMINER_API_BASE_URL}/api/venue/search' \
   -H 'Content-Type: application/json;charset=utf-8' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw' \
@@ -301,7 +301,7 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  'https://publicapi.chatglm.cn/chatglm_public/skill/aminer/api/patent/search' \
+  '${AMINER_API_BASE_URL}/api/patent/search' \
   -H 'Content-Type: application/json;charset=utf-8' \
   -H "Authorization: ${AMINER_API_KEY}" \
   -H 'X-Platform: openclaw' \

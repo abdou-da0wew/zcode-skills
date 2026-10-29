@@ -1,6 +1,6 @@
 ---
 name: saas-landing
-description: Premium calm-tech SaaS landing template — bilingual (CN/EN) literary voice over a dark forest-night palette with warm gold accent, Cormorant + Noto Serif SC, Three.js procedural forest hero, station-based scrolling narrative, custom cursor. Built for ambient-AI / creative-tool / philosophical SaaS, not loud commercial launch.
+description: Premium calm-tech SaaS landing template — bilingual literary voice over a dark forest-night palette with warm gold accent, Cormorant serif display, Three.js procedural forest hero, station-based scrolling narrative, custom cursor. Built for ambient-AI / creative-tool / philosophical SaaS, not loud commercial launch.
 visibility: public
 mode: template
 carrier: web-page
@@ -8,12 +8,12 @@ scenario: marketing-landing
 pattern_source: reference.html
 source_priority: skill-first
 triggers:
-  - "做个 calm-tech SaaS 落地页"
-  - "双语 SaaS landing"
-  - "森林夜调 SaaS"
-  - "Three.js hero 落地页"
-  - "高端 SaaS 官网"
-  - "氛围型 AI 工具落地页"
+  - "make a calm-tech SaaS landing page"
+  - "bilingual SaaS landing"
+  - "forest-night SaaS landing"
+  - "Three.js hero landing page"
+  - "premium SaaS website"
+  - "ambient AI tool landing page"
 ---
 
 # SaaS Landing Template
@@ -23,7 +23,7 @@ Use this template when the artifact is a **premium, slow-paced, design-led SaaS 
 ## Use When
 
 - The product is an **ambient / creative / calm-tech / philosophical** SaaS — AI companion, journaling tool, content tool, creative software, slow productivity.
-- The brand voice can sustain Chinese literary prose alongside English — bilingual is a feature, not an afterthought.
+- The brand voice can sustain literary prose alongside English — bilingual is a feature, not an afterthought.
 - The user wants stations of scrolling narrative (manifesto → features → CTA), not a generic hero-features-pricing-FAQ stack.
 - 3D / Three.js hero is welcome (or at least an atmospheric visual carrying the mood).
 
@@ -40,6 +40,8 @@ Use this template when the artifact is a **premium, slow-paced, design-led SaaS 
 Read this `SKILL.md` first. Do **not** read `reference.html` by default.
 
 Read `reference.html` only when you need: the Three.js forest scene geometry (instanced trunks, canopy, fireflies), the scroll-driven camera walk, the custom-cursor expand-to-ring behavior, or the station-scrolling pattern. Extract patterns; do not copy placeholder product copy, the bilingual nav strings, or the exact gold / forest tokens wholesale.
+
+If the target language is Chinese, pair the serif display with a Chinese serif (e.g. Noto Serif SC); otherwise use the Latin serif alone.
 
 ## Design Strategy
 

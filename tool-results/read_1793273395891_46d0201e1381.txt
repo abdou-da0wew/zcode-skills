@@ -1,0 +1,1155 @@
+     1→#!/usr/bin/env python3
+     2→"""
+     3→AMiner Open Platform API Client
+     4→Optional convenience client for AMiner Open Platform.
+     5→The skills in this repository can be used directly with curl; this script is kept
+     6→as an optional local wrapper for users who prefer Python-based composition.
+     7→
+     8→Usage:
+     9→    python aminer_client.py --token <TOKEN> --action <ACTION> [options]
+    10→
+    11→Workflows:
+    12→    scholar_profile   Scholar profile analysis (search → details + portrait + papers + patents + projects)
+    13→    paper_deep_dive   Paper deep dive (search → details + citation chain)
+    14→    org_analysis      Institution research capability analysis (disambiguation → details + scholars + papers + patents)
+    15→    venue_papers      Journal paper monitoring (search → details + papers by year)
+    16→    paper_qa          Academic Q&A (AI-driven keyword search)
+    17→    patent_search     Patent search and details
+    18→    scholar_patents   Retrieve all patent details for a scholar by name
+    19→
+    20→Direct single API call:
+    21→    raw               Call any API directly; requires --api and --params
+    22→
+    23→Console (Generate Token): https://open.aminer.cn/open/board?tab=control
+    24→Docs: https://open.aminer.cn/open/docs
+    25→"""
+    26→
+    27→import argparse
+    28→import json
+    29→import os
+    30→import sys
+    31→import time
+    32→import random
+    33→import threading
+    34→import urllib.request
+    35→import urllib.error
+    36→import urllib.parse
+    37→from concurrent.futures import ThreadPoolExecutor, as_completed
+    38→from typing import Any, Optional
+    39→
+    40→BASE_URL = "https://publicapi.chatglm.cn/chatglm_public/skill/aminer"
+    41→
+    42→REQUEST_TIMEOUT_SECONDS = 30
+    43→MAX_RETRIES = 3
+    44→RETRYABLE_HTTP_STATUS = {408, 429, 500, 502, 503, 504}
+    45→
+    46→API_PRICE: dict[str, float] = {
+    47→    "paper_search": 0, "paper_info": 0, "person_search": 0,
+    48→    "org_search": 0, "venue_search": 0, "patent_search": 0, "patent_info": 0,
+    49→    "paper_search_pro": 0.01, "paper_detail": 0.01, "patent_detail": 0.01,
+    50→    "org_detail": 0.01, "org_disambiguate": 0.01,
+    51→    "paper_qa_search": 0.05, "paper_qa_search_pro": 0.70, "org_disambiguate_pro": 0.05,
+    52→    "paper_relation": 0.10, "org_paper_relation": 0.10,
+    53→    "org_patent_relation": 0.10, "venue_paper_relation": 0.10,
+    54→    "paper_list_by_keywords": 0.10,
+    55→    "venue_detail": 0.20, "paper_detail_by_condition": 0.20,
+    56→    "person_figure": 0.50, "org_person_relation": 0.50,
+    57→    "person_detail": 1.00,
+    58→    "person_paper_relation": 1.50, "person_patent_relation": 1.50,
+    59→    "person_project": 1.50,
+    60→}
+    61→
+    62→_cost_log: list[tuple[str, float]] = []
+    63→_cost_lock = threading.Lock()
+    64→
+    65→
+    66→def _track_cost(api_name: str) -> None:
+    67→    price = API_PRICE.get(api_name, 0)
+    68→    with _cost_lock:
+    69→        _cost_log.append((api_name, price))
+    70→
+    71→
+    72→def get_cost_summary() -> dict:
+    73→    with _cost_lock:
+    74→        total = sum(p for _, p in _cost_log)
+    75→        breakdown = {}
+    76→        for name, price in _cost_log:
+    77→            breakdown[name] = breakdown.get(name, 0) + price
+    78→        return {"total": round(total, 2), "breakdown": breakdown, "calls": len(_cost_log)}
+    79→
+    80→
+    81→def reset_cost() -> None:
+    82→    with _cost_lock:
+    83→        _cost_log.clear()
+    84→
+    85→
+    86→# ──────────────────────────────────────────────────────────────────────────────
+    87→# Core HTTP Utilities
+    88→# ──────────────────────────────────────────────────────────────────────────────
+    89→
+    90→def _request(token: str, method: str, path: str,
+    91→             params: Optional[dict] = None,
+    92→             body: Optional[dict] = None) -> Any:
+    93→    """Send an HTTP request and return the parsed JSON data (with retries)."""
+    94→    url = BASE_URL + path
+    95→    headers = {
+    96→        "Authorization": token,
+    97→        "X-Platform": "openclaw",
+    98→        "Content-Type": "application/json;charset=utf-8",
+    99→    }
+   100→
+   101→    if method.upper() == "GET" and params:
+   102→        query = urllib.parse.urlencode(
+   103→            {k: (json.dumps(v) if isinstance(v, (list, dict)) else v)
+   104→             for k, v in params.items() if v is not None}
+   105→        )
+   106→        url = f"{url}?{query}"
+   107→
+   108→    data = json.dumps(body).encode("utf-8") if body else None
+   109→    req = urllib.request.Request(url, data=data, headers=headers, method=method.upper())
+   110→
+   111→    last_error_result = None
+   112→    for attempt in range(1, MAX_RETRIES + 1):
+   113→        try:
+   114→            with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT_SECONDS) as resp:
+   115→                raw = resp.read().decode("utf-8")
+   116→                return json.loads(raw)
+   117→        except urllib.error.HTTPError as e:
+   118→            body_bytes = e.read()
+   119→            try:
+   120→                err = json.loads(body_bytes)
+   121→            except Exception:
+   122→                err = body_bytes.decode("utf-8", errors="replace")
+   123→            retryable = e.code in RETRYABLE_HTTP_STATUS
+   124→            print(f"[HTTP {e.code}] {e.reason}: {err}", file=sys.stderr)
+   125→            last_error_result = {
+   126→                "code": e.code, "success": False,
+   127→                "msg": str(e.reason), "error": err, "retryable": retryable,
+   128→            }
+   129→            if not retryable:
+   130→                return last_error_result
+   131→        except urllib.error.URLError as e:
+   132→            reason = str(getattr(e, "reason", e))
+   133→            print(f"[Request failed] {reason}", file=sys.stderr)
+   134→            last_error_result = {
+   135→                "code": -1, "success": False,
+   136→                "msg": "network_error", "error": reason, "retryable": True,
+   137→            }
+   138→        except TimeoutError as e:
+   139→            print(f"[Request timeout] {e}", file=sys.stderr)
+   140→            last_error_result = {
+   141→                "code": -1, "success": False,
+   142→                "msg": "timeout", "error": str(e), "retryable": True,
+   143→            }
+   144→        except Exception as e:
+   145→            print(f"[Request failed] {e}", file=sys.stderr)
+   146→            return {
+   147→                "code": -1, "success": False,
+   148→                "msg": "unknown_error", "error": str(e), "retryable": False,
+   149→            }
+   150→
+   151→        if attempt < MAX_RETRIES:
+   152→            backoff = (2 ** (attempt - 1)) + random.uniform(0, 0.3)
+   153→            print(f"[Retry] attempt={attempt}/{MAX_RETRIES} wait={backoff:.2f}s", file=sys.stderr)
+   154→            time.sleep(backoff)
+   155→
+   156→    return last_error_result or {
+   157→        "code": -1, "success": False,
+   158→        "msg": "request_failed", "error": "max retries exceeded", "retryable": True,
+   159→    }
+   160→
+   161→
+   162→def _print(data: Any) -> None:
+   163→    """Pretty-print JSON result."""
+   164→    print(json.dumps(data, ensure_ascii=False, indent=2))
+   165→
+   166→
+   167→# ──────────────────────────────────────────────────────────────────────────────
+   168→# Paper APIs
+   169→# ──────────────────────────────────────────────────────────────────────────────
+   170→
+   171→def paper_search(token: str, title: str, page: int = 1, size: int = 10) -> Any:
+   172→    """Paper Search (Free): search by title; returns ID/title/DOI."""
+   173→    _track_cost("paper_search")
+   174→    return _request(token, "GET", "/api/paper/search",
+   175→                    params={"title": title, "page": page, "size": size})
+   176→
+   177→
+   178→def paper_search_pro(token: str, title: str = None, keyword: str = None,
+   179→                     abstract: str = None, author: str = None,
+   180→                     org: str = None, venue: str = None,
+   181→                     order: str = None, page: int = 0, size: int = 10) -> Any:
+   182→    """Paper Search Pro (¥0.01/call): multi-condition search."""
+   183→    _track_cost("paper_search_pro")
+   184→    params = {"page": page, "size": size}
+   185→    for k, v in [("title", title), ("keyword", keyword), ("abstract", abstract),
+   186→                 ("author", author), ("org", org), ("venue", venue), ("order", order)]:
+   187→        if v is not None:
+   188→            params[k] = v
+   189→    return _request(token, "GET", "/api/paper/search/pro", params=params)
+   190→
+   191→
+   192→def paper_qa_search(token: str, query: str = None,
+   193→                    use_topic: bool = True,
+   194→                    topic_high: str = None, topic_middle: str = None, topic_low: str = None,
+   195→                    title: list = None, doi: str = None, year: list = None,
+   196→                    sci_flag: bool = False, n_citation_flag: bool = False,
+   197→                    force_citation_sort: bool = False, force_year_sort: bool = False,
+   198→                    author_terms: list = None, org_terms: list = None,
+   199→                    author_id: list = None, org_id: list = None, venue_ids: list = None,
+   200→                    size: int = 10, offset: int = 0) -> Any:
+   201→    """Legacy Paper QA Search (¥0.05/call). Prefer paper_qa_search_pro; use this only for topic_* OR/AND."""
+   202→    _track_cost("paper_qa_search")
+   203→    body: dict = {"use_topic": use_topic, "size": size, "offset": offset}
+   204→    optional = {
+   205→        "query": query, "topic_high": topic_high, "topic_middle": topic_middle,
+   206→        "topic_low": topic_low, "title": title, "doi": doi, "year": year,
+   207→        "author_terms": author_terms, "org_terms": org_terms,
+   208→        "author_id": author_id, "org_id": org_id, "venue_ids": venue_ids,
+   209→    }
+   210→    body.update({k: v for k, v in optional.items() if v})
+   211→    if sci_flag:
+   212→        body["sci_flag"] = True
+   213→    if n_citation_flag:
+   214→        body["n_citation_flag"] = True
+   215→    if force_citation_sort:
+   216→        body["force_citation_sort"] = True
+   217→    if force_year_sort:
+   218→        body["force_year_sort"] = True
+   219→    return _request(token, "POST", "/api/paper/qa/search", body=body)
+   220→
+   221→
+   222→def paper_qa_search_pro(
+   223→    token: str,
+   224→    query: str = None,
+   225→    query_type: str = "auto",
+   226→    cursor: str = None,
+   227→    authors: list = None,
+   228→    author_ids: list = None,
+   229→    organizations: list = None,
+   230→    organization_ids: list = None,
+   231→    venues: list = None,
+   232→    venue_ids: list = None,
+   233→    year_values: list = None,
+   234→    year_from: int = None,
+   235→    year_to: int = None,
+   236→    languages: list = None,
+   237→    language_preference: str = None,
+   238→    has_chinese_title: bool = None,
+   239→    has_abstract: bool = None,
+   240→    min_citations: int = None,
+   241→    max_citations: int = None,
+   242→    all_terms: list = None,
+   243→    any_terms: list = None,
+   244→    exclude_terms: list = None,
+   245→    search_in: str = None,
+   246→    paper_ids: list = None,
+   247→    exclude_paper_ids: list = None,
+   248→    dois: list = None,
+   249→    sort: str = None,
+   250→) -> Any:
+   251→    """Paper QA Search Pro (¥0.70/call): NL + filters; fixed 10/page; cursor pagination."""
+   252→    _track_cost("paper_qa_search_pro")
+   253→    if cursor:
+   254→        return _request(
+   255→            token, "POST", "/api/v3/paper/qa/searchPro", body={"cursor": cursor}
+   256→        )
+   257→    body: dict = {}
+   258→    if query is not None:
+   259→        body["query"] = query
+   260→    if query_type is not None:
+   261→        body["query_type"] = query_type
+   262→    optional = {
+   263→        "authors": authors,
+   264→        "author_ids": author_ids,
+   265→        "organizations": organizations,
+   266→        "organization_ids": organization_ids,
+   267→        "venues": venues,
+   268→        "venue_ids": venue_ids,
+   269→        "year_values": year_values,
+   270→        "year_from": year_from,
+   271→        "year_to": year_to,
+   272→        "languages": languages,
+   273→        "language_preference": language_preference,
+   274→        "has_chinese_title": has_chinese_title,
+   275→        "has_abstract": has_abstract,
+   276→        "min_citations": min_citations,
+   277→        "max_citations": max_citations,
+   278→        "all_terms": all_terms,
+   279→        "any_terms": any_terms,
+   280→        "exclude_terms": exclude_terms,
+   281→        "search_in": search_in,
+   282→        "paper_ids": paper_ids,
+   283→        "exclude_paper_ids": exclude_paper_ids,
+   284→        "dois": dois,
+   285→        "sort": sort,
+   286→    }
+   287→    for key, value in optional.items():
+   288→        if value is None:
+   289→            continue
+   290→        if isinstance(value, list) and not value:
+   291→            continue
+   292→        body[key] = value
+   293→    return _request(token, "POST", "/api/v3/paper/qa/searchPro", body=body)
+   294→
+   295→
+   296→def paper_info(token: str, ids: list) -> Any:
+   297→    """Paper Info (Free): batch-retrieve basic information by ID."""
+   298→    _track_cost("paper_info")
+   299→    return _request(token, "POST", "/api/paper/info", body={"ids": ids})
+   300→
+   301→
+   302→def paper_detail(token: str, paper_id: str) -> Any:
+   303→    """Paper Details (¥0.01/call): retrieve complete paper information."""
+   304→    _track_cost("paper_detail")
+   305→    return _request(token, "GET", "/api/paper/detail", params={"id": paper_id})
+   306→
+   307→
+   308→def paper_relation(token: str, paper_id: str) -> Any:
+   309→    """Paper Citations (¥0.10/call): retrieve papers cited by this paper."""
+   310→    _track_cost("paper_relation")
+   311→    return _request(token, "GET", "/api/paper/relation", params={"id": paper_id})
+   312→
+   313→
+   314→def paper_list_by_keywords(token: str, keywords: list, page: int = 0, size: int = 10) -> Any:
+   315→    """Paper Batch Query (¥0.10/call): retrieve paper abstracts and info via multiple keywords."""
+   316→    _track_cost("paper_list_by_keywords")
+   317→    params = {"page": page, "size": size, "keywords": json.dumps(keywords, ensure_ascii=False)}
+   318→    return _request(token, "GET", "/api/paper/list/citation/by/keywords", params=params)
+   319→
+   320→
+   321→def paper_detail_by_condition(token: str, year: int, venue_id: str = None) -> Any:
+   322→    """Paper Details by Year and Venue (¥0.20/call): year and venue_id must both be provided; providing only year returns null."""
+   323→    _track_cost("paper_detail_by_condition")
+   324→    params: dict = {"year": year}
+   325→    if venue_id:
+   326→        params["venue_id"] = venue_id
+   327→    return _request(token, "GET",
+   328→                    "/api/paper/platform/allpubs/more/detail/by/ts/org/venue",
+   329→                    params=params)
+   330→
+   331→
+   332→# ──────────────────────────────────────────────────────────────────────────────
+   333→# Scholar APIs
+   334→# ──────────────────────────────────────────────────────────────────────────────
+   335→
+   336→def person_search(token: str, name: str = None, org: str = None,
+   337→                  org_id: list = None, offset: int = 0, size: int = 5) -> Any:
+   338→    """Scholar Search (Free): search for scholars by name/institution."""
+   339→    _track_cost("person_search")
+   340→    body: dict = {"offset": offset, "size": size}
+   341→    if name:
+   342→        body["name"] = name
+   343→    if org:
+   344→        body["org"] = org
+   345→    if org_id:
+   346→        body["org_id"] = org_id
+   347→    return _request(token, "POST", "/api/person/search", body=body)
+   348→
+   349→
+   350→def person_detail(token: str, person_id: str) -> Any:
+   351→    """Scholar Details (¥1.00/call): retrieve complete personal information."""
+   352→    _track_cost("person_detail")
+   353→    return _request(token, "GET", "/api/person/detail", params={"id": person_id})
+   354→
+   355→
+   356→def person_figure(token: str, person_id: str) -> Any:
+   357→    """Scholar Portrait (¥0.50/call): retrieve research interests, domains, and structured history."""
+   358→    _track_cost("person_figure")
+   359→    return _request(token, "GET", "/api/person/figure", params={"id": person_id})
+   360→
+   361→
+   362→def person_paper_relation(token: str, person_id: str) -> Any:
+   363→    """Scholar Papers (¥1.50/call): retrieve list of papers published by a scholar."""
+   364→    _track_cost("person_paper_relation")
+   365→    return _request(token, "GET", "/api/person/paper/relation", params={"id": person_id})
+   366→
+   367→
+   368→def person_patent_relation(token: str, person_id: str) -> Any:
+   369→    """Scholar Patents (¥1.50/call): retrieve a scholar's patent list."""
+   370→    _track_cost("person_patent_relation")
+   371→    return _request(token, "GET", "/api/person/patent/relation", params={"id": person_id})
+   372→
+   373→
+   374→def person_project(token: str, person_id: str) -> Any:
+   375→    """Scholar Projects (¥1.50/call): retrieve research projects (funding amount/dates/source)."""
+   376→    _track_cost("person_project")
+   377→    return _request(token, "GET", "/api/project/person/v3/open", params={"id": person_id})
+   378→
+   379→
+   380→# ──────────────────────────────────────────────────────────────────────────────
+   381→# Institution APIs
+   382→# ──────────────────────────────────────────────────────────────────────────────
+   383→
+   384→def org_search(token: str, orgs: list) -> Any:
+   385→    """Org Search (Free): search for institutions by name keyword."""
+   386→    _track_cost("org_search")
+   387→    return _request(token, "POST", "/api/organization/search", body={"orgs": orgs})
+   388→
+   389→
+   390→def org_detail(token: str, ids: list) -> Any:
+   391→    """Org Details (¥0.01/call): retrieve institution details by ID."""
+   392→    _track_cost("org_detail")
+   393→    return _request(token, "POST", "/api/organization/detail", body={"ids": ids})
+   394→
+   395→
+   396→def org_person_relation(token: str, org_id: str, offset: int = 0) -> Any:
+   397→    """Org Scholars (¥0.50/call): retrieve affiliated scholars (10 per call)."""
+   398→    _track_cost("org_person_relation")
+   399→    return _request(token, "GET", "/api/organization/person/relation",
+   400→                    params={"org_id": org_id, "offset": offset})
+   401→
+   402→
+   403→def org_paper_relation(token: str, org_id: str, offset: int = 0) -> Any:
+   404→    """Org Papers (¥0.10/call): retrieve papers published by institution scholars (10 per call)."""
+   405→    _track_cost("org_paper_relation")
+   406→    return _request(token, "GET", "/api/organization/paper/relation",
+   407→                    params={"org_id": org_id, "offset": offset})
+   408→
+   409→
+   410→def org_patent_relation(token: str, org_id: str,
+   411→                        page: int = 1, page_size: int = 100) -> Any:
+   412→    """Org Patents (¥0.10/call): retrieve institution patent list with pagination (max page_size 10,000)."""
+   413→    _track_cost("org_patent_relation")
+   414→    return _request(token, "GET", "/api/organization/patent/relation",
+   415→                    params={"id": org_id, "page": page, "page_size": page_size})
+   416→
+   417→
+   418→def org_disambiguate(token: str, org: str) -> Any:
+   419→    """Org Disambiguation (¥0.01/call): retrieve the normalized institution name."""
+   420→    _track_cost("org_disambiguate")
+   421→    return _request(token, "POST", "/api/organization/na", body={"org": org})
+   422→
+   423→
+   424→def org_disambiguate_pro(token: str, org: str) -> Any:
+   425→    """Org Disambiguation Pro (¥0.05/call): extract primary and secondary institution IDs."""
+   426→    _track_cost("org_disambiguate_pro")
+   427→    return _request(token, "POST", "/api/organization/na/pro", body={"org": org})
+   428→
+   429→
+   430→# ──────────────────────────────────────────────────────────────────────────────
+   431→# Journal APIs
+   432→# ──────────────────────────────────────────────────────────────────────────────
+   433→
+   434→def venue_search(token: str, name: str) -> Any:
+   435→    """Venue Search (Free): search for journal ID and standard name by name."""
+   436→    _track_cost("venue_search")
+   437→    return _request(token, "POST", "/api/venue/search", body={"name": name})
+   438→
+   439→
+   440→def venue_detail(token: str, venue_id: str) -> Any:
+   441→    """Venue Details (¥0.20/call): retrieve ISSN, abbreviation, type, etc."""
+   442→    _track_cost("venue_detail")
+   443→    return _request(token, "POST", "/api/venue/detail", body={"id": venue_id})
+   444→
+   445→
+   446→def venue_paper_relation(token: str, venue_id: str, offset: int = 0,
+   447→                         limit: int = 20, year: Optional[int] = None) -> Any:
+   448→    """Venue Papers (¥0.10/call): retrieve journal paper list (supports year filtering)."""
+   449→    _track_cost("venue_paper_relation")
+   450→    body: dict = {"id": venue_id, "offset": offset, "limit": limit}
+   451→    if year is not None:
+   452→        body["year"] = year
+   453→    return _request(token, "POST", "/api/venue/paper/relation", body=body)
+   454→
+   455→
+   456→# ──────────────────────────────────────────────────────────────────────────────
+   457→# Patent APIs
+   458→# ──────────────────────────────────────────────────────────────────────────────
+   459→
+   460→def patent_search(token: str, query: str, page: int = 0, size: int = 10) -> Any:
+   461→    """Patent Search (Free): search patents by name/keyword."""
+   462→    _track_cost("patent_search")
+   463→    return _request(token, "POST", "/api/patent/search",
+   464→                    body={"query": query, "page": page, "size": size})
+   465→
+   466→
+   467→def patent_info(token: str, patent_id: str) -> Any:
+   468→    """Patent Info (Free): retrieve basic patent information (title/patent number/inventor)."""
+   469→    _track_cost("patent_info")
+   470→    return _request(token, "GET", "/api/patent/info", params={"id": patent_id})
+   471→
+   472→
+   473→def patent_detail(token: str, patent_id: str) -> Any:
+   474→    """Patent Details (¥0.01/call): retrieve complete patent information (abstract/filing date/IPC, etc.)."""
+   475→    _track_cost("patent_detail")
+   476→    return _request(token, "GET", "/api/patent/detail", params={"id": patent_id})
+   477→
+   478→
+   479→# ──────────────────────────────────────────────────────────────────────────────
+   480→# Combined Workflows
+   481→# ──────────────────────────────────────────────────────────────────────────────
+   482→
+   483→def workflow_scholar_profile(token: str, name: str) -> dict:
+   484→    """
+   485→    Workflow 1: Scholar Profile
+   486→    Search scholar → details + portrait + papers + patents + projects
+   487→    """
+   488→    print(f"[1/6] Searching scholar: {name}", file=sys.stderr)
+   489→    search_result = person_search(token, name=name, size=5)
+   490→    if not search_result or not search_result.get("data"):
+   491→        return {"error": f"Scholar not found: {name}"}
+   492→
+   493→    candidates = search_result["data"]
+   494→    scholar = candidates[0]
+   495→    person_id = scholar.get("id") or scholar.get("_id")
+   496→    print(f"      Found: {scholar.get('name')} ({scholar.get('org')}), ID={person_id}", file=sys.stderr)
+   497→
+   498→    result = {
+   499→        "source_api_chain": [
+   500→            "person_search",
+   501→            "person_detail",
+   502→            "person_figure",
+   503→            "person_paper_relation",
+   504→            "person_patent_relation",
+   505→            "person_project",
+   506→        ],
+   507→        "search_candidates": candidates[:3],
+   508→        "selected": {
+   509→            "id": person_id,
+   510→            "name": scholar.get("name"),
+   511→            "name_zh": scholar.get("name_zh"),
+   512→            "org": scholar.get("org"),
+   513→            "interests": scholar.get("interests"),
+   514→            "n_citation": scholar.get("n_citation"),
+   515→        }
+   516→    }
+   517→
+   518→    print("[2/6] Fetching scholar details (parallel)...", file=sys.stderr)
+   519→    tasks = {
+   520→        "detail": lambda: person_detail(token, person_id),
+   521→        "figure": lambda: person_figure(token, person_id),
+   522→        "papers": lambda: person_paper_relation(token, person_id),
+   523→        "patents": lambda: person_patent_relation(token, person_id),
+   524→        "projects": lambda: person_project(token, person_id),
+   525→    }
+   526→    with ThreadPoolExecutor(max_workers=5) as pool:
+   527→        futures = {pool.submit(fn): key for key, fn in tasks.items()}
+   528→        for future in as_completed(futures):
+   529→            key = futures[future]
+   530→            try:
+   531→                resp = future.result()
+   532→            except Exception as e:
+   533→                print(f"  [{key}] failed: {e}", file=sys.stderr)
+   534→                continue
+   535→            data = resp.get("data") if resp else None
+   536→            if not data:
+   537→                continue
+   538→            if key == "detail":
+   539→                result["detail"] = data
+   540→            elif key == "figure":
+   541→                result["figure"] = data
+   542→            elif key == "papers":
+   543→                result["papers"] = data[:20]
+   544→                result["papers_total"] = resp.get("total", len(data))
+   545→            elif key == "patents":
+   546→                result["patents"] = data[:10]
+   547→            elif key == "projects":
+   548→                result["projects"] = data[:10]
+   549→
+   550→    return result
+   551→
+   552→
+   553→def workflow_paper_deep_dive(token: str, title: str = None, keyword: str = None,
+   554→                              author: str = None, order: str = "n_citation") -> dict:
+   555→    """
+   556→    Workflow 2: Paper Deep Dive
+   557→    Search paper → details + citation chain + basic info of cited papers
+   558→    """
+   559→    print(f"[1/4] Searching paper: title={title}, keyword={keyword}", file=sys.stderr)
+   560→    if keyword or author:
+   561→        search_result = paper_search_pro(token, title=title, keyword=keyword,
+   562→                                         author=author, order=order, size=5)
+   563→        search_api = "paper_search_pro"
+   564→    else:
+   565→        search_result = paper_search(token, title=title or keyword, size=5)
+   566→        search_api = "paper_search"
+   567→        if not search_result or not search_result.get("data"):
+   568→            # Fall back to pro search when title search yields no results to improve recall
+   569→            print("      Title search returned no results; falling back to paper_search_pro...", file=sys.stderr)
+   570→            search_result = paper_search_pro(token, title=title, keyword=title,
+   571→                                             author=author, order=order, size=5)
+   572→            search_api = "paper_search_pro(fallback)"
+   573→
+   574→    if not search_result or not search_result.get("data"):
+   575→        return {"error": "No relevant papers found"}
+   576→
+   577→    papers = search_result["data"]
+   578→    top_paper = papers[0]
+   579→    paper_id = top_paper.get("id") or top_paper.get("_id")
+   580→    print(f"      Found: {top_paper.get('title')[:60]}, ID={paper_id}", file=sys.stderr)
+   581→
+   582→    result = {
+   583→        "source_api_chain": [
+   584→            search_api,
+   585→            "paper_detail",
+   586→            "paper_relation",
+   587→            "paper_info",
+   588→        ],
+   589→        "search_candidates": papers[:5],
+   590→        "selected_id": paper_id,
+   591→        "selected_title": top_paper.get("title"),
+   592→    }
+   593→
+   594→    print("[2/4] Fetching paper details...", file=sys.stderr)
+   595→    detail = paper_detail(token, paper_id)
+   596→    if detail and detail.get("data"):
+   597→        result["detail"] = detail["data"]
+   598→
+   599→    print("[3/4] Fetching citation relationships...", file=sys.stderr)
+   600→    relation = paper_relation(token, paper_id)
+   601→    if relation and relation.get("data"):
+   602→        # data structure: [{"_id": "<paper_id>", "cited": [{...}, ...]}]
+   603→        # the outer array wraps each paper; the actual citation list is in the cited field
+   604→        all_cited = []
+   605→        for item in relation["data"]:
+   606→            all_cited.extend(item.get("cited") or [])
+   607→        result["citations_count"] = len(all_cited)
+   608→        result["citations_preview"] = all_cited[:10]
+   609→
+   610→        cited_ids = [c.get("_id") or c.get("id") for c in all_cited[:20]
+   611→                     if c.get("_id") or c.get("id")]
+   612→        if cited_ids:
+   613→            print(f"[4/4] Batch-fetching basic info for {len(cited_ids)} cited papers...", file=sys.stderr)
+   614→            info = paper_info(token, cited_ids)
+   615→            if info and info.get("data"):
+   616→                result["cited_papers_info"] = info["data"]
+   617→        else:
+   618→            print("[4/4] Skipping (no cited IDs)", file=sys.stderr)
+   619→    else:
+   620→        print("[4/4] Skipping (no citation data)", file=sys.stderr)
+   621→
+   622→    return result
+   623→
+   624→
+   625→def workflow_org_analysis(token: str, org: str) -> dict:
+   626→    """
+   627→    Workflow 3: Org Analysis
+   628→    Org disambiguation pro → details + scholars + papers + patents
+   629→    """
+   630→    print(f"[1/5] Disambiguating org: {org}", file=sys.stderr)
+   631→    disamb = org_disambiguate_pro(token, org)
+   632→    org_id = None
+   633→
+   634→    if disamb and disamb.get("data"):
+   635→        data = disamb["data"]
+   636→        if isinstance(data, list) and data:
+   637→            first = data[0]
+   638→            org_id = first.get("一级ID") or first.get("二级ID")
+   639→        elif isinstance(data, dict):
+   640→            org_id = data.get("一级ID") or data.get("二级ID")
+   641→
+   642→    if not org_id:
+   643→        print("      Disambiguation pro returned no ID; trying org search...", file=sys.stderr)
+   644→        search_r = org_search(token, [org])
+   645→        if search_r and search_r.get("data"):
+   646→            orgs = search_r["data"]
+   647→            org_id = orgs[0].get("org_id") if orgs else None
+   648→
+   649→    if not org_id:
+   650→        return {"error": f"Could not find org ID: {org}"}
+   651→
+   652→    print(f"      Org ID: {org_id}", file=sys.stderr)
+   653→    result = {
+   654→        "source_api_chain": [
+   655→            "org_disambiguate_pro",
+   656→            "org_detail",
+   657→            "org_person_relation",
+   658→            "org_paper_relation",
+   659→            "org_patent_relation",
+   660→        ],
+   661→        "org_query": org,
+   662→        "org_id": org_id,
+   663→        "disambiguate": disamb,
+   664→    }
+   665→
+   666→    print("[2/5] Fetching org data (parallel)...", file=sys.stderr)
+   667→    tasks = {
+   668→        "detail": lambda: org_detail(token, [org_id]),
+   669→        "scholars": lambda: org_person_relation(token, org_id, offset=0),
+   670→        "papers": lambda: org_paper_relation(token, org_id, offset=0),
+   671→        "patents": lambda: org_patent_relation(token, org_id, page=1, page_size=100),
+   672→    }
+   673→    with ThreadPoolExecutor(max_workers=4) as pool:
+   674→        futures = {pool.submit(fn): key for key, fn in tasks.items()}
+   675→        for future in as_completed(futures):
+   676→            key = futures[future]
+   677→            try:
+   678→                resp = future.result()
+   679→            except Exception as e:
+   680→                print(f"  [{key}] failed: {e}", file=sys.stderr)
+   681→                continue
+   682→            data = resp.get("data") if resp else None
+   683→            if not data:
+   684→                continue
+   685→            if key == "detail":
+   686→                result["detail"] = data
+   687→            elif key == "scholars":
+   688→                result["scholars"] = data
+   689→                result["scholars_total"] = resp.get("total", len(data))
+   690→            elif key == "papers":
+   691→                result["papers"] = data
+   692→                result["papers_total"] = resp.get("total", len(data))
+   693→            elif key == "patents":
+   694→                result["patents"] = data
+   695→                result["patents_total"] = resp.get("total", len(data))
+   696→
+   697→    return result
+   698→
+   699→
+   700→def workflow_venue_papers(token: str, venue: str, year: Optional[int] = None,
+   701→                           limit: int = 20) -> dict:
+   702→    """
+   703→    Workflow 4: Venue Papers
+   704→    Venue search → venue details + papers by year
+   705→    """
+   706→    print(f"[1/3] Searching venue: {venue}", file=sys.stderr)
+   707→    search_result = venue_search(token, venue)
+   708→    if not search_result or not search_result.get("data"):
+   709→        return {"error": f"Venue not found: {venue}"}
+   710→
+   711→    venues = search_result["data"]
+   712→    top_venue = venues[0]
+   713→    venue_id = top_venue.get("id")
+   714→    print(f"      Found: {top_venue.get('name_en')}, ID={venue_id}", file=sys.stderr)
+   715→    result = {
+   716→        "source_api_chain": [
+   717→            "venue_search",
+   718→            "venue_detail",
+   719→            "venue_paper_relation",
+   720→        ],
+   721→        "search_candidates": venues[:3],
+   722→        "venue_id": venue_id,
+   723→    }
+   724→
+   725→    print("[2/3] Fetching venue details...", file=sys.stderr)
+   726→    detail = venue_detail(token, venue_id)
+   727→    if detail and detail.get("data"):
+   728→        result["venue_detail"] = detail["data"]
+   729→
+   730→    print(f"[3/3] Fetching venue papers (year={year}, limit={limit})...", file=sys.stderr)
+   731→    papers = venue_paper_relation(token, venue_id, year=year, limit=limit)
+   732→    if papers and papers.get("data"):
+   733→        result["papers"] = papers["data"]
+   734→        result["papers_total"] = papers.get("total", len(papers["data"]))
+   735→
+   736→    return result
+   737→
+   738→
+   739→def workflow_paper_qa(token: str, query: str = None,
+   740→                      topic_high: str = None, topic_middle: str = None,
+   741→                      sci_flag: bool = False, sort_citation: bool = False, sort_year: bool = False,
+   742→                      author_id: list = None, org_id: list = None, venue_ids: list = None,
+   743→                      size: int = 10,
+   744→                      year_from: int = None, year_to: int = None,
+   745→                      min_citations: int = None, cursor: str = None) -> dict:
+   746→    """
+   747→    Workflow: Paper QA Search — prefer Pro, use legacy sparingly.
+   748→    - Default: natural language / filters → paper_qa_search_pro (¥0.70, fixed 10/page)
+   749→    - Rare: only topic_high/topic_middle → legacy paper_qa_search (¥0.05)
+   750→    """
+   751→    # Structured topic_* exists only on the legacy endpoint; avoid unless required.
+   752→    if topic_high or topic_middle:
+   753→        print(f"[1/1] Legacy topic QA search: topic_high={bool(topic_high)}", file=sys.stderr)
+   754→        qa_result = paper_qa_search(
+   755→            token, query=query, use_topic=True,
+   756→            topic_high=topic_high, topic_middle=topic_middle,
+   757→            sci_flag=sci_flag, force_citation_sort=sort_citation,
+   758→            force_year_sort=sort_year,
+   759→            author_id=author_id, org_id=org_id, venue_ids=venue_ids,
+   760→            size=size,
+   761→        )
+   762→        if isinstance(qa_result, dict):
+   763→            qa_result["source_api_chain"] = ["paper_qa_search"]
+   764→            qa_result["route"] = "paper_qa_search"
+   765→        return qa_result
+   766→
+   767→    sort = None
+   768→    if sort_citation:
+   769→        sort = "citation"
+   770→    elif sort_year:
+   771→        sort = "recent"
+   772→
+   773→    print(f"[1/1] Paper QA Search Pro: query={query}, sort={sort}", file=sys.stderr)
+   774→    qa_result = paper_qa_search_pro(
+   775→        token,
+   776→        query=query,
+   777→        query_type="auto",
+   778→        cursor=cursor,
+   779→        author_ids=author_id,
+   780→        organization_ids=org_id,
+   781→        venue_ids=venue_ids,
+   782→        year_from=year_from,
+   783→        year_to=year_to,
+   784→        min_citations=min_citations,
+   785→        sort=sort,
+   786→    )
+   787→    data = (qa_result or {}).get("data") or {}
+   788→    items = data.get("items") if isinstance(data, dict) else None
+   789→    if qa_result and qa_result.get("code") == 200 and items:
+   790→        qa_result["source_api_chain"] = ["paper_qa_search_pro"]
+   791→        qa_result["route"] = "paper_qa_search_pro"
+   792→        return qa_result
+   793→
+   794→    if query and not cursor:
+   795→        print("      paper_qa_search_pro returned no results; falling back to paper_search_pro...", file=sys.stderr)
+   796→        order = "n_citation" if sort_citation or not sort_year else "year"
+   797→        fallback = paper_search_pro(token, keyword=query, order=order, size=min(size, 10))
+   798→        fb_data = (fallback or {}).get("data") or []
+   799→        return {
+   800→            "code": 200 if fb_data else (qa_result or {}).get("code", -1),
+   801→            "success": bool(fb_data),
+   802→            "msg": "" if fb_data else "no data",
+   803→            "data": fb_data,
+   804→            "total": (fallback or {}).get("total", len(fb_data)),
+   805→            "route": "paper_qa_search_pro -> paper_search_pro",
+   806→            "source_api_chain": ["paper_qa_search_pro", "paper_search_pro"],
+   807→            "primary_result": qa_result,
+   808→        }
+   809→
+   810→    if isinstance(qa_result, dict):
+   811→        qa_result["source_api_chain"] = ["paper_qa_search_pro"]
+   812→        qa_result["route"] = "paper_qa_search_pro"
+   813→    return qa_result
+   814→
+   815→
+   816→def workflow_patent_search(token: str, query: str, page: int = 0, size: int = 10) -> dict:
+   817→    """
+   818→    Workflow 6: Patent Search and Details
+   819→    Patent search → retrieve details for each patent
+   820→    """
+   821→    print(f"[1/2] Searching patents: {query}", file=sys.stderr)
+   822→    search_result = patent_search(token, query, page=page, size=size)
+   823→    if not search_result or not search_result.get("data"):
+   824→        return {"error": f"No patents found: {query}"}
+   825→
+   826→    patents = search_result["data"]
+   827→    result = {
+   828→        "source_api_chain": ["patent_search", "patent_detail"],
+   829→        "search_results": patents,
+   830→        "total": len(patents),
+   831→    }
+   832→
+   833→    top_patents = [p for p in patents[:3] if p.get("id")]
+   834→    print(f"[2/2] Fetching details for {len(top_patents)} patents (parallel)...", file=sys.stderr)
+   835→    details = []
+   836→    with ThreadPoolExecutor(max_workers=3) as pool:
+   837→        futs = {pool.submit(patent_detail, token, p["id"]): p["id"] for p in top_patents}
+   838→        for fut in as_completed(futs):
+   839→            try:
+   840→                d = fut.result()
+   841→                if d and d.get("data"):
+   842→                    details.append(d["data"])
+   843→            except Exception as e:
+   844→                print(f"  [patent_detail] failed: {e}", file=sys.stderr)
+   845→    result["details"] = details
+   846→    return result
+   847→
+   848→
+   849→def workflow_scholar_patents(token: str, name: str) -> dict:
+   850→    """
+   851→    Retrieve patent list + individual patent details for a scholar by name
+   852→    """
+   853→    print(f"[1/3] Searching scholar: {name}", file=sys.stderr)
+   854→    search_result = person_search(token, name=name, size=3)
+   855→    if not search_result or not search_result.get("data"):
+   856→        return {"error": f"Scholar not found: {name}"}
+   857→
+   858→    scholar = search_result["data"][0]
+   859→    person_id = scholar.get("id")
+   860→    print(f"      Found: {scholar.get('name')}, ID={person_id}", file=sys.stderr)
+   861→    result = {"scholar": scholar}
+   862→
+   863→    print("[2/3] Fetching scholar patent list...", file=sys.stderr)
+   864→    patents = person_patent_relation(token, person_id)
+   865→    if not patents or not patents.get("data"):
+   866→        return {**result, "patents": [], "error": "No patent data for this scholar"}
+   867→    patent_list = patents["data"]
+   868→    result["patents_list"] = patent_list
+   869→
+   870→    top_patents = [p for p in patent_list[:3] if p.get("patent_id")]
+   871→    print(f"[3/3] Fetching details for {len(top_patents)} patents (parallel)...", file=sys.stderr)
+   872→    details = []
+   873→    with ThreadPoolExecutor(max_workers=3) as pool:
+   874→        futs = {pool.submit(patent_detail, token, p["patent_id"]): p["patent_id"]
+   875→                for p in top_patents}
+   876→        for fut in as_completed(futs):
+   877→            try:
+   878→                d = fut.result()
+   879→                if d and d.get("data"):
+   880→                    details.append(d["data"])
+   881→            except Exception as e:
+   882→                print(f"  [patent_detail] failed: {e}", file=sys.stderr)
+   883→    result["patent_details"] = details
+   884→    return result
+   885→
+   886→
+   887→# ──────────────────────────────────────────────────────────────────────────────
+   888→# Command-Line Entry Point
+   889→# ──────────────────────────────────────────────────────────────────────────────
+   890→
+   891→def build_parser() -> argparse.ArgumentParser:
+   892→    p = argparse.ArgumentParser(
+   893→        description="AMiner Open Platform Academic Data Query Client",
+   894→        formatter_class=argparse.RawDescriptionHelpFormatter,
+   895→        epilog="""
+   896→Examples:
+   897→  # Scholar profile analysis
+   898→  python aminer_client.py --token <TOKEN> --action scholar_profile --name "Andrew Ng"
+   899→
+   900→  # Paper deep dive
+   901→  python aminer_client.py --token <TOKEN> --action paper_deep_dive --title "BERT"
+   902→  python aminer_client.py --token <TOKEN> --action paper_deep_dive --keyword "large language model" --author "Hinton"
+   903→
+   904→  # Institution research capability analysis
+   905→  python aminer_client.py --token <TOKEN> --action org_analysis --org "Tsinghua University"
+   906→
+   907→  # Journal paper monitoring
+   908→  python aminer_client.py --token <TOKEN> --action venue_papers --venue "NeurIPS" --year 2023
+   909→
+   910→  # Academic Q&A (default: paper_qa_search_pro)
+   911→  python aminer_client.py --token <TOKEN> --action paper_qa --query "deep learning for protein structure"
+   912→  python aminer_client.py --token <TOKEN> --action paper_qa \\
+   913→    --query "graph neural network" --sort_citation --year_from 2020 --min_citations 50
+   914→  python aminer_client.py --token <TOKEN> --action paper_qa \\
+   915→    --topic_high '[["transformer","self-attention"],["protein folding"]]' \\
+   916→    --sci_flag --sort_citation
+   917→
+   918→  # Patent search
+   919→  python aminer_client.py --token <TOKEN> --action patent_search --query "quantum computing chip"
+   920→
+   921→  # Scholar patents
+   922→  python aminer_client.py --token <TOKEN> --action scholar_patents --name "Shou-Cheng Zhang"
+   923→
+   924→  # Direct single API call
+   925→  python aminer_client.py --token <TOKEN> --action raw \\
+   926→    --api paper_search --params '{"title":"BERT","page":0,"size":5}'
+   927→
+   928→Console (Generate Token): https://open.aminer.cn/open/board?tab=control
+   929→Docs: https://open.aminer.cn/open/docs
+   930→        """
+   931→    )
+   932→    p.add_argument(
+   933→        "--token",
+   934→        default=None,
+   935→        help=(
+   936→            "AMiner API Token. If not provided, reads from the environment variable AMINER_API_KEY by default; "
+   937→            "or go to https://open.aminer.cn/open/board?tab=control to generate one."
+   938→        ),
+   939→    )
+   940→    p.add_argument("--action", required=True,
+   941→                   choices=["scholar_profile", "paper_deep_dive", "org_analysis",
+   942→                            "venue_papers", "paper_qa", "patent_search",
+   943→                            "scholar_patents", "raw"],
+   944→                   help="Action to perform")
+   945→
+   946→    # General parameters
+   947→    p.add_argument("--name", help="Scholar name")
+   948→    p.add_argument("--title", help="Paper title")
+   949→    p.add_argument("--keyword", help="Keyword")
+   950→    p.add_argument("--author", help="Author name")
+   951→    p.add_argument("--org", help="Institution name")
+   952→    p.add_argument("--venue", help="Journal name")
+   953→    p.add_argument("--query", help="Query string (natural language Q&A or patent search)")
+   954→    p.add_argument("--year", type=int, help="Year filter")
+   955→    p.add_argument("--size", type=int, default=10, help="Number of results to return")
+   956→    p.add_argument("--page", type=int, default=0, help="Page number")
+   957→    p.add_argument("--page_size", type=int, default=100,
+   958→                   help="Org patent pagination size (max 10,000)")
+   959→    p.add_argument("--order", default="n_citation",
+   960→                   choices=["n_citation", "year"], help="Sort order")
+   961→
+   962→    # Paper QA specific
+   963→    p.add_argument("--topic_high", help="Required keyword array (JSON string; outer AND, inner OR)")
+   964→    p.add_argument("--topic_middle", help="Strongly boosted keywords (same format as topic_high)")
+   965→    p.add_argument("--sci_flag", action="store_true", help="Return SCI papers only")
+   966→    p.add_argument("--sort_citation", action="store_true", help="Sort by citation count")
+   967→    p.add_argument("--sort_year", action="store_true", help="Sort by year (most recent first)")
+   968→    p.add_argument("--author_id", help="Author ID filter; accepts single ID or JSON array string")
+   969→    p.add_argument("--org_id", help="Institution ID filter; accepts single ID or JSON array string")
+   970→    p.add_argument("--venue_ids", help="Conference/journal ID filter; accepts JSON array string")
+   971→    p.add_argument("--year_from", type=int, help="[paper_qa pro] start year (inclusive)")
+   972→    p.add_argument("--year_to", type=int, help="[paper_qa pro] end year (inclusive)")
+   973→    p.add_argument("--min_citations", type=int, help="[paper_qa pro] minimum citation count")
+   974→    p.add_argument("--cursor", help="[paper_qa pro] pagination cursor from previous next_cursor")
+   975→
+   976→    # Raw mode
+   977→    p.add_argument("--api", help="[raw mode] API function name, e.g. paper_search")
+   978→    p.add_argument("--params", help="[raw mode] Parameter dictionary in JSON format")
+   979→
+   980→    # Dry run
+   981→    p.add_argument("--dry-run", action="store_true", dest="dry_run",
+   982→                   help="Preview the API call chain and estimated cost without sending requests")
+   983→
+   984→    return p
+   985→
+   986→
+   987→WORKFLOW_DRY_RUN_INFO = {
+   988→    "scholar_profile": [
+   989→        ("person_search", 0), ("person_detail", 1.00), ("person_figure", 0.50),
+   990→        ("person_paper_relation", 1.50), ("person_patent_relation", 1.50), ("person_project", 1.50),
+   991→    ],
+   992→    "paper_deep_dive": [
+   993→        ("paper_search", 0), ("paper_detail", 0.01), ("paper_relation", 0.10), ("paper_info", 0),
+   994→    ],
+   995→    "org_analysis": [
+   996→        ("org_disambiguate_pro", 0.05), ("org_detail", 0.01),
+   997→        ("org_person_relation", 0.50), ("org_paper_relation", 0.10), ("org_patent_relation", 0.10),
+   998→    ],
+   999→    "venue_papers": [
+  1000→        ("venue_search", 0), ("venue_detail", 0.20), ("venue_paper_relation", 0.10),
+  1001→    ],
+  1002→    "paper_qa": [("paper_qa_search_pro", 0.70)],
+  1003→    "patent_search": [("patent_search", 0), ("patent_detail", 0.01)],
+  1004→    "scholar_patents": [
+  1005→        ("person_search", 0), ("person_patent_relation", 1.50), ("patent_detail", 0.01),
+  1006→    ],
+  1007→}
+  1008→
+  1009→
+  1010→def main():
+  1011→    parser = build_parser()
+  1012→    args = parser.parse_args()
+  1013→    token = (args.token or os.getenv("AMINER_API_KEY") or "").strip()
+  1014→
+  1015→    if args.dry_run:
+  1016→        info = WORKFLOW_DRY_RUN_INFO.get(args.action, [])
+  1017→        if not info:
+  1018→            print(f"[Dry Run] No preview available for action '{args.action}'.")
+  1019→        else:
+  1020→            total = sum(p for _, p in info)
+  1021→            print(f"[Dry Run] Action: {args.action}")
+  1022→            for i, (api, price) in enumerate(info, 1):
+  1023→                label = "Free" if price == 0 else f"¥{price:.2f}"
+  1024→                print(f"  {i}. {api} ({label})")
+  1025→            print(f"  Estimated total: ¥{total:.2f}")
+  1026→        return
+  1027→
+  1028→    if not token or not token.strip():
+  1029→        parser.error(
+  1030→            "Missing --token; cannot call AMiner API. Please go to "
+  1031→            "https://open.aminer.cn/open/board?tab=control to generate a token first."
+  1032→        )
+  1033→
+  1034→    def _parse_id_filter(value: Optional[str]) -> Optional[list]:
+  1035→        if not value:
+  1036→            return None
+  1037→        # Accepts a single ID string or a JSON array string
+  1038→        try:
+  1039→            parsed = json.loads(value)
+  1040→            if isinstance(parsed, list):
+  1041→                return parsed
+  1042→            if isinstance(parsed, str) and parsed.strip():
+  1043→                return [parsed.strip()]
+  1044→        except Exception:
+  1045→            pass
+  1046→        return [value.strip()] if value.strip() else None
+  1047→
+  1048→    if args.action == "scholar_profile":
+  1049→        if not args.name:
+  1050→            parser.error("--action scholar_profile requires --name")
+  1051→        result = workflow_scholar_profile(token, args.name)
+  1052→
+  1053→    elif args.action == "paper_deep_dive":
+  1054→        if not args.title and not args.keyword:
+  1055→            parser.error("--action paper_deep_dive requires --title or --keyword")
+  1056→        result = workflow_paper_deep_dive(
+  1057→            token, title=args.title, keyword=args.keyword,
+  1058→            author=args.author, order=args.order
+  1059→        )
+  1060→
+  1061→    elif args.action == "org_analysis":
+  1062→        if not args.org:
+  1063→            parser.error("--action org_analysis requires --org")
+  1064→        result = workflow_org_analysis(token, args.org)
+  1065→
+  1066→    elif args.action == "venue_papers":
+  1067→        if not args.venue:
+  1068→            parser.error("--action venue_papers requires --venue")
+  1069→        result = workflow_venue_papers(token, args.venue, year=args.year, limit=args.size)
+  1070→
+  1071→    elif args.action == "paper_qa":
+  1072→        if not args.query and not args.topic_high:
+  1073→            parser.error("--action paper_qa requires --query or --topic_high")
+  1074→        if args.sort_citation and args.sort_year:
+  1075→            parser.error("--sort_citation and --sort_year cannot both be enabled")
+  1076→        author_id_filter = _parse_id_filter(args.author_id)
+  1077→        org_id_filter = _parse_id_filter(args.org_id)
+  1078→        venue_ids_filter = _parse_id_filter(args.venue_ids)
+  1079→        result = workflow_paper_qa(
+  1080→            token, query=args.query,
+  1081→            topic_high=args.topic_high, topic_middle=args.topic_middle,
+  1082→            sci_flag=args.sci_flag, sort_citation=args.sort_citation, sort_year=args.sort_year,
+  1083→            author_id=author_id_filter, org_id=org_id_filter, venue_ids=venue_ids_filter,
+  1084→            size=args.size,
+  1085→            year_from=args.year_from, year_to=args.year_to,
+  1086→            min_citations=args.min_citations, cursor=args.cursor,
+  1087→        )
+  1088→
+  1089→    elif args.action == "patent_search":
+  1090→        if not args.query:
+  1091→            parser.error("--action patent_search requires --query")
+  1092→        result = workflow_patent_search(token, args.query, page=args.page, size=args.size)
+  1093→
+  1094→    elif args.action == "scholar_patents":
+  1095→        if not args.name:
+  1096→            parser.error("--action scholar_patents requires --name")
+  1097→        result = workflow_scholar_patents(token, args.name)
+  1098→
+  1099→    elif args.action == "raw":
+  1100→        if not args.api:
+  1101→            parser.error("--action raw requires --api (API function name)")
+  1102→        RAW_API_ALLOWLIST = {
+  1103→            "paper_search": paper_search,
+  1104→            "paper_search_pro": paper_search_pro,
+  1105→            "paper_qa_search": paper_qa_search,
+  1106→            "paper_qa_search_pro": paper_qa_search_pro,
+  1107→            "paper_info": paper_info,
+  1108→            "paper_detail": paper_detail,
+  1109→            "paper_relation": paper_relation,
+  1110→            "paper_list_by_keywords": paper_list_by_keywords,
+  1111→            "paper_detail_by_condition": paper_detail_by_condition,
+  1112→            "person_search": person_search,
+  1113→            "person_detail": person_detail,
+  1114→            "person_figure": person_figure,
+  1115→            "person_paper_relation": person_paper_relation,
+  1116→            "person_patent_relation": person_patent_relation,
+  1117→            "person_project": person_project,
+  1118→            "org_search": org_search,
+  1119→            "org_detail": org_detail,
+  1120→            "org_person_relation": org_person_relation,
+  1121→            "org_paper_relation": org_paper_relation,
+  1122→            "org_patent_relation": org_patent_relation,
+  1123→            "org_disambiguate": org_disambiguate,
+  1124→            "org_disambiguate_pro": org_disambiguate_pro,
+  1125→            "venue_search": venue_search,
+  1126→            "venue_detail": venue_detail,
+  1127→            "venue_paper_relation": venue_paper_relation,
+  1128→            "patent_search": patent_search,
+  1129→            "patent_info": patent_info,
+  1130→            "patent_detail": patent_detail,
+  1131→        }
+  1132→        fn = RAW_API_ALLOWLIST.get(args.api)
+  1133→        if fn is None:
+  1134→            allowed = ", ".join(sorted(RAW_API_ALLOWLIST.keys()))
+  1135→            parser.error(f"API function not found: {args.api}. Available APIs: {allowed}")
+  1136→        kwargs = json.loads(args.params) if args.params else {}
+  1137→        result = fn(token, **kwargs)
+  1138→
+  1139→    else:
+  1140→        parser.print_help()
+  1141→        sys.exit(1)
+  1142→
+  1143→    _print(result)
+  1144→
+  1145→    cost = get_cost_summary()
+  1146→    if cost["calls"] > 0:
+  1147→        parts = [f"{k}: ¥{v:.2f}" if v > 0 else f"{k}: Free"
+  1148→                 for k, v in sorted(cost["breakdown"].items())]
+  1149→        print(f"\n[Cost] ¥{cost['total']:.2f} total, {cost['calls']} API calls "
+  1150→              f"({', '.join(parts)})", file=sys.stderr)
+  1151→
+  1152→
+  1153→if __name__ == "__main__":
+  1154→    main()
+  1155→

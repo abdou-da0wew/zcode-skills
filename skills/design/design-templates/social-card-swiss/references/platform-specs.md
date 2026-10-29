@@ -89,8 +89,8 @@ Short-title rule:
 Example:
 
 ```text
-Long: 开源了一个 Skill，让 AI 接管你屏幕边那张便签纸
-Square: AI 接管便签纸
+Long: Open-sourced a Skill that lets AI take over the sticky note beside your screen
+Square: AI takes the sticky note
 ```
 
 Naming:
@@ -113,7 +113,7 @@ For supplied screenshots/photos:
 
 ## Final Response Media
 
-In Codex desktop, local media can be shown with absolute paths:
+In the DiveeOI desktop app, local media can be shown with absolute paths:
 
 ```markdown
 ![cover](/absolute/path/to/output/xhs-01-cover.png)

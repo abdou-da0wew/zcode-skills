@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,9 +18,9 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{background:var(--bg);color:var(--fg);font-family:"Songti SC","STSong","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;font-size:14px;line-height:1.8;-webkit-font-smoothing:antialiased}
-/* 中文段落均使用宋体 */
+/* All prose paragraphs use the serif face */
 :lang(zh),.intro-text,.showcase-text p,.showcase-text h3,.info-big,.hero-title,.card-title,.price .desc,.cell{font-family:"Songti SC","STSong","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif}
-/* 数字 / 拉丁字母仍保持等宽，但中文遇到等宽会 fallback 回宋体 */
+/* Numbers / Latin letters stay monospaced; CJK glyphs fall back to the serif face when monospaced */
 .header-logo,.nav a,.hero-meta,.hero-sub,.sec-head,.scroll-cue,.tag,.card-num,.card-tags,.spec-row b,.price h4,.price .num,.platforms,.footer,.here{font-family:"SF Mono","Menlo","Consolas","Songti SC","STSong","SimSun",serif}
 a{color:inherit;text-decoration:none;cursor:pointer}
 ::selection{background:var(--accent);color:var(--bg)}
@@ -53,7 +53,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 .hero-title .em{font-style:italic;color:var(--accent)}
 .hero-sub{font-size:14px;letter-spacing:0.3em;color:var(--dim);margin-bottom:36px}
 
-/* ASCII 大标题 */
+/* ASCII big title */
 .ascii-title{font-family:"SF Mono","Menlo","Consolas",monospace;color:var(--accent);white-space:pre;display:inline-block;text-align:left;line-height:1;font-weight:700;margin:0 auto;letter-spacing:0;text-shadow:0 0 12px rgba(139,233,255,.5),0 0 2px rgba(199,146,234,.4)}
 .ascii-title.lg{font-size:clamp(8px,1.25vw,14px);line-height:1.05}
 .ascii-title.md{font-size:clamp(6px,.85vw,10px);color:var(--fg)}
@@ -63,7 +63,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 .ascii-cn{display:none}
 .sec-ascii{display:block;color:var(--accent);white-space:pre;font-family:"SF Mono",monospace;font-size:14px;line-height:1;margin-bottom:10px;opacity:.85;letter-spacing:0.4em}
 
-/* 中文真字宋体大标题 + ASCII 网点背景 */
+/* Serif display title with ASCII dot-matrix backdrop */
 .brand-block{text-align:center;line-height:1;display:inline-block;padding:36px 64px;position:relative}
 .brand-block::before{
   content:"";position:absolute;inset:0;
@@ -72,7 +72,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   pointer-events:none;
   opacity:.85;
   z-index:0;
-  /* 中间淡四角浓的渐隐遮罩，像深空尘埃 */
+  /* Fade-out mask, faint at center and dense at corners, like deep-space dust */
   -webkit-mask-image:radial-gradient(ellipse at center, transparent 30%, #000 90%);
           mask-image:radial-gradient(ellipse at center, transparent 30%, #000 90%);
 }
@@ -88,7 +88,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   position:relative;
   z-index:1;
 
-  /* 字内填充：星云网点，模拟字符画/星尘 */
+  /* In-glyph fill: nebula dot-matrix, mimicking character art / stardust */
   background-image:
     radial-gradient(circle, var(--accent) 0.95px, transparent 1.3px),
     radial-gradient(circle, var(--accent2) 0.45px, transparent 0.85px);
@@ -99,7 +99,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   color:transparent;
   -webkit-text-fill-color:transparent;
 
-  /* 极细描边 */
+  /* Ultra-thin outline */
   -webkit-text-stroke:0.4px rgba(139,233,255,.55);
   text-shadow:0 0 8px rgba(139,233,255,.3);
 }
@@ -152,7 +152,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 .card-tags span{font-size:10px;letter-spacing:0.16em;color:var(--dim);padding:2px 8px;border:1px solid var(--line);text-transform:uppercase}
 .card.hidden{display:none}
 
-/* SHOWCASE / UI 截图 */
+/* SHOWCASE / UI screenshots */
 .showcase{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center;margin-top:24px}
 .showcase-shot{border:1px solid var(--line);background:var(--paper);padding:14px;position:relative;box-shadow:0 8px 28px -16px rgba(139,233,255,.3)}
 .showcase-shot .bar{display:flex;gap:6px;margin-bottom:10px}
@@ -209,7 +209,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 /* FOOTER */
 .footer{padding:24px 32px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:0.18em;color:var(--dim);border-top:1px solid var(--line);flex-wrap:wrap;gap:12px;background:var(--paper)}
 
-/* HERO 后景柔光遮罩，仅在中心给标题留出可读区，四周让 ASCII 充分显现 */
+/* HERO backdrop soft-light mask: leaves a readable zone for the title only at the center, lets the ASCII show fully around it */
 .hero::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(82vw,1100px);height:min(58vh,520px);background:radial-gradient(ellipse at center,rgba(5,6,15,.85) 0%,rgba(5,6,15,.6) 40%,rgba(5,6,15,0) 80%);pointer-events:none;z-index:1;border-radius:50%}
 
 @media(max-width:900px){
@@ -228,7 +228,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 </head>
 <body>
 
-<!-- HEADER · SWAP-2: logo + 5 项导航 -->
+<!-- HEADER · SWAP-2: logo + 5 nav items -->
 <div class="header">
   <div class="header-logo"><a href="#top">{{LOGO_TEXT}}</a></div>
   <nav class="nav">
@@ -242,8 +242,8 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   </nav>
 </div>
 
-<!-- HEY · 角落问候，可改成产品 slogan -->
-<div class="here">{{GREETING}}<br><span class="blink">▮</span> 现在是 凌晨 03:14</div>
+<!-- HEY · corner greeting; can be changed to the product slogan -->
+<div class="here">{{GREETING}}<br><span class="blink">▮</span> it is 03:14 am</div>
 
 <!-- HERO -->
 <section class="hero" id="top">
@@ -254,9 +254,9 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   <pre id="ascii-comets" class="ascii-layer"></pre>
   <div class="hero-overlay">
     <div class="brand-wrap-outer">
-<!-- SWAP-3: 产品英文名的 5-6 行 ANSI Shadow ASCII 字模。
-     字模生成参考 patorjk.com/software/taag (字体 ANSI Shadow)。
-     最长支持 ~10 字母；超长名缩写或换更窄的字体。 -->
+<!-- SWAP-3: 5-6 line ANSI Shadow ASCII letterforms of the product's English name.
+     Generate letterforms with patorjk.com/software/taag (font: ANSI Shadow).
+     Supports up to ~10 letters; abbreviate longer names or switch to a narrower font. -->
 <pre class="ascii-title lg">
 {{ASCII_TITLE_LINE_1}}
 {{ASCII_TITLE_LINE_2}}
@@ -265,29 +265,29 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 {{ASCII_TITLE_LINE_5}}
 {{ASCII_TITLE_LINE_6}}
 </pre>
-      <!-- SWAP-4a: 中文 1-2 字大字（会渲染为彩色网点字） -->
+      <!-- SWAP-4a: 1-2 CJK display characters (rendered as colored dot-matrix type) -->
       <div class="brand-cn-sub">{{PRODUCT_CN_BIG}}</div>
     </div>
-    <!-- SWAP-4b: hero 副标语，30-50 字，每字之间空格让节奏更慢 -->
+    <!-- SWAP-4b: hero sub-slogan, 30-50 characters, spaces between characters slow the rhythm -->
     <div class="hero-sub" style="margin-top:28px">{{HERO_TAGLINE}}</div>
-    <!-- SWAP-4c: 3 个 meta — 版本 / 类型 / 平台 -->
+    <!-- SWAP-4c: 3 meta items — version / type / platform -->
     <div class="hero-meta">
       <span>{{META_LABEL_1}} <b>{{META_VALUE_1}}</b></span>
       <span>{{META_LABEL_2}} <b>{{META_VALUE_2}}</b></span>
       <span>{{META_LABEL_3}} <b>{{META_VALUE_3}}</b></span>
     </div>
   </div>
-  <div class="scroll-cue">↓ 向 下 滚 动 探 索 ↓</div>
+  <div class="scroll-cue">↓ scroll down to explore ↓</div>
 </section>
 
-<!-- INTRO · SWAP-5: 关于段落 + 3 个亮点格 -->
+<!-- INTRO · SWAP-5: about paragraph + 3 highlight cells -->
 <section class="sec">
-  <div class="sec-head"><h2><pre class="sec-ascii">═══ ❖ ═══</pre>关于</h2><div class="idx">[ 01 / 05 ]</div></div>
+  <div class="sec-head"><h2><pre class="sec-ascii">═══ ❖ ═══</pre>About</h2><div class="idx">[ 01 / 05 ]</div></div>
   <div class="intro">
     <p class="intro-text">
       {{ABOUT_PARAGRAPH_HTML}}
-      <!-- 段落里要撒 3-5 个 <span class="pt" data-text="原文">原文</span>
-           做 hover 字符乱码动效，2-3 个 <span class="em">关键词</span> 做色字强调 -->
+      <!-- Sprinkle 3-5 <span class="pt" data-text="original">original</span> in the paragraph
+           for the hover character-scramble effect, and 2-3 <span class="em">keywords</span> for colored emphasis -->
     </p>
     <div class="intro-grid">
       <div class="cell"><b>✦ {{HIGHLIGHT_1_TITLE}}</b>{{HIGHLIGHT_1_DESC}}</div>
@@ -297,11 +297,11 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   </div>
 </section>
 
-<!-- FEATURES GRID · SWAP-6: 6 张功能卡片  +  SWAP-7: 4-5 个分类筛选 -->
+<!-- FEATURES GRID · SWAP-6: 6 feature cards  +  SWAP-7: 4-5 category filters -->
 <section class="sec" id="features">
   <div class="sec-head"><h2><pre class="sec-ascii">═══ ❍ ═══</pre>{{FEATURES_TITLE}}</h2><div class="idx">[ 02 / 05 ]</div></div>
   <div class="filter">
-    <a class="tag active" data-cat="all"><span class="dot"></span>全部</a>
+    <a class="tag active" data-cat="all"><span class="dot"></span>All</a>
     <a class="tag" data-cat="{{CAT_1_KEY}}"><span class="dot"></span>{{CAT_1_LABEL}}</a>
     <a class="tag" data-cat="{{CAT_2_KEY}}"><span class="dot"></span>{{CAT_2_LABEL}}</a>
     <a class="tag" data-cat="{{CAT_3_KEY}}"><span class="dot"></span>{{CAT_3_LABEL}}</a>
@@ -309,7 +309,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   </div>
   <div class="grid" id="grid">
 
-    <!-- 卡片模板：data-cat 必须用上面 4 个 key 之一（可空格分隔多个） -->
+    <!-- Card template: data-cat must be one of the 4 keys above (space-separated for multiple) -->
     <div class="card" data-cat="{{CARD_1_CATS}}">
       <div class="card-img">
         <img src="{{CARD_1_IMG_URL}}" alt="{{CARD_1_TITLE}}">
@@ -385,7 +385,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   </div>
 </section>
 
-<!-- SHOWCASE · SWAP-8: 2 块界面截图 + 文案 -->
+<!-- SHOWCASE · SWAP-8: 2 interface screenshots + copy -->
 <section class="sec" id="showcase">
   <div class="sec-head"><h2><pre class="sec-ascii">═══ ◈ ═══</pre>{{SHOWCASE_TITLE}}</h2><div class="idx">[ 03 / 05 ]</div></div>
 
@@ -397,10 +397,10 @@ a{color:inherit;text-decoration:none;cursor:pointer}
     <div class="showcase-text">
 <pre class="mini-ascii">{{SHOWCASE_1_MINI_ASCII}}</pre>
       <h3>{{SHOWCASE_1_HEADLINE_HTML}}</h3>
-      <!-- headline 可用 <span class="em">关键词</span> 强调 -->
+      <!-- headline may use <span class="em">keywords</span> for emphasis -->
       <p>{{SHOWCASE_1_PARA_1_HTML}}</p>
       <p>{{SHOWCASE_1_PARA_2_HTML}}</p>
-      <!-- 段落里撒 1-2 个 <span class="pt" data-text="...">...</span> -->
+      <!-- sprinkle 1-2 <span class="pt" data-text="...">...</span> into the paragraphs -->
     </div>
   </div>
 
@@ -418,7 +418,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   </div>
 </section>
 
-<!-- SPEC · SWAP-9: 大图 + 10 行规格表 -->
+<!-- SPEC · SWAP-9: large image + 10-row spec table -->
 <section class="sec" id="spec">
   <div class="sec-head"><h2><pre class="sec-ascii">═══ ✦ ═══</pre>{{SPEC_TITLE}}</h2><div class="idx">[ 04 / 05 ]</div></div>
   <div class="spec-wrap">
@@ -441,7 +441,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   </div>
 </section>
 
-<!-- PRICING · SWAP-10: 3 档订阅，中间档加 .featured -->
+<!-- PRICING · SWAP-10: 3 subscription tiers, middle tier gets .featured -->
 <section class="sec" id="price">
   <div class="sec-head"><h2><pre class="sec-ascii">═══ ❑ ═══</pre>{{PRICING_TITLE}}</h2><div class="idx">[ 05 / 05 ]</div></div>
   <div class="price-grid">
@@ -493,11 +493,11 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   </div>
 </section>
 
-<!-- INFO / CTA · SWAP-11: 大字 CTA + 3 按钮 + 平台标签 -->
+<!-- INFO / CTA · SWAP-11: big-type CTA + 3 buttons + platform tags -->
 <section class="sec info" id="info">
   <div class="info-orbit"><pre id="info-ascii"></pre></div>
   <div class="info-big">{{CTA_BIG_HTML}}</div>
-  <!-- CTA_BIG 可用 <em>...</em> 强调，<br> 换行 -->
+  <!-- CTA_BIG may use <em>...</em> for emphasis and <br> for line breaks -->
   <div class="hero-sub">{{CTA_SUB}}</div>
   <div class="info-links">
     <a class="pt" data-text="{{CTA_BTN_1}}">{{CTA_BTN_1}}</a>
@@ -517,7 +517,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 
 <script>
 /* ============================================================
-   1. HERO ASCII ：旋转球体 + 行星轨道 + 星点场
+   1. HERO ASCII : rotating sphere + planetary orbits + star field
    ============================================================ */
 (function(){
   const elNeb = document.getElementById('ascii-nebula');
@@ -533,13 +533,13 @@ a{color:inherit;text-decoration:none;cursor:pointer}
   let nebulae = [];
 
   // ============================================================
-  // SWAP-13 · ASCII 场景资产（motif 可替换处）
-  // 想换主题（咖啡/森林/音乐/代码/齿轮/海洋…），只改这个 SCENE 对象。
-  // 渲染逻辑不要动 — 只要每个键的"形状个数 / 字符个数"保持合理即可。
-  // 详见 SKILL.md「ASCII 场景 motif 库」。
+  // SWAP-13 · ASCII scene assets (the replaceable motif)
+  // To change the theme (coffee/forest/music/code/gears/ocean…), edit only this SCENE object.
+  // Do not touch the rendering logic — just keep each key's "shape count / character count" reasonable.
+  // See SKILL.md, "ASCII scene motif library".
   // ============================================================
   const SCENE = {
-    // 漂浮的不规则物体（默认：小行星）。每个元素是多行 string 数组
+    // Drifting irregular objects (default: asteroids). Each entry is a multi-line string array
     floaters: [
       [
         "  .-~~-. ",
@@ -575,23 +575,23 @@ a{color:inherit;text-decoration:none;cursor:pointer}
         " `-,_,-' "
       ]
     ],
-    // 中央旋转球体的明暗梯度字符（暗→亮）。默认：太空岩石球
+    // Shading ramp of the central rotating sphere (dark→light). Default: space rock ball
     centerShade: " .,:;-~+*=%#@█",
-    // 弥漫底层的"气体云"字符梯度（淡→浓）。默认：星云尘埃
+    // Character ramp of the diffuse background "gas cloud" (light→dense). Default: nebula dust
     diffuseChars: "·∙∶⋮⋯░▒",
-    // 闪烁的散点：稀有 / 中频 / 普通频。默认：星
-    sparkRare:   "★",   // ~4% 概率出现
+    // Twinkling sparks: rare / medium / common frequency. Default: stars
+    sparkRare:   "★",   // appears ~4% of the time
     sparkBright: "✦",   // ~15%
-    sparkDim:    ".∙",  // 其余对半分
-    // 飞掠物：头 + 拖尾从近到远 5 段。默认：彗星
+    sparkDim:    ".∙",  // the rest split evenly
+    // Streaking object: head + 5-segment trail fading from near to far. Default: comet
     streakHead:    "☄",
     streakTailNear:"*",
     streakTailMid: "∙",
     streakTailFar: "·",
     streakTailEnd: ".",
-    // 中央球体周围的 3 颗"卫星" + 轨道线点
-    centerSats:    "◉◎○",   // 3 颗，由内向外
-    orbitDots:     ".∙•"     // 3 圈轨道，由内向外
+    // The 3 "satellites" around the central sphere + orbit-ring dots
+    centerSats:    "◉◎○",   // 3, inner to outer
+    orbitDots:     ".∙•"     // 3 rings, inner to outer
   };
   // ============================================================
   // END SWAP-13
@@ -680,7 +680,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
     const bufAst = newBuf();
     const bufComet = newBuf();
 
-    // 星云气体
+    // Nebula gas
     for(const n of nebulae){
       const cx = n.x + Math.sin(t*0.2 + n.seed)*3;
       const cy = n.y + Math.cos(t*0.15 + n.seed)*2;
@@ -701,7 +701,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       }
     }
 
-    // 闪烁星点
+    // Twinkling stars
     for(const s of stars){
       const xi = Math.floor((s.x + Math.sin(t*0.3 + s.y)*0.3 + cols)%cols);
       const yi = Math.floor(s.y);
@@ -711,7 +711,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       }
     }
 
-    // 旋转行星
+    // Rotating planet
     const cx = cols/2, cy = rows/2;
     const R = Math.min(cols,rows*2)*0.18;
     const aspect = 0.5;
@@ -734,7 +734,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       }
     }
 
-    // 行星轨道与卫星
+    // Planetary orbits and satellites
     for(let i=0; i<3; i++){
       const orbR = R*(1.6 + i*0.5);
       const tilt = 0.35 + i*0.1;
@@ -754,7 +754,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       if(sx>=0&&sx<cols&&sy>=0&&sy<rows) bufPlanet[sy][sx] = SCENE.centerSats[i] || SCENE.centerSats[SCENE.centerSats.length-1];
     }
 
-    // 彗星拖尾
+    // Comet trails
     for(const c of comets){
       c.x += c.vx; c.y += c.vy; c.life++;
       if(c.x>cols+10 || c.y>rows+5){
@@ -771,7 +771,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       }
     }
 
-    // 漂浮的小行星
+    // Drifting asteroids
     for(const a of asteroids){
       a.x += a.vx; a.y += a.vy; a.rot += a.rs;
       if(a.x<-6) a.x = cols+6;
@@ -793,14 +793,14 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 })();
 
 /* ============================================================
-   2. INFO 区小型轨道
+   2. INFO section mini orbit
    ============================================================ */
 (function(){
   const el = document.getElementById('info-ascii');
   if(!el) return;
   const W=44, H=22;
   let t=0;
-  // 小行星带的随机位置
+  // Random positions of the asteroid belt
   const belt = [];
   for(let i=0;i<14;i++){
     belt.push({
@@ -815,7 +815,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
     const buf = Array.from({length:H},()=>new Array(W).fill(' '));
     const cx=W/2, cy=H/2;
 
-    // 散落的星点背景
+    // Scattered star-dot background
     for(let i=0;i<24;i++){
       const x = Math.floor((Math.sin(i*7.3)+1)*W/2);
       const y = Math.floor((Math.cos(i*5.1)+1)*H/2);
@@ -823,7 +823,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       if(x>=0&&x<W&&y>=0&&y<H && tw>0.6) buf[y][x]='.';
     }
 
-    // 行星轨道
+    // Planetary orbits
     for(let i=0;i<4;i++){
       const r = 3+i*2.6;
       for(let a=0;a<Math.PI*2;a+=0.18){
@@ -837,7 +837,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       if(x>=0&&x<W&&y>=0&&y<H) buf[y][x]='★';
     }
 
-    // 外侧小行星带
+    // Outer asteroid belt
     for(const b of belt){
       const ang = b.a + t*b.sp*0.3;
       const x = Math.floor(cx + b.r*Math.cos(ang));
@@ -845,7 +845,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
       if(x>=0&&x<W&&y>=0&&y<H) buf[y][x]=b.ch;
     }
 
-    // 中心恒星与日冕
+    // Central star and corona
     if(buf[Math.floor(cy)]) buf[Math.floor(cy)][Math.floor(cx)]='◉';
     const halo = [[-1,0,'-'],[1,0,'-'],[0,-1,'|'],[0,1,'|']];
     for(const [dx,dy,ch] of halo){
@@ -860,8 +860,8 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 })();
 
 /* ============================================================
-   3. PROTEXT ：文本乱码-解码效果
-   悬停或进入视口时，文字先打乱再逐字"解密"显现
+   3. PROTEXT : text scramble-then-decode effect
+   On hover or viewport entry, text scrambles first, then "decrypts" character by character
    ============================================================ */
 (function(){
   const glyphs = "★☆✶✦✧◉◎○●∙•~≈≋▁▂▃▄▅▆▇█ABCDEFGHJKLMNPQRSTUVWXYZ0123456789@#%&*";
@@ -913,7 +913,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 })();
 
 /* ============================================================
-   4. 标签筛选
+   4. Tag filtering
    ============================================================ */
 (function(){
   const tags = document.querySelectorAll('.tag');
@@ -935,7 +935,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}
 })();
 
 /* ============================================================
-   5. 平滑滚动
+   5. Smooth scrolling
    ============================================================ */
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click', e=>{
@@ -948,7 +948,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 });
 
 /* ============================================================
-   6. 实时时钟
+   6. Live clock
    ============================================================ */
 (function(){
   const el = document.querySelector('.here');
@@ -956,7 +956,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   function fmt(n){return n<10?'0'+n:n}
   function tick(){
     const d = new Date();
-    el.innerHTML = '{{GREETING}}<br><span class="blink">▮</span> 现在是 ' + fmt(d.getHours())+':'+fmt(d.getMinutes())+':'+fmt(d.getSeconds());
+    el.innerHTML = '{{GREETING}}<br><span class="blink">▮</span> it is ' + fmt(d.getHours())+':'+fmt(d.getMinutes())+':'+fmt(d.getSeconds());
     setTimeout(tick, 1000);
   }
   tick();

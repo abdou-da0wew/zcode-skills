@@ -110,8 +110,8 @@ p, .body-text, td, li {
 ```
 
 **Effect of `line-break: strict`**:
-- Prevents line-start: ，。、；：！？）】》…—
-- Prevents line-end: （【《
+- Prevents line-start: CJK comma (U+FF0C), ideographic full stop (U+3002), enum comma (U+3001), semicolon/colon/exclamation/question (U+FF1B U+FF1A U+FF01 U+FF1F), closing brackets/quotes (U+FF09 U+3011 U+300B), ellipsis (U+2026), em dash (U+2014)
+- Prevents line-end: opening brackets (U+FF08 U+3010 U+300A)
 - Natively supported by Chromium engine, no extra JS needed
 
 ### ReportLab Route
@@ -134,9 +134,9 @@ style = ParagraphStyle(
 
 ## 4. Major Section Page-Break Rule (3/4 Threshold)
 
-**Problem**: A major section (H1/一级标题) ends at ~75% of the page, and the next major section’s title gets squeezed into the remaining 25%. This looks cramped and ugly — the new section deserves a fresh page.
+**Problem**: A major section (H1-level heading) ends at ~75% of the page, and the next major section’s title gets squeezed into the remaining 25%. This looks cramped and ugly — the new section deserves a fresh page.
 
-**Iron Rule**: When a major section (H1-level heading, e.g., “一、”“二、” or “Chapter 1”) is about to start, check remaining page space:
+**Iron Rule**: When a major section (H1-level heading, e.g., a CJK-numbered section or "Chapter 1") is about to start, check remaining page space:
 
 | Remaining space | Action |
 |----------------|--------|
@@ -193,7 +193,7 @@ document.querySelectorAll('h1, .major-section-title').forEach(h => {
 \section{New Major Section}
 ```
 
-**Scope**: This rule applies to **H1-level headings only** (major sections, chapters, top-level numbered items like “一、”“二、”). Sub-sections (H2, H3) follow the standard heading-body binding rule (no orphan headings at page bottom) but do NOT force page breaks.
+**Scope**: This rule applies to **H1-level headings only** (major sections, chapters, top-level numbered items). Sub-sections (H2, H3) follow the standard heading-body binding rule (no orphan headings at page bottom) but do NOT force page breaks.
 
 ---
 
@@ -260,7 +260,7 @@ All multi-page documents MUST follow this five-zone page numbering convention un
 
 ### Key Rules
 
-0. **NEVER use "Page X of Y" format (denominator is FORBIDDEN).** Footer must show only the page number itself (e.g., `1`, `2`, `iii`). Do NOT display total page count. No `Page 3 of 12`, no `第3页/共12页`, no `3 / 12`. Just the bare number.
+0. **NEVER use "Page X of Y" format (denominator is FORBIDDEN).** Footer must show only the page number itself (e.g., `1`, `2`, `iii`). Do NOT display total page count. No `Page 3 of 12`, no `Page 3 / Total 12`, no `3 / 12`. Just the bare number.
 
 1. **Cover page is ALWAYS page 1 internally** but the page number is **never displayed**. This is achieved by suppressing the footer/header on the first page, not by excluding it from the page count.
 

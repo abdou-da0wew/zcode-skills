@@ -1,12 +1,14 @@
 ---
 name: VLM
-description: Implement vision-based AI chat capabilities using the z-ai-web-dev-sdk. Use this skill when the user needs to analyze images, describe visual content, or create applications that combine image understanding with conversational AI. Supports image URLs and base64 encoded images for multimodal interactions.
+description: Implement vision-based AI chat capabilities against any OpenAI-compatible server using plain HTTP calls. Use this skill when the user needs to analyze images, describe visual content, or create applications that combine image understanding with conversational AI. Supports image URLs and base64 encoded images for multimodal interactions. Works with any OpenAI-compatible LLM server (open-source or free), designed for the DiveeOI agent (OpenCode-based).
 license: MIT
 ---
 
 # VLM(Vision Chat) Skill
 
-This skill guides the implementation of vision chat functionality using the z-ai-web-dev-sdk package, enabling AI models to understand and respond to images combined with text prompts.
+This skill guides the implementation of vision chat functionality using plain OpenAI-compatible HTTP calls (no SDK, no extra dependencies), enabling AI models to understand and respond to images combined with text prompts.
+
+It works with any OpenAI-compatible LLM server (open-source or free) — Ollama, vLLM, LM Studio, OpenRouter, and most gateways — provided the configured model is vision-capable (e.g. `qwen2.5-vl`, `llama3.2-vision`, `minicpm-v`). Designed for the DiveeOI agent (OpenCode-based).
 
 ## Skills Path
 
@@ -20,78 +22,113 @@ this skill is located at above path in your project.
 
 Vision Chat allows you to build applications that can analyze images, extract information from visual content, and answer questions about images through natural language conversation.
 
-**IMPORTANT**: z-ai-web-dev-sdk MUST be used in backend code only. Never use it in client-side code.
+**IMPORTANT**: Keep your API key in backend code or environment variables only. Never hardcode credentials in client-side code.
 
 ## Prerequisites
 
-The z-ai-web-dev-sdk package is already installed. Import it as shown in the examples below.
+- Node.js 18+ (for the global `fetch` API) or any HTTP client
+- An OpenAI-compatible server with a **vision-capable** model installed
+- No npm packages required — examples use built-in APIs only
+
+## Configuration (Environment Variables)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LLM_BASE_URL` | `http://localhost:11434/v1` | OpenAI-compatible base URL |
+| `LLM_API_KEY` | (empty) | API key sent as `Authorization: Bearer <key>`; leave empty for local servers |
+| `LLM_MODEL` | `qwen2.5` | **Vision-capable** model name (e.g. `qwen2.5-vl`, `llama3.2-vision`, `minicpm-v`) |
+
+### Shared Client Helper
+
+All examples below use this helper (plain `fetch`, zero dependencies):
+
+```javascript
+const BASE_URL = process.env.LLM_BASE_URL ?? "http://localhost:11434/v1";
+const API_KEY = process.env.LLM_API_KEY ?? "";
+const MODEL = process.env.LLM_MODEL ?? "qwen2.5";
+
+async function chatCompletions(body) {
+  const res = await fetch(`${BASE_URL}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`LLM request failed (${res.status}): ${await res.text()}`);
+  return res.json();
+}
+```
 
 ## CLI Usage (For Simple Tasks)
 
-For simple image analysis tasks, you can use the z-ai CLI instead of writing code. This is ideal for quick image descriptions, testing vision capabilities, or simple automation.
+For simple image analysis tasks, you can use `curl` instead of writing code. This is ideal for quick image descriptions, testing vision capabilities, or simple automation.
 
 ### Basic Image Analysis
 
 ```bash
 # Describe an image from URL
-z-ai vision --prompt "What's in this image?" --image "https://example.com/photo.jpg"
-
-# Using short options
-z-ai vision -p "Describe this image" -i "https://example.com/image.png"
+curl -s "$LLM_BASE_URL/chat/completions" \
+  -H "Content-Type: application/json" \
+  ${LLM_API_KEY:+-H "Authorization: Bearer $LLM_API_KEY"} \
+  -d '{
+    "model": "qwen2.5-vl",
+    "messages": [{
+      "role": "user",
+      "content": [
+        {"type": "text", "text": "What'"'"'s in this image?"},
+        {"type": "image_url", "image_url": {"url": "https://example.com/photo.jpg"}}
+      ]
+    }]
+  }'
 ```
 
 ### Analyze Local Images
 
 ```bash
-# Analyze a local image file
-z-ai vision -p "What objects are in this photo?" -i "./photo.jpg"
-
-# Save response to file
-z-ai vision -p "Describe the scene" -i "./landscape.png" -o description.json
+# Analyze a local image file: encode it to a base64 data URL first
+B64=$(base64 -w0 ./photo.jpg)
+curl -s "$LLM_BASE_URL/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "qwen2.5-vl",
+    "messages": [{
+      "role": "user",
+      "content": [
+        {"type": "text", "text": "What objects are in this photo?"},
+        {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,'"$B64"'"}}
+      ]
+    }]
+  }' -o description.json
 ```
 
 ### Multiple Images
 
 ```bash
-# Analyze multiple images at once
-z-ai vision \
-  -p "Compare these two images" \
-  -i "./photo1.jpg" \
-  -i "./photo2.jpg" \
-  -o comparison.json
-
-# Multiple images with detailed analysis
-z-ai vision \
-  --prompt "What are the differences between these images?" \
-  --image "https://example.com/before.jpg" \
-  --image "https://example.com/after.jpg"
-```
-
-### With Thinking (Chain of Thought)
-
-```bash
-# Enable thinking for complex visual reasoning
-z-ai vision \
-  -p "Count the number of people in this image and describe their activities" \
-  -i "./crowd.jpg" \
-  --thinking \
-  -o analysis.json
-```
-
-### Streaming Output
-
-```bash
-# Stream the vision analysis
-z-ai vision -p "Describe this image in detail" -i "./photo.jpg" --stream
+# Analyze multiple images at once (multiple content parts)
+curl -s "$LLM_BASE_URL/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "qwen2.5-vl",
+    "messages": [{
+      "role": "user",
+      "content": [
+        {"type": "text", "text": "Compare these two images"},
+        {"type": "image_url", "image_url": {"url": "https://example.com/before.jpg"}},
+        {"type": "image_url", "image_url": {"url": "https://example.com/after.jpg"}}
+      ]
+    }]
+  }' -o comparison.json
 ```
 
 ### CLI Parameters
 
-- `--prompt, -p <text>`: **Required** - Question or instruction about the image(s)
-- `--image, -i <URL or path>`: Optional - Image URL or local file path (can be used multiple times)
-- `--thinking, -t`: Optional - Enable chain-of-thought reasoning (default: disabled)
-- `--output, -o <path>`: Optional - Output file path (JSON format)
-- `--stream`: Optional - Stream the response in real-time
+- Request body fields follow the standard OpenAI Chat Completions schema:
+  - `model`: **Required** - Vision-capable model name
+  - `messages`: **Required** - Array of messages; multimodal messages use content parts (`text`, `image_url`)
+  - `temperature`, `max_tokens`: Optional - Sampling controls
+  - `stream`: Optional - Stream the response in real-time
 
 ### Supported Image Formats
 
@@ -101,15 +138,15 @@ z-ai vision -p "Describe this image in detail" -i "./photo.jpg" --stream
 - WebP (.webp)
 - BMP (.bmp)
 
-### When to Use CLI vs SDK
+### When to Use CLI vs Code
 
-**Use CLI for:**
+**Use curl for:**
 - Quick image analysis
 - Testing vision model capabilities
 - One-off image descriptions
 - Simple automation scripts
 
-**Use SDK for:**
+**Use code for:**
 - Multi-turn conversations with images
 - Dynamic image analysis in applications
 - Batch processing with custom logic
@@ -121,10 +158,10 @@ For better performance and reliability, use base64 encoding to pass images to th
 
 ## Supported Content Types
 
-The Vision Chat API supports three types of media content:
+The vision chat API accepts multimodal content parts. Three part types are commonly seen in the ecosystem:
 
 ### 1. **image_url** - For Image Files
-Use this type for static images (PNG, JPEG, GIF, WebP, etc.)
+Use this type for static images (PNG, JPEG, GIF, WebP, etc.). Universally supported by vision servers.
 ```typescript
 {
     role: 'user',
@@ -136,7 +173,7 @@ Use this type for static images (PNG, JPEG, GIF, WebP, etc.)
 ```
 
 ### 2. **video_url** - For Video Files
-Use this type for video content (MP4, AVI, MOV, etc.)
+Use this type for video content (MP4, AVI, MOV, etc.). Support depends on the server/model (video VLMs such as Qwen-VL-Video style deployments).
 ```typescript
 {
     role: 'user',
@@ -148,7 +185,7 @@ Use this type for video content (MP4, AVI, MOV, etc.)
 ```
 
 ### 3. **file_url** - For Document Files
-Use this type for document files (PDF, DOCX, TXT, etc.)
+Use this type for document files (PDF, DOCX, TXT, etc.). Support depends on the server; many deployments only accept `image_url` and `text`.
 ```typescript
 {
     role: 'user',
@@ -166,12 +203,9 @@ Use this type for document files (PDF, DOCX, TXT, etc.)
 ### Single Image Analysis
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-
 async function analyzeImage(imageUrl, question) {
-  const zai = await ZAI.create();
-
-  const response = await zai.chat.completions.createVision({
+  const response = await chatCompletions({
+    model: MODEL,
     messages: [
       {
         role: 'user',
@@ -188,8 +222,7 @@ async function analyzeImage(imageUrl, question) {
           }
         ]
       }
-    ],
-    thinking: { type: 'disabled' }
+    ]
   });
 
   return response.choices[0]?.message?.content;
@@ -206,11 +239,7 @@ console.log('Analysis:', result);
 ### Multiple Images Analysis
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-
 async function compareImages(imageUrls, question) {
-  const zai = await ZAI.create();
-
   const content = [
     {
       type: 'text',
@@ -222,14 +251,14 @@ async function compareImages(imageUrls, question) {
     }))
   ];
 
-  const response = await zai.chat.completions.createVision({
+  const response = await chatCompletions({
+    model: MODEL,
     messages: [
       {
         role: 'user',
         content: content
       }
-    ],
-    thinking: { type: 'disabled' }
+    ]
   });
 
   return response.choices[0]?.message?.content;
@@ -248,18 +277,16 @@ const comparison = await compareImages(
 ### Base64 Image Support
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
 import fs from 'fs';
 
 async function analyzeLocalImage(imagePath, question) {
-  const zai = await ZAI.create();
-
   // Read image file and convert to base64
   const imageBuffer = fs.readFileSync(imagePath);
   const base64Image = imageBuffer.toString('base64');
   const mimeType = imagePath.endsWith('.png') ? 'image/png' : 'image/jpeg';
 
-  const response = await zai.chat.completions.createVision({
+  const response = await chatCompletions({
+    model: MODEL,
     messages: [
       {
         role: 'user',
@@ -276,8 +303,7 @@ async function analyzeLocalImage(imagePath, question) {
           }
         ]
       }
-    ],
-    thinking: { type: 'disabled' }
+    ]
   });
 
   return response.choices[0]?.message?.content;
@@ -289,15 +315,9 @@ async function analyzeLocalImage(imagePath, question) {
 ### Conversational Vision Chat
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-
 class VisionChatSession {
   constructor() {
     this.messages = [];
-  }
-
-  async initialize() {
-    this.zai = await ZAI.create();
   }
 
   async addImage(imageUrl, initialQuestion) {
@@ -333,13 +353,13 @@ class VisionChatSession {
   }
 
   async getResponse() {
-    const response = await this.zai.chat.completions.createVision({
-      messages: this.messages,
-      thinking: { type: 'disabled' }
+    const response = await chatCompletions({
+      model: MODEL,
+      messages: this.messages
     });
 
     const assistantMessage = response.choices[0]?.message?.content;
-    
+
     this.messages.push({
       role: 'assistant',
       content: assistantMessage
@@ -351,7 +371,6 @@ class VisionChatSession {
 
 // Usage
 const session = new VisionChatSession();
-await session.initialize();
 
 const initial = await session.addImage(
   'https://example.com/chart.jpg',
@@ -366,11 +385,7 @@ console.log('Follow-up:', followup);
 ### Image Classification and Tagging
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-
 async function classifyImage(imageUrl) {
-  const zai = await ZAI.create();
-
   const prompt = `Analyze this image and provide:
 1. Main subject/category
 2. Key objects detected
@@ -379,7 +394,8 @@ async function classifyImage(imageUrl) {
 
 Format your response as JSON.`;
 
-  const response = await zai.chat.completions.createVision({
+  const response = await chatCompletions({
+    model: MODEL,
     messages: [
       {
         role: 'user',
@@ -394,12 +410,11 @@ Format your response as JSON.`;
           }
         ]
       }
-    ],
-    thinking: { type: 'disabled' }
+    ]
   });
 
   const content = response.choices[0]?.message?.content;
-  
+
   try {
     return JSON.parse(content);
   } catch (e) {
@@ -411,12 +426,9 @@ Format your response as JSON.`;
 ### OCR and Text Extraction
 
 ```javascript
-import ZAI from 'z-ai-web-dev-sdk';
-
 async function extractText(imageUrl) {
-  const zai = await ZAI.create();
-
-  const response = await zai.chat.completions.createVision({
+  const response = await chatCompletions({
+    model: MODEL,
     messages: [
       {
         role: 'user',
@@ -431,8 +443,7 @@ async function extractText(imageUrl) {
           }
         ]
       }
-    ],
-    thinking: { type: 'disabled' }
+    ]
   });
 
   return response.choices[0]?.message?.content;
@@ -455,9 +466,8 @@ async function extractText(imageUrl) {
 ```javascript
 async function safeVisionChat(imageUrl, question) {
   try {
-    const zai = await ZAI.create();
-    
-    const response = await zai.chat.completions.createVision({
+    const response = await chatCompletions({
+      model: MODEL,
       messages: [
         {
           role: 'user',
@@ -466,8 +476,7 @@ async function safeVisionChat(imageUrl, question) {
             { type: 'image_url', image_url: { url: imageUrl } }
           ]
         }
-      ],
-      thinking: { type: 'disabled' }
+      ]
     });
 
     return {
@@ -485,7 +494,7 @@ async function safeVisionChat(imageUrl, question) {
 ```
 
 ### 4. Performance Optimization
-- Cache SDK instance creation when processing multiple images
+- Reuse HTTP connections when processing multiple images
 - Use appropriate image formats (JPEG for photos, PNG for diagrams)
 - Consider image preprocessing for large batches
 
@@ -493,7 +502,7 @@ async function safeVisionChat(imageUrl, question) {
 - Validate image URLs before processing
 - Sanitize user-provided image data
 - Implement rate limiting for public-facing APIs
-- Never expose SDK credentials in client-side code
+- Never expose API keys in client-side code
 
 ## Common Use Cases
 
@@ -511,29 +520,22 @@ async function safeVisionChat(imageUrl, question) {
 
 ```javascript
 import express from 'express';
-import ZAI from 'z-ai-web-dev-sdk';
 
 const app = express();
 app.use(express.json());
-
-let zaiInstance;
-
-// Initialize SDK once
-async function initZAI() {
-  zaiInstance = await ZAI.create();
-}
 
 app.post('/api/analyze-image', async (req, res) => {
   try {
     const { imageUrl, question } = req.body;
 
     if (!imageUrl || !question) {
-      return res.status(400).json({ 
-        error: 'imageUrl and question are required' 
+      return res.status(400).json({
+        error: 'imageUrl and question are required'
       });
     }
 
-    const response = await zaiInstance.chat.completions.createVision({
+    const response = await chatCompletions({
+      model: MODEL,
       messages: [
         {
           role: 'user',
@@ -542,8 +544,7 @@ app.post('/api/analyze-image', async (req, res) => {
             { type: 'image_url', image_url: { url: imageUrl } }
           ]
         }
-      ],
-      thinking: { type: 'disabled' }
+      ]
     });
 
     res.json({
@@ -558,20 +559,21 @@ app.post('/api/analyze-image', async (req, res) => {
   }
 });
 
-initZAI().then(() => {
-  app.listen(3000, () => {
-    console.log('Vision chat API running on port 3000');
-  });
+app.listen(3000, () => {
+  console.log('Vision chat API running on port 3000');
 });
 ```
 
 ## Troubleshooting
 
-**Issue**: "SDK must be used in backend"
-- **Solution**: Ensure z-ai-web-dev-sdk is only imported and used in server-side code
+**Issue**: "API key must be kept server-side"
+- **Solution**: Read `LLM_API_KEY` from environment variables and only use it in server-side code
 
 **Issue**: Image not loading or being analyzed
-- **Solution**: Verify the image URL is accessible and returns a valid image format
+- **Solution**: Verify the image URL is accessible and returns a valid image format; for local files prefer base64 data URLs
+
+**Issue**: "Model does not support image input"
+- **Solution**: Point `LLM_MODEL` at a vision-capable model (e.g. `qwen2.5-vl`, `llama3.2-vision`, `minicpm-v`)
 
 **Issue**: Poor analysis quality
 - **Solution**: Provide more specific prompts and ensure image quality is sufficient
@@ -581,8 +583,11 @@ initZAI().then(() => {
 
 ## Remember
 
-- Always use z-ai-web-dev-sdk in backend code only
-- The SDK is already installed - import as shown in examples
+- Works with any OpenAI-compatible LLM server (open-source or free) — Ollama, vLLM, LM Studio, OpenRouter, and more
+- Designed for the DiveeOI agent (OpenCode-based)
+- The configured model must be vision-capable (`LLM_MODEL`)
+- Vision requests are plain `chat/completions` calls with `image_url` content parts; base64 data URLs (`data:<mime>;base64,...`) are the most reliable input
+- `video_url` and `file_url` content parts exist in the ecosystem but support depends on the server
 - Structure prompts clearly for best results
 - Handle errors gracefully in production applications
 - Consider user privacy when processing images

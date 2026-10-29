@@ -1,121 +1,125 @@
-# 专业与职业方向参考（供 Agent 分析时查阅）
+# Major & Career-Direction Reference (for agent reference during analysis)
 
-本文档为**参考知识库**，不替代个性化判断。Agent 应结合考生画像、`parsed.json` 中的真实志愿数据，产出 `analysis.json`。
+This document is a **reference knowledge base**; it does not replace personalized
+judgment. The agent should combine the student's profile with the real volunteer data
+in `parsed.json` to produce `analysis.json`.
 
 ---
 
-## 分析维度（Agent 必须考虑）
+## Analysis dimensions (the agent must consider)
 
-| 维度 | 说明 |
+| Dimension | Description |
 |------|------|
-| 选科与专业要求 | 核对 `claim` 字段（如「物且化」），避免推荐选科不符的专业 |
-| 各科成绩 | 数学/物理强 → 工科、计算机、电子信息；生物/化学强 → 医学、生命科学；语文/英语强 → 经管、法学、人文 |
-| 兴趣爱好 | 映射到具体专业大类，而非泛泛而谈 |
-| 就业方向 | 区分「首选方向」与「备选方向」，说明理由 |
-| 家庭情况 | 深造意愿、经济承受力、地域偏好、是否接受长线培养（如医学） |
-| 城市机会 | 意向城市产业与实习/就业资源 |
-| 录取概率 | 结合冲/稳/保档位，说明为何将该校/专业标为推荐 |
+| Subject selection vs. major requirements | Check the `claim` field (e.g. "physics and chemistry") and avoid recommending majors whose subject requirements are not met |
+| Per-subject scores | Strong math/physics → engineering, computer science, electronic information; strong biology/chemistry → medicine, life sciences; strong Chinese/English → economics & management, law, humanities |
+| Interests & hobbies | Map them to concrete major classes rather than staying vague |
+| Career direction | Distinguish the "primary direction" from "backup directions" and explain why |
+| Family situation | Willingness to pursue further study, financial capacity, regional preferences, acceptance of long training paths (e.g. medicine) |
+| City opportunities | Industries and internship/employment resources of the preferred cities |
+| Admission probability | Combine with the reach/match/safety tiers to explain why a school/major is flagged as recommended |
 
-**硬性约束**：`recommended_majors` / `recommended_schools` 中的 `university_name`、`university_code`、`major_name`、`major_code` 必须来自 `parsed.json`，否则 HTML 无法打上推荐标签。
+**Hard constraint**: the `university_name`, `university_code`, `major_name`, and
+`major_code` in `recommended_majors` / `recommended_schools` must come from `parsed.json`,
+otherwise the HTML cannot be tagged as recommended.
 
 ---
 
-## 常见专业方向与职业出口
+## Common major directions & career outcomes
 
-### 🧑‍💻 信息与硬核科技
+### 🧑‍💻 Information & hard tech
 
-| 专业大类 | 典型专业名关键词 | 就业出口 | 培养特点 |
+| Major class | Typical major-name keywords | Career outcomes | Training characteristics |
 |----------|------------------|----------|----------|
-| 计算机类 | 计算机、软件、人工智能、大数据 | 互联网、AI、金融科技、游戏 | 就业面广，竞争激烈，需持续学习 |
-| 电子信息类 | 电子信息、通信、微电子、集成电路 | 芯片、通信设备、消费电子 | 硬核科技核心，数理要求高 |
-| 自动化类 | 自动化、机器人、控制 | 智能制造、自动驾驶、工业软件 | 交叉学科，工科基础扎实 |
+| Computer science | computer science, software, artificial intelligence, big data | Internet, AI, fintech, gaming | Broad job market, fierce competition, requires continuous learning |
+| Electronic information | electronic information, communications, microelectronics, integrated circuits | Chips, communications equipment, consumer electronics | Core of hard tech; high math/physics demands |
+| Automation | automation, robotics, control | Smart manufacturing, autonomous driving, industrial software | Interdisciplinary, solid engineering foundation |
 
-**适合考生**：数理成绩突出、对编程/科技有兴趣、家庭支持深造或接受高强度学习。
+**Suited for students** who: have outstanding math/physics scores, are interested in programming/technology, and whose family supports further study or accepts intensive learning.
 
 ---
 
-### 🩺 医药卫生
+### 🩺 Medicine & health
 
-| 专业大类 | 典型专业名关键词 | 就业出口 | 培养特点 |
+| Major class | Typical major-name keywords | Career outcomes | Training characteristics |
 |----------|------------------|----------|----------|
-| 临床医学 | 临床医学、口腔医学 | 三甲医院、基层医疗、科研 | 学制长（5+），考研/规培常见 |
-| 基础/预防医学 | 基础医学、预防医学、公共卫生 | 疾控、科研、公卫管理 | 偏研究与管理 |
-| 药学/护理 | 药学、护理学 | 制药企业、医院护理岗 | 就业相对稳定 |
+| Clinical medicine | clinical medicine, stomatology | Top-tier (Grade 3A) hospitals, primary care, research | Long programs (5+ years); graduate school / standardized residency training common |
+| Basic / preventive medicine | basic medicine, preventive medicine, public health | Disease control, research, public-health administration | Research- and management-oriented |
+| Pharmacy / nursing | pharmacy, nursing | Pharmaceutical companies, hospital nursing positions | Relatively stable employment |
 
-**适合考生**：生物/化学较好、能接受长周期培养、家庭支持读研、追求职业稳定性。
+**Suited for students** who: have good biology/chemistry, can accept a long training cycle, whose family supports graduate study, and who value career stability.
 
 ---
 
-### ⚙️ 工科与先进制造
+### ⚙️ Engineering & advanced manufacturing
 
-| 专业大类 | 典型专业名关键词 | 就业出口 | 培养特点 |
+| Major class | Typical major-name keywords | Career outcomes | Training characteristics |
 |----------|------------------|----------|----------|
-| 机械/车辆 | 机械、车辆、智能制造 | 汽车、装备制造、新能源 | 传统工科底盘稳 |
-| 航空航天 | 航空航天、飞行器 | 军工、航天、民航 | 院校集中，国防七子值得关注 |
-| 电气/能源 | 电气、能源动力、新能源 | 电网、新能源、电力设备 | 国企/央企机会多 |
-| 材料/土木 | 材料、土木、建筑 | 基建、新材料、房地产相关 | 行业周期性强，需结合城市 |
+| Mechanical / vehicles | mechanical engineering, vehicles, intelligent manufacturing | Automotive, equipment manufacturing, new energy | Stable traditional-engineering foundation |
+| Aerospace | aerospace, aircraft | Defense industry, space program, civil aviation | Concentrated in a few universities; the "Seven Sons of National Defense" are worth attention |
+| Electrical / energy | electrical engineering, energy & power, new energy | Power grid, new energy, power equipment | Many opportunities at state-owned / central enterprises |
+| Materials / civil engineering | materials, civil engineering, architecture | Infrastructure, new materials, real-estate-related | Highly cyclical industries; factor in the city |
 
-**适合考生**：物理扎实、偏好实体产业、可接受工程师成长路径。
+**Suited for students** who: have solid physics, prefer real-economy industries, and can accept an engineer's growth path.
 
 ---
 
-### 📊 经济金融与管理
+### 📊 Economics, finance & management
 
-| 专业大类 | 典型专业名关键词 | 就业出口 | 培养特点 |
+| Major class | Typical major-name keywords | Career outcomes | Training characteristics |
 |----------|------------------|----------|----------|
-| 金融学/经济学 | 金融、经济、财政 | 银行、证券、咨询、企业财务 | 名校与实习资源重要 |
-| 工商管理 | 工商管理、市场营销、会计学 | 企业管理、审计、运营 | 宽口径，需尽早积累实习 |
-| 统计学 | 统计学、经济统计 | 数据分析、风控、研究岗 | 数理+商业复合 |
+| Finance / economics | finance, economics, public finance | Banking, securities, consulting, corporate finance | Prestigious universities and internship resources matter |
+| Business administration | business administration, marketing, accounting | Corporate management, auditing, operations | Broad-entry major; start accumulating internships early |
+| Statistics | statistics, economic statistics | Data analysis, risk control, research positions | Math + business hybrid |
 
-**适合考生**：语文英语较好、沟通能力强、意向一线城市金融/商科资源。
+**Suited for students** who: have good Chinese/English, communicate well, and aim at first-tier-city finance/business resources.
 
 ---
 
-### ⚖️ 法学、教育与公共服务
+### ⚖️ Law, education & public service
 
-| 方向 | 关键词 | 说明 |
+| Direction | Keywords | Notes |
 |------|--------|------|
-| 法学 | 法学、知识产权 | 法考门槛，就业分化大 |
-| 师范/教育 | 师范、教育学、心理学 | 稳定性高，需关注部属/省属师范 |
-| 公共管理 | 行政管理、公共事业管理 | 考公、事业单位方向 |
+| Law | law, intellectual property | Bar-exam threshold; highly polarized employment |
+| Teacher training / education | normal education, pedagogy, psychology | High stability; pay attention to ministry-affiliated / province-affiliated normal universities |
+| Public administration | administrative management, public administration | Civil-service and public-institution track |
 
 ---
 
-## 意向城市与产业参考
+## Preferred cities & industry reference
 
-| 城市 | 优势产业与就业特点 |
+| City | Key industries & employment characteristics |
 |------|-------------------|
-| 北京 | 互联网总部、央企、科研院所、金融总部密集；实习与深造资源丰富 |
-| 上海 | 金融、外企、生物医药、集成电路；国际化程度高 |
-| 深圳 | 硬科技、互联网、创新创业；民营与科技企业活跃 |
-| 杭州 | 电商、数字经济、AI 应用；阿里系及创业公司生态 |
-| 武汉 | 光谷科创、高校资源、制造业；性价比高的中部枢纽 |
-| 成都 | 游戏、互联网、电子信息；新一线生活成本相对友好 |
-| 西安 | 航空航天、电子信息、军工；科教底蕴深厚 |
-| 广州 | 大湾区制造、医疗、贸易；省属高校与产业结合紧密 |
-| 南京 | 软件、先进制造、高校云集 |
-| 天津 | 制造业、港口经济、工科院校集中 |
+| Beijing | Dense with internet HQs, central SOEs, research institutes, and financial HQs; rich internship and further-study resources |
+| Shanghai | Finance, foreign companies, biopharmaceuticals, integrated circuits; highly international |
+| Shenzhen | Hard tech, internet, innovation & entrepreneurship; active private and tech companies |
+| Hangzhou | E-commerce, digital economy, AI applications; the Alibaba ecosystem plus a startup scene |
+| Wuhan | Optics Valley tech innovation, university resources, manufacturing; cost-effective central-China hub |
+| Chengdu | Gaming, internet, electronic information; relatively friendly cost of living among the new first-tier cities |
+| Xi'an | Aerospace, electronic information, defense industry; deep science-and-education heritage |
+| Guangzhou | Greater Bay Area manufacturing, healthcare, trade; province-affiliated universities closely tied to industry |
+| Nanjing | Software, advanced manufacturing, a large cluster of universities |
+| Tianjin | Manufacturing, port economy, concentrated engineering universities |
 
 ---
 
-## 院校层次速查（辅助学校推荐）
+## University-tier quick reference (aids school recommendation)
 
-| 标签 | 填报策略提示 |
+| Tag | Application-strategy tip |
 |------|--------------|
-| 985 / 双一流 | 冲/稳核心目标，关注优势学科与保研率 |
-| 211 | 稳/保主力，结合城市与专业排名 |
-| 保研资格 | 有深造计划时优先加权 |
-| 部属 / 省属 | 师范、医学等行业认可度高 |
-| 国防七子 / 军工六校 | 工科、国防相关方向 |
+| 985 / Double First-Class | Core reach/match targets; look at strong disciplines and postgraduate-recommendation rates |
+| 211 | The backbone of match/safety; weigh city and major ranking |
+| Postgraduate-recommendation eligibility | Weight it higher when further study is planned |
+| Ministry-affiliated / province-affiliated | High industry recognition in teacher training, medicine, etc. |
+| Seven Sons of National Defense / Six Military-Industry Schools | Engineering and defense-related directions |
 
 ---
 
-## 产出建议数量
+## Recommended output counts
 
-| 字段 | 建议数量 | 说明 |
+| Field | Recommended count | Notes |
 |------|----------|------|
-| `major_directions` | 2–4 条 | 按匹配度排序，每条含个性化描述 |
-| `recommended_majors` | 8–15 条 | 覆盖冲/稳/保，优先「稳」档核心专业 |
-| `recommended_schools` | 6–12 所 | 去重院校，冲稳保均有代表 |
+| `major_directions` | 2–4 | Sort by match level; each entry carries a personalized description |
+| `recommended_majors` | 8–15 | Cover reach/match/safety; prioritize core "match"-tier majors |
+| `recommended_schools` | 6–12 | Deduplicate schools; reach/match/safety all represented |
 
-`modal.body` 使用 HTML 片段（`<h4>`、`<ul>`、`<li>`、`<strong>`），内容需**针对该考生**撰写，避免模板化套话。
+`modal.body` uses HTML fragments (`<h4>`, `<ul>`, `<li>`, `<strong>`); the content must be written **specifically for this student**, avoiding templated boilerplate.

@@ -1,69 +1,69 @@
 ---
 name: resume-builder
-description: 从零生成或全面优化一份中文简历，并导出 docx / pdf / markdown 多种格式。用 STAR 法则改写经历、做 ATS 关键词覆盖率检查、根据行业（互联网产品 / 技术 / 金融 / 通用）选模板。当用户说"帮我写简历 / 优化简历 / 简历不会写 / 我的简历太弱了 / 简历看起来不专业 / 简历改一改 / 给我做个简历模板 / 简历导出 / 简历加点关键词"，或者上传 .pdf/.docx 简历后说"看看怎么改"时，必须触发本 skill。即使用户只问"我的简历有什么问题"也要触发。
+description: Generates a resume from scratch or fully optimizes an existing one, and exports it to docx / pdf / markdown. Rewrites experiences using the STAR method, runs ATS keyword coverage checks, and picks a template by industry (internet product / tech / finance / general). Trigger this skill when the user says "help me write my resume / improve my resume / I don't know how to write a resume / my resume is too weak / my resume looks unprofessional / polish my resume / make me a resume template / export my resume / add keywords to my resume", or uploads a .pdf/.docx resume and asks "how should I improve it". Trigger even when the user only asks "what's wrong with my resume".
 ---
 
-# Resume Builder（简历生成与优化）
+# Resume Builder
 
-这个 skill 干三件事：
+This skill does three things:
 
-1. **结构化生成**：从用户经历产出一份符合中文求职市场审美的简历
-2. **STAR 法则改写**：把"参与了 X"这种弱句子，改写成"通过 X 实现 Y，结果 Z"
-3. **ATS 关键词优化 + 多模板导出**：保证简历能过自动筛选，并支持 docx/pdf/md
+1. **Structured generation**: turn the user's experiences into a polished, professionally structured resume
+2. **STAR-method rewriting**: transform weak sentences like "participated in X" into "did X, enabling Y, resulting in Z"
+3. **ATS keyword optimization + multi-template export**: make sure the resume passes automated screening, and support docx/pdf/md export
 
-不做：JD 定向改写（那是 jd-resume-tailor 的事，请在那里做"针对某 JD 改简历"）
-
----
-
-## 何时触发
-
-- "帮我写一份简历"
-- "我的简历太弱了 / 没有亮点 / 看起来不专业"
-- "把这段经历用 STAR 改一下"
-- "简历里关键词够不够"
-- "导出 PDF / docx 简历"
-- 用户上传简历但没明确说"针对某 JD 改" → 触发本 skill；如果说了"针对 X 公司 / X 岗位改" → 调用 jd-resume-tailor
+Does not do: JD-targeted rewriting (that's jd-resume-tailor's job — go there for "tailor my resume to a specific JD")
 
 ---
 
-## 工作流
+## When to Trigger
 
-### Step 1: 摸清简历当前状态
+- "Help me write a resume"
+- "My resume is too weak / has no highlights / looks unprofessional"
+- "Rewrite this experience with STAR"
+- "Are there enough keywords in my resume?"
+- "Export the resume as PDF / docx"
+- User uploads a resume without saying "tailor it to a JD" → trigger this skill; if they say "tailor it for company X / role X" → call jd-resume-tailor
 
-如果用户**有简历文件**（.pdf / .docx / .md / .txt）：
-- pdf 走 pdf skill 解析
-- docx 走 docx skill 解析
-- 提取出：基本信息、教育、工作经历、项目经历、技能、其他
+---
 
-如果用户**没有简历**：
-- 用 AskUserQuestion 收集信息（参考 `references/intake_questions.md` 里的问题清单）
-- 一次问 3~4 个问题，分轮收集，避免劝退
+## Workflow
 
-### Step 2: 选模板
+### Step 1: Understand the Resume's Current State
 
-读取 `references/templates/` 决定结构：
+If the user **has a resume file** (.pdf / .docx / .md / .txt):
+- pdf → parse with the pdf skill
+- docx → parse with the docx skill
+- Extract: basic info, education, work experience, project experience, skills, other
 
-- 互联网产品 / 运营 / PM → `templates/internet.md`
-- 技术 / 研发 / 数据 → `templates/tech.md`
-- 金融 / 咨询 / 商科 → `templates/finance.md`
-- 通用 / 跨行业 → `templates/general.md`
+If the user **has no resume**:
+- Use AskUserQuestion to collect information (see the question list in `references/intake_questions.md`)
+- Ask 3-4 questions per round, gathered over multiple rounds, so the user doesn't drop off
 
-如果用户没指定方向，用通用模板，但**询问一句**："你下一步主要往什么方向投？我可以用更适合那个方向的版式。"
+### Step 2: Pick a Template
 
-### Step 3: 用 STAR 改写每段经历
+Read `references/templates/` to decide the structure:
 
-读取 `references/star_rewrite_guide.md`，对每条工作 / 项目经历做 STAR 改写。
+- Internet product / operations / PM → `templates/internet.md`
+- Engineering / R&D / data → `templates/tech.md`
+- Finance / consulting / business → `templates/finance.md`
+- General / cross-industry → `templates/general.md`
 
-**STAR 不是死板的四段式**，而是确保每条 bullet 都有：
-- **背景信号**（一句话点出问题大小或情境）
-- **动作**（你具体做了什么，要有动词）
-- **结果**（数字 / 百分比 / 排名 / 规模）
+If the user hasn't specified a direction, use the general template, but **ask one question**: "Which direction will you mostly be applying to? I can use a layout better suited to it."
 
-如果用户提供的信息里**没有数字**，要主动追问："这个项目用户量大概是多少？""这个优化大概提了多少？记不准的话给个量级也行。"
+### Step 3: Rewrite Every Experience with STAR
 
-### Step 4: ATS 关键词检查
+Read `references/star_rewrite_guide.md` and apply STAR rewriting to each work / project bullet.
 
-调用脚本：
+**STAR is not a rigid 4-section format** — it means every bullet contains:
+- **A context signal** (one sentence sizing the problem or situation)
+- **An action** (what you specifically did, with a verb)
+- **A result** (number / percentage / ranking / scale)
+
+If the user's information contains **no numbers**, proactively follow up: "Roughly how many users did this project have?" "About how much did this optimization improve things? Even an order of magnitude is fine if you're not sure."
+
+### Step 4: ATS Keyword Check
+
+Call the script:
 
 ```bash
 python scripts/ats_check.py --resume <resume.md> \
@@ -71,63 +71,63 @@ python scripts/ats_check.py --resume <resume.md> \
     [--jd <jd.txt>]
 ```
 
-脚本会：
-1. 抽取简历里的关键词
-2. 对照行业关键词库（来自 job-intent-tracker 或本 skill 的 `references/keywords/`）
-3. 输出"已覆盖 / 建议补充"两个清单
-4. 给出 ATS 友好度评分（字体单一性、表格使用、特殊符号、图片等）
+The script will:
+1. Extract keywords from the resume
+2. Compare against the industry keyword library (from job-intent-tracker or this skill's `references/keywords/`)
+3. Output two lists: "covered" / "suggested additions"
+4. Give an ATS-friendliness score (font uniformity, table usage, special symbols, images, etc.)
 
-**ATS 友好的硬规则**：
-- 不要用 word 表格放经历（很多 ATS 解析不了）
-- 不要把日期放在装饰性图片里
-- 不要写两栏布局（有些 ATS 会按列读，导致顺序混乱）
-- 不要插图标 / emoji 在标题里
-- 字体用宋体 / 思源宋体 / Arial / Helvetica 之一
+**Hard rules for ATS-friendly resumes**:
+- Don't use Word tables for experiences (many ATS can't parse them)
+- Don't put dates inside decorative images
+- Don't use two-column layouts (some ATS read column by column, scrambling the order)
+- Don't insert icons / emoji in headings
+- Use one of these fonts: Times New Roman / Source Han Serif / Arial / Helvetica
 
-### Step 5: 多格式导出
+### Step 5: Multi-Format Export
 
-读取 `references/export_guide.md`，按用户需求选择：
+Read `references/export_guide.md` and choose based on the user's needs:
 
-**docx 导出**（最通用，国内 HR 优先要 docx）：
-- 调用 docx skill
-- 用 `assets/resume_template.docx` 作为模板（如果存在）
+**docx export** (the most universal; HR usually prefers docx):
+- Call the docx skill
+- Use `assets/resume_template.docx` as the template (if it exists)
 
-**pdf 导出**（最终投递版）：
-- 推荐流程：先 docx → 再用 word/libreoffice 转 pdf
-- 直接生成 pdf 用 reportlab 比较丑，不推荐
-- 调用 pdf skill 做后处理（加密 / 元数据清理）
+**pdf export** (the final submission version):
+- Recommended flow: docx first → then convert to pdf with Word/LibreOffice
+- Generating pdf directly with reportlab looks bad; not recommended
+- Call the pdf skill for post-processing (encryption / metadata cleanup)
 
-**markdown 导出**（备份 + GitHub）：
-- 直接写 .md 文件即可
+**markdown export** (backup + GitHub):
+- Just write the .md file
 
-**默认行为**：除非用户指定，同时输出 docx + md 两个版本。
+**Default behavior**: unless the user specifies, output both docx + md versions.
 
-### Step 6: 自检 & 反馈
+### Step 6: Self-Check & Feedback
 
-输出后做一次自检（写到聊天里给用户看，不用单独存文件）：
+After output, run one self-check (show it in chat for the user; no separate file needed):
 
 ```
-✓ 长度：< 1 页（应届）/ ≤ 2 页（社招）
-✓ 联系方式齐全（手机 + 邮箱，可选 GitHub/作品集）
-✓ 每段经历都有量化结果
-✓ 关键词覆盖率（vs <industry> 行业库）：__%
-✓ ATS 友好度：__/10
-⚠ 待用户确认：<还需要补的信息>
+✓ Length: < 1 page (new grad) / ≤ 2 pages (experienced)
+✓ Contact info complete (phone + email, optionally GitHub/portfolio)
+✓ Every experience has quantified results
+✓ Keyword coverage (vs. <industry> keyword library): __%
+✓ ATS friendliness: __/10
+⚠ Pending user confirmation: <info still to be filled in>
 ```
 
 ---
 
-## 反模式（不要做）
+## Anti-patterns (do not do)
 
-- ❌ 帮用户编数字（说"提升 30%"但用户根本没说过）—— 必须基于用户提供的信息，不知道就标 `[待补充：具体数字]`
-- ❌ 用形容词堆砌（"具有出色的沟通能力" "认真负责" "有上进心"）—— 删掉
-- ❌ 一段经历写超过 5 条 bullet —— 太密会被 HR 跳过
-- ❌ 写"自我评价"长篇 —— 国内现在不流行，1~2 行 summary 即可
-- ❌ 把所有公司都写一样的 bullet 数 —— 重要的多写，次要的少写
-- ❌ 把"熟悉 / 了解 / 会用"当能力描述 —— 改成"用 X 做了 Y"
+- ❌ Making up numbers for the user (saying "improved 30%" when the user never said so) — must be based on information the user provided; if unknown, mark `[TODO: exact number]`
+- ❌ Piling up adjectives ("excellent communication skills", "conscientious and responsible", "self-motivated") — delete them
+- ❌ Writing more than 5 bullets for one experience — too dense and HR will skim past it
+- ❌ Writing a long "self-evaluation" section — out of fashion; a 1-2 line summary is enough
+- ❌ Giving every company the same number of bullets — write more for the important ones, less for the minor ones
+- ❌ Using "familiar with / aware of / can use" as capability descriptions — rewrite as "used X to do Y"
 
-## 与其他 skill 的协作
+## Collaboration with Other Skills
 
-- 用户接着说"针对这家公司改一下" → 转 `jd-resume-tailor`
-- 用户接着说"准备面试" → 转 `interview-prep`
-- 用户没确定方向就来改简历 → 先反问"你打算投什么方向？"，必要时转 `job-intent-tracker`
+- User then says "tailor it for this company" → hand off to `jd-resume-tailor`
+- User then says "prepare me for interviews" → hand off to `interview-prep`
+- User comes to fix the resume without a direction in mind → ask back "What direction are you applying to?", and hand off to `job-intent-tracker` if needed

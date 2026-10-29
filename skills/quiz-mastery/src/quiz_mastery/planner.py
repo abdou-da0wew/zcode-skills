@@ -39,22 +39,22 @@ class Planner:
 
             # Check Ebbinghaus due
             if record.next_review_at and record.next_review_at <= today_str:
-                reasons.append("遗忘曲线到期，需要复习")
+                reasons.append("Forgetting-curve review is due")
 
             # Check weak + recently reviewed
             if record.is_weak and record.last_reviewed_at:
                 if record.last_reviewed_at >= three_days_ago_str:
-                    reasons.append("薄弱知识点，最近3天内有练习记录")
+                    reasons.append("Weak knowledge point, practiced within the last 3 days")
                 elif not record.next_review_at:
                     # Weak but no review schedule yet
-                    reasons.append("薄弱知识点，建议复习")
+                    reasons.append("Weak knowledge point, review recommended")
 
             if reasons and kp_id not in seen_ids:
                 seen_ids.add(kp_id)
                 recommendations.append({
                     "knowledge_point_id": kp_id,
                     "title": kp_title_map.get(kp_id, kp_id),
-                    "reason": "；".join(reasons),
+                    "reason": "; ".join(reasons),
                     "current_level": record.current_level,
                     "is_weak": record.is_weak,
                 })

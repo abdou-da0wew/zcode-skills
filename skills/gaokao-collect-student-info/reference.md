@@ -1,65 +1,65 @@
-# 智能推荐志愿表 API 速查
+# Smart Volunteer Recommendation API Quick Reference
 
-## 接口
+## Endpoints
 
-| 项 | 值 |
-|----|-----|
-| 路径 | `POST /zp/volunteer/intelligenceVolunteer` |
-| Content-Type | `application/json` |
-| 认证 | 无（公网 skill-test 接口） |
-| 默认 BASE_URL | `https://publicapi.chatglm.cn/chatglm_public/skill-test` |
-| 完整地址 | `{BASE_URL}/zp/volunteer/intelligenceVolunteer` |
-
-## 请求体字段
-
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| province | string | ✓ | 高考省份 |
-| classify | string | ✓ | 文科/理科/物理/历史/综合 |
-| score | integer | ✓ | 高考成绩 |
-| batch | string | ✓ | 填报批次 |
-| subjects | string \| null | 模式相关 | 逗号分隔选科 |
-| gradeType | string \| null | 京沪津 | 本科 / 专科 |
-| rank | integer \| null | | 位次 |
-| universitys | string \| null | | 心仪高校，`,` 分隔 |
-| provinces | string \| null | | 省份意向 |
-| tags | string \| null | | 院校属性意向 |
-| majorClass | string \| null | | 专业类意向 |
-| universityNum | integer | | 推荐院校数，默认 30 |
-| majorNum | integer | | 每组专业数，默认 6 |
-| isAdjust | boolean | | 是否调剂 |
-| volunteerType | string | | ACADEMY_GROUP / ACADEMY_MAJOR / MAJOR_GROUP |
-| returnUniversityNum | integer | | 已填志愿数 |
-| intentionNum | integer | | 已填意向数 |
-
-## 省份与选科模式
-
-详见 [gaokao-fetch-volunteers/reference.md](../gaokao-fetch-volunteers/reference.md) 实测规律。采集 `student.json` 时务必按省填对 `classify` / `subjects` / `gradeType`：
-
-| 模式 | 省份 | classify | subjects | gradeType |
-|------|------|----------|----------|-----------|
-| 老高考 | 新疆 | 文科/理科 | 不传 | 不传 |
-| 3+1+2 | 23省 | 物理/历史 | **完整三科**（含首选，如 `物理,化学,生物`） | 不传 |
-| 3+3 | 沪京津鲁浙琼 | 综合 | 三科（浙可选技术） | 仅京沪津：本科/专科 |
-
-**西藏**：测试环境不支持。 **新疆**：score 必传，勿仅传 rank。
-
-**批次 batch（静态兜底，优先走 batch/list API）**：
-
-| 省份 | batch |
+| Item | Value |
 |------|-------|
-| 天津 | 本科批A段 |
-| 浙江 | 普通类一段 |
-| 山东 | 普通类一段 |
-| 四川、云南 | 本科批B段 |
-| 甘肃 | 本科批 |
-| 宁夏 | 本科批B段 |
-| 新疆 | 本科一批 |
-| 西藏 | 测试环境暂不支持（2222010 高考省份错误） |
+| Path | `POST /zp/volunteer/intelligenceVolunteer` |
+| Content-Type | `application/json` |
+| Auth | none (public skill-test endpoint) |
+| Default BASE_URL | From the `ZP_API_BASE_URL` env var (point it at your deployed volunteer-recommendation service; the fetch-volunteers scripts also accept `--base-url`) |
+| Full URL | `{BASE_URL}/zp/volunteer/intelligenceVolunteer` |
 
-## 响应结构
+## Request body fields
 
-公网 skill-test 接口返回 `{ status, message, result }`（`status=0` 为成功），脚本会自动转换为统一格式。
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| province | string | ✓ | Gaokao province (Chinese province name, e.g. `"\u5c71\u4e1c"` = Shandong) |
+| classify | string | ✓ | `"\u6587\u79d1"` (liberal arts) / `"\u7406\u79d1"` (science) / `"\u7269\u7406"` (physics) / `"\u5386\u53f2"` (history) / `"\u7efc\u5408"` (comprehensive) |
+| score | integer | ✓ | Gaokao score |
+| batch | string | ✓ | Application batch (e.g. `"\u672c\u79d1\u6279"` = undergraduate batch) |
+| subjects | string \| null | mode-dependent | Comma-separated subject combination |
+| gradeType | string \| null | Beijing/Shanghai/Tianjin only | `"\u672c\u79d1"` (undergraduate) / `"\u4e13\u79d1"` (vocational) |
+| rank | integer \| null | | Provincial rank |
+| universitys | string \| null | | Desired universities, `,`-separated |
+| provinces | string \| null | | Province preferences |
+| tags | string \| null | | University attribute preferences |
+| majorClass | string \| null | | Major-class preferences |
+| universityNum | integer | | Number of recommended universities, default 30 |
+| majorNum | integer | | Majors per group, default 6 |
+| isAdjust | boolean | | Accepts major adjustment |
+| volunteerType | string | | ACADEMY_GROUP / ACADEMY_MAJOR / MAJOR_GROUP |
+| returnUniversityNum | integer | | Number of already-filled volunteers |
+| intentionNum | integer | | Number of already-filled intentions |
+
+## Provinces and subject-combination modes
+
+See [gaokao-fetch-volunteers/reference.md](../gaokao-fetch-volunteers/reference.md) for empirically verified behavior. When collecting `student.json`, always fill `classify` / `subjects` / `gradeType` correctly for the province:
+
+| Mode | Provinces | classify | subjects | gradeType |
+|------|-----------|----------|----------|-----------|
+| Old system | Xinjiang | liberal arts / science | do not send | do not send |
+| 3+1+2 | 23 provinces | physics / history | **all three subjects** (including the primary, e.g. `"\u7269\u7406,\u5316\u5b66,\u751f\u7269"`) | do not send |
+| 3+3 | Shanghai, Beijing, Tianjin, Shandong, Zhejiang, Hainan | comprehensive | three subjects (Zhejiang may choose technology) | only Beijing/Shanghai/Tianjin: undergraduate / vocational |
+
+**Tibet**: not supported by the test environment. **Xinjiang**: `score` is required; do not send only a rank.
+
+**Static batch fallback (prefer the batch/list API)**:
+
+| Province | batch value |
+|----------|-------------|
+| Tianjin | `"\u672c\u79d1\u6279A\u6bb5"` (undergraduate batch, segment A) |
+| Zhejiang | `"\u666e\u901a\u7c7b\u4e00\u6bb5"` (general category, segment 1) |
+| Shandong | `"\u666e\u901a\u7c7b\u4e00\u6bb5"` (general category, segment 1) |
+| Sichuan, Yunnan | `"\u672c\u79d1\u6279B\u6bb5"` (undergraduate batch, segment B) |
+| Gansu | `"\u672c\u79d1\u6279"` (undergraduate batch) |
+| Ningxia | `"\u672c\u79d1\u6279B\u6bb5"` (undergraduate batch, segment B) |
+| Xinjiang | `"\u672c\u79d1\u4e00\u6279"` (undergraduate, first batch) |
+| Tibet | not supported by the test environment (error 2222010, invalid gaokao province) |
+
+## Response structure
+
+The public skill-test endpoint returns `{ status, message, result }` (`status=0` means success); the scripts normalize it into a unified format.
 
 ```json
 {
@@ -81,8 +81,8 @@
 }
 ```
 
-旧版接口格式 `{ code, msg, body }`（`code=200`）同样兼容。
+The legacy envelope `{ code, msg, body }` (`code=200`) is also supported.
 
-`type` 枚举：`CHONG` 冲、`WEN` 稳、`BAO` 保、`NAN` 难、`YI` 易。
+`type` enum: `CHONG` = reach, `WEN` = match, `BAO` = safety, `NAN` = difficult, `YI` = easy.
 
-`score` / `parityScore` 常为 JSON 字符串，如 `[{"2025":"660,2153,60"}]`（分,位次,计划数）。
+`score` / `parityScore` are usually JSON-encoded strings such as `[{"2025":"660,2153,60"}]` (score, rank, planned seats).

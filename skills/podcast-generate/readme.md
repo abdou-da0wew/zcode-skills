@@ -1,53 +1,68 @@
-# Podcast Generate Skill（TypeScript 线上版本）
+# Podcast Generate Skill (TypeScript Online Version)
 
-将一篇资料自动转化为对谈播客，时长根据内容长度自动调整（3-20 分钟，约240字/分钟）：
-- 自动提炼核心内容
-- 生成可编辑的播客脚本
-- 使用 z-ai TTS 合成音频
+Automatically turn a document into a dialogue podcast, with duration adjusted to the content length (3-20 minutes):
+- Automatically extracts the core content
+- Generates an editable podcast script
+- Synthesizes audio via an OpenAI-compatible `/audio/speech` endpoint
 
-这是一个使用 **z-ai-web-dev-sdk** 的 TypeScript 版本，适用于线上环境。
+This is a TypeScript version that uses **plain OpenAI-compatible HTTP calls** (no proprietary SDK), suitable for online environments.
 
 ---
 
-## 快速开始
+## Quick Start
 
-### 一键生成（脚本 + 音频）
+### One-command generation (script + audio)
 
 ```bash
 npm run generate -- --input=test_data/material.txt --out_dir=out
 ```
 
-**最终输出：**
-- `out/podcast_script.md` - 播客脚本（Markdown 格式）
-- `out/podcast.wav` - 最终播客音频
+**Final output:**
+- `out/podcast_script.md` - Podcast script (Markdown format)
+- `out/podcast.wav` - Final podcast audio
 
 ---
 
-## 目录结构
+## Directory Structure
 
 ```text
 podcast-generate/
-├── readme.md               # 使用说明（本文件）
-├── SKILL.md                # Skill 能力与接口约定
-├── package.json            # Node.js 依赖配置
-├── tsconfig.json           # TypeScript 编译配置
-├── generate.ts             # ⭐ 统一入口（唯一需要的文件）
+├── readme.md               # Usage documentation (this file)
+├── SKILL.md                # Skill capabilities and interface conventions
+├── package.json            # Node.js dependency configuration
+├── tsconfig.json           # TypeScript compilation configuration
+├── generate.ts             # ⭐ Unified entry point (the only file you need)
 └── test_data/
-    └── material.txt        # 示例输入资料
+    └── material.txt        # Sample input material
 ```
 
 ---
 
-## 环境要求
+## Requirements
 
-- **Node.js 18+**
-- **z-ai-web-dev-sdk**（已安装在环境中）
+- **Node.js 18+** (for the global `fetch` API)
+- An **OpenAI-compatible LLM server** for script generation (Ollama, vLLM, LM Studio, OpenRouter, ...)
+- An **OpenAI-compatible TTS endpoint** (`/audio/speech`) for audio synthesis
+- Optional: a **SearXNG-style search endpoint** for `--topic` mode
 
-**不需要** z-ai CLI，本代码完全使用 SDK。
+**No proprietary SDK or CLI is needed** — this code uses plain HTTP calls only.
+
+### Configuration (Environment Variables)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LLM_BASE_URL` | `http://localhost:11434/v1` | OpenAI-compatible base URL |
+| `LLM_API_KEY` | (empty) | API key for bearer auth; leave empty for local servers |
+| `LLM_MODEL` | `qwen2.5` | Chat model used for script writing |
+| `TTS_MODEL` | `tts-1` | TTS model name |
+| `TTS_HOST_VOICE` | `onyx` | Voice id for the host (server-dependent) |
+| `TTS_GUEST_VOICE` | `nova` | Voice id for the guest (server-dependent) |
+| `SEARCH_BASE_URL` | `http://localhost:8080` | Metasearch endpoint (SearXNG JSON API convention) for `--topic` mode |
+| `SEARCH_API_KEY` | (empty) | Optional API key for the search endpoint |
 
 ---
 
-## 安装
+## Installation
 
 ```bash
 npm install
@@ -55,120 +70,123 @@ npm install
 
 ---
 
-## 使用方式
+## Usage
 
-### 方式 1：从文件生成
+### Option 1: Generate from a file
 
 ```bash
 npm run generate -- --input=material.txt --out_dir=out
 ```
 
-### 方式 2：联网搜索生成
+### Option 2: Generate from web search
 
 ```bash
-npm run generate -- --topic="最新AI新闻" --out_dir=out
-npm run generate -- --topic="量子计算应用" --out_dir=out --duration=8
+npm run generate -- --topic="latest AI news" --out_dir=out
+npm run generate -- --topic="quantum computing applications" --out_dir=out --duration=8
 ```
 
-### 参数说明
+### Parameters
 
-| 参数 | 说明 | 默认值 |
-|------|------|--------|
-| `--input` | 输入资料文件路径，支持 txt/md/docx/pdf 等文本格式（与 --topic 二选一） | - |
-| `--topic` | 搜索主题关键词（与 --input 二选一） | - |
-| `--out_dir` | 输出目录（必需） | - |
-| `--mode` | 播客模式：dual / single-male / single-female | dual |
-| `--duration` | 手动指定分钟数（3-20）；0 表示自动 | 0 |
-| `--host_name` | 主持人/主播名称 | 小谱 |
-| `--guest_name` | 嘉宾名称 | 锤锤 |
-| `--voice_host` | 主持音色 | xiaochen |
-| `--voice_guest` | 嘉宾音色 | chuichui |
-| `--speed` | 语速（0.5-2.0） | 1.0 |
-| `--pause_ms` | 段间停顿毫秒数 | 200 |
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `--input` | Input material file path; supports txt/md/docx/pdf and other text formats (mutually exclusive with --topic) | - |
+| `--topic` | Search topic keywords (mutually exclusive with --input) | - |
+| `--out_dir` | Output directory (required) | - |
+| `--mode` | Podcast mode: dual / single-male / single-female | dual |
+| `--duration` | Manually specify minutes (3-20); 0 means automatic | 0 |
+| `--host_name` | Host/presenter name | Alex |
+| `--guest_name` | Guest name | Sam |
+| `--voice_host` | Host voice id | onyx |
+| `--voice_guest` | Guest voice id | nova |
+| `--speed` | Speech speed (0.5-2.0) | 1.0 |
+| `--pause_ms` | Pause between segments in milliseconds | 200 |
 
 ---
 
-## 使用示例
+## Usage Examples
 
-### 双人对谈播客（默认）
+### Dual-host dialogue podcast (default)
 
 ```bash
 npm run generate -- --input=material.txt --out_dir=out
 ```
 
-### 单人男声播客
+### Single male-host podcast
 
 ```bash
 npm run generate -- --input=material.txt --out_dir=out --mode=single-male
 ```
 
-### 指定 5 分钟时长
+### Specify a 5-minute duration
 
 ```bash
 npm run generate -- --input=material.txt --out_dir=out --duration=5
 ```
 
-### 自定义角色名称
+### Customize role names
 
 ```bash
-npm run generate -- --input=material.txt --out_dir=out --host_name=张三 --guest_name=李四
+npm run generate -- --input=material.txt --out_dir=out --host_name=Jordan --guest_name=Taylor
 ```
 
-### 使用不同音色
+### Use different voices
 
 ```bash
-npm run generate -- --input=material.txt --out_dir=out --voice_host=tongtong --voice_guest=douji
+npm run generate -- --input=material.txt --out_dir=out --voice_host=alloy --voice_guest=shimmer
 ```
 
-### 联网搜索生成播客
+### Generate a podcast from web search
 
 ```bash
-# 根据主题搜索并生成播客
-npm run generate -- --topic="最新AI技术突破" --out_dir=out
+# Search for a topic and generate a podcast
+npm run generate -- --topic="latest AI breakthroughs" --out_dir=out
 
-# 指定搜索主题和时长
-npm run generate -- --topic="量子计算应用场景" --out_dir=out --duration=8
+# Specify the topic and duration
+npm run generate -- --topic="quantum computing use cases" --out_dir=out --duration=8
 
-# 搜索并生成单人播客
-npm run generate -- --topic="气候变化影响" --out_dir=out --mode=single-male
+# Search and generate a single-host podcast
+npm run generate -- --topic="climate change impact" --out_dir=out --mode=single-male
 ```
 
 ---
 
-## 可用音色
+## Available Voices
 
-| 音色 | 特点 |
-|------|------|
-| xiaochen | 沉稳专业 |
-| chuichui | 活泼可爱 |
-| tongtong | 温暖亲切 |
-| jam | 英音绅士 |
-| kazi | 清晰标准 |
-| douji | 自然流畅 |
-| luodo | 富有感染力 |
+Voice availability depends on your TTS server. Servers following the OpenAI convention typically expose:
+
+| Voice | Character |
+|-------|-----------|
+| alloy | balanced, neutral |
+| echo | calm, steady |
+| fable | expressive, storyteller |
+| onyx | deep, authoritative |
+| nova | bright, energetic |
+| shimmer | warm, friendly |
+
+Open-source engines (Kokoro, Piper, Coqui) expose their own voice ids — set the CLI flags or `TTS_HOST_VOICE` / `TTS_GUEST_VOICE` accordingly.
 
 ---
 
-## 技术架构
+## Technical Architecture
 
-### generate.ts（统一入口）
-- **LLM**：使用 `z-ai-web-dev-sdk` (`chat.completions.create`)
-- **TTS**：使用 `z-ai-web-dev-sdk` (`audio.tts.create`)
-- **不需要** z-ai CLI
-- 自动拼接音频片段
-- 只输出最终文件，中间文件自动清理
+### generate.ts (unified entry point)
+- **LLM**: plain OpenAI-compatible HTTP call (`POST {LLM_BASE_URL}/chat/completions`)
+- **TTS**: plain OpenAI-compatible HTTP call (`POST {LLM_BASE_URL}/audio/speech`)
+- **No proprietary SDK or CLI needed**
+- Automatically stitches audio segments
+- Outputs only the final files; intermediate files are cleaned up automatically
 
-### LLM 调用
-- System prompt：播客脚本编剧角色
-- User prompt：包含资料 + 硬性约束 + 呼吸感要求
-- 输出校验：字数、结构、角色标签
-- 自动重试：最多 3 次
+### LLM calls
+- System prompt: podcast scriptwriter role
+- User prompt: contains the material + hard constraints + breathing-room requirements
+- Output validation: character count, structure, speaker tags
+- Automatic retries: up to 3 attempts
 
-### TTS 调用
-- 使用 `zai.audio.tts.create()`
-- 支持自定义音色、语速
-- 自动拼接多个 wav 片段
-- 临时文件自动清理
+### TTS calls
+- Uses `POST {LLM_BASE_URL}/audio/speech` with `{model, input, voice, speed, response_format}`
+- Supports custom voices and speed
+- Automatically stitches multiple wav segments
+- Temporary files are cleaned up automatically
 
 ---
 

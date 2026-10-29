@@ -1,18 +1,18 @@
-# 编码配置解码
+# Encoded Config Decoding
 
-## 识别信号
+## Recognition Signals
 
-1. API 返回有 `_encoded: true` 标志
-2. `definition` 字段是 Base64 字符串而非 JSON
-3. JS 中有 `atob()`/`btoa()` + `TextEncoder`/`TextDecoder` + XOR
-4. Runtime config 中有 `obfuscationKey`
+1. The API response carries an `_encoded: true` flag
+2. The `definition` field is a Base64 string rather than JSON
+3. The JS contains `atob()`/`btoa()` + `TextEncoder`/`TextDecoder` + XOR
+4. The runtime config contains `obfuscationKey`
 
 ```bash
 grep -oE '(atob|btoa|obfuscation|_encoded)' /tmp/*.js | sort | uniq -c
 grep -oE 'obfuscationKey:"[^"]*"' /tmp/page.html
 ```
 
-## 常见方案
+## Common Schemes
 
 ### Base64 + XOR
 
@@ -26,28 +26,28 @@ def decode(encoded, key):
     return json.loads(decrypted.decode('utf-8'))
 ```
 
-### 短码映射（组件/属性名缩写）
+### Short-code mapping (abbreviated component/prop names)
 
-配置中 `C74`/`p29` 代替 `StudioBackground`/`color`。
+The config uses `C74`/`p29` in place of `StudioBackground`/`color`.
 
 ```bash
 grep -oE '(codeToComponent|codeToProp)' /tmp/bundle.js
 ```
 
-映射表通常是动态生成的——所有名称按字母排序分配 `C{nn}`/`p{nn}` 编号。
+The mapping table is usually generated dynamically — all names are sorted alphabetically and assigned `C{nn}`/`p{nn}` numbers.
 
-## 密钥来源
+## Key Sources
 
-| 框架 | 位置 |
+| Framework | Location |
 |------|------|
-| Nuxt.js | `public:{obfuscationKey:"..."}` in HTML |
-| Next.js | `__NEXT_DATA__` 的 runtimeConfig |
-| SPA | bundle 常量或 `window.__CONFIG__` |
+| Nuxt.js | `public:{obfuscationKey:"..."}` in the HTML |
+| Next.js | `runtimeConfig` inside `__NEXT_DATA__` |
+| SPA | bundle constant or `window.__CONFIG__` |
 
-## 查找解码函数
+## Finding the Decode Function
 
 ```bash
 grep -l '_encoded' /tmp/*.js
 grep -A3 '_encoded' /tmp/bundle.js
-# 模式：if (t._encoded) { return decode(t.definition, key) }
+# Pattern: if (t._encoded) { return decode(t.definition, key) }
 ```

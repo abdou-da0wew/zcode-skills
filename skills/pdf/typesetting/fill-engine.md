@@ -515,7 +515,7 @@ Input content arrives
 
 ```
 □ Body font size ≥ 14pt (single-column) / 12pt (double-column)?
-□ H1 ≥ 32pt、H2 ≥ 24pt、H3 ≥ 18pt？
+□ H1 >= 32pt, H2 >= 24pt, H3 >= 18pt?
 □ Virtual render calculated Fill Ratio?
 □ Inflation triggered when Fill Ratio < 65%?
 □ Line-height inflation not exceeding 2.2?

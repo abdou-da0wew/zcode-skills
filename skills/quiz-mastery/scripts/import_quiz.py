@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""从题目文件导入题目。
+"""Import questions from a question file.
 
-用法：python3 import_quiz.py <file_path> <document_id> <user_id>
+Usage: python3 import_quiz.py <file_path> <document_id> <user_id>
 
-输出：JSON 格式的 prompt（system_prompt + user_prompt），由 agent 发给 LLM 解析题目。
-LLM 返回题目 JSON 后，agent 应调用 service.import_questions() 导入。
+Output: the prompt in JSON format (system_prompt + user_prompt), to be sent to
+the LLM by the agent for question parsing. Once the LLM returns the questions
+JSON, the agent should call service.import_questions() to import them.
 """
 from pathlib import Path
 import json

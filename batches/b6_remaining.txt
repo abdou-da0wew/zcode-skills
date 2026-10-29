@@ -1,0 +1,10 @@
+gaokao-collect-student-info/SKILL.md
+gaokao-fetch-volunteers/scripts/__pycache__/build_api_request.cpython-314.pyc
+gaokao-fetch-volunteers/scripts/__pycache__/fetch_volunteers.cpython-314.pyc
+gaokao-fetch-volunteers/scripts/__pycache__/province_config.cpython-314.pyc
+gaokao-recommend-majors/SKILL.md
+gaokao-recommend-majors/career_reference.md
+gaokao-recommend-majors/examples/major_recommendation_template.json
+gaokao-recommend-schools/SKILL.md
+gaokao-recommend-schools/career_reference.md
+gaokao-recommend-schools/examples/school_recommendation_template.json

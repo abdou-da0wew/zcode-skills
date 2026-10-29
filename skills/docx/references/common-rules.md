@@ -92,15 +92,15 @@ When `needsRedHeader() = true`:
 
 When required information is missing, use standardized placeholders so users can Find & Replace in Word.
 
-**Format:** Always use full-width brackets `【 】`.
+**Format:** Always use square brackets `[ ]`.
 
 | Type | Format | Example |
 |------|--------|---------|
-| General field | `【field name】` | Name: 【company name】 |
-| Monetary amount | `【RMB in words: yuan (lowercase: ¥)】` | Amount: 【RMB in words】 |
-| Date field | `【____/____/____】` | Signing date: 【____/____/____】 |
-| Long text | `【Please fill in: ______】` | Delivery criteria: 【Please fill in: ______】 |
-| Attachment ref | `【See Appendix 1: ______】` | |
+| General field | `[field name]` | Name: [company name] |
+| Monetary amount | `[RMB in words: yuan (lowercase: ¥)]` | Amount: [RMB in words] |
+| Date field | `[____/____/____]` | Signing date: [____/____/____] |
+| Long text | `[Please fill in: ______]` | Delivery criteria: [Please fill in: ______] |
+| Attachment ref | `[See Appendix 1: ______]` | |
 
 **Rules:**
 1. Placeholder format must be consistent throughout the entire document
@@ -148,20 +148,20 @@ Generated code MUST guard against outputting literal `undefined`, `null`, `NaN`,
 // ✅ MANDATORY: Safe text helper — use for ALL user-facing text values
 function safeText(value, placeholder) {
   if (value === undefined || value === null || value === "" || String(value) === "NaN" || String(value) === "undefined") {
-    return placeholder || "【Please fill in】";
+    return placeholder || "[Please fill in]";
   }
   return String(value);
 }
 
 // Usage:
-new TextRun({ text: safeText(config.contact, "【Contact person】") })
-new TextRun({ text: safeText(row.phone, "【Phone number】") })
+new TextRun({ text: safeText(config.contact, "[Contact person]") })
+new TextRun({ text: safeText(row.phone, "[Phone number]") })
 ```
 
 **Rules:**
 1. Every `TextRun` displaying user-provided or config-derived data MUST use `safeText()` or equivalent guard
-2. If a field is optional and not provided, use `【Please fill in: field_name】` placeholder (full-width brackets)
-3. Table cells with missing data: show `【Please fill in】`, never leave as empty string or undefined
+2. If a field is optional and not provided, use `[Please fill in: field_name]` placeholder (square brackets)
+3. Table cells with missing data: show `[Please fill in]`, never leave as empty string or undefined
 4. This applies to ALL scenes — contracts, reports, academic, exams, etc.
 
 ---
@@ -240,7 +240,7 @@ These apply to ALL scenes. Scene files may add scene-specific prohibitions.
 3. **No fake TOC / page numbers / headers** — use proper docx-js structures
 4. **No excessive blank lines** to pad layout
 5. **No dirty formatting** — no stray annotations, template fragments, broken hyperlinks, garbled markers
-6. **No sloppy placeholders** — "TBD", "omitted", "略", "to be refined" are forbidden; use proper `【】` placeholders
+6. **No sloppy placeholders** — "TBD", "omitted", "(omitted)", "to be refined" are forbidden; use proper `[ ]` placeholders
 7. **No fabricated data** — do not invent statistics, citations, legal references, or facts to appear professional
 8. **No inconsistent heading/numbering** — one numbering system per document, no level-skipping
 9. **No Markdown artifacts** — no `#`, `**`, `-` list markers, `>` blockquotes, and **no Markdown table syntax** (`| col1 | col2 |`, `|---|---|`) in the final docx. Any tabular data MUST be rendered as a proper docx `Table` object — never as plain-text pipe-delimited lines. This applies to ALL scenes including exam paper data tables, report statistics, and academic result tables.
@@ -310,7 +310,7 @@ If the last line of a title contains only 1–2 characters, merge it into the pr
 
 Line breaks must occur at semantic boundaries: after particles (e.g., de/yu/he/ji/zhi), punctuation, connectors, spaces, or underscores. Never split a compound term (e.g., a 4-character term like a management specification must not be split into 3+1 characters).
 
-For mixed Chinese+English titles (e.g., "基于Transformer架构的..."), use `estimateTextWidth()` instead of character count for line break calculation. Chinese characters are ~2× wider than English characters at the same font size.
+For mixed Chinese+English titles, use `estimateTextWidth()` instead of character count for line break calculation. Chinese characters are ~2× wider than English characters at the same font size.
 
 ### Rule 4: Maximum 3 title lines on cover
 
@@ -328,7 +328,7 @@ Before generating, verify that total content height stays within 15638 twips (16
 
 Academic cover meta info must use a 2-column table with **percentage widths only** (NOT DXA — WPS breaks with DXA widths):
 - **Table width:** adaptive 55–75% of page, calculated by `calcR5MetaLayout()` in `design-system.md`. Table is centered via `alignment: CENTER`.
-- **Label column:** adaptive 25–45% of table width, **LEFT aligned**, plain text label + "：". NO full-width space padding, NO right-alignment, NO distributed alignment.
+- **Label column:** adaptive 25–45% of table width, **LEFT aligned**, plain text label + full-width colon (U+FF1A). NO full-width space padding, NO right-alignment, NO distributed alignment.
 - **Value column:** remaining percentage, **LEFT aligned**, `bottom border single sz=4` = fixed-length underline (same length for all rows regardless of value text length).
 - **Label column borders:** none (NO bottom border on label cells).
 - ⚠️ Do NOT use DXA widths, full-width space padding (`\u3000`), spacer columns, or tab stops — these render inconsistently between MS Office and WPS.
@@ -381,7 +381,7 @@ All multi-section documents MUST follow this five-zone page numbering scheme unl
 | 5. References | Bibliography | Continues body (no reset) | Same as body | If body ends on p.42, references continue from p.43 |
 
 **Key rules:**
-0. **NEVER use "Page X of Y" denominator format.** Footer must show only the current page number (e.g., `1`, `2`, `iii`). Do NOT display total page count. No `Page 3 of 12`, no `3 / 12`, no `第3页/共12页`. Just the bare number. `PageNumber.TOTAL_PAGES` / `NUMPAGES` is **FORBIDDEN** in footers.
+0. **NEVER use "Page X of Y" denominator format.** Footer must show only the current page number (e.g., `1`, `2`, `iii`). Do NOT display total page count. No `Page 3 of 12`, no `3 / 12`, no `Page 3 / Total 12`. Just the bare number. `PageNumber.TOTAL_PAGES` / `NUMPAGES` is **FORBIDDEN** in footers.
 1. **Cover is always page 1 internally** but the page number is never displayed. Suppress footer in cover section.
 2. **Front matter uses independent Roman numerals** starting at `i`. This sequence is separate from the body.
 3. **Body resets to Arabic 1.** The first page of main content is always page `1`.

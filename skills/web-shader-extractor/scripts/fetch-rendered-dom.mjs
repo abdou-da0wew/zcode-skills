@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 /**
- * 使用 Playwright 获取 JS 渲染后的完整 DOM 和 WebGL 元数据
+ * Uses Playwright to fetch the fully JS-rendered DOM and WebGL metadata
  *
  * Usage:
  *   node fetch-rendered-dom.mjs <URL> [outDir]
  *
- * 首次运行会自动安装 playwright 到 ~/.cache/playwright-runner/
+ * The first run auto-installs playwright into ~/.cache/playwright-runner/
  *
- * 输出到 outDir (默认 /tmp/rendered):
- *   dom.html         — 完整渲染后 HTML
- *   canvas-info.json — 所有 canvas 元素的信息
- *   webgl-info.json  — WebGL 上下文元数据
- *   console.log      — 页面 console 输出
- *   screenshot.png   — 页面截图
- *   network.json     — 运行时加载的 JS/资源 URL
+ * Outputs to outDir (default /tmp/rendered):
+ *   dom.html         — the fully rendered HTML
+ *   canvas-info.json — info about all canvas elements
+ *   webgl-info.json  — WebGL context metadata
+ *   console.log      — the page's console output
+ *   screenshot.png   — page screenshot
+ *   network.json     — JS/asset URLs loaded at runtime
  */
 
 import { execSync } from 'child_process';

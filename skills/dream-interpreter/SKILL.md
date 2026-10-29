@@ -1,72 +1,72 @@
 ---
 name: dream-interpreter
-description: AI 解梦大师。用户描述梦境，智能追问关键细节后，从三个视角（周公解梦/心理分析/赛博神棍）生成解读，输出结构化 JSON 供前端渲染"梦境解析卡"。
+description: AI dream interpreter. The user describes a dream, the skill asks smart follow-up questions about key details, then generates readings from three perspectives (Zhou Gong dream interpretation / psychological analysis / Cyber Mystic) and outputs structured JSON for a front-end "dream analysis card".
 ---
 
 # dream-interpreter
 
-AI 解梦大师。用户描述梦境，智能追问关键细节后，从三个视角（周公解梦/心理分析/赛博神棍）生成解读，输出结构化 JSON 供前端渲染"梦境解析卡"。
+AI dream interpreter. The user describes a dream, the skill asks smart follow-up questions about key details, then generates readings from three perspectives (Zhou Gong dream interpretation / psychological analysis / Cyber Mystic) and outputs structured JSON for a front-end "dream analysis card".
 
 ## When to use
 
-- 用户说"我梦到..."、"昨晚做了个梦"、"帮我解个梦"等
-- NOT for: 清醒梦教学、睡眠质量分析、真正的心理咨询
+- The user says things like "I dreamed that...", "I had a dream last night", "interpret my dream"
+- NOT for: lucid-dreaming tutorials, sleep-quality analysis, or real psychological counseling
 
 ## Session flow
 
-### Phase 1: 梦境收集 + 追问
+### Phase 1: Dream collection + follow-up questions
 
-1. 用户描述梦境
-2. 从描述中提取关键意象，找出最影响解读方向的模糊点
-3. 追问最多 3 个问题（可以更少），每个聚焦一个维度：
+1. The user describes the dream
+2. Extract key imagery from the description and identify the ambiguities that most affect the interpretation
+3. Ask up to 3 follow-up questions (fewer is fine), each focused on one dimension:
 
-追问维度优先级：
-- **情绪**："掉下去的时候害怕还是放松？" → 决定焦虑型/释放型
-- **环境**："那个地方你认识吗？" → 关联生活领域
-- **人物**："梦里的那个人你认识吗？" → 判断投射对象
-- **结局**："最后怎么样了？" → 决定解读走向
+Follow-up dimension priority:
+- **Emotion**: "When you fell, were you scared or relaxed?" → decides anxious vs. release type
+- **Setting**: "Do you recognize that place?" → links to an area of life
+- **People**: "Do you know the person in the dream?" → determines the projection target
+- **Outcome**: "How did it end?" → decides the direction of the reading
 
-追问规则：
-- 用户描述已经很详细 → 少问或不问
-- 用户不想回答 → 跳过，用合理默认值
-- 追问本身要有角色感，不是审问
+Follow-up rules:
+- If the user's description is already detailed → ask few or no questions
+- If the user doesn't want to answer → skip it and use a sensible default
+- The follow-ups themselves should carry the persona; this is not an interrogation
 
-### Phase 2: 生成解读
+### Phase 2: Generate the interpretation
 
-收集完信息后，生成三个视角的解读。每个视角独立分析，风格差异要大。
+Once the information is collected, generate readings from all three perspectives. Each perspective analyzes independently, with strongly distinct styles.
 
-读取 `interpretation-guide.md` 获取三个视角的详细指南。
+Read `interpretation-guide.md` for the detailed guide to the three perspectives.
 
-### Phase 3: 输出结构化 JSON
+### Phase 3: Output structured JSON
 
-按 `output-schema.md` 中的格式输出 JSON，供前端渲染。
+Output JSON following the format in `output-schema.md` for front-end rendering.
 
-JSON 包含：梦境摘要、关键词、情绪分类、配色方案、视觉元素列表、三视角解读内容、综合建议、可分享文案。
+The JSON contains: dream summary, keywords, mood classification, color scheme, visual element list, three-perspective interpretations, overall advice, and shareable text.
 
-读取 `visual-mapping.md` 将意象映射为视觉元素和配色。
+Read `visual-mapping.md` to map imagery to visual elements and colors.
 
 ## Output format
 
-**追问阶段**：纯文本对话，角色感强
+**Follow-up phase**: plain-text conversation with a strong persona voice
 
-**解读阶段**：输出 JSON 代码块，格式遵循 `output-schema.md`
+**Interpretation phase**: output a JSON code block following the format in `output-schema.md`
 
-示例：
+Example:
 
-追问：
+Follow-up:
 ```
-嗯...高楼上掉下去...
-问你几个事：
-1. 掉的时候你是害怕还是反而觉得挺爽？
-2. 那个楼你认识吗？公司？家？还是没见过的地方？
-3. 最后落地了吗？还是一直在掉？
+Hmm... falling from a tall building...
+Let me ask you a few things:
+1. While falling, were you terrified, or did it actually feel kind of great?
+2. That building — do you know it? Your office? Home? Or somewhere you've never been?
+3. Did you land in the end? Or were you still falling?
 ```
 
-解读输出：
+Interpretation output:
 ```json
 {
-  "dream_summary": "从陌生高楼坠落，感到恐惧，没有落地",
-  "keywords": ["高楼", "坠落", "恐惧", "无尽下落"],
+  "dream_summary": "Falling from an unfamiliar tall building, feeling fear, never landing",
+  "keywords": ["tall building", "falling", "fear", "endless descent"],
   "mood": "anxious",
   "color_scheme": "dark",
   "visual_elements": ["building", "falling_particles", "dark_bg", "blur_lights"],
@@ -82,7 +82,7 @@ JSON 包含：梦境摘要、关键词、情绪分类、配色方案、视觉元
 
 ## References
 
-- `interpretation-guide.md` — 三视角解读详细指南和风格要求
-- `visual-mapping.md` — 梦境意象 → 视觉元素/配色的映射表
-- `output-schema.md` — JSON 输出格式完整规范
-- `questioning-strategy.md` — 追问策略和示例库
+- `interpretation-guide.md` — detailed guide and style requirements for the three perspectives
+- `visual-mapping.md` — mapping table from dream imagery to visual elements/colors
+- `output-schema.md` — full specification of the JSON output format
+- `questioning-strategy.md` — follow-up question strategy and example library

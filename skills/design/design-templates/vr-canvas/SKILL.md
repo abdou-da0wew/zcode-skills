@@ -1,6 +1,6 @@
 ---
 name: vr-canvas
-description: Generate a single-file VR-style portfolio website — works are tiled on the inside of a 3D cylinder/sphere (concave wraparound, like an immersive headset), with mouse-controlled head tilt, long-press to drag and browse the infinite canvas, click to open work detail. Includes overlays for About / CV / Contact / Filter. Takes a natural-language description of the studio and works (images + brief copy); outputs ONE working .html file. Runs in BOTH Claude Code (writes to ~/Desktop) and GLM / online chat (outputs HTML inline). Trigger phrases: "做个 VR 作品集", "做个无限画布作品集", "做个穹顶包裹的作品集", "vr-canvas-gen ...", or when user drags this skill folder into chat asking for a wraparound/immersive portfolio site.
+description: Generate a single-file VR-style portfolio website — works are tiled on the inside of a 3D cylinder/sphere (concave wraparound, like an immersive headset), with mouse-controlled head tilt, long-press to drag and browse the infinite canvas, click to open work detail. Includes overlays for About / CV / Contact / Filter. Takes a natural-language description of the studio and works (images + brief copy); outputs ONE working .html file. Runs in BOTH local agent environments with a filesystem such as the DiveeOI agent (OpenCode-based) (writes to ~/Desktop) and plain online chat without a filesystem (outputs HTML inline). Trigger phrases: "make a VR portfolio", "make an infinite-canvas portfolio", "make a dome-wrapped portfolio", "vr-canvas-gen ...", or when the user drags this skill folder into chat asking for a wraparound/immersive portfolio site.
 visibility: public
 mode: template
 carrier: web-page
@@ -8,132 +8,132 @@ scenario: portfolio
 pattern_source: reference.html
 source_priority: skill-first
 triggers:
-  - "做个 VR 作品集"
-  - "做个无限画布作品集"
-  - "做个穹顶包裹的作品集"
-  - "弧幕作品集"
-  - "包裹感作品集"
+  - "make a VR portfolio"
+  - "make an infinite-canvas portfolio"
+  - "make a dome-wrapped portfolio"
+  - "curved-screen portfolio"
+  - "wraparound portfolio"
 related_patterns: portfolio-detail, digital-eguide
 legacy_gen: true
 ---
 
-# vr-canvas — VR 弧幕作品集生成器
+# vr-canvas — VR curved-screen portfolio generator
 
-## 何时触发
-用户说「做个 VR 作品集」/「做个穹顶 / 弧幕 / 包裹感的作品集」/「做个无限画布作品集」/「vr-canvas-gen ...」，并提供了：
-- **作品文件**（图片，文件夹路径或多个文件路径）— GLM 模式可以是描述
-- **自然语言描述**（工作室介绍 + 每件作品的故事 — 散文也行，不必结构化）
+## When to trigger
+The user says "make a VR portfolio" / "make a dome / curved-screen / wraparound portfolio" / "make an infinite-canvas portfolio" / "vr-canvas-gen ..." and provides:
+- **Work files** (images, a folder path or several file paths) — in chat mode, a description may suffice
+- **Natural-language description** (studio intro + the story of each work — prose is fine, no need to be structured)
 
-## 输入解析
-从用户消息抽取：
-- **works_path**（A 模式必填）：作品文件夹路径或一组文件路径
-- **bio_text**（必填）：工作室自我介绍 + 各项目背景。可能含：工作室名、城市、领域、成立年份、团队、客户类型、各作品的故事
-- **风格变体**（可选）：默认深色「材料/工作室」氛围；用户说「亮色 / 杂志感 / 赛博 / 极简」时调 `:root` 配色
+## Input parsing
+Extract from the user's message:
+- **works_path** (required in Mode A): work folder path or a set of file paths
+- **bio_text** (required): studio self-introduction + background per project. May include: studio name, city, field, founding year, team, client types, and each work's story
+- **Style variant** (optional): default is the dark "material/studio" mood; if the user says "light / magazine / cyber / minimal", adjust the `:root` palette
 
-如果用户只说「做个 VR 作品集」但没给作品 → **必须问一次**作品和工作室名字。
-给了作品但没写描述 → **不追问**，从文件名/视觉内容推断标题和分类。
+If the user only says "make a VR portfolio" without works → **ask once** for the works and the studio name.
+Works given but no description → **don't follow up**; infer titles and categories from filenames/visual content.
 
-## 运行环境（两种模式）
+## Runtime environments (two modes)
 
-### A. Claude Code / 本地（有文件系统）
-- 用 `Bash` 列文件、`sips` 探尺寸、`cp` 拷贝图片
-- 输出到 `~/Desktop/{slug}-vr-canvas/index.html` + `images/`
-- 图片用相对路径 `images/work-NN.jpg`
-- 模板自带 `images/p-01-color-macro.jpg ... p-18-magazine.jpg` 共 18 张设计向真实摄影（≈2.2MB），用户没传图片时直接 open template.html 就能看到完整 VR 球面效果
+### A. Local agent such as DiveeOI (has a filesystem)
+- Use `Bash` to list files, `sips` to probe sizes, `cp` to copy images
+- Output to `~/Desktop/{slug}-vr-canvas/index.html` + `images/`
+- Images use relative paths `images/work-NN.jpg`
+- The template ships with `images/p-01-color-macro.jpg ... p-18-magazine.jpg` — 18 design-oriented real photos (≈2.2MB); if the user provides no images, just open template.html to see the full VR sphere effect
 
-### B. GLM / 在线对话（无文件系统）
-- 你**只输出一份完整的 HTML 字符串**（包在 ```html 代码块里）
-- 用户上传图片但没给 URL → 用 `https://picsum.photos/seed/{描述-序号}/1080/1080` 做占位
-- 用户给了 URL → 直接 `<img src="https://...">`
-- 不要尝试访问本地文件、不要建议命令行操作（除了「把这段保存成 index.html」）
+### B. Online chat (no filesystem)
+- You **output exactly one complete HTML string** (wrapped in a ```html code block)
+- User uploaded images but gave no URLs → use `https://picsum.photos/seed/{description-NN}/1080/1080` placeholders
+- User gave URLs → use `<img src="https://...">` directly
+- Do not try to access local files; do not suggest command-line operations (other than "save this as index.html")
 
-判断：**不能用 Read 看到本地图片** → 默认走 B。
+Decision rule: **if you cannot Read local images** → default to Mode B.
 
-## 文件分工
+## File roles
 
-| 文件 | 角色 | 怎么用 |
+| File | Role | How to use it |
 |---|---|---|
-| `reference.html` | **完整成品**（虚白工作室 20 件作品 + 完整 about/cv/contact/filter 文案）| 看：tile 文案语气、tag 词汇、desc 长度、about/cv 信息密度、整体氛围 |
-| `template.html` | **空骨架**（同样的 CSS/JS，2 件示例 + 全部 SWAP 标注）| 在它的基础上改，输出最终 HTML |
+| `reference.html` | **Complete finished piece** (Xubai studio, 20 works + full about/cv/contact/filter copy) | Read for: tile copy tone, tag vocabulary, desc length, about/cv information density, overall mood |
+| `template.html` | **Empty skeleton** (same CSS/JS, 2 samples + all SWAP markers) | Build on it to produce the final HTML |
 
-**核心规则**：所有改动基于 `template.html`；从 `reference.html` 学**怎么写得像**，但不要复制它的具体内容（虚白、京都驻地、青木茶寮 …… 这些都是别人的）。
+**Core rule**: all edits are based on `template.html`; learn **how to write like it** from `reference.html`, but do not copy its concrete content (Xubai, the Kyoto residency, the Aokicha tea room … — those belong to someone else).
 
-## 工作步骤
+## Workflow
 
-### 1. 读两份 HTML
-- 先读 `template.html`，定位 SWAP 标记（共 12 处）
-- 再扫一眼 `reference.html`，体会作品文案、about/cv 的密度与节奏
+### 1. Read both HTML files
+- Read `template.html` first and locate the SWAP markers (12 total)
+- Then skim `reference.html` to absorb the work copy and about/cv density and rhythm
 
-**不要改 JS、不要改 .work / .frame / .sphere / .viewport / .overlay 的 CSS、不要改任何 #sphere / #viewport / .splash 的逻辑**。
+**Do not change the JS, the .work / .frame / .sphere / .viewport / .overlay CSS, or any #sphere / #viewport / .splash logic**.
 
-### 2.（仅 A 模式）列作品 + 探尺寸
+### 2. (Mode A only) List works + probe sizes
 ```bash
 ls -la "{works_path}"
 sips -g pixelWidth -g pixelHeight "{works_path}/{file}" 2>/dev/null
 ```
 
-每件作品按文件名 + 视觉判断 (Read 看代表性几张) → (title, brand, year, tags, desc)。
+Per work, judge from filename + visuals (Read a few representative ones) → (title, brand, year, tags, desc).
 
-### 3. 解析 bio_text 抽信息
+### 3. Parse bio_text and extract
 
-**工作室级**（每个值都至少有默认 fallback）：
-- **STUDIO_NAME_CN / STUDIO_NAME_EN**（如「虚白 / Xubai」「明川 / Mingchuan」）
-- **STUDIO_TYPE**（如「设计工作室」「影像工作室」「建筑事务所」「独立设计师」）
-- **TAGLINE**（两行：长句 + 短结论，参考 `虚白是一家以材料与场景为方法的中文设计工作室，致力于在品牌、视觉与空间之间寻找静止的位置`）
-- **LOCATION_PRIMARY / SECONDARY**（如「中国 · 上海」「日本 · 京都」；只有一个城市就把第二行去掉）
-- **TIMEZONE_PRIMARY / SECONDARY**（如「北京时间 UTC+8」、第二个城市的 JST/EST 等）
-- **YEAR_FOUNDED**（如 2017）
-- **CTA_TEXT**（默认「我们来聊聊吧。」，可改成「Let's Talk」「联系合作」等）
-- **TAB_LABELS**（默认 `作品 / 关于 / 履历`，可改）
-- **CAPABILITIES**（4—5 项能力，写进 about overlay）
-- **TEAM**（3—5 名成员，写进 about overlay；个人作品集就只写自己一行）
-- **CV_YEARS**（按年份分组的项目时间线）
-- **AWARDS**（3—8 条展览/奖项）
-- **CONTACT_EMAILS**（new project / press / hiring 三类邮箱）
-- **OFFICE_ADDRESSES**（1—2 个办公室地址）
-- **SOCIAL**（IG / 微信 / Twitter / Behance 等）
-- **FILTER_CATEGORIES / YEARS**（用于 filter overlay 的复选框，自动从 WORKS 派生）
+**Studio level** (every value has a default fallback):
+- **STUDIO_NAME_CN / STUDIO_NAME_EN** (e.g. "Xubai / Void White", "Mingchuan / Bright River")
+- **STUDIO_TYPE** (e.g. "design studio", "moving-image studio", "architecture office", "independent designer")
+- **TAGLINE** (two lines: long sentence + short conclusion, cf. `Xubai is a design studio that works through material and situation, committed to finding the still point between brand, visual, and space`)
+- **LOCATION_PRIMARY / SECONDARY** (e.g. "Shanghai, China", "Kyoto, Japan"; with only one city, drop the second line)
+- **TIMEZONE_PRIMARY / SECONDARY** (e.g. "UTC+8"; JST/EST etc. for the second city)
+- **YEAR_FOUNDED** (e.g. 2017)
+- **CTA_TEXT** (default "Let's talk."; may become "Let's Talk", "Get in touch", etc.)
+- **TAB_LABELS** (default `Works / About / CV`, editable)
+- **CAPABILITIES** (4–5 capabilities for the about overlay)
+- **TEAM** (3–5 members for the about overlay; a personal portfolio lists just yourself)
+- **CV_YEARS** (project timeline grouped by year)
+- **AWARDS** (3–8 exhibitions/awards)
+- **CONTACT_EMAILS** (three addresses: new project / press / hiring)
+- **OFFICE_ADDRESSES** (1–2 office addresses)
+- **SOCIAL** (IG / WeChat / Twitter / Behance etc.)
+- **FILTER_CATEGORIES / YEARS** (checkboxes for the filter overlay, derived automatically from WORKS)
 
-**每件作品**：
-- **id**（'01'—'NN' 字符串两位）
-- **brand**（客户名或「个人项目」「独立创作」）
-- **title**（4—12 字简洁标题）
-- **year**（YYYY 数字）
-- **tags**（数组，1—3 个英文一词，如 Identity / Editorial / Web / Installation / Poster / Sound / Motion / Print / Type / Packaging / Exhibition / Light）
-- **img**（封面图，1080×1080 正方形）
-- **hero**（详情页头图，1600×1000 横版）
-- **g1, g2**（详情页两张配图，800×600）
-- **desc**（一句话 ~20—50 字，会显示在二级详情页副标题）
-- **long**（详情页正文，2—3 段，每段 60—120 字）
-- **spec**（4 行键值对：`[['Client','xxx'],['Year','xxx'],['Scope','xxx'],['Duration / Pages / Edition','xxx']]`）
+**Per work**:
+- **id** ('01'—'NN', two-character string)
+- **brand** (client name, or "Personal project" / "Independent work")
+- **title** (concise, 4–12 characters)
+- **year** (YYYY number)
+- **tags** (array, 1–3 single English words, e.g. Identity / Editorial / Web / Installation / Poster / Sound / Motion / Print / Type / Packaging / Exhibition / Light)
+- **img** (cover, 1080×1080 square)
+- **hero** (detail hero, 1600×1000 landscape)
+- **g1, g2** (two detail images, 800×600)
+- **desc** (one line, ~20–50 characters, shown as the detail-page subtitle)
+- **long** (detail body, 2–3 paragraphs, 60–120 characters each)
+- **spec** (4 key-value rows: `[['Client','xxx'],['Year','xxx'],['Scope','xxx'],['Duration / Pages / Edition','xxx']]`)
 
-如果 bio_text 只有零散描述没有具体故事 → **编**简短叙述呼应整体氛围，但**不要瞎编客户名**（写 'Personal' / '独立创作' / `工作室自发`）。
+If bio_text is scattered with no concrete stories → **invent** brief narratives matching the overall mood, but **never fabricate client names** (write 'Personal' / 'Independent work' / `studio-initiated`).
 
-### 4. WORKS 数量
-- 至少 **8 件**（屏幕上才不空），少于 8 件就重复填充：让 `workFor()` 自动用 mod 循环就行
-- 上限 **30 件**（再多没必要，球面会重复）
-- 推荐 **15—25 件**
+### 4. WORKS count
+- At least **8 works** (otherwise the sphere looks empty); below 8, repeat-fill: let `workFor()` loop with mod
+- Cap **30 works** (more is pointless — the sphere repeats)
+- Recommended **15–25**
 
-### 5. 替换 12 个 SWAP
+### 5. Fill the 12 SWAPs
 
-| SWAP | 位置 | 内容 |
+| SWAP | Location | Content |
 |---|---|---|
-| 1 | `<title>` | `{STUDIO_NAME_CN} — {STUDIO_TYPE} · Index {YEAR}` |
-| 2 | `.brand-block`（顶栏左 logo + 文字）| 自定义 SVG logo 或换图标 + 「声音 [关闭]」可改可保留 |
-| 3 | `.tagline`（顶栏中部两行字）| `{TAGLINE}` 长句 + `<br>` + 短结论 |
-| 4 | `.col-meta`（顶栏右上 location）| 1—2 个 `<div class="row"><span class="loc-dot live"></span>{LOCATION}</div>` |
-| 5 | `.col-times`（顶栏右上时区）| `北京时间 UTC+8` / `<div id="time1">` 留空让 JS 填 / 第二行 `<div id="time2">` 也留空 |
-| 6 | `.cta` 按钮 | `{CTA_TEXT}` |
-| 7 | `.bottombar .tabs` | 三个 `<button class="tab">` 文字（默认 `作品 / 关于 / 履历`） |
-| 8 | `#overlay-about` | 完整 about 内容：eyebrow + 标题 + 正文 + 能力领域 + 团队成员 |
-| 9 | `#overlay-cv` | 按年份分组的项目时间线 + 展览/奖项 |
-| 10 | `#overlay-contact` | 邮箱 / 地址 / 社交 / 招聘 6 个 contact-cell |
-| 11 | `#overlay-filter` | 类别 / 年份 / 客户类型三组 checkbox（按你最终的 WORKS 派生） |
-| 12 | `const WORKS = [...]` | 完整 WORKS 数组 |
+| 1 | `<title>` | `{STUDIO_NAME_EN} — {STUDIO_TYPE} · Index {YEAR}` |
+| 2 | `.brand-block` (top-left logo + text) | custom SVG logo or swap the mark; the "Sound [off]" chip may stay or go |
+| 3 | `.tagline` (two lines, top center) | `{TAGLINE}` long sentence + `<br>` + short conclusion |
+| 4 | `.col-meta` (top-right location) | 1–2 `<div class="row"><span class="loc-dot live"></span>{LOCATION}</div>` |
+| 5 | `.col-times` (top-right timezones) | `UTC+8` etc. / leave `<div id="time1">` empty for JS to fill / leave `<div id="time2">` empty too |
+| 6 | `.cta` button | `{CTA_TEXT}` |
+| 7 | `.bottombar .tabs` | three `<button class="tab">` labels (default `Works / About / CV`) |
+| 8 | `#overlay-about` | full about content: eyebrow + title + body + capabilities + team members |
+| 9 | `#overlay-cv` | project timeline grouped by year + exhibitions/awards |
+| 10 | `#overlay-contact` | emails / addresses / social / hiring — 6 contact-cells |
+| 11 | `#overlay-filter` | three checkbox groups — category / year / client type (derived from your final WORKS) |
+| 12 | `const WORKS = [...]` | the complete WORKS array |
 
-### 6. 风格变体（可选）
+### 6. Style variants (optional)
 
-默认配色（深色「材料 / 工作室」氛围）：
+Default palette (dark "material / studio" mood):
 ```css
 --bg: #0d0c0b;
 --ink: #f0e9df;
@@ -141,54 +141,54 @@ sips -g pixelWidth -g pixelHeight "{works_path}/{file}" 2>/dev/null
 --accent: #c89a5a;
 ```
 
-如果用户说：
-- **亮色 / 杂志感** → bg `#f4f1ec`、ink `#1a1714`、accent `#8a4a1a`
-- **极简白** → bg `#ffffff`、ink `#0a0a0a`、accent `#666666`
-- **赛博紫** → bg `#0a0612`、ink `#e8d8ff`、accent `#9b6dff`
-- **暖棕复古** → bg `#1f1610`、ink `#e8d4b6`、accent `#c8895a`
+If the user says:
+- **Light / magazine** → bg `#f4f1ec`, ink `#1a1714`, accent `#8a4a1a`
+- **Minimal white** → bg `#ffffff`, ink `#0a0a0a`, accent `#666666`
+- **Cyber purple** → bg `#0a0612`, ink `#e8d8ff`, accent `#9b6dff`
+- **Warm brown vintage** → bg `#1f1610`, ink `#e8d4b6`, accent `#c8895a`
 
-只改 `:root` 四个变量；不改 layout / JS。
+Change only the four `:root` variables; do not touch layout / JS.
 
-### 7. 写出文件 / 输出 HTML
+### 7. Write the file / output the HTML
 
-**模式 A（Claude Code）**：
+**Mode A (local agent)**:
 ```
 ~/Desktop/{slug}-vr-canvas/
 ├── index.html
 └── images/
     ├── work-01.jpg ... work-NN.jpg
-    └── (hero / g1 / g2 同名 -hero / -g1 / -g2)
+    └── (hero / g1 / g2 use the same name with -hero / -g1 / -g2 suffixes)
 ```
-slug 用工作室名拼音连字符（xubai / mingchuan / li-ming）。
+slug: romanized studio name, hyphenated (xubai / mingchuan / li-ming).
 
-**模式 B（GLM）**：
-直接在回答里输出一份完整的 HTML，包在 ```html 代码块里。所有 `<img src>` 用 picsum 占位或用户给的 URL。
+**Mode B (online chat)**:
+Output one complete HTML in the reply, wrapped in a ```html code block. All `<img src>` use picsum placeholders or user-provided URLs.
 
-回答末尾说一句：
-> 把上面这段保存成 `index.html` 双击打开。要换图，把 WORKS 数组里的 `img / hero / g1 / g2` 换成你的图片地址。
+End the reply with one line:
+> Save the block above as `index.html` and double-click to open. To swap images, replace `img / hero / g1 / g2` in the WORKS array with your own URLs.
 
-### 8. 报告
+### 8. Report
 
-**模式 A**：一句话报告路径 + 件数 + 风格。
-> 已生成 ~/Desktop/xubai-vr-canvas/index.html — 18 件作品，深色「材料」配色。双击打开，鼠标在屏幕里走会有 VR 头部转动感，长按拖拽翻阅其他作品，点击查看详情。
+**Mode A**: one line — path + count + style.
+> Generated ~/Desktop/xubai-vr-canvas/index.html — 18 works, dark "material" palette. Double-click to open; moving the mouse gives a VR head-turn feel, long-press and drag to browse other works, click for details.
 
-**模式 B**：直接给 HTML 代码块 + 一行使用说明。
+**Mode B**: HTML code block + one line of usage notes.
 
-## 强制保留（绝对不能改）
+## Must keep unchanged (absolutely do not modify)
 
-- 全部 JS（球面投影 / 拖拽惯性 / 滚轮缩放 / hash 路由 / splash / time tick / mouse tilt）
-- `.work / .frame / .cell-head / .cell-foot / .num / .brand / .proj` 的 CSS
-- `.viewport / .sphere` 的 CSS 和 DOM 结构
-- `SPHERE_R = 1700 / STEP_DEG = 11 / ROW_HALF = 6`（这些是球面投影的核心参数；要更强 VR 感才改 R）
-- `.overlay / .overlay-close / .info-pane / .info-section` 的结构（only 改文字，不改 class）
-- `mix-blend-mode: difference` 在 topbar 上（这是设计语言核心）
+- All JS (sphere projection / drag inertia / wheel zoom / hash routing / splash / time tick / mouse tilt)
+- The CSS of `.work / .frame / .cell-head / .cell-foot / .num / .brand / .proj`
+- The CSS and DOM structure of `.viewport / .sphere`
+- `SPHERE_R = 1700 / STEP_DEG = 11 / ROW_HALF = 6` (core sphere-projection parameters; change R only for a stronger VR feel)
+- The structure of `.overlay / .overlay-close / .info-pane / .info-section` (change text only, never classes)
+- `mix-blend-mode: difference` on the topbar (core to the design language)
 
-## 易错速查
+## Pitfalls checklist
 
-- **图片**：必须 1080×1080 正方形作为 `img`（球面 cell 是正方形）；详情页 hero 用 1600×1000 横版
-- **WORKS 数量太少**：至少 8 件；不够就在 bio 里编几个「独立创作 / 实验项目」
-- **不要**给所有作品写超长 long（300 字+）— 留白节奏比信息密度重要
-- **不要**改 `font-family: "Noto Serif SC"` 之类的中文衬线字体（这是工作室质感的来源）
-- **about / cv / contact 三个 overlay 都必须有**：用户即使没给信息，也要根据 bio 编出合理内容；不要留空 overlay
-- **filter overlay 的 checkbox** 是装饰性的（没接 JS），但要根据实际 WORKS 派生类别和年份
-- **个人作品集**（不是工作室）：team 写一个人就行；office addresses 改成「自由独立 · 工作地点 城市」
+- **Images**: `img` must be 1080×1080 square (the sphere cells are square); detail hero uses 1600×1000 landscape
+- **Too few WORKS**: at least 8; if short, invent a few "independent work / experimental project" entries in the bio
+- **Don't** write overlong `long` text for every work (300+ characters) — rhythm of white space matters more than information density
+- **Don't** change the CJK serif stack like `font-family: "Noto Serif SC"` (it is the source of the atelier texture)
+- **All three overlays (about / cv / contact) must be filled**: even if the user gave nothing, compose plausible content from the bio; never leave an overlay empty
+- **filter overlay checkboxes** are decorative (no JS wired), but must derive from the actual WORKS categories and years
+- **Personal portfolio** (not a studio): team lists one person; office addresses become "Independent · City of work"

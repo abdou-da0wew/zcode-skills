@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<!-- 🔧 SWAP-1: <title> = "{STUDIO_NAME_CN} — {STUDIO_TYPE} · Index {YEAR}" -->
-<title>虚白 — 设计工作室 · Index 2026</title>
+<!-- 🔧 SWAP-1: <title> = "{STUDIO_NAME_EN} — {STUDIO_TYPE} · Index {YEAR}" -->
+<title>Xubai — Design Studio · Index 2026</title>
 
-<!-- 🔧 SWAP-OPT-COLOR: 默认深色「材料工作室」配色。改 :root 的四个变量切风格：
-     - 亮色杂志感: bg #f4f1ec / ink #1a1714 / accent #8a4a1a
-     - 极简白:    bg #ffffff / ink #0a0a0a / accent #666666
-     - 赛博紫:    bg #0a0612 / ink #e8d8ff / accent #9b6dff
-     - 暖棕复古:  bg #1f1610 / ink #e8d4b6 / accent #c8895a
-     CSS 变量在下面 <style> 块顶部 --bg / --ink / --ink-soft / --accent 处 -->
+<!-- 🔧 SWAP-OPT-COLOR: default dark "material studio" palette. Switch styles by editing the four :root variables:
+     - light magazine: bg #f4f1ec / ink #1a1714 / accent #8a4a1a
+     - minimal white:  bg #ffffff / ink #0a0a0a / accent #666666
+     - cyber purple:   bg #0a0612 / ink #e8d8ff / accent #9b6dff
+     - warm brown:     bg #1f1610 / ink #e8d4b6 / accent #c8895a
+     The variables live at the top of the <style> block below: --bg / --ink / --ink-soft / --accent -->
 
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,7 +45,7 @@
   body{ cursor: grab; }
   body.dragging{ cursor: grabbing; }
 
-  /* —— 顶栏 —— */
+  /* —— Topbar —— */
   .topbar{
     position:fixed;top:0;left:0;right:0;
     display:flex; justify-content:space-between; align-items:flex-start;
@@ -125,7 +125,7 @@
   }
   .cta:hover{ transform:scale(1.03); }
 
-  /* —— 底栏 —— */
+  /* —— Bottombar —— */
   .bottombar{
     position:fixed; bottom:22px; left:26px; right:26px;
     display:flex; justify-content:center; align-items:center;
@@ -192,13 +192,13 @@
   }
   .filter-pill:hover{ opacity:.9; }
 
-  /* —— 视口 / 球面（经纬网）—— */
+  /* —— Viewport / sphere (lat-long grid) —— */
   .viewport{
     position:fixed; inset:0; overflow:hidden; z-index:10;
     perspective: 1500px;
     perspective-origin: 50% 50%;
   }
-  /* 边缘虚化 vignette */
+  /* Edge vignette */
   .viewport::after{
     content:""; position:fixed; inset:0;
     pointer-events:none; z-index:50;
@@ -208,7 +208,7 @@
         rgba(13,12,11,0.45) 76%,
         rgba(13,12,11,0.94) 100%);
   }
-  /* 整个球面：定位到屏幕中心，所有 cell 都挂在它上面 */
+  /* The whole sphere: positioned at screen center; every cell hangs on it */
   .sphere{
     position:absolute;
     left:50%; top:50%;
@@ -217,7 +217,7 @@
     will-change: transform;
   }
 
-  /* —— 作品格子（正方形，跟相邻 cell 在球面上共享边）—— */
+  /* —— Work cells (square, sharing edges with neighbors on the sphere) —— */
   .work{
     position:absolute;
     left:0; top:0;
@@ -230,7 +230,7 @@
     cursor: pointer;
     backface-visibility: hidden;
   }
-  /* frame 填满整个 cell — 相邻 cell 的图片直接接触 */
+  /* frame fills the whole cell — neighboring cells’ images touch directly */
   .frame{
     position:absolute; inset:0;
     overflow:hidden;
@@ -257,7 +257,7 @@
     backdrop-filter: blur(6px);
     z-index:6;
   }
-  /* cell-head / cell-foot 浮在 frame 顶部和底部，带渐变保证文字可读 */
+  /* cell-head / cell-foot float at the frame’s top and bottom, with gradients for legible text */
   .cell-head, .cell-foot{
     position:absolute; left:0; right:0;
     display:flex; justify-content:space-between; align-items:center;
@@ -334,7 +334,7 @@
   }
   .splash.hide{ opacity:0; visibility:hidden; }
 
-  /* —— 二级页面 / Overlay —— */
+  /* —— Detail overlay —— */
   .overlay{
     position:fixed; inset:0;
     background:var(--bg);
@@ -576,10 +576,10 @@
 <div class="splash" id="splash"></div>
 
 <header class="topbar">
-  <!-- 🔧 SWAP-2: brand-block — logo SVG 可保留这个手刻方框（默认）或换成自定义 SVG。
-       「声音 [关闭]」可保留可改（如 "VR · ON" / "Demo Reel" / 工作室英文名缩写） -->
+  <!-- 🔧 SWAP-2: brand-block — keep this hand-carved frame logo SVG (default) or swap in your own.
+       The "Sound [off]" chip may stay or be changed (e.g. "VR · ON" / "Demo Reel" / studio initials) -->
   <div class="brand-block">
-    <div class="logo" data-nav="home" title="返回首页">
+    <div class="logo" data-nav="home" title="Back to index">
       <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
           <filter id="ink" x="-15%" y="-15%" width="130%" height="130%">
@@ -588,9 +588,9 @@
           </filter>
         </defs>
         <g filter="url(#ink)" fill="#1d3a8c" stroke="#1d3a8c">
-          <!-- 略微歪斜的方框（手刻印章） -->
+          <!-- slightly tilted frame (hand-carved seal) -->
           <path d="M 8 9 L 72 7 L 73 71 L 9 72 Z" fill="none" stroke-width="3" stroke-linejoin="round"/>
-          <!-- 三个抽象立人 -->
+          <!-- three abstract standing figures -->
           <g stroke="none">
             <!-- person 1 -->
             <circle cx="22" cy="26" r="3.2"/>
@@ -605,491 +605,491 @@
         </g>
       </svg>
     </div>
-    <span class="sound-toggle">声音 [关闭]</span>
+    <span class="sound-toggle">Sound [off]</span>
   </div>
 
-  <!-- 🔧 SWAP-3: tagline — 工作室一句话介绍。两行：长句 + <br> + 短结论 -->
+  <!-- 🔧 SWAP-3: tagline — one-line studio intro. Two lines: long sentence + <br> + short conclusion -->
   <div class="tagline">
-    虚白是一家以材料与场景为方法的中文设计工作室，<br>
-    致力于在品牌、视觉与空间之间寻找静止的位置。
+    Xubai is a design studio that works through material and situation,<br>
+    committed to finding the still point between brand, visual, and space.
   </div>
 
-  <!-- 🔧 SWAP-4: col-meta — 1—2 个城市。loc-dot 加 .live (默认) 或 .night (夜间) -->
+  <!-- 🔧 SWAP-4: col-meta — 1–2 cities. Give loc-dot .live (default) or .night -->
   <div class="col-meta">
-    <div class="row"><span class="loc-dot live"></span>中国 · 上海</div>
-    <div class="row"><span class="loc-dot night"></span>日本 · 京都</div>
+    <div class="row"><span class="loc-dot live"></span>Shanghai, China</div>
+    <div class="row"><span class="loc-dot night"></span>Kyoto, Japan</div>
   </div>
 
-  <!-- 🔧 SWAP-5: col-times — 时区标题（第一行）。time1 / time2 由 JS 自动填实时时间，保留 id 不要改 -->
+  <!-- 🔧 SWAP-5: col-times — timezone label (first line). time1 / time2 are auto-filled by JS; keep the ids -->
   <div class="col-times">
-    <div>北京时间 UTC+8</div>
+    <div>Shanghai UTC+8</div>
     <div id="time1">17:30</div>
     <div id="time2">18:30 JST</div>
   </div>
 
-  <!-- 🔧 SWAP-6: cta — 联系按钮文字。data-nav="contact" 必须保留 -->
-  <button class="cta" data-nav="contact">我们来聊聊吧。</button>
+  <!-- 🔧 SWAP-6: cta — contact button label. data-nav="contact" must be kept -->
+  <button class="cta" data-nav="contact">Let’s talk.</button>
 </header>
 
-<!-- 球面：所有作品 cell 都贴在这个球面上，相邻 cell 沿经纬线共享边 -->
+<!-- Sphere: all work cells stick to this sphere; neighbors share edges along the lat-long lines -->
 <div class="viewport" id="viewport">
   <div class="sphere" id="sphere"></div>
 </div>
 
 <div class="hud">
   POS  <span id="pos">0°, 0°</span><br>
-  ZOOM <span id="zoom">1.00×</span> · 拖拽旋转球面 / 滚轮缩放 / <span>0</span> 回中心 / 点击查看
+  ZOOM <span id="zoom">1.00×</span> · drag to rotate the sphere / wheel to zoom / <span>0</span> recenter / click to view
 </div>
 
 <div class="bottombar">
-  <!-- 🔧 SWAP-7: tabs — 三个 tab 文字（默认「作品 / 关于 / 履历」）。data-nav 必须保留 -->
+  <!-- 🔧 SWAP-7: tabs — three tab labels (default "Works / About / CV"). data-nav must be kept -->
   <div class="tabs">
-    <button class="tab active" data-nav="home">作品</button>
-    <button class="tab" data-nav="about">关于</button>
-    <button class="tab" data-nav="cv">履历</button>
+    <button class="tab active" data-nav="home">Works</button>
+    <button class="tab" data-nav="about">About</button>
+    <button class="tab" data-nav="cv">CV</button>
   </div>
 
   <button class="filter-pill" data-nav="filter">
     <svg width="11" height="11" viewBox="0 0 11 11" style="opacity:.55"><path d="M0.5 1.5h10M2 5.5h7M3.5 9.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-    筛选
+    Filter
   </button>
 </div>
 
-<!-- ============ 二级页面 ============ -->
+<!-- ============ Sub-pages ============ -->
 <div class="overlay" id="overlay-detail">
-  <button class="overlay-close" data-nav="home">← 返回</button>
+  <button class="overlay-close" data-nav="home">← Back</button>
   <div class="detail" id="detail-content"></div>
 </div>
 
 <div class="overlay" id="overlay-about">
-  <button class="overlay-close" data-nav="home">← 返回</button>
-  <!-- 🔧 SWAP-8: about overlay 整段。包含：eyebrow / 大标题 / 正文 3 段 / 能力领域 / 团队成员
-       结构：保留 .info-eyebrow / .info-title / .info-body / .info-section / .info-list / .y span 全部 class
-       内容：用用户工作室的真实信息替换。能力 4—5 项；团队 3—5 行（个人作品集就只一行） -->
+  <button class="overlay-close" data-nav="home">← Back</button>
+  <!-- 🔧 SWAP-8: the whole about overlay. Contains: eyebrow / big title / 3 body paragraphs / capabilities / team
+       Structure: keep all classes .info-eyebrow / .info-title / .info-body / .info-section / .info-list / .y span
+       Content: replace with the user’s real studio info. 4–5 capabilities; 3–5 team rows (one row for a personal portfolio) -->
   <div class="info-pane">
-    <div class="info-eyebrow">关于 · About the Studio</div>
-    <h1 class="info-title">在材料与场景<br>之间，构造静止。</h1>
-    <div class="info-body">虚白成立于 2017 年的上海，是一家由六位设计师组成的小型工作室。我们关心一件作品在最终落地之前，材料、场景与时间如何共同塑造它的样貌——而非追逐某种风格的表层。
+    <div class="info-eyebrow">About the Studio</div>
+    <h1 class="info-title">Constructing stillness<br>between material<br>and situation.</h1>
+    <div class="info-body">Xubai was founded in Shanghai in 2017 — a small studio of six designers. We care about how material, situation, and time jointly shape a work before it finally lands, rather than chasing the surface of any particular style.
 
-我们服务过博物馆、出版机构、艺术空间、独立品牌与艺术家个体。无论项目规模与媒介如何变化，我们倾向于先观察、再回应；先减法、再装饰。
+We have worked with museums, publishers, art spaces, independent brands, and individual artists. Whatever the scale or medium, we prefer to observe first and respond second; subtract first, decorate later.
 
-从 2020 年起，我们在京都设立了第二个工作站，与一位驻地匠人合作完成所有的物料与原型工作。</div>
+Since 2020 we have kept a second work post in Kyoto, collaborating with a resident craftsperson on all material and prototyping work.</div>
 
     <div class="info-section">
-      <h3>能力领域</h3>
+      <h3>Capabilities</h3>
       <div class="info-list">
-        <span class="y">01</span><span>品牌系统 / 视觉识别 / 字体定制</span>
-        <span class="y">02</span><span>编辑设计 / 出版物 / 印刷品</span>
-        <span class="y">03</span><span>数字产品 / 网站 / 互动体验</span>
-        <span class="y">04</span><span>空间装置 / 展览 / 临时建筑</span>
+        <span class="y">01</span><span>Brand systems / visual identity / custom type</span>
+        <span class="y">02</span><span>Editorial design / publications / print</span>
+        <span class="y">03</span><span>Digital products / websites / interactive experiences</span>
+        <span class="y">04</span><span>Spatial installations / exhibitions / temporary architecture</span>
       </div>
     </div>
 
     <div class="info-section">
-      <h3>团队成员</h3>
+      <h3>Team</h3>
       <div class="info-list">
-        <span class="y">主理人</span><span>沈白 · 创意总监</span>
-        <span class="y">设计</span><span>陆青、林一川、何予安</span>
-        <span class="y">技术</span><span>周野</span>
-        <span class="y">工艺</span><span>松本健（驻京都）</span>
+        <span class="y">Director</span><span>Shen Bai · Creative Director</span>
+        <span class="y">Design</span><span>Lu Qing, Lin Yichuan, He Yu’an</span>
+        <span class="y">Tech</span><span>Zhou Ye</span>
+        <span class="y">Craft</span><span>Ken Matsumoto (Kyoto)</span>
       </div>
     </div>
   </div>
 </div>
 
 <div class="overlay" id="overlay-cv">
-  <button class="overlay-close" data-nav="home">← 返回</button>
-  <!-- 🔧 SWAP-9: cv overlay 整段。包含：eyebrow / 大标题（如「2017 — 2026 / 九年的工作」）/
-       正文导语 / 多个 .info-section（每个 <h3> 是年份分组，下面 .info-list 列项目）
-       结构：年份倒序排列；末尾加一个「展览与奖项」section -->
+  <button class="overlay-close" data-nav="home">← Back</button>
+  <!-- 🔧 SWAP-9: the whole cv overlay. Contains: eyebrow / big title (e.g. "2017 — 2026 / Nine years of work") /
+       body lead / several .info-section blocks (each <h3> is a year group; .info-list below it lists projects)
+       Structure: years in descending order; end with an "Exhibitions & Awards" section -->
   <div class="info-pane">
-    <div class="info-eyebrow">履历 · Selected Works</div>
-    <h1 class="info-title">2017 — 2026<br>九年的工作。</h1>
-    <div class="info-body">下面是我们认为值得被记录的 32 个项目，按照时间倒序排列。完整作品列表与未公开案例，请联系工作室索取作品集 PDF。</div>
+    <div class="info-eyebrow">CV · Selected Works</div>
+    <h1 class="info-title">2017 — 2026<br>Nine years of work.</h1>
+    <div class="info-body">Below are the 32 projects we consider worth recording, in reverse chronological order. For the complete list and unpublished case studies, ask the studio for the portfolio PDF.</div>
 
     <div class="info-section">
       <h3>2025</h3>
       <div class="info-list">
-        <span class="y">2025</span><span>水镜 — 苏州博物馆 / 装置</span>
-        <span class="y">2025</span><span>数字诗集 v.02 — 个人 / Web</span>
-        <span class="y">2025</span><span>字非字 — 实验字体 / 独立</span>
-        <span class="y">2025</span><span>字图 #047 — 个人 / 创作</span>
+        <span class="y">2025</span><span>Water Mirror — Suzhou Museum / installation</span>
+        <span class="y">2025</span><span>Digital Poetry v.02 — personal / web</span>
+        <span class="y">2025</span><span>Not-Quite-Characters — experimental type / independent</span>
+        <span class="y">2025</span><span>Ink Study #047 — personal / practice</span>
       </div>
     </div>
 
     <div class="info-section">
       <h3>2024</h3>
       <div class="info-list">
-        <span class="y">2024</span><span>东方观象台 — 上海天文馆 / 品牌</span>
-        <span class="y">2024</span><span>方圆律所 — 方圆所 / 品牌</span>
-        <span class="y">2024</span><span>沉影官网 — 沉影空间 / Web</span>
-        <span class="y">2024</span><span>白盒子艺廊 — 白盒子 / Web</span>
-        <span class="y">2024</span><span>无名之地 — 上海西岸 / 装置</span>
-        <span class="y">2024</span><span>静物 · 光谱 — 个展 / 海报</span>
-        <span class="y">2024</span><span>声音地形 — 上海当代 / 装置</span>
-        <span class="y">2024</span><span>夜半笔记 — 个人 / 速写</span>
+        <span class="y">2024</span><span>Eastern Observatory — Shanghai Astronomy Museum / brand</span>
+        <span class="y">2024</span><span>Fangyuan Law — Fangyuan / brand</span>
+        <span class="y">2024</span><span>Sunken Shadow site — Sunken Shadow Space / web</span>
+        <span class="y">2024</span><span>White Box Gallery — White Box / web</span>
+        <span class="y">2024</span><span>Nameless Land — West Bund, Shanghai / installation</span>
+        <span class="y">2024</span><span>Still Life · Spectrum — solo show / poster</span>
+        <span class="y">2024</span><span>Sound Terrain — MoCA Shanghai / installation</span>
+        <span class="y">2024</span><span>Midnight Notes — personal / sketch</span>
       </div>
     </div>
 
     <div class="info-section">
       <h3>2023</h3>
       <div class="info-list">
-        <span class="y">2023</span><span>南山诗刊 — 三联书店 / 编辑</span>
-        <span class="y">2023</span><span>明月几时有 — 中央美院 / 互动</span>
-        <span class="y">2023</span><span>呼吸的墙 — 北京 798 / 装置</span>
-        <span class="y">2023</span><span>时间的褶皱 — 上海双年展 / 海报</span>
-        <span class="y">2023</span><span>空亭 — 西塘古镇 / 临时建筑</span>
-        <span class="y">2023</span><span>青木茶寮 — 青木茶寮 / 品牌</span>
+        <span class="y">2023</span><span>Nanshan Poetry Review — Sanlian Books / editorial</span>
+        <span class="y">2023</span><span>When Will the Moon Be Clear — CAFA / interactive</span>
+        <span class="y">2023</span><span>The Breathing Wall — 798 Beijing / installation</span>
+        <span class="y">2023</span><span>Folds of Time — Shanghai Biennale / poster</span>
+        <span class="y">2023</span><span>Empty Pavilion — Xitang Ancient Town / temporary architecture</span>
+        <span class="y">2023</span><span>Aoki Tea House — Aoki / brand</span>
       </div>
     </div>
 
     <div class="info-section">
-      <h3>2022 及更早</h3>
+      <h3>2022 and earlier</h3>
       <div class="info-list">
-        <span class="y">2022</span><span>无声电台 — 独立播客 / 品牌</span>
-        <span class="y">2022</span><span>冬日影像志 — 三联生活周刊 / 编辑</span>
-        <span class="y">2021</span><span>未发表作品 12 项</span>
-        <span class="y">2017</span><span>工作室成立 · 上海</span>
+        <span class="y">2022</span><span>Radio Silence — independent podcast / brand</span>
+        <span class="y">2022</span><span>Winter Image Journal — Sanlian Lifeweek / editorial</span>
+        <span class="y">2021</span><span>12 unpublished works</span>
+        <span class="y">2017</span><span>Studio founded · Shanghai</span>
       </div>
     </div>
 
     <div class="info-section">
-      <h3>展览与奖项</h3>
+      <h3>Exhibitions & Awards</h3>
       <div class="info-list">
-        <span class="y">2025</span><span>东京字体艺术指导俱乐部年鉴 · 入选</span>
-        <span class="y">2024</span><span>上海平面设计大展 · 银奖</span>
-        <span class="y">2024</span><span>D&AD Wood Pencil · 编辑设计</span>
-        <span class="y">2023</span><span>北京设计周 · 客座工作坊</span>
-        <span class="y">2022</span><span>东京 TDC 字形入围</span>
+        <span class="y">2025</span><span>Tokyo Type Directors Club Annual · selected</span>
+        <span class="y">2024</span><span>Shanghai Graphic Design Biennial · silver</span>
+        <span class="y">2024</span><span>D&AD Wood Pencil · editorial design</span>
+        <span class="y">2023</span><span>Beijing Design Week · guest workshop</span>
+        <span class="y">2022</span><span>Tokyo TDC type shortlist</span>
       </div>
     </div>
   </div>
 </div>
 
 <div class="overlay" id="overlay-contact">
-  <button class="overlay-close" data-nav="home">← 返回</button>
-  <!-- 🔧 SWAP-10: contact overlay 整段。包含：eyebrow / 大标题 / 正文导语 / .contact-grid 内 4—6 个 .contact-cell
-       每个 cell 用 <h4> 小标题 + <p> 内容（邮件用 <a href="mailto:..."> 包裹）
-       推荐分类：新项目咨询 / 媒体写作 / 工作室地址（1—2 个）/ 社交（IG, 微信等）/ 招聘 -->
+  <button class="overlay-close" data-nav="home">← Back</button>
+  <!-- 🔧 SWAP-10: the whole contact overlay. Contains: eyebrow / big title / body lead / 4–6 .contact-cell inside .contact-grid
+       Each cell: an <h4> mini title + <p> content (wrap emails in <a href="mailto:...">)
+       Suggested groups: new projects / press / studio addresses (1–2) / social (IG, WeChat etc.) / hiring -->
   <div class="info-pane">
-    <div class="info-eyebrow">联系 · Get in touch</div>
-    <h1 class="info-title">我们来<br>聊聊吧。</h1>
-    <div class="info-body">如果你有一个尚不清晰、但值得认真对待的想法，写信给我们。
-我们一年只接 8—10 个项目，回信平均需要 3 个工作日。</div>
+    <div class="info-eyebrow">Get in touch</div>
+    <h1 class="info-title">Let’s<br>talk.</h1>
+    <div class="info-body">If you have an idea that is still unclear but worth taking seriously, write to us.
+We take on only 8–10 projects a year; replies average 3 business days.</div>
 
     <div class="contact-grid">
       <div class="contact-cell">
-        <h4>新项目咨询</h4>
+        <h4>New projects</h4>
         <p><a href="mailto:hello@xubai.studio">hello@xubai.studio</a></p>
       </div>
       <div class="contact-cell">
-        <h4>媒体 · 写作</h4>
+        <h4>Press · writing</h4>
         <p><a href="mailto:press@xubai.studio">press@xubai.studio</a></p>
       </div>
       <div class="contact-cell">
-        <h4>上海工作室</h4>
-        <p>中国上海市黄浦区建国中路 10 号<br>3 号楼 4F<br>邮编 200025</p>
+        <h4>Shanghai studio</h4>
+        <p>10 Jianguo Middle Road, Huangpu, Shanghai<br>Building 3, 4F<br>200025</p>
       </div>
       <div class="contact-cell">
-        <h4>京都驻地</h4>
-        <p>日本京都市左京区净土寺西田町<br>3-12 二楼</p>
+        <h4>Kyoto residency</h4>
+        <p>3-12 Nishida-cho, Jodoji, Sakyo-ku, Kyoto<br>2nd floor</p>
       </div>
       <div class="contact-cell">
-        <h4>社交</h4>
-        <p><a href="#">Instagram @xubai.studio</a><br><a href="#">微信公众号 · 虚白工作室</a></p>
+        <h4>Social</h4>
+        <p><a href="#">Instagram @xubai.studio</a><br><a href="#">WeChat · Xubai Studio</a></p>
       </div>
       <div class="contact-cell">
-        <h4>招聘</h4>
-        <p>2026 春季招聘 1 位品牌设计师 · 1 位前端工程师。简历投至 <a href="mailto:join@xubai.studio">join@xubai.studio</a></p>
+        <h4>Hiring</h4>
+        <p>Spring 2026: hiring 1 brand designer · 1 front-end engineer. Portfolios to <a href="mailto:join@xubai.studio">join@xubai.studio</a></p>
       </div>
     </div>
   </div>
 </div>
 
 <div class="overlay" id="overlay-filter">
-  <button class="overlay-close" data-nav="home">← 返回</button>
-  <!-- 🔧 SWAP-11: filter overlay 整段。装饰性（不接 JS），但选项要从你的 WORKS 派生：
-       类别：从 WORKS[].tags 去重得到（最多 6—8 项）
-       年份：从 WORKS[].year 去重倒序
-       客户类型：从 WORKS[].brand 推断分类（如 文化机构 / 商业品牌 / 独立 个人） -->
+  <button class="overlay-close" data-nav="home">← Back</button>
+  <!-- 🔧 SWAP-11: the whole filter overlay. Decorative (no JS wired), but options must derive from your WORKS:
+       categories: deduped from WORKS[].tags (at most 6–8 items)
+       years: deduped from WORKS[].year, descending
+       client types: inferred from WORKS[].brand (e.g. institutions / commercial brands / independent-personal) -->
   <div class="info-pane">
-    <div class="info-eyebrow">筛选 · Filter</div>
-    <h1 class="info-title">查找作品。</h1>
+    <div class="info-eyebrow">Filter</div>
+    <h1 class="info-title">Find works.</h1>
 
     <div class="filter-grid">
       <div>
-        <h4>类别</h4>
-        <label><input type="checkbox" checked> 品牌设计</label>
-        <label><input type="checkbox" checked> 编辑 / 印刷</label>
-        <label><input type="checkbox" checked> 网页 / 互动</label>
-        <label><input type="checkbox" checked> 装置 / 空间</label>
-        <label><input type="checkbox" checked> 字体 / 实验</label>
-        <label><input type="checkbox" checked> 海报 / 视觉</label>
+        <h4>Category</h4>
+        <label><input type="checkbox" checked> Brand design</label>
+        <label><input type="checkbox" checked> Editorial / print</label>
+        <label><input type="checkbox" checked> Web / interactive</label>
+        <label><input type="checkbox" checked> Installation / spatial</label>
+        <label><input type="checkbox" checked> Type / experimental</label>
+        <label><input type="checkbox" checked> Poster / visual</label>
       </div>
       <div>
-        <h4>年份</h4>
+        <h4>Year</h4>
         <label><input type="checkbox" checked> 2025</label>
         <label><input type="checkbox" checked> 2024</label>
         <label><input type="checkbox" checked> 2023</label>
         <label><input type="checkbox" checked> 2022</label>
-        <label><input type="checkbox"> 2021 及更早</label>
+        <label><input type="checkbox"> 2021 and earlier</label>
       </div>
       <div>
-        <h4>客户类型</h4>
-        <label><input type="checkbox" checked> 文化机构</label>
-        <label><input type="checkbox" checked> 商业品牌</label>
-        <label><input type="checkbox" checked> 独立 / 个人</label>
-        <label><input type="checkbox" checked> 艺术家合作</label>
-        <label><input type="checkbox"> 自发项目</label>
+        <h4>Client type</h4>
+        <label><input type="checkbox" checked> Cultural institutions</label>
+        <label><input type="checkbox" checked> Commercial brands</label>
+        <label><input type="checkbox" checked> Independent / personal</label>
+        <label><input type="checkbox" checked> Artist collaborations</label>
+        <label><input type="checkbox"> Self-initiated</label>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-// ====== 作品数据 ======
-// 🔧 SWAP-12: WORKS 数组——核心内容。
-// 模板里保留 20 个虚白工作室的示例作品作为参考，输出最终 HTML 时全部替换为用户的真实作品。
-// 每件作品必填字段：id (两位字符串) / brand / title / year / tags (1—3 个英文一词) /
-//                  img (1080×1080 正方形封面) / hero (1600×1000 横版) / g1 g2 (800×600) /
-//                  desc (一句话 ~30 字) / long (2—3 段每段 60—120 字) /
+// ====== Works data ======
+// 🔧 SWAP-12: the WORKS array — the core content.
+// The template keeps 20 sample works from the Xubai studio as reference; replace them all with the user's real works when producing the final HTML.
+// Required fields per work: id (two-digit string) / brand / title / year / tags (1-3 single English words) /
+//                  img (1080×1080 square cover) / hero (1600×1000 landscape) / g1 g2 (800×600) /
+//                  desc (one sentence, ~30 words) / long (2-3 paragraphs, 60-120 words each) /
 //                  spec ([['Client','xxx'],['Year','xxx'],['Scope','xxx'],['Duration','xxx']])
-// 数量推荐 15—25 件，最少 8 件（球面太空会显得稀疏）。
-// 图片来源：模式 A 用相对路径 'images/work-NN.jpg'；模式 B (GLM) 用 picsum 占位或用户给的 URL。
+// 15-25 works recommended, 8 minimum (a too-empty sphere looks sparse).
+// Image sources: Mode A uses relative paths 'images/work-NN.jpg'; Mode B (AI image generation) uses picsum placeholders or user-provided URLs.
 const WORKS = [
   {
-    id:'01', brand:'上海天文馆', title:'东方观象台', year:2024,
+    id:'01', brand:'Shanghai Astronomy Museum', title:'Oriental Observatory', year:2024,
     tags:['Identity','Wayfinding','System'],
     img:'images/p-01-color-macro.jpg',
     hero:'images/p-02-typography.jpg',
     g1:'images/p-03-packaging.jpg',
     g2:'images/p-04-paint-stroke.jpg',
-    desc:'为新落成的天文馆设计的视觉识别系统。基于天体运行的几何节律，构建一套动态生长的标识与导视语言。',
-    long:'整套视觉系统从天体运行的几何节律出发，构建出一套可生长的标识与导视语言。我们设计了 12 套围绕节气的动态标识，以及覆盖整馆的模块化导视体系，让观众在馆内的每一次抬头都能感知到时间的流动。\n\n项目跨越了 11 个月，包括标识研发、字体定制、空间导视、网站、印刷品与数字物料。最终的视觉系统已在全馆 18,000 平方米的空间内全面落地。',
-    spec:[['Client','上海天文馆'],['Year','2024'],['Scope','品牌系统 · 导视'],['Duration','11 个月']]
+    desc:'Visual identity for a newly built astronomy museum. Built on the geometric rhythm of celestial motion — an identity and wayfinding language that keeps growing.',
+    long:'The whole visual system starts from the geometric rhythm of celestial motion, building an identity and wayfinding language designed to grow. We designed 12 dynamic marks around the solar terms plus a modular wayfinding system covering the entire building, so every upward glance lets visitors feel time flowing.\n\nThe project ran 11 months across identity development, custom type, spatial wayfinding, web, print, and digital assets. The final system is now deployed across all 18,000 square meters of the museum.',
+    spec:[['Client','Shanghai Astronomy Museum'],['Year','2024'],['Scope','Brand system · Wayfinding'],['Duration','11 months']]
   },
   {
-    id:'02', brand:'青木茶寮', title:'青木茶寮 VI', year:2023,
+    id:'02', brand:'Aoki Tea House', title:'Aoki Tea House VI', year:2023,
     tags:['Identity','Packaging'],
     img:'images/p-05-brand-flatlay.jpg',
     hero:'images/p-06-studio-portrait.jpg',
     g1:'images/p-07-gradient.jpg',
     g2:'images/p-08-editorial.jpg',
-    desc:'京都风格茶寮的整套视觉。从手写题字到木刻包装，回到工艺与时间本身。',
-    long:'青木茶寮是京都左京区的一家小型茶馆。我们用六个月时间，与店主一同重新整理了它的视觉系统：标识由当地书法家书写后木刻；包装统一回到未漂白的素纸；菜单印刷采用活字工艺。\n\n品牌的核心不在新意，而在于一种克制的、可持续被使用的安静感。',
-    spec:[['Client','青木茶寮'],['Year','2023'],['Scope','标识 · 包装 · 物料'],['Location','日本京都']]
+    desc:'Full visual identity for a Kyoto-style tea house. From hand-lettered calligraphy to woodcut packaging — back to craft and time itself.',
+    long:'Aoki Tea House is a small tea house in Kyoto's Sakyo ward. Over six months we rebuilt its visual system with the owner: the mark was lettered by a local calligrapher then cut in wood; packaging returned to unbleached plain paper; menus are printed letterpress.\n\nThe core of the brand is not novelty but a restrained quietness that can keep being used.',
+    spec:[['Client','Aoki Tea House'],['Year','2023'],['Scope','Identity · Packaging · Collateral'],['Location','Kyoto, Japan']]
   },
   {
-    id:'03', brand:'独立播客', title:'无声电台', year:2022,
+    id:'03', brand:'Independent podcast', title:'Radio Silence', year:2022,
     tags:['Identity','Sound','Cover'],
     img:'images/p-09-ceramic.jpg',
     hero:'images/p-10-urban.jpg',
     g1:'images/p-11-ink-paper.jpg',
     g2:'images/p-12-botanical.jpg',
-    desc:'一档关注城市深夜声音的独立播客。VI 与 60 多期节目封面均由工作室设计。',
-    long:'无声电台是一档由两位编辑制作的城市夜间声音播客。从 2022 年至今已发布 64 期。\n\n我们为节目设计了一套可生长的封面系统：每期封面都基于一段录音波形，自动派生出一个抽象图形。播客的标识与名片亦由同一套规则生成。',
-    spec:[['Client','独立播客'],['Year','2022'],['Scope','VI · 64 期封面'],['Format','Spotify · Apple']]
+    desc:'An independent podcast about the sounds of the city after dark. The studio designed the VI and more than 60 episode covers.',
+    long:'Radio Silence is a city night-sound podcast made by two editors; 64 episodes have shipped since 2022.\n\nWe designed a growing cover system for the show: each cover derives an abstract shape from that episode's audio waveform. The podcast's mark and business cards are generated by the same rules.',
+    spec:[['Client','Independent podcast'],['Year','2022'],['Scope','VI · 64 episode covers'],['Format','Spotify · Apple']]
   },
   {
-    id:'04', brand:'西岸艺术中心', title:'无名之地', year:2024,
+    id:'04', brand:'West Bund Art Center', title:'Nameless Ground', year:2024,
     tags:['Installation','Light'],
     img:'images/p-13-risograph.jpg',
     hero:'images/p-14-gallery-wall.jpg',
     g1:'images/p-15-light-motion.jpg',
     g2:'images/p-16-interior.jpg',
-    desc:'沿旧厂房梁柱排布的低强度光带，黄昏后才真正显形，把一段被忽略的空间归还给人的目光。',
-    long:'《无名之地》是为上海西岸艺术中心北侧旧厂房做的临时灯光介入。我们沿着 18 米长的钢梁布置了一组低强度暖白色光带，光带在白天几乎不可见，唯有在黄昏后逐渐显形。\n\n作品不指向任何主题——它的目的是让那段被人长期忽略的工业空间，被重新看到一次。展期结束后所有材料被回收。',
-    spec:[['Client','西岸艺术中心'],['Year','2024'],['Scope','灯光装置'],['Duration','42 天']]
+    desc:'Low-intensity light bands laid along the beams of an old factory, truly visible only after dusk, returning a neglected space to the gaze.',
+    long:'“Nameless Ground” is a temporary light intervention in the old factory buildings north of the West Bund Art Center in Shanghai. We placed a group of low-intensity warm-white light bands along an 18-meter steel beam — nearly invisible by day, emerging gradually after dusk.\n\nThe work points at no theme — its purpose is to let that long-overlooked industrial space be seen once more. All materials were recycled after the show.',
+    spec:[['Client','West Bund Art Center'],['Year','2024'],['Scope','Light installation'],['Duration','42 days']]
   },
   {
-    id:'05', brand:'个人项目', title:'静物 · 光谱', year:2024,
+    id:'05', brand:'Personal project', title:'Still Life · Spectrum', year:2024,
     tags:['Poster','Exhibition'],
     img:'images/p-17-color-block.jpg',
     hero:'images/p-18-magazine.jpg',
     g1:'images/p-01-color-macro.jpg',
     g2:'images/p-02-typography.jpg',
-    desc:'个人展览的二十张海报，记录光在桌面上的不同时刻。',
-    long:'《静物 · 光谱》是 2024 年 9 月在上海一处独立画廊举办的小型海报个展，展出 20 张丝印海报。\n\n每张海报都基于同一张静物照片——一杯水、一片纸、一颗石——只是色温随时间被逐渐分解。这是一次关于"时间是否可以被印刷"的提问。',
-    spec:[['Client','个展'],['Year','2024'],['Scope','20 张海报 · 丝印'],['Edition','30 套']]
+    desc:'Twenty posters for a solo exhibition, recording light on a tabletop at different moments.',
+    long:'“Still Life · Spectrum” was a small solo poster show held in an independent Shanghai gallery in September 2024, exhibiting 20 silkscreened posters.\n\nEvery poster is based on the same still-life photo — a glass of water, a sheet of paper, a stone — with only the color temperature slowly decomposed over time. It is a question of whether time can be printed.',
+    spec:[['Client','Solo show'],['Year','2024'],['Scope','20 posters · silkscreen'],['Edition','30 sets']]
   },
   {
-    id:'06', brand:'三联书店', title:'南山诗刊', year:2023,
+    id:'06', brand:'SDX Joint Publishing', title:'South Mountain Poetry Review', year:2023,
     tags:['Editorial','Print','Series'],
     img:'images/p-03-packaging.jpg',
     hero:'images/p-04-paint-stroke.jpg',
     g1:'images/p-05-brand-flatlay.jpg',
     g2:'images/p-06-studio-portrait.jpg',
-    desc:'季度诗刊的整体设计。每期围绕一座山展开，文字、图像与白纸之间相互让位。',
-    long:'《南山诗刊》是三联书店出版的一本独立诗刊，季度发行，每期约 80 页。\n\n我们设计了刊物的整体识别、版式、印刷工艺。每一期围绕一座中国境内的山展开，封面由一张山的轮廓图与刊名构成。内文极少装饰，主要是诗与白纸之间的呼吸。',
-    spec:[['Client','三联书店'],['Year','2023'],['Scope','整刊设计 · 4 期'],['Pages','80 / 期']]
+    desc:'Overall design for a quarterly poetry journal. Each issue centers on one mountain; text, image, and white paper yield to one another.',
+    long:'“South Mountain Poetry Review” is an independent poetry journal published by SDX Joint Publishing, issued quarterly at roughly 80 pages.\n\nWe designed the journal's identity, layout, and print production. Every issue is built around one mountain in China; the cover pairs a mountain outline with the masthead. The interior is barely decorated — mostly the breathing between poems and white paper.',
+    spec:[['Client','SDX Joint Publishing'],['Year','2023'],['Scope','Full journal design · 4 issues'],['Pages','80 / issue']]
   },
   {
-    id:'07', brand:'独立项目', title:'字非字', year:2025,
+    id:'07', brand:'Independent project', title:'Not Quite Characters', year:2025,
     tags:['Type','Experiment'],
     img:'images/p-07-gradient.jpg',
     hero:'images/p-08-editorial.jpg',
     g1:'images/p-09-ceramic.jpg',
     g2:'images/p-10-urban.jpg',
-    desc:'关于"汉字之外"的字形实验，探索笔画解构后剩下的结构性沉默。',
-    long:'《字非字》是工作室 2024–2025 年的一项内部实验，共制作了 286 个字形。\n\n这些字形并不"成字"——它们是汉字结构被解构、抽离、再保留的部分。整套字形以可变字体形式公开发布，供研究使用。',
-    spec:[['Client','独立项目'],['Year','2025'],['Scope','286 字形 · 可变字体'],['License','非商用']]
+    desc:'A glyph experiment about the structural silence that remains once strokes are deconstructed — beyond the character.',
+    long:'“Not Quite Characters” is an internal studio experiment from 2024–2025 that produced 286 glyphs.\n\nThese glyphs never quite \"form words\" — they are what remains when CJK structures are deconstructed, extracted, and re-preserved. The full set is released publicly as a variable font for research use.',
+    spec:[['Client','Independent project'],['Year','2025'],['Scope','286 glyphs · variable font'],['License','Non-commercial']]
   },
   {
-    id:'08', brand:'方圆律师事务所', title:'方圆律所', year:2024,
+    id:'08', brand:'Fangyuan Law Firm', title:'Fangyuan Law', year:2024,
     tags:['Identity','Legal'],
     img:'images/p-11-ink-paper.jpg',
     hero:'images/p-12-botanical.jpg',
     g1:'images/p-13-risograph.jpg',
     g2:'images/p-14-gallery-wall.jpg',
-    desc:'在严肃与可亲之间寻找平衡。"方圆"二字成为整个视觉的几何核心。',
-    long:'方圆律师事务所是一家专注于商业并购的中型律所。我们为他们重新设计了品牌系统——以"方"与"圆"两个汉字的几何关系作为视觉核心，覆盖了名片、文书、签约用品、官网与办公空间标识。\n\n核心理念是：让一家律所的品牌既有专业感，也有人在其中。',
-    spec:[['Client','方圆所'],['Year','2024'],['Scope','VI · 名片 · 文书系统'],['Coverage','45 项物料']]
+    desc:'Finding the balance between serious and approachable. The two characters for "square" and "circle" became the geometric core of the whole visual.',
+    long:'Fangyuan Law Firm is a mid-size practice focused on M&A. We redesigned its brand system around the geometric relationship between the characters for "square" and "circle", covering business cards, legal documents, signing sets, the website, and office signage.\n\nThe core idea: a law firm's brand should feel professional and human at once.',
+    spec:[['Client','Fangyuan Law'],['Year','2024'],['Scope','VI · Cards · Document system'],['Coverage','45 items']]
   },
   {
-    id:'09', brand:'三联生活周刊', title:'冬日影像志', year:2022,
+    id:'09', brand:'Sanlian Lifeweek', title:'Winter Photobook', year:2022,
     tags:['Editorial','Photo'],
     img:'images/p-15-light-motion.jpg',
     hero:'images/p-16-interior.jpg',
     g1:'images/p-17-color-block.jpg',
     g2:'images/p-18-magazine.jpg',
-    desc:'一本冬季摄影特辑。无装饰的网格与留白节奏承载所有图像的重量。',
-    long:'《冬日影像志》是三联生活周刊在 2022 年冬天出版的一本 168 页摄影 mook，收录了 9 位中国摄影师的冬季作品。\n\n我们设计了刊物的版式与印刷规格——所有图像采用三色印刷，以增强冬天特有的灰度层次。版式上几乎不出现任何文字装饰，只让图像与图像之间留白。',
-    spec:[['Client','三联生活周刊'],['Year','2022'],['Scope','版式 · 印制规范'],['Pages','168']]
+    desc:'A winter photography special. An undecorated grid and the rhythm of whitespace carry the weight of every image.',
+    long:'“Winter Photobook” is a 168-page photography mook published by Sanlian Lifeweek in the winter of 2022, collecting winter work by nine Chinese photographers.\n\nWe designed the layout and print spec — all images are tritone printed to deepen winter's grey scale. The layout almost never uses decorative type; images are separated only by whitespace.',
+    spec:[['Client','Sanlian Lifeweek'],['Year','2022'],['Scope','Layout · Print spec'],['Pages','168']]
   },
   {
-    id:'10', brand:'个人项目', title:'数字诗集 v.02', year:2025,
+    id:'10', brand:'Personal project', title:'Digital Poetry v.02', year:2025,
     tags:['Web','WebGL','Poetry'],
     img:'images/p-01-color-macro.jpg',
     hero:'images/p-02-typography.jpg',
     g1:'images/p-03-packaging.jpg',
     g2:'images/p-04-paint-stroke.jpg',
-    desc:'网页诗集的第二版。每一首都是一段可被读者扰动的动态文本。',
-    long:'《数字诗集》是工作室自 2022 年开始的实验性出版项目。第二版收录了 24 首当代汉语诗，每一首都由 WebGL 着色器重写为一段可被读者交互的动态文本。\n\n读者可以拖动、悬停、吹动屏幕，文字随之飘散或重组。它是一次关于"诗在浏览器里如何继续被读"的练习。',
-    spec:[['Client','个人项目'],['Year','2025'],['Scope','24 首 · WebGL'],['URL','poetry.xubai.studio']]
+    desc:'Second edition of a web poetry collection. Each poem is dynamic text a reader can disturb.',
+    long:'“Digital Poetry” is the studio's experimental publishing project running since 2022. Volume two collects 24 contemporary Chinese-language poems, each rewritten by a WebGL shader into dynamic text the reader can interact with.\n\nReaders can drag, hover, or blow at the screen; the words scatter and regroup. It is a study in how a poem can keep being read inside a browser.',
+    spec:[['Client','Personal project'],['Year','2025'],['Scope','24 poems · WebGL'],['URL','poetry.xubai.studio']]
   },
   {
-    id:'11', brand:'中央美术学院', title:'明月几时有', year:2023,
+    id:'11', brand:'Central Academy of Fine Arts', title:'When Will the Moon Be Clear', year:2023,
     tags:['Interactive','Narrative'],
     img:'images/p-05-brand-flatlay.jpg',
     hero:'images/p-06-studio-portrait.jpg',
     g1:'images/p-07-gradient.jpg',
     g2:'images/p-08-editorial.jpg',
-    desc:'以宋词为脚本的互动叙事实验。鼠标的每一次停顿都改变下一行的语意。',
-    long:'《明月几时有》是与中央美术学院实验艺术学院合作的一次互动叙事项目。我们以苏轼的同名宋词为基底，重新解构成 28 个语义单元。\n\n读者通过鼠标在屏幕上的停留时间影响叙事路径——停留越久，下一行的语境越偏向静；越快滑过，越偏向动。每一次阅读都是一次独立的版本。',
-    spec:[['Client','中央美院'],['Year','2023'],['Scope','互动叙事 · 毕设'],['Tech','Three.js']]
+    desc:'An interactive narrative experiment scripted from a Song-dynasty lyric. Every pause of the cursor changes the meaning of the next line.',
+    long:'“When Will the Moon Be Clear” is an interactive narrative project with the Experimental Art school of the Central Academy of Fine Arts. We took Su Shi's lyric of the same name and re-deconstructed it into 28 semantic units.\n\nHow long the cursor lingers shapes the narrative path — the longer the pause, the quieter the next line leans; the quicker the pass, the more restless. Every reading is its own version.',
+    spec:[['Client','CAFA'],['Year','2023'],['Scope','Interactive narrative · Thesis'],['Tech','Three.js']]
   },
   {
-    id:'12', brand:'沉影空间', title:'沉影 · 官方网站', year:2024,
+    id:'12', brand:'Sunken Shadow Space', title:'Sunken Shadow · Website', year:2024,
     tags:['Web','Slow'],
     img:'images/p-09-ceramic.jpg',
     hero:'images/p-10-urban.jpg',
     g1:'images/p-11-ink-paper.jpg',
     g2:'images/p-12-botanical.jpg',
-    desc:'影像艺术空间的官方网站。整站围绕慢速滚动展开，让浏览本身成为一种观看。',
-    long:'沉影是一家以影像作品为主的当代艺术空间，每年策划 4–6 个展览。我们为他们设计了官方网站——整站不使用任何弹窗、模态、悬停动画。一切只通过滚动展开。\n\n滚动速度被刻意降低 40%，使观众无法快速浏览，必须停下来。这与他们的展览理念是同构的。',
-    spec:[['Client','沉影空间'],['Year','2024'],['Scope','整站 · 18 页'],['Tech','Astro · GSAP']]
+    desc:'Website for a moving-image art space. The whole site is built around slow scrolling, so browsing itself becomes a way of watching.',
+    long:'Sunken Shadow is a contemporary art space centered on moving-image work, curating 4–6 shows a year. We designed its website — no popups, no modals, no hover animations anywhere; everything unfolds through scroll.\n\nScroll speed is deliberately reduced by 40%, so visitors cannot skim and have to stop. That is isomorphic with their curatorial idea.',
+    spec:[['Client','Sunken Shadow Space'],['Year','2024'],['Scope','Full site · 18 pages'],['Tech','Astro · GSAP']]
   },
   {
-    id:'13', brand:'白盒子艺廊', title:'白盒子艺廊', year:2024,
+    id:'13', brand:'White Box Gallery', title:'White Box Gallery', year:2024,
     tags:['Web','Gallery','CMS'],
     img:'images/p-13-risograph.jpg',
     hero:'images/p-14-gallery-wall.jpg',
     g1:'images/p-15-light-motion.jpg',
     g2:'images/p-16-interior.jpg',
-    desc:'极简画廊网站。模块化 CMS 让画廊主自己管理展览、艺术家与作品。',
-    long:'白盒子艺廊是上海一家成立于 2018 年的小型当代艺术空间。我们设计并开发了它的官方网站与后台 CMS。\n\n前台界面几乎只有图像、艺术家姓名与展览年份；后台允许画廊主每周自行更新内容、调整顺序、管理馆藏。',
-    spec:[['Client','白盒子'],['Year','2024'],['Scope','整站 · CMS'],['Tech','Next · Sanity']]
+    desc:'A minimal gallery website. A modular CMS lets the gallerist manage exhibitions, artists, and works themselves.',
+    long:'White Box Gallery is a small contemporary art space in Shanghai founded in 2018. We designed and built its website and back-office CMS.\n\nThe front end is nearly only images, artist names, and exhibition years; the back end lets the gallerist update content weekly, reorder shows, and manage the collection.',
+    spec:[['Client','White Box'],['Year','2024'],['Scope','Full site · CMS'],['Tech','Next · Sanity']]
   },
   {
-    id:'14', brand:'北京 798', title:'呼吸的墙', year:2023,
+    id:'14', brand:'Beijing 798', title:'The Breathing Wall', year:2023,
     tags:['Installation','Textile'],
     img:'images/p-17-color-block.jpg',
     hero:'images/p-18-magazine.jpg',
     g1:'images/p-01-color-macro.jpg',
     g2:'images/p-02-typography.jpg',
-    desc:'由温感面料构成的可呼吸墙体。当观众靠近，墙以体温的频率起伏。',
-    long:'《呼吸的墙》是 2023 年在北京 798 艺术区一个临时空间内展示的作品。墙体由一种温感面料构成，覆盖了 6×3 米的墙面。\n\n墙后藏有 24 个微型气泵——当红外线感知到观众靠近时，气泵以观众心率的近似频率为墙体充放气。墙开始"呼吸"。',
-    spec:[['Client','北京 798'],['Year','2023'],['Scope','装置 · 6m × 3m'],['Sensors','24 ch']]
+    desc:'A breathable wall made of thermosensitive fabric. As viewers approach, the wall swells at the frequency of body heat.',
+    long:'“The Breathing Wall” showed in 2023 in a temporary space in Beijing's 798 art district. The wall is built from a thermosensitive fabric covering a 6×3-meter surface.\n\nBehind it hide 24 micro air pumps — when infrared senses a viewer approaching, they inflate and deflate the wall at a frequency approximating the visitor's heartbeat. The wall begins to \"breathe\".',
+    spec:[['Client','Beijing 798'],['Year','2023'],['Scope','Installation · 6m × 3m'],['Sensors','24 ch']]
   },
   {
-    id:'15', brand:'上海当代艺术馆', title:'声音地形', year:2024,
+    id:'15', brand:'Museum of Contemporary Art Shanghai', title:'Sound Terrain', year:2024,
     tags:['Sound','Spatial'],
     img:'images/p-03-packaging.jpg',
     hero:'images/p-04-paint-stroke.jpg',
     g1:'images/p-05-brand-flatlay.jpg',
     g2:'images/p-06-studio-portrait.jpg',
-    desc:'由 96 个微型扬声器构成的声音地形。每走一步路，都在改变地图。',
-    long:'《声音地形》是为上海当代艺术馆 2024 年秋季群展所做的一件 17 分钟的步行式声音装置。\n\n我们在展厅地面下方布设了 96 个独立通道的微型扬声器，每个扬声器播放一段不超过 2 秒的环境录音。观众的脚步触发不同区域的扬声器组合——同一段路在不同的步频下听起来完全不同。',
-    spec:[['Client','上海当代'],['Year','2024'],['Scope','96 通道 · 17 min'],['Area','220 m²']]
+    desc:'A sound terrain of 96 micro speakers. Every step you take redraws the map.',
+    long:'“Sound Terrain” is a 17-minute walk-through sound installation made for the Museum of Contemporary Art Shanghai's autumn 2024 group show.\n\nBeneath the gallery floor we laid 96 micro speakers on independent channels, each playing an ambient recording no longer than 2 seconds. Visitors' footsteps trigger different speaker combinations — the same path sounds completely different at different walking rhythms.',
+    spec:[['Client','MoCA Shanghai'],['Year','2024'],['Scope','96 channels · 17 min'],['Area','220 m²']]
   },
   {
-    id:'16', brand:'苏州博物馆', title:'水镜', year:2025,
+    id:'16', brand:'Suzhou Museum', title:'Water Mirror', year:2025,
     tags:['Sculpture','Water'],
     img:'images/p-07-gradient.jpg',
     hero:'images/p-08-editorial.jpg',
     g1:'images/p-09-ceramic.jpg',
     g2:'images/p-10-urban.jpg',
-    desc:'置于苏州博物馆庭院中的镜面水池。倒影成为一种安静的雕塑。',
-    long:'《水镜》是受苏州博物馆邀请，为其新落成的庭院设计的一件永久性装置。一块 12 平方米、深仅 5 毫米的镜面水池，被嵌入庭院南端的青石平台中。\n\n池水从一侧极缓慢地循环流入，使水面始终保持镜面状态。倒影所映出的，是博物馆白墙、屋脊与远处一树梅花。',
-    spec:[['Client','苏州博物馆'],['Year','2025'],['Scope','永久装置 · 12 m²'],['Material','不锈钢 · 水']]
+    desc:'A mirror-still pool set in the Suzhou Museum courtyard. Reflection becomes a quiet sculpture.',
+    long:'“Water Mirror” is a permanent piece commissioned by the Suzhou Museum for its newly built courtyard: a 12-square-meter mirror pool only 5 millimeters deep, set into the bluestone platform at the courtyard's south end.\n\nWater circulates in extremely slowly from one side so the surface stays mirror-flat. What it reflects: the museum's white walls, its roof ridges, and a plum tree in the distance.',
+    spec:[['Client','Suzhou Museum'],['Year','2025'],['Scope','Permanent installation · 12 m²'],['Material','Stainless steel · water']]
   },
   {
-    id:'17', brand:'上海双年展', title:'时间的褶皱', year:2023,
+    id:'17', brand:'Shanghai Biennale', title:'Folds of Time', year:2023,
     tags:['Poster','Biennale'],
     img:'images/p-11-ink-paper.jpg',
     hero:'images/p-12-botanical.jpg',
     g1:'images/p-13-risograph.jpg',
     g2:'images/p-14-gallery-wall.jpg',
-    desc:'为上海双年展所做的主视觉系统。一张纸被反复折叠，留下不可逆的地理。',
-    long:'《时间的褶皱》是 2023 上海双年展的主视觉与海报系统。我们的方法是字面意义的——把 36 张全开纸反复手工折叠后铺平，扫描后作为视觉的基底。\n\n每一道折痕代表一次时间的介入。最终的主视觉由 6 张被选中的"折痕地图"演变而成，覆盖了海报、画册、导视与衍生品。',
-    spec:[['Client','上海双年展'],['Year','2023'],['Scope','主视觉 · 海报系统'],['Posters','12 张']]
+    desc:'The key visual system for the Shanghai Biennale. A sheet of paper folded again and again leaves an irreversible geography.',
+    long:'“Folds of Time” is the key visual and poster system of the 2023 Shanghai Biennale. Our method was literal — 36 full sheets of paper were folded by hand, flattened, and scanned as the visual base.\n\nEvery crease marks one intervention of time. The final key visual evolved from six selected \"crease maps\" and ran across posters, catalogs, signage, and merchandise.',
+    spec:[['Client','Shanghai Biennale'],['Year','2023'],['Scope','Key visual · Poster system'],['Posters','12 sheets']]
   },
   {
-    id:'18', brand:'西塘古镇', title:'空亭', year:2023,
+    id:'18', brand:'Xitang Ancient Town', title:'Empty Pavilion', year:2023,
     tags:['Architecture','Temporary'],
     img:'images/p-15-light-motion.jpg',
     hero:'images/p-16-interior.jpg',
     g1:'images/p-17-color-block.jpg',
     g2:'images/p-18-magazine.jpg',
-    desc:'由 36 根白色钢管搭建的临时亭子。三个月后拆除，只留下一组照片。',
-    long:'《空亭》是为西塘古镇 2023 年秋季艺术周设计的一处临时建筑。结构由 36 根白色无缝钢管以最少节点连接而成，形成一个 3.6 米见方的开放亭子，无墙、无顶、无装饰。\n\n它被放置在古镇南面的水边，三个月后被完整拆除。我们刻意没有为它做任何视觉设计或标识——它的价值就在于它存在过的那一段时间。',
-    spec:[['Client','西塘古镇艺术周'],['Year','2023'],['Scope','临时建筑'],['Footprint','3.6 × 3.6 m']]
+    desc:'A temporary pavilion built from 36 white steel tubes. Dismantled after three months, leaving only a set of photographs.',
+    long:'“Empty Pavilion” is a temporary structure for the Xitang Ancient Town autumn art week 2023. Thirty-six seamless white steel tubes connected with a minimum of joints form an open 3.6-meter pavilion — no walls, no roof, no ornament.\n\nIt stood at the water's edge south of the old town and was fully dismantled three months later. We deliberately gave it no visual design or signage — its value is the time it existed.',
+    spec:[['Client','Xitang Art Week'],['Year','2023'],['Scope','Temporary architecture'],['Footprint','3.6 × 3.6 m']]
   },
   {
-    id:'19', brand:'个人创作', title:'字图 #047', year:2025,
+    id:'19', brand:'Personal work', title:'Glyph Diary #047', year:2025,
     tags:['Diary','Type'],
     img:'images/p-01-color-macro.jpg',
     hero:'images/p-02-typography.jpg',
     g1:'images/p-03-packaging.jpg',
     g2:'images/p-04-paint-stroke.jpg',
-    desc:'每日字图练习的第 047 号。墨与纸之间的对话。',
-    long:'《字图》是工作室主理人沈白自 2024 年开始的每日练习，每天一张，用毛笔与宣纸记录一个字或一组笔画。这是 047 号。\n\n练习的目的不是书法，而是观察——观察墨在纸上的扩散与停止，观察手势与呼吸的关系。完整的 365 张已开始计划在 2027 年集结出版。',
-    spec:[['Client','个人创作'],['Year','2025'],['Scope','日课 · 第 047 号'],['Material','宣纸 · 墨']]
+    desc:'Entry no. 047 of a daily glyph practice. A dialogue between ink and paper.',
+    long:'“Glyph Diary” is a daily practice the studio's founder Shen Bai started in 2024 — one sheet a day, brush and xuan paper, recording a character or a group of strokes. This is no. 047.\n\nThe point is not calligraphy but observation — watching ink spread and stop on paper, watching the relation between gesture and breath. The full 365 sheets are being planned toward a 2027 book.',
+    spec:[['Client','Personal work'],['Year','2025'],['Scope','Daily practice · No. 047'],['Material','Xuan paper · ink']]
   },
   {
-    id:'20', brand:'个人创作', title:'夜半笔记', year:2024,
+    id:'20', brand:'Personal work', title:'Midnight Notes', year:2024,
     tags:['Sketch','Ink'],
     img:'images/p-05-brand-flatlay.jpg',
     hero:'images/p-06-studio-portrait.jpg',
     g1:'images/p-07-gradient.jpg',
     g2:'images/p-08-editorial.jpg',
-    desc:'失眠时的速写练习。未发表，仅作记录。',
-    long:'《夜半笔记》是一组在 2024 年间断续记录的速写，多数完成于深夜。题材并不指向具体——一段对话残片、一个尚未存在的物件、一种未被命名的情绪。\n\n它们没有被装订成册，也没有发表过，但工作室认为它们是这一年里最诚实的工作。',
-    spec:[['Client','个人创作'],['Year','2024'],['Scope','速写 · 38 张'],['Status','未发表']]
+    desc:'Sketches kept through sleepless nights. Unpublished; for the record.',
+    long:'“Midnight Notes” is a set of sketches recorded on and off through 2024, most finished deep in the night. The subjects point at nothing in particular — a fragment of conversation, an object that does not yet exist, an unnamed feeling.\n\nThey were never bound into a book and never published, but the studio considers them the most honest work of the year.',
+    spec:[['Client','Personal work'],['Year','2024'],['Scope','Sketches · 38 sheets'],['Status','Unpublished']]
   },
 ];
 
-// ====== 球面投影：把作品按经纬网铺在一个球面上 ======
-// 思路：每个 cell 在球面上有固定的 (col, row) → (经度, 纬度)。
-// 相邻 cell 沿经线 / 纬线共享角点，所以边自然贴合，像地球仪上的经纬网。
-// 拖拽 = 转动相机经纬度；缩放 = 球面整体 scale。
+// ====== Spherical projection: lay the works out on a sphere as a lat/long grid ======
+// Idea: every cell has a fixed (col, row) → (longitude, latitude) on the sphere.
+// Adjacent cells share corner points along meridians / parallels, so edges meet naturally like a globe's graticule.
+// Drag = rotate camera longitude/latitude; zoom = overall sphere scale.
 (() => {
-  const SPHERE_R   = 1700;                                    // 圆柱半径
-  const STEP_DEG   = 11;                                      // 每格经/纬跨度
+  // cylinder radius
+  // degrees per cell step (lat/long)
   const STEP_RAD   = STEP_DEG * Math.PI / 180;
   const CELL       = Math.round(SPHERE_R * STEP_RAD);         // ≈ 326
-  const TOTAL_COLS = Math.round(360 / STEP_DEG);              // 经度方向无限循环：用 mod 取作品
-  const ROW_HALF   = 6;                                       // 上下各 6 行 ≈ ±66°，避开极区严重畸变
+  // infinite loop along longitude: works are picked with mod
+  // 6 rows each way ≈ ±66°, avoiding heavy polar distortion
   const ROW_MIN    = -ROW_HALF, ROW_MAX = ROW_HALF;
 
   document.documentElement.style.setProperty('--cell', CELL + 'px');
@@ -1099,15 +1099,15 @@ const WORKS = [
   const posEl    = document.getElementById('pos');
   const zoomEl   = document.getElementById('zoom');
 
-  // 相机：经度（可无限旋转）、纬度（夹紧）、缩放
+  // Camera: longitude (endless), latitude (clamped), zoom
   let camLon = 0, camLat = 0, camZoom = 1;
   const MIN_Z = 0.6, MAX_Z = 1.8;
 
-  // 鼠标视角微转：根据鼠标在屏幕的位置，整个球面轻微 yaw / pitch
-  const TILT_Y_AMP = 6;     // 左右最大旋转角度（度）
-  const TILT_X_AMP = 4;     // 上下最大旋转角度（度）
-  let tiltY = 0, tiltX = 0;                 // 当前实际值（写到 sphere transform）
-  let tiltTargetY = 0, tiltTargetX = 0;     // 目标值（鼠标位置算出来）
+  // Mouse parallax: the whole sphere yaws / pitches slightly based on cursor position
+  // max yaw (degrees)
+  // max pitch (degrees)
+  // current values (written to the sphere transform)
+  // targets (derived from cursor position)
   let tiltAnimating = false;
 
   const cellEls = new Map();   // key "col,row" → element
@@ -1115,7 +1115,7 @@ const WORKS = [
   function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
   function tagHTML(tags){ return tags.map(t => `<em>${t}</em>`).join(''); }
 
-  // (col, row) → 选哪个作品。混合两个素数避免明显重复
+  // (col, row) → which work to show. Two primes mixed to avoid obvious repeats
   function workFor(col, row){
     const colN = ((col % TOTAL_COLS) + TOTAL_COLS) % TOTAL_COLS;
     const rowN = row + ROW_HALF;
@@ -1147,19 +1147,19 @@ const WORKS = [
   }
 
   function placeCell(el, col, row){
-    // cell 在圆柱坐标：横向绕圈（经度），纵向走直线（行号）
+    // Cell in cylinder coordinates: horizontal wraps around (longitude), vertical runs straight (row)
     const lonDeg = col * STEP_DEG - camLon;
     const yPos   = (row * STEP_DEG - camLat) / STEP_DEG * CELL;
-    // 内凹圆柱：相机在轴心，cell 贴在圆柱内壁
-    // 横向：rotateY 绕中轴卷起 → 纬线向中心凹
-    // 纵向：直接 translateY → 经线是直线（不再赤道外凸）
-    // 单 cell 略放大 1.008 吸收浮点缝隙
+    // Concave cylinder: camera at the axis, cells on the inner wall
+    // Horizontal: rotateY curls around the axis → parallels curve inward
+    // Vertical: plain translateY → meridians stay straight (no equatorial bulge)
+    // Each cell scaled 1.008 to absorb floating-point gaps
     el.style.transform =
       `rotateY(${-lonDeg}deg) translateZ(${-SPHERE_R}px) translateY(${yPos}px) scale(1.008)`;
   }
 
   function visibleRange(){
-    // 视野半角：屏幕越大、缩放越小，可见角度越大
+    // Half field of view: bigger screen or lower zoom → wider visible angle
     const halfH = (Math.atan2(window.innerWidth / 2, 1500) * 180 / Math.PI) / camZoom + STEP_DEG;
     const halfV = (Math.atan2(window.innerHeight / 2, 1500) * 180 / Math.PI) / camZoom + STEP_DEG;
     const c0 = Math.floor((camLon - halfH) / STEP_DEG);
@@ -1196,12 +1196,12 @@ const WORKS = [
   recenter();
   window.addEventListener('resize', render);
 
-  // —— 拖拽 / 点击 ——
+  // —— Drag / click ——
   let isDown = false, sx = 0, sy = 0, oLon = 0, oLat = 0;
   let vx = 0, vy = 0, lastX = 0, lastY = 0, lastT = 0;
   let dragMoved = 0, downTarget = null;
 
-  // 像素 → 度的灵敏度：80 px ≈ 1 格
+  // Pixel-to-degree sensitivity: 80 px ≈ 1 cell
   const SENS = STEP_DEG / 80;
 
   function down(x, y, target){
@@ -1233,7 +1233,7 @@ const WORKS = [
         if(id){ location.hash = '#work/' + id; }
       }
     }
-    // 惯性
+    // Inertia
     const decay = 0.93, minV = 0.02;
     function step(){
       if(Math.abs(vx) < minV && Math.abs(vy) < minV) return;
@@ -1254,11 +1254,11 @@ const WORKS = [
   window.addEventListener('mouseup', up);
 
   function setMouseTilt(x, y){
-    // 屏幕中心为 0，左右 ±1
+    // Screen center = 0, edges at ±1
     const nx = (x / window.innerWidth  - 0.5) * 2;
     const ny = (y / window.innerHeight - 0.5) * 2;
-    tiltTargetY =  nx * TILT_Y_AMP;   // 鼠标在右 → 球面向右转一点
-    tiltTargetX = -ny * TILT_X_AMP;   // 鼠标在下 → 球面向下俯一点（-ny 让方向更自然）
+    // cursor right → sphere yaws right a little
+    // cursor down → sphere pitches down a little (-ny makes the direction feel natural)
     if(!tiltAnimating){ tiltAnimating = true; requestAnimationFrame(tickTilt); }
   }
   function tickTilt(){
@@ -1307,7 +1307,7 @@ const WORKS = [
     if(e.key === 'ArrowDown'){  camLat = clamp(camLat + K, ROW_MIN * STEP_DEG, ROW_MAX * STEP_DEG); render(); }
   });
 
-  // 入场：从一个稍微偏的角度滑回中心
+  // Entrance: glide back to center from a slightly offset angle
   setTimeout(() => {
     document.getElementById('splash').classList.add('hide');
     setTimeout(() => {
@@ -1329,7 +1329,7 @@ const WORKS = [
   }, 800);
 })();
 
-// ====== 时钟 ======
+// ====== Clock ======
 function updateClock(){
   const now = new Date();
   const h = String(now.getHours()).padStart(2, '0');
@@ -1342,7 +1342,7 @@ function updateClock(){
 }
 updateClock(); setInterval(updateClock, 30000);
 
-// ====== 二级页面 / 路由 ======
+// ====== Detail overlay / routing ======
 const overlays = {
   about:   document.getElementById('overlay-about'),
   cv:      document.getElementById('overlay-cv'),
@@ -1362,7 +1362,7 @@ function renderDetail(id){
   const prev = WORKS[(idx - 1 + WORKS.length) % WORKS.length];
   const next = WORKS[(idx + 1) % WORKS.length];
   detailContent.innerHTML = `
-    <div class="detail-num">作品 ${w.id} · ${w.year}</div>
+    <div class="detail-num">Work ${w.id} · ${w.year}</div>
     <div class="detail-brand">${w.brand}</div>
     <h1 class="detail-title">${w.title}</h1>
     <div class="detail-tags">${detailTagsHTML(w.tags)}</div>
@@ -1377,11 +1377,11 @@ function renderDetail(id){
     </div>
     <div class="detail-nav">
       <a data-nav-to="work/${prev.id}">
-        <span class="label">← 上一件</span>
+        <span class="label">← Previous</span>
         <span>${prev.title}</span>
       </a>
       <a data-nav-to="work/${next.id}" class="next">
-        <span class="label">下一件 →</span>
+        <span class="label">Next →</span>
         <span>${next.title}</span>
       </a>
     </div>`;
